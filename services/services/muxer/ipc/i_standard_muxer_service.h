@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ public:
     virtual int32_t WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info) = 0;
     virtual int32_t Stop() = 0;
     virtual void Release() = 0;
-	virtual int32_t DestroyStub() = 0;
+    virtual int32_t DestroyStub() = 0;
 
     enum MuxerServiceMsg {
         INIT_PARAMETER = 0,

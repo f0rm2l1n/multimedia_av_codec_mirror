@@ -13,7 +13,7 @@
       "name": "av_codec",
       "subsystem": "multimedia",
       "syscap": [
-        "SystemCapability.Multimedia.Media.AVMuxer"
+        "SystemCapability.Multimedia.Media.Muxer"
       ],
       "features": [],
       "adapted_system_type": [ "standard" ],

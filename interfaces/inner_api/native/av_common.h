@@ -144,7 +144,7 @@ enum StateChangeReason {
  * @since 10
  * @version 4.0
  */
-enum OutputFormat : uint32_t{
+enum OutputFormat : uint32_t {
     /**
      * output format default mp4
     */

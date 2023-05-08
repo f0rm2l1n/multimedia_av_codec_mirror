@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,11 +37,11 @@ namespace OHOS {
 namespace Media {
 const std::map<uint32_t, std::set<std::string_view>> MUX_FORMAT_INFO = {
     {OUTPUT_FORMAT_MPEG_4, {CodecMimeType::AUDIO_MPEG, CodecMimeType::AUDIO_AAC,
-                                CodecMimeType::VIDEO_AVC, CodecMimeType::VIDEO_MPEG4,
-                                CodecMimeType::IMAGE_JPG, CodecMimeType::IMAGE_PNG, CodecMimeType::IMAGE_BMP}},
-    {OUTPUT_FORMAT_M4A, {CodecMimeType::AUDIO_AAC,
                             CodecMimeType::VIDEO_AVC, CodecMimeType::VIDEO_MPEG4,
                             CodecMimeType::IMAGE_JPG, CodecMimeType::IMAGE_PNG, CodecMimeType::IMAGE_BMP}},
+    {OUTPUT_FORMAT_M4A, {CodecMimeType::AUDIO_AAC,
+                         CodecMimeType::VIDEO_AVC, CodecMimeType::VIDEO_MPEG4,
+                         CodecMimeType::IMAGE_JPG, CodecMimeType::IMAGE_PNG, CodecMimeType::IMAGE_BMP}},
 };
 
 const std::map<std::string_view, std::set<std::string_view>> MUX_MIME_INFO = {
@@ -54,7 +54,8 @@ const std::map<std::string_view, std::set<std::string_view>> MUX_MIME_INFO = {
     {CodecMimeType::IMAGE_BMP, {MediaDescriptionKey::MD_KEY_WIDTH, MediaDescriptionKey::MD_KEY_HEIGHT}},
 };
 
-std::shared_ptr<IMuxerEngine> IMuxerEngineFactory::CreateMuxerEngine(int32_t appUid, int32_t appPid, int32_t fd, OutputFormat format)
+std::shared_ptr<IMuxerEngine> IMuxerEngineFactory::CreateMuxerEngine(
+    int32_t appUid, int32_t appPid, int32_t fd, OutputFormat format)
 {
     AVCodecTrace trace("IMuxerEngineFactory::CreateMuxerEngine");
     CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDWR) == O_RDWR, nullptr, "no permission to read and write fd");
@@ -71,7 +72,7 @@ MuxerEngineImpl::MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, Out
     AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
     muxer_ = Plugin::MuxerFactory::Instance().CreatePlugin(fd_, format_);
     if (muxer_ != nullptr && fd_ >= 0) {
-        state_ = INITIALIZED;
+        state_ = State::INITIALIZED;
         AVCODEC_LOGI("state_ is INITIALIZED");
     } else {
         AVCODEC_LOGE("state_ is UNINITIALIZED");
@@ -82,7 +83,7 @@ MuxerEngineImpl::~MuxerEngineImpl()
 {
     AVCODEC_LOGD("Destroy");
 
-    if (state_ == STARTED) {
+    if (state_ == State::STARTED) {
         que_.SetActive(false);
         StopThread();
     }
@@ -99,10 +100,10 @@ int32_t MuxerEngineImpl::SetLocation(float latitude, float longitude)
     AVCodecTrace trace("MuxerEngine::SetLocation");
     AVCODEC_LOGI("SetLocation");
     std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(state_ == INITIALIZED, AVCS_ERR_INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
         "The state is not INITIALIZED, the interface must be called after constructor and before Start(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
-    if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE || 
+    if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE ||
         longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
         AVCODEC_LOGW("Invalid GeoLocation, latitude must be greater than %{public}d and less than %{public}d,"
             "longitude must be greater than %{public}d and less than %{public}d",
@@ -118,10 +119,10 @@ int32_t MuxerEngineImpl::SetRotation(int32_t rotation)
     AVCodecTrace trace("MuxerEngine::SetRotation");
     AVCODEC_LOGI("SetRotation");
     std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(state_ == INITIALIZED, AVCS_ERR_INVALID_OPERATION,
+    CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
         "The state is not INITIALIZED, the interface must be called after constructor and before Start(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
-    if (rotation != VIDEO_ROTATION_0 && rotation != VIDEO_ROTATION_90 && 
+    if (rotation != VIDEO_ROTATION_0 && rotation != VIDEO_ROTATION_90 &&
         rotation != VIDEO_ROTATION_180 && rotation != VIDEO_ROTATION_270) {
         AVCODEC_LOGW("Invalid rotation: %{public}d, keep default 0", rotation);
         return AVCS_ERR_INVALID_VAL;
@@ -136,7 +137,7 @@ int32_t MuxerEngineImpl::AddTrack(int32_t &trackIndex, const MediaDescription &t
     AVCODEC_LOGI("AddTrack");
     std::unique_lock<std::mutex> lock(mutex_);
     trackIndex = ERR_TRACK_INDEX;
-    CHECK_AND_RETURN_RET_LOG(state_ == INITIALIZED, AVCS_ERR_INVALID_OPERATION,
+    CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
         "The state is not INITIALIZED, the interface must be called after constructor and before Start(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     std::string mimeType = {};
@@ -164,14 +165,14 @@ int32_t MuxerEngineImpl::Start()
     AVCodecTrace trace("MuxerEngine::Start");
     AVCODEC_LOGI("Start");
     std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(state_ == INITIALIZED, AVCS_ERR_INVALID_OPERATION,
+    CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
         "The state is not INITIALIZED, the interface must be called after AddTrack() and before WriteSampleBuffer(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
-    CHECK_AND_RETURN_RET_LOG(tracks_.size() > 0, AVCS_ERR_INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(tracks_.size() > 0, AVCS_ERR_INVALID_OPERATION,
         "The track count is error, count is %{public}d", tracks_.size());
     Plugin::Status ret = muxer_->Start();
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "Start failed");
-    state_ = STARTED;
+    state_ = State::STARTED;
     StartThread("muxer_write_loop");
 
     return AVCS_ERR_OK;
@@ -181,7 +182,7 @@ int32_t MuxerEngineImpl::WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampl
 {
     AVCodecTrace trace("MuxerEngine::WriteSampleBuffer");
     std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(state_ == STARTED, AVCS_ERR_INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED, the interface must be called after Start() and before Stop(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracks_.find(info.trackIndex) != tracks_.end(), AVCS_ERR_INVALID_VAL,
@@ -201,13 +202,13 @@ int32_t MuxerEngineImpl::Stop()
     AVCodecTrace trace("MuxerEngine::Stop");
     AVCODEC_LOGI("Stop");
     std::unique_lock<std::mutex> lock(mutex_);
-    if (state_ == STOPPED) {
+    if (state_ == State::STOPPED) {
         AVCODEC_LOGW("current state is STOPPED!");
         return AVCS_ERR_OK;
     }
-    CHECK_AND_RETURN_RET_LOG(state_ == STARTED, AVCS_ERR_INVALID_OPERATION,
+    CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED. The current state is %{public}s", ConvertStateToString(state_).c_str());
-    state_ = STOPPED;
+    state_ = State::STOPPED;
     que_.SetActive(false, false);
     cond_.wait(lock, [this] { return que_.Empty(); });
     StopThread();
@@ -361,7 +362,7 @@ bool MuxerEngineImpl::CheckKeys(std::string &mimeType, const MediaDescription &t
     }
 
     for (auto &key : it->second) {
-        if(!trackDesc.ContainKey(key)) {
+        if (!trackDesc.ContainKey(key)) {
             ret = false;
             AVCODEC_LOGE("the MediaDescriptionKey %{public}s not contained", key.data());
         }
@@ -369,25 +370,24 @@ bool MuxerEngineImpl::CheckKeys(std::string &mimeType, const MediaDescription &t
     return ret;
 }
 
-std::string MuxerEngineImpl::ConvertStateToString(int32_t state)
+std::string MuxerEngineImpl::ConvertStateToString(State state)
 {
     std::string stateInfo {};
-    switch (state)
-    {
-    case UNINITIALIZED:
-        stateInfo = "UNINITIALIZED";
-        break;
-    case INITIALIZED:
-        stateInfo = "INITIALIZED";
-        break;
-    case STARTED:
-        stateInfo = "STARTED";
-        break;
-    case STOPPED:
-        stateInfo = "STOPPED";
-        break;
-    default:
-        break;
+    switch (state) {
+        case State::UNINITIALIZED:
+            stateInfo = "UNINITIALIZED";
+            break;
+        case State::INITIALIZED:
+            stateInfo = "INITIALIZED";
+            break;
+        case State::STARTED:
+            stateInfo = "STARTED";
+            break;
+        case State::STOPPED:
+            stateInfo = "STOPPED";
+            break;
+        default:
+            break;
     }
     return stateInfo;
 }

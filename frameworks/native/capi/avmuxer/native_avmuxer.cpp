@@ -33,7 +33,8 @@ struct AVMuxerObject : public OH_AVMuxer {
     const std::shared_ptr<AVMuxer> muxer_;
 };
 
-struct OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format) {
+struct OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format)
+{
     CHECK_AND_RETURN_RET_LOG(fd >= 0, nullptr, "fd %{public}d is error!", fd);
     std::shared_ptr<AVMuxer> avmuxer = AVMuxerFactory::CreateAVMuxer(fd, static_cast<OutputFormat>(format));
     CHECK_AND_RETURN_RET_LOG(avmuxer != nullptr, nullptr, "create muxer failed!");
@@ -41,7 +42,8 @@ struct OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format) {
     return object;
 }
 
-OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer *muxer, float latitude, float longitude) {
+OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer *muxer, float latitude, float longitude)
+{
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
@@ -54,7 +56,8 @@ OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer *muxer, float latitude, float lon
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation) {
+OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation)
+{
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
@@ -67,7 +70,8 @@ OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation) {
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFormat *trackFormat) {
+OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFormat *trackFormat)
+{
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
     CHECK_AND_RETURN_RET_LOG(trackIndex != nullptr, AV_ERR_INVALID_VAL, "input track index is nullptr!");
@@ -83,7 +87,8 @@ OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFo
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer) {
+OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer)
+{
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
@@ -96,7 +101,9 @@ OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer) {
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer, uint32_t trackIndex, uint8_t *sampleBuffer, OH_AVCodecBufferAttr info) {
+OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer,
+    uint32_t trackIndex, uint8_t *sampleBuffer, OH_AVCodecBufferAttr info)
+{
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
@@ -115,7 +122,8 @@ OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer, uint32_t trackIndex
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer) {
+OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer)
+{
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
@@ -128,7 +136,8 @@ OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer) {
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVMuxer_Destroy(OH_AVMuxer *muxer) {
+OH_AVErrCode OH_AVMuxer_Destroy(OH_AVMuxer *muxer)
+{
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
 

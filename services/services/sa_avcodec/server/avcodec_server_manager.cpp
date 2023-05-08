@@ -161,29 +161,9 @@ void AVCodecServerManager::DestroyStubObject(StubType type, sptr<IRemoteObject> 
     pid_t pid = IPCSkeleton::GetCallingPid();
     DestroyDumper(type, object);
     
-    auto compare_func = [object](std::pair<sptr<IRemoteObject>, pid_t> objectPair) -> bool { return objectPair.first == object; };
+    auto compare_func = [object](std::pair<sptr<IRemoteObject>, pid_t> objectPair) ->
+        bool { return objectPair.first == object; };
     switch (type) {
-        case CODEC: {
-            auto it = find_if(codecStubMap_.begin(), codecStubMap_.end(), compare_func);
-            if (it != codecStubMap_.end()) {
-                AVCODEC_LOGD("destroy codec stub services(%{public}zu) pid(%{public}d).", codecStubMap_.size(), pid);
-                (void)codecStubMap_.erase(it);
-                return;
-            }
-            AVCODEC_LOGE("find codec object failed, pid(%{public}d).", pid);
-            break;
-        }
-        case CODECLIST: {
-            auto it = find_if(codecListStubMap_.begin(), codecListStubMap_.end(), compare_func);
-            if (it != codecListStubMap_.end()) {
-                AVCODEC_LOGD("destroy codeclist stub services(%{public}zu) pid(%{public}d).",
-                    codecListStubMap_.size(), pid);
-                (void)codecListStubMap_.erase(it);
-                return;
-            }
-            AVCODEC_LOGE("find codeclist object failed, pid(%{public}d).", pid);
-            break;
-        }
         case MUXER: {
             auto it = find_if(muxerStubMap_.begin(), muxerStubMap_.end(), compare_func);
             if (it != muxerStubMap_.end()) {
@@ -193,27 +173,6 @@ void AVCodecServerManager::DestroyStubObject(StubType type, sptr<IRemoteObject> 
                 return;
             }
             AVCODEC_LOGE("find muxer object failed, pid(%{public}d).", pid);
-            break;
-        }
-        case DEMUXER: {
-            auto it = find_if(demuxerStubMap_.begin(), demuxerStubMap_.end(), compare_func);
-            if (it != demuxerStubMap_.end()) {
-                AVCODEC_LOGD("destroy demuxer stub services(%{public}zu) pid(%{public}d).",
-                    demuxerStubMap_.size(), pid);
-                (void)demuxerStubMap_.erase(it);
-                return;
-            }
-            AVCODEC_LOGE("find demuxer object failed, pid(%{public}d).", pid);
-            break;
-        }
-        case SOURCE: {
-            auto it = find_if(sourceStubMap_.begin(), sourceStubMap_.end(), compare_func);
-            if (it != sourceStubMap_.end()) {
-                AVCODEC_LOGD("destroy source stub services(%{public}zu) pid(%{public}d).", sourceStubMap_.size(), pid);
-                (void)sourceStubMap_.erase(it);
-                return;
-            }
-            AVCODEC_LOGE("find demuxer object failed, pid(%{public}d).", pid);
             break;
         }
         default: {
@@ -226,28 +185,6 @@ void AVCodecServerManager::DestroyStubObject(StubType type, sptr<IRemoteObject> 
 void AVCodecServerManager::DestroyStubObjectForPid(pid_t pid)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    AVCODEC_LOGD("codec stub services(%{public}zu) pid(%{public}d).", codecStubMap_.size(), pid);
-    for (auto it = codecStubMap_.begin(); it != codecStubMap_.end();) {
-        if (it->second == pid) {
-            executor_.Commit(it->first);
-            it = codecStubMap_.erase(it);
-        } else {
-            it++;
-        }
-    }
-    AVCODEC_LOGD("codec stub services(%{public}zu).", codecStubMap_.size());
-
-    AVCODEC_LOGD("codeclist stub services(%{public}zu) pid(%{public}d).", codecListStubMap_.size(), pid);
-    for (auto it = codecListStubMap_.begin(); it != codecListStubMap_.end();) {
-        if (it->second == pid) {
-            executor_.Commit(it->first);
-            it = codecListStubMap_.erase(it);
-        } else {
-            it++;
-        }
-    }
-    AVCODEC_LOGD("codeclist stub services(%{public}zu).", codecListStubMap_.size());
-
     AVCODEC_LOGD("muxer stub services(%{public}zu) pid(%{public}d).", muxerStubMap_.size(), pid);
     for (auto it = muxerStubMap_.begin(); it != muxerStubMap_.end();) {
         if (it->second == pid) {
@@ -258,28 +195,6 @@ void AVCodecServerManager::DestroyStubObjectForPid(pid_t pid)
         }
     }
     AVCODEC_LOGD("muxer stub services(%{public}zu).", muxerStubMap_.size());
-
-    AVCODEC_LOGD("demuxer stub services(%{public}zu) pid(%{public}d).", demuxerStubMap_.size(), pid);
-    for (auto it = demuxerStubMap_.begin(); it != demuxerStubMap_.end();) {
-        if (it->second == pid) {
-            executor_.Commit(it->first);
-            it = demuxerStubMap_.erase(it);
-        } else {
-            it++;
-        }
-    }
-    AVCODEC_LOGD("demuxer stub services(%{public}zu).", demuxerStubMap_.size());
-
-    AVCODEC_LOGD("source stub services(%{public}zu) pid(%{public}d).", sourceStubMap_.size(), pid);
-    for (auto it = sourceStubMap_.begin(); it != sourceStubMap_.end();) {
-        if (it->second == pid) {
-            executor_.Commit(it->first);
-            it = sourceStubMap_.erase(it);
-        } else {
-            it++;
-        }
-    }
-    AVCODEC_LOGD("source stub services(%{public}zu).", sourceStubMap_.size());
 
     executor_.Clear();
 }

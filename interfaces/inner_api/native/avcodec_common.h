@@ -56,7 +56,6 @@ struct AVCodecBufferInfo {
     int32_t size = 0;
     /* The start-offset of the data in the buffer */
     int32_t offset = 0;
-
 };
 
 struct AVBufferElement {
@@ -126,19 +125,21 @@ private:
 
 class AVSourceFormat {
 public:
-    static constexpr std::string_view SOURCE_TITLE         = "title";            //< string
-    static constexpr std::string_view SOURCE_ARTIST        = "artist";           //< std::string, artist
-    static constexpr std::string_view SOURCE_ALBUM         = "album";            //< std::string, album
-    static constexpr std::string_view SOURCE_ALBUM_ARTIST  = "album_artist";     //< std::string, album artist
-    static constexpr std::string_view SOURCE_DATE          = "date";             //< std::string, media date, format：YYYY-MM-DD
-    static constexpr std::string_view SOURCE_COMMENT       = "comment";          //< std::string, comment
-    static constexpr std::string_view SOURCE_GENRE         = "genre";            //< std::string, genre
-    static constexpr std::string_view SOURCE_COPYRIGHT     = "copyright";        //< std::string, copyright
-    static constexpr std::string_view SOURCE_LANGUAGE      = "language";         //< std::string, language
-    static constexpr std::string_view SOURCE_DESCRIPTION   = "description";      //< std::string, description
-    static constexpr std::string_view SOURCE_LYRICS        = "lyrics";           //< std::string, cyrics
-    static constexpr std::string_view SOURCE_DURATION      = "duration";         //< int64_t, duration based on {@link HST_TIME_BASE}
-    static constexpr std::string_view SOURCE_TYPE          = "type";             //< std::string, sourece type
+    static constexpr std::string_view SOURCE_TITLE         = "title";            // string
+    static constexpr std::string_view SOURCE_ARTIST        = "artist";           // std::string, artist
+    static constexpr std::string_view SOURCE_ALBUM         = "album";            // std::string, album
+    static constexpr std::string_view SOURCE_ALBUM_ARTIST  = "album_artist";     // std::string, album artist
+    static constexpr std::string_view SOURCE_DATE          = "date";             // std::string, media date,
+                                                                                 // format: YYYY-MM-DD
+    static constexpr std::string_view SOURCE_COMMENT       = "comment";          // std::string, comment
+    static constexpr std::string_view SOURCE_GENRE         = "genre";            // std::string, genre
+    static constexpr std::string_view SOURCE_COPYRIGHT     = "copyright";        // std::string, copyright
+    static constexpr std::string_view SOURCE_LANGUAGE      = "language";         // std::string, language
+    static constexpr std::string_view SOURCE_DESCRIPTION   = "description";      // std::string, description
+    static constexpr std::string_view SOURCE_LYRICS        = "lyrics";           // std::string, cyrics
+    static constexpr std::string_view SOURCE_DURATION      = "duration";         // int64_t, duration based on
+                                                                                 // {@link HST_TIME_BASE}
+    static constexpr std::string_view SOURCE_TYPE          = "type";             // std::string, sourece type
 private:
     AVSourceFormat() = delete;
     ~AVSourceFormat() = delete;
@@ -168,7 +169,6 @@ enum VideoBitStreamFormat {
     HVCC,
     ANNEXB
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_COMMOM_H

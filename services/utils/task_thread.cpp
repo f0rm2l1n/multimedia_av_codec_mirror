@@ -21,7 +21,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Ta
 }
 namespace OHOS {
 namespace Media {
-
 TaskThread::TaskThread(std::string_view name) : name_(name), runningState_(RunningState::STOPPED), loop_(nullptr)
 {
     AVCODEC_LOGD("task %{public}s ctor called", name_.data());
@@ -91,23 +90,23 @@ void TaskThread::Pause()
     AVCODEC_LOGD("task %{public}s Pause called", name_.data());
     std::unique_lock lock(stateMutex_);
     switch (runningState_.load()) {
-    case RunningState::STARTED: {
-        runningState_ = RunningState::PAUSING;
-        syncCond_.wait(lock, [this] {
-            return runningState_.load() == RunningState::PAUSED || runningState_.load() == RunningState::STOPPED;
-        });
-        break;
-    }
-    case RunningState::STOPPING: {
-        syncCond_.wait(lock, [this] { return runningState_.load() == RunningState::STOPPED; });
-        break;
-    }
-    case RunningState::PAUSING: {
-        syncCond_.wait(lock, [this] { return runningState_.load() == RunningState::PAUSED; });
-        break;
-    }
-    default:
-        break;
+        case RunningState::STARTED: {
+            runningState_ = RunningState::PAUSING;
+            syncCond_.wait(lock, [this] {
+                return runningState_.load() == RunningState::PAUSED || runningState_.load() == RunningState::STOPPED;
+            });
+            break;
+        }
+        case RunningState::STOPPING: {
+            syncCond_.wait(lock, [this] { return runningState_.load() == RunningState::STOPPED; });
+            break;
+        }
+        case RunningState::PAUSING: {
+            syncCond_.wait(lock, [this] { return runningState_.load() == RunningState::PAUSED; });
+            break;
+        }
+        default:
+            break;
     }
     AVCODEC_LOGD("task %{public}s Pause done.", name_.data());
 }
@@ -154,6 +153,5 @@ void TaskThread::Run()
         }
     }
 }
-
 } // namespace Media
 } // namespace OHOS

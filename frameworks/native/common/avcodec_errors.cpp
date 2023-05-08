@@ -239,6 +239,5 @@ OH_AVErrCode AVCSErrorToOHAVErrCode(AVCodecServiceErrCode code)
 
     return AV_ERR_UNKNOWN;
 }
-
 } // namespace Media
 } // namespace OHOS

@@ -27,12 +27,8 @@ config("plugin_presets") {
     "//third_party/bounds_checking_function/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
-
 }
 
 group("av_codec_plugin") {
-  deps = [
-    "plugins:av_codec_plugin_store",
-  ]
+  deps = [ "plugins:av_codec_plugin_store" ]
 }
-

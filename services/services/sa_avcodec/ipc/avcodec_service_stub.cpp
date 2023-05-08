@@ -145,6 +145,5 @@ int32_t AVCodecServiceStub::GetSystemAbility(MessageParcel &data, MessageParcel 
         "AVCodecServiceStub::GetSystemAbility");
     return AVCS_ERR_OK;
 }
-
 } // namespace Media
 } // namespace OHOS

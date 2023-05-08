@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -150,7 +150,8 @@ int32_t MuxerServiceStub::InitParameter(MessageParcel &data, MessageParcel &repl
 {
     int32_t fd = data.ReadFileDescriptor();
     OutputFormat format = static_cast<OutputFormat>(data.ReadInt32());
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitParameter(fd, format)), AVCS_ERR_UNKNOWN, "Reply InitParameter failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitParameter(fd, format)), AVCS_ERR_UNKNOWN,
+        "Reply InitParameter failed!");
     return AVCS_ERR_OK;
 }
 

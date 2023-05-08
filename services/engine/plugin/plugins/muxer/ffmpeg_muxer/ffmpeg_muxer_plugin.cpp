@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -193,7 +193,7 @@ Status FFmpegMuxerPlugin::SetCodecParameterOfTrack(AVStream *stream, const Media
         CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get audio sample_rate failed!");
         ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, par->channels); // channels
         CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get audio channels failed!");
-    } else if(!mimeType.compare(0, mimeTypeLen, "video") || !mimeType.compare(0, mimeTypeLen, "image")) {
+    } else if (!mimeType.compare(0, mimeTypeLen, "video") || !mimeType.compare(0, mimeTypeLen, "image")) {
         if (!mimeType.compare(0, mimeTypeLen, "image")) { // pic
             stream->disposition = AV_DISPOSITION_ATTACHED_PIC;
         }
@@ -202,7 +202,7 @@ Status FFmpegMuxerPlugin::SetCodecParameterOfTrack(AVStream *stream, const Media
         CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get video width failed!");
         ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, par->height); // height
         CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get video height failed!");
-    } else{
+    } else {
         AVCODEC_LOGD("mimeType %{public}s is unsupported", mimeType.c_str());
     }
     
@@ -276,8 +276,10 @@ Status FFmpegMuxerPlugin::Stop()
 
 Status FFmpegMuxerPlugin::WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info)
 {
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr, Status::ERROR_NULL_POINTER, "av_write_frame sampleBuffer is null!");
-    CHECK_AND_RETURN_RET_LOG(info.trackIndex < formatContext_->nb_streams, Status::ERROR_INVALID_PARAMETER, "track index is invalid!");
+    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr, Status::ERROR_NULL_POINTER,
+        "av_write_frame sampleBuffer is null!");
+    CHECK_AND_RETURN_RET_LOG(info.trackIndex < formatContext_->nb_streams,
+        Status::ERROR_INVALID_PARAMETER, "track index is invalid!");
     (void)memset_s(cachePacket_.get(), sizeof(AVPacket), 0, sizeof(AVPacket));
     cachePacket_->data = sampleBuffer;
     cachePacket_->size = info.size;
@@ -405,7 +407,8 @@ int64_t FFmpegMuxerPlugin::IoSeek(void *opaque, int64_t offset, int whence)
     return newPos;
 }
 
-int32_t FFmpegMuxerPlugin::IoOpen(AVFormatContext *s, AVIOContext **pb, const char *url, int flags, AVDictionary **options)
+int32_t FFmpegMuxerPlugin::IoOpen(AVFormatContext *s, AVIOContext **pb,
+                                  const char *url, int flags, AVDictionary **options)
 {
     AVCODEC_LOGD("IoOpen flags %{public}d", flags);
     *pb = InitAvIoCtx(static_cast<IOContext*>(s->pb->opaque)->fd_, 0);

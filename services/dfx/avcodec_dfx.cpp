@@ -29,7 +29,7 @@ namespace {
 
 namespace OHOS {
 namespace Media {
-bool AVCodecEvent::CreateMsg(const char *format, ...) 
+bool AVCodecEvent::CreateMsg(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -44,8 +44,8 @@ bool AVCodecEvent::CreateMsg(const char *format, ...)
     return true;
 }
 
-void AVCodecEvent::StatisticEventWrite(std::string eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module) 
+void AVCodecEvent::StatisticEventWrite(std::string eventName,
+    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
 {
     int32_t pid = getpid();
     uint32_t uid = getuid();
@@ -56,8 +56,8 @@ void AVCodecEvent::StatisticEventWrite(std::string eventName, OHOS::HiviewDFX::H
         "MSG", msg_);
 }
 
-void AVCodecEvent::BehaviorEventWrite(std::string eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module) 
+void AVCodecEvent::BehaviorEventWrite(std::string eventName,
+    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
 {
     int32_t pid = getpid();
     uint32_t uid = getuid();
@@ -68,8 +68,8 @@ void AVCodecEvent::BehaviorEventWrite(std::string eventName, OHOS::HiviewDFX::Hi
         "STATE", msg_);
 }
 
-void AVCodecEvent::FaultEventWrite(std::string eventName, int32_t errorCode, OHOS::HiviewDFX::HiSysEvent::EventType type,
-    std::string module) 
+void AVCodecEvent::FaultEventWrite(std::string eventName, int32_t errorCode,
+    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
 {
     int32_t pid = getpid();
     uint32_t uid = getuid();
@@ -81,7 +81,7 @@ void AVCodecEvent::FaultEventWrite(std::string eventName, int32_t errorCode, OHO
         "MSG", msg_);
 }
 
-void BehaviorEventWrite(std::string status, std::string moudle) 
+void BehaviorEventWrite(std::string status, std::string moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s, current state is: %s", "state change", status.c_str())) {
@@ -91,7 +91,7 @@ void BehaviorEventWrite(std::string status, std::string moudle)
     }
 }
 
-void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle) 
+void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s", msg.c_str())) {
@@ -111,33 +111,32 @@ void StatisticEventWrite(std::string msg, std::string moudle)
     }
 }
 
-AVCodecTrace::AVCodecTrace(const std::string &funcName) 
+AVCodecTrace::AVCodecTrace(const std::string &funcName)
 {
     StartTrace(HITRACE_TAG_ZMEDIA, funcName);
     isSync_ = true;
 }
 
-void AVCodecTrace::TraceBegin(const std::string &funcName, int32_t taskId) 
+void AVCodecTrace::TraceBegin(const std::string &funcName, int32_t taskId)
 {
     StartAsyncTrace(HITRACE_TAG_ZMEDIA, funcName, taskId);
 }
 
-void AVCodecTrace::TraceEnd(const std::string &funcName, int32_t taskId) 
+void AVCodecTrace::TraceEnd(const std::string &funcName, int32_t taskId)
 {
     FinishAsyncTrace(HITRACE_TAG_ZMEDIA, funcName, taskId);
 }
 
-void AVCodecTrace::CounterTrace(const std::string &varName, int32_t val) 
+void AVCodecTrace::CounterTrace(const std::string &varName, int32_t val)
 {
     CountTrace(HITRACE_TAG_ZMEDIA, varName, val);
 }
 
-AVCodecTrace::~AVCodecTrace() 
+AVCodecTrace::~AVCodecTrace()
 {
     if (isSync_) {
         FinishTrace(HITRACE_TAG_ZMEDIA);
     }
 }
-
 } // namespace Media
 } // namespace OHOS

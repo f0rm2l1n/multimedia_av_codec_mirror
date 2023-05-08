@@ -50,9 +50,9 @@ private:
     do {                                                                            \
         (void)OHOS::Media::AVCodecLogDump::GetInstance().SaveLog(                   \
             "{%s():%d} " fmt, __FUNCTION__, __LINE__, ##args);                      \
-    } while (0);
+    } while (0)
 #else
-#define AVCODEC_DUMP_LOG(fmt, args...) ;
+#define AVCODEC_DUMP_LOG(fmt, args...)
 #endif
 } // namespace Media
 } // namespace OHOS

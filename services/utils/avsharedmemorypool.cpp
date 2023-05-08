@@ -51,9 +51,9 @@ int32_t AVSharedMemoryPool::Init(const InitializeOption &option)
     }
 
     AVCODEC_LOGI("name: %{public}s, init option: preAllocMemCnt = %{public}u, memSize = %{public}d, "
-               "maxMemCnt = %{public}u, enableFixedSize = %{public}d",
-               name_.c_str(), option_.preAllocMemCnt, option_.memSize, option_.maxMemCnt,
-               option_.enableFixedSize);
+                 "maxMemCnt = %{public}u, enableFixedSize = %{public}d",
+                 name_.c_str(), option_.preAllocMemCnt, option_.memSize, option_.maxMemCnt,
+                 option_.enableFixedSize);
     bool ret = true;
     for (uint32_t i = 0; i < option_.preAllocMemCnt; ++i) {
         auto memory = AllocMemory(option_.memSize);
@@ -186,7 +186,7 @@ bool AVSharedMemoryPool::CheckSize(int32_t size)
 std::shared_ptr<AVSharedMemory> AVSharedMemoryPool::AcquireMemory(int32_t size, bool blocking)
 {
     AVCODEC_LOGD("acquire memory for size: %{public}d from pool %{public}s, blocking: %{public}d",
-               size, name_.c_str(), blocking);
+                 size, name_.c_str(), blocking);
 
     std::unique_lock<std::mutex> lock(mutex_);
     if (!CheckSize(size)) {

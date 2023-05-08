@@ -58,7 +58,6 @@ config("av_codec_service_config") {
 
     "//foundation/graphic/graphic_2d/interfaces/inner_api",
     "//third_party/ffmpeg",
-
   ]
 
   if (target_cpu == "arm64") {
@@ -99,7 +98,7 @@ ohos_shared_library("av_codec_service") {
     cfi_cross_dso = true
     debug = true
   }
-  
+
   configs = [
     ":av_codec_service_config",
     "$av_codec_root_dir/services/dfx:av_codec_service_log_dfx_public_config",
@@ -107,16 +106,16 @@ ohos_shared_library("av_codec_service") {
 
   sources = [
     "$av_codec_root_dir/frameworks/native/common/avcodec_errors.cpp",
+    "$av_codec_root_dir/services/engine/muxer/muxer_engine_impl.cpp",
+    "$av_codec_root_dir/services/engine/plugin/core/muxer.cpp",
+    "$av_codec_root_dir/services/engine/plugin/core/muxer_factory.cpp",
+    "$av_codec_root_dir/services/engine/plugin/core/plugin_loader.cpp",
     "common/avsharedmemory_ipc.cpp",
     "sa_avcodec/ipc/avcodec_listener_proxy.cpp",
     "sa_avcodec/ipc/avcodec_parcel.cpp",
     "sa_avcodec/ipc/avcodec_service_stub.cpp",
     "sa_avcodec/server/avcodec_server.cpp",
     "sa_avcodec/server/avcodec_server_manager.cpp",
-    "$av_codec_root_dir/services/engine/muxer/muxer_engine_impl.cpp",
-    "$av_codec_root_dir/services/engine/plugin/core/muxer_factory.cpp",
-    "$av_codec_root_dir/services/engine/plugin/core/muxer.cpp",
-    "$av_codec_root_dir/services/engine/plugin/core/plugin_loader.cpp",
   ]
 
   if (multimedia_av_codec_support_muxer) {
@@ -125,21 +124,21 @@ ohos_shared_library("av_codec_service") {
       "muxer/server/muxer_server.cpp",
     ]
   }
-  
+
   deps = [
     "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
+    "$av_codec_root_dir/services/engine:av_codec_engine_package",
     "$av_codec_root_dir/services/utils:av_codec_format",
     "$av_codec_root_dir/services/utils:av_codec_service_utils",
-    "$av_codec_root_dir/services/engine:av_codec_engine_package",
     "//third_party/ffmpeg:libohosffmpeg",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "ipc:ipc_single",
-    "hiviewdfx_hilog_native:libhilog",
-    "safwk:system_ability_fwk",
     "graphic_standard:surface",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
   ]
 
   subsystem_name = "multimedia"

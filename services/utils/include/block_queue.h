@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,7 +67,7 @@ public:
             condFull_.wait(lock, [this] { return !isActive_ || que_.size() < capacity_; });
         }
         if (!isActive_) {
-            AVCODEC_LOGD("block queue %{public}s: inactive: %{public}d, isFull: %{public}d.", 
+            AVCODEC_LOGD("block queue %{public}s: inactive: %{public}d, isFull: %{public}d.",
                 name_.c_str(), isActive_.load(), que_.size() < capacity_);
             return false;
         }

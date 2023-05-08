@@ -72,11 +72,7 @@ private:
         std::mutex listMutex_;
     };
 
-    std::map<sptr<IRemoteObject>, pid_t> demuxerStubMap_;
     std::map<sptr<IRemoteObject>, pid_t> muxerStubMap_;
-    std::map<sptr<IRemoteObject>, pid_t> codecStubMap_;
-    std::map<sptr<IRemoteObject>, pid_t> codecListStubMap_;
-    std::map<sptr<IRemoteObject>, pid_t> sourceStubMap_;
     std::map<StubType, std::vector<Dumper>> dumperTbl_;
     AsyncExecutor executor_;
 

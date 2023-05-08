@@ -28,7 +28,7 @@ ohos_shared_library("av_codec_service_dfx") {
     debug = false
   }
 
-  sources = [ 
+  sources = [
     "avcodec_dfx.cpp",
     "avcodec_log_dump.cpp",
     "avcodec_xcollie.cpp",

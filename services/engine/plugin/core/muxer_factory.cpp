@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ MuxerFactory::MuxerFactory()
     RegisterPlugins();
 }
 
-MuxerFactory::~MuxerFactory() 
+MuxerFactory::~MuxerFactory()
 {
     UnregisterAllPlugins();
 }
@@ -86,7 +86,7 @@ void MuxerFactory::RegisterDynamicPlugins(const char* libDirPath)
             }
             std::string libName = lib->d_name;
             AVCODEC_LOGD("libName %{public}s", libName.c_str());
-            if (libName.find(g_libFileHead) ||  
+            if (libName.find(g_libFileHead) ||
                 libName.find(g_fileMark) == std::string::npos ||
                 libName.compare(libName.size() - g_libFileTail.size(), g_libFileTail.size(), g_libFileTail)) {
                 continue;

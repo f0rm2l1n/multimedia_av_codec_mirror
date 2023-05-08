@@ -49,7 +49,7 @@ typedef enum OH_AVCodecBufferFlags {
 
 /**
  * @brief Enumerates the muxer ouputfile format
- * 
+ *
  * @since 10
  * @version 1.0
  */

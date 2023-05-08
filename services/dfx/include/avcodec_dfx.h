@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Media {
-
 class __attribute__((visibility("default"))) AVCodecEvent : public NoCopyable {
 public:
     AVCodecEvent() = default;
@@ -53,7 +52,6 @@ public:
 private:
     bool isSync_ = false;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_DFX_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,14 +24,7 @@
 extern "C" {
 #endif
 #include "libavcodec/avcodec.h"
-#include "libavutil/channel_layout.h"
 #include "libavutil/error.h"
-#include "libavutil/frame.h"
-#include "libavutil/imgutils.h"
-#include "libavutil/pixdesc.h"
-#include "libavutil/pixfmt.h"
-#include "libswresample/swresample.h"
-#include "libswscale/swscale.h"
 #ifdef __cplusplus
 };
 #endif

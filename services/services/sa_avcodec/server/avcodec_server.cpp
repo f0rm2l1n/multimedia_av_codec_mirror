@@ -64,14 +64,14 @@ sptr<IRemoteObject> AVCodecServer::GetSubSystemAbility(IStandardAVCodecService::
     
     switch (subSystemId) {
 #ifdef SUPPORT_MUXER
-    case AVCodecSystemAbility::AVCODEC_MUXER: {
-        return AVCodecServerManager::GetInstance().CreateStubObject(AVCodecServerManager::MUXER);
-    }
+        case AVCodecSystemAbility::AVCODEC_MUXER: {
+            return AVCodecServerManager::GetInstance().CreateStubObject(AVCodecServerManager::MUXER);
+        }
 #endif
-    default: {
-        AVCODEC_LOGE("subSystemId is invalid");
-        return nullptr;
-    }
+        default: {
+            AVCODEC_LOGE("subSystemId is invalid");
+            return nullptr;
+        }
     }
 }
 

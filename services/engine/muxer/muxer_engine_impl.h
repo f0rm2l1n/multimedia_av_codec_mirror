@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,13 @@ public:
     int32_t WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info) override;
     int32_t Stop() override;
     int32_t DumpInfo(int32_t fd) override;
+    
+    enum class State {
+        UNINITIALIZED,
+        INITIALIZED,
+        STARTED,
+        STOPPED
+    };
 
 private:
     int32_t StartThread(std::string name);
@@ -46,16 +53,9 @@ private:
     void DumpMediaDescription(int32_t fd, const MediaDescription &trackDesc);
     bool CanAddTrack(std::string &mimeType);
     bool CheckKeys(std::string &mimeType, const MediaDescription &trackDesc);
-    std::string ConvertStateToString(int32_t state);
+    std::string ConvertStateToString(State state);
     int32_t TranslatePluginStatus(Plugin::Status error);
 
-private:
-    enum State {
-        UNINITIALIZED,
-        INITIALIZED,
-        STARTED,
-        STOPPED
-    };
     struct BlockBuffer {
         std::shared_ptr<AVSharedMemory> buffer_;
         TrackSampleInfo info_;
@@ -65,7 +65,7 @@ private:
     int32_t appPid_ = -1;
     int64_t fd_ = -1;
     OutputFormat format_;
-    std::atomic<State> state_ = UNINITIALIZED;
+    std::atomic<State> state_ = State::UNINITIALIZED;
     std::shared_ptr<Plugin::Muxer> muxer_ = nullptr;
     std::map<int32_t, std::string> tracks_;
     std::map<int32_t, MediaDescription> mediaDescMap_;

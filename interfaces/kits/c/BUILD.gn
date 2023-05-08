@@ -17,9 +17,7 @@ import("//foundation/multimedia/av_codec/config.gni")
 group("capi_packages") {
   deps = []
   if (multimedia_av_codec_support_capi) {
-    deps += [
-      "$av_codec_root_dir/interfaces/kits/c:native_av_codec_avmuxer",
-    ]
+    deps += [ "$av_codec_root_dir/interfaces/kits/c:native_av_codec_avmuxer" ]
   }
 }
 
@@ -58,10 +56,9 @@ ohos_shared_library("native_av_codec_avmuxer") {
   install_enable = true
   sources = [
     "$av_codec_root_dir/frameworks/native/capi/avcodec/native_avcodec_base.cpp",
+    "$av_codec_root_dir/frameworks/native/capi/avmuxer/native_avmuxer.cpp",
     "$av_codec_root_dir/frameworks/native/capi/common/native_avformat.cpp",
     "$av_codec_root_dir/frameworks/native/capi/common/native_avmemory.cpp",
-    "$av_codec_root_dir/frameworks/native/capi/avmuxer/native_avmuxer.cpp",
-
   ]
 
   public_configs = [ ":av_codec_capi_config" ]

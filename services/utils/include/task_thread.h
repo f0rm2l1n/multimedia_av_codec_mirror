@@ -65,7 +65,6 @@ private:
     std::mutex stateMutex_;
     std::condition_variable syncCond_;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif

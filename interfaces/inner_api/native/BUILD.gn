@@ -98,12 +98,12 @@ ohos_shared_library("av_codec_client") {
   ]
 
   sources = [
-      "$av_codec_root_dir/frameworks/native/common/avcodec_errors.cpp",
-      "$av_codec_root_dir/services/services/common/avsharedmemory_ipc.cpp",
-      "$av_codec_root_dir/services/services/sa_avcodec/client/avcodec_client.cpp",
-      "$av_codec_root_dir/services/services/sa_avcodec/ipc/avcodec_listener_stub.cpp",
-      "$av_codec_root_dir/services/services/sa_avcodec/ipc/avcodec_parcel.cpp",
-      "$av_codec_root_dir/services/services/sa_avcodec/ipc/avcodec_service_proxy.cpp",
+    "$av_codec_root_dir/frameworks/native/common/avcodec_errors.cpp",
+    "$av_codec_root_dir/services/services/common/avsharedmemory_ipc.cpp",
+    "$av_codec_root_dir/services/services/sa_avcodec/client/avcodec_client.cpp",
+    "$av_codec_root_dir/services/services/sa_avcodec/ipc/avcodec_listener_stub.cpp",
+    "$av_codec_root_dir/services/services/sa_avcodec/ipc/avcodec_parcel.cpp",
+    "$av_codec_root_dir/services/services/sa_avcodec/ipc/avcodec_service_proxy.cpp",
   ]
 
   if (multimedia_av_codec_support_muxer) {
@@ -113,19 +113,19 @@ ohos_shared_library("av_codec_client") {
       "$av_codec_root_dir/services/services/muxer/ipc/muxer_service_proxy.cpp",
     ]
   }
-  
+
   deps = [
-      "$av_codec_root_dir/services/utils:av_codec_format",
-      "//third_party/bounds_checking_function:libsec_static",
-      "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
+    "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
+    "$av_codec_root_dir/services/utils:av_codec_format",
+    "//third_party/bounds_checking_function:libsec_static",
   ]
 
   external_deps = [
-      "c_utils:utils",
-      "hiviewdfx_hilog_native:libhilog",
-      "graphic_standard:surface",
-      "ipc:ipc_single",
-      "samgr:samgr_proxy",
+    "c_utils:utils",
+    "graphic_standard:surface",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "multimedia"

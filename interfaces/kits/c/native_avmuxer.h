@@ -31,7 +31,7 @@ typedef struct OH_AVMuxer OH_AVMuxer;
 
 /**
  * @brief Create an OH_AVMuxer instance by output file handler and format.
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param fd Must be opened with read and write permission. Caller is responsible for closing fd.
  * @param format The output format is {@link OH_AVOutputFormat} .
  * @return Returns a pointer to an OH_AVMuxer instance, needs to be freed by OH_AVMuxer_Destroy.
@@ -41,11 +41,11 @@ typedef struct OH_AVMuxer OH_AVMuxer;
 OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format);
 
 /**
- * @brief Set and store the location to the output file. 
+ * @brief Set and store the location to the output file.
  * Note: This interface can only be called before OH_AVMuxer_Start.
- * The location is stored in the output file if the output format is {@link OH_AVOutputFormat} 
- * AV_OUTPUT_FORMAT_MPEG_4, and is ignored for other output formats. 
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * The location is stored in the output file if the output format is {@link OH_AVOutputFormat}
+ * AV_OUTPUT_FORMAT_MPEG_4, and is ignored for other output formats.
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance.
  * @param latitude Must be in the range [-90, 90].
  * @param longitude Must be in the range [-180, 180].
@@ -57,9 +57,9 @@ OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format);
 OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer *muxer, float latitude, float longitude);
 
 /**
- * @brief Set the rotation for output video playback. 
+ * @brief Set the rotation for output video playback.
  * Note: This interface can only be called before OH_AVMuxer_Start.
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance.
  * @param rotation The supported angles are 0, 90, 180, and 270 degrees.  {@link OH_VideoRotation}
  * @return Returns AV_ERR_OK if the execution is successful,
@@ -70,9 +70,9 @@ OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer *muxer, float latitude, float lon
 OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation);
 
 /**
- * @brief Add track format to the muxer. 
+ * @brief Add track format to the muxer.
  * Note: This interface can only be called before OH_AVMuxer_Start.
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance
  * @param trackIndex The int32_t handle pointer used to get the track index for this newly added track,
  * and it should be used in the OH_AVMuxer_WriteSampleBuffer. The track index is greater than or equal to 0,
@@ -86,9 +86,9 @@ OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation);
 OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFormat *trackFormat);
 
 /**
- * @brief Start the muxer. 
+ * @brief Start the muxer.
  * Note: This interface is called after OH_AVMuxer_AddTrack and before OH_AVMuxer_WriteSampleBuffer.
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
@@ -98,11 +98,11 @@ OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFo
 OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer);
 
 /**
- * @brief Write an encoded sample to the muxer. 
- * Note: This interface can only be called after OH_AVMuxer_Start and before OH_AVMuxer_Stop. The application needs to 
- * make sure that the samples are written to the right tacks. Also, it needs to make sure the samples for each track are 
- * written in chronological order. 
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * @brief Write an encoded sample to the muxer.
+ * Note: This interface can only be called after OH_AVMuxer_Start and before OH_AVMuxer_Stop. The application needs to
+ * make sure that the samples are written to the right tacks. Also, it needs to make sure the samples for each track are
+ * written in chronological order.
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance
  * @param trackIndex The track index for this sample
  * @param sampleBuffer The encoded sample buffer
@@ -112,12 +112,13 @@ OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer);
  * @since 10
  * @version 1.0
  */
-OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer, uint32_t trackIndex, uint8_t *sampleBuffer, OH_AVCodecBufferAttr info);
+OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer,
+    uint32_t trackIndex, uint8_t *sampleBuffer, OH_AVCodecBufferAttr info);
 
 /**
- * @brief Stop the muxer. 
+ * @brief Stop the muxer.
  * Note: Once the muxer stops, it can not be restarted.
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
@@ -128,7 +129,7 @@ OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer);
 
 /**
  * @brief Clear the internal resources of the muxer and destroy the muxer instance
- * @syscap SystemCapability.Multimedia.Media.AVMuxer
+ * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param codec Pointer to an OH_AVMuxer instance
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}

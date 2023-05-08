@@ -16,17 +16,17 @@
 #ifndef AVCODEC_ERRORS_H
 #define AVCODEC_ERRORS_H
 
-#include "native_averrors.h"
-#include "errors.h"
 #include <map>
 #include <string>
+#include "native_averrors.h"
+#include "errors.h"
 
 namespace OHOS {
 namespace Media {
 using AVCSErrCode = ErrCode;
 
 // bit 28~21 is subsys, bit 20~16 is Module. bit 15~0 is code
-// TODO: confirm module offset
+// confirm module offset
 constexpr AVCSErrCode AVCS_MODULE = 0X01000;
 constexpr AVCSErrCode AVCS_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMEDIA, AVCS_MODULE);
 typedef enum AVCodecServiceErrCode : ErrCode {
@@ -92,7 +92,6 @@ __attribute__((visibility("default"))) std::string AVCSErrorToString(AVCodecServ
 __attribute__((visibility("default"))) std::string OHAVErrCodeToString(OH_AVErrCode code);
 __attribute__((visibility("default"))) std::string AVCSErrorToOHAVErrCodeString(AVCodecServiceErrCode code);
 __attribute__((visibility("default"))) OH_AVErrCode AVCSErrorToOHAVErrCode(AVCodecServiceErrCode code);
-
 } // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_ERRORS_H

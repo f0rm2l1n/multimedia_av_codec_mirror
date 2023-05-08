@@ -26,7 +26,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecCli
 
 namespace OHOS {
 namespace Media {
-
 static AVCodecClient avCodecClientInstance;
 IAVCodecService &AVCodecServiceFactory::GetInstance()
 {
