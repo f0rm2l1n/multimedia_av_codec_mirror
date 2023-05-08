@@ -1,0 +1,2 @@
+src:*services/engine/*
+src:*frameworks/native/capi/*
