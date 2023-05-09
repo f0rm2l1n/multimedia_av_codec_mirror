@@ -1,0 +1,70 @@
+{
+    "name": "@ohos/av_codec",
+    "description": "Media standard provides atomic capabilities",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "foundation/multimedia/av_codec"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+      "name": "av_codec",
+      "subsystem": "multimedia",
+      "syscap": [
+        "SystemCapability.Multimedia.Media.Muxer"
+      ],
+      "features": [],
+      "adapted_system_type": [ "standard" ],
+      "rom": "10000KB",
+      "ram": "10000KB",
+      "hisysevent_config": [
+        "//foundation/multimedia/av_codec/hisysevent.yaml"
+      ],
+      "deps": {
+        "components": [
+          "hiviewdfx_hilog_native",
+          "ipc",
+          "hisysevent_native",
+          "c_utils",
+          "hilog_native",
+          "hitrace_native"
+        ],
+        "third_party": [
+          "glib",
+          "gstreamer",
+          "libffi",
+          "ffmpeg",
+          "common"
+        ]
+      },
+      "build": {
+        "group_type": {
+          "base_group": [],
+          "fwk_group": [
+            "//foundation/multimedia/av_codec/interfaces/kits/c:capi_packages",
+            "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client"
+          ],
+          "service_group": [
+            "//foundation/multimedia/av_codec/services:av_codec_services_package",
+            "//foundation/multimedia/av_codec/sa_profile:av_codec_service_profile"
+          ]
+        },
+        "inner_kits": [
+          {
+            "type": "so",
+            "name": "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
+            "header": {
+              "header_files": [
+                "avmuxer.h"
+              ],
+              "header_base": "//foundation/multimedia/av_codec/interfaces/inner_api/native"
+            }
+          }
+        ],
+      "test": [
+      ]
+      }
+    }
+  }
