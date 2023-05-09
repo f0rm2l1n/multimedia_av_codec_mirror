@@ -16,6 +16,7 @@ av_codec部件提供了以下常用功能：
 
 **图 1** av_codec部件架构图
 
+![av_codec部件架构图](figures/framework-image-zh_CN.png)
 
 
 ## 目录
@@ -71,6 +72,3 @@ av_codec部件提供了以下常用功能：
 ```
 ./build.sh --product-name {product_name} --ccache --target-cpu arm64 --build-target multimedia_av_codec
 ```
-
-## 相关仓
-
