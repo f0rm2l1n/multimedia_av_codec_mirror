@@ -113,7 +113,9 @@ OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer);
  * @version 1.0
  */
 OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer,
-    uint32_t trackIndex, uint8_t *sampleBuffer, OH_AVCodecBufferAttr info);
+                                          uint32_t trackIndex,
+                                          uint8_t *sampleBuffer,
+                                          OH_AVCodecBufferAttr info);
 
 /**
  * @brief Stop the muxer.

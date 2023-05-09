@@ -102,7 +102,9 @@ OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer)
 }
 
 OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer,
-    uint32_t trackIndex, uint8_t *sampleBuffer, OH_AVCodecBufferAttr info)
+                                          uint32_t trackIndex,
+                                          uint8_t *sampleBuffer,
+                                          OH_AVCodecBufferAttr info)
 {
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
