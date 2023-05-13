@@ -107,7 +107,7 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     dumpString += "[Codec_Server]\n";
     bool dumpCodecFlag = (argSets.find(u"codec") != argSets.end()) | dumpAllFlag;
     ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::CODEC], dumpCodecFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
         "Failed to write codec server information");
 #endif
 
@@ -115,7 +115,7 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     dumpString += "[Muxer_Server]\n";
     bool dumpMuxerFlag = (argSets.find(u"muxer") != argSets.end()) | dumpAllFlag;
     ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::MUXER], dumpMuxerFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
         "Failed to write muxer server information");
 #endif
 
@@ -123,7 +123,7 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     dumpString += "[Demuxer_Server]\n";
     bool dumpDemuxerFlag = (argSets.find(u"demuxer") != argSets.end()) | dumpAllFlag;
     ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::DEMUXER], dumpDemuxerFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
         "Failed to write demuxer server information");
 #endif
 
@@ -131,12 +131,12 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     dumpString += "[Source_Server]\n";
     bool dumpSourceFlag = (argSets.find(u"source") != argSets.end()) | dumpAllFlag;
     ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::SOURCE], dumpSourceFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
         "Failed to write source server information");
 #endif
 
     ret = AVCodecXCollie::GetInstance().Dump(fd) != OHOS::NO_ERROR;
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION, 
+    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
         "Failed to write xcollie dump information");
 
     if (argSets.empty() ||

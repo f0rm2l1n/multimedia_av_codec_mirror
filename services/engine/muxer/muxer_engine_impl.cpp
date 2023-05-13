@@ -261,7 +261,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
     
     dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX, "Muxer_Info");
     dumpControler.AddInfo(DUMP_STATUS_INDEX, "Status", ConvertStateToString(state_));
-    dumpControler.AddInfo(DUMP_OUTPUT_FORMAT_INDEX, 
+    dumpControler.AddInfo(DUMP_OUTPUT_FORMAT_INDEX,
         "Output_Format", OutputFormatStringMap.at(format_));
 
     int32_t dumpTrackIndex = 3;
@@ -279,7 +279,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
             std::string("Track_") + std::to_string(mediaDescIdx) + "_Info");
         for (auto iter : dumpTable) {
             dumpControler.AddInfoFromFormat(
-                DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << 8) + dumpInfoIndex, 
+                DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << 8) + dumpInfoIndex,
                 mediaDesc, iter.first, iter.second);
             dumpInfoIndex++;
         }

@@ -113,7 +113,7 @@ int32_t DemuxerServiceStub::UnselectSourceTrackByID(uint32_t trackIndex)
 }
 
 int32_t DemuxerServiceStub::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                         AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+                                           AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
     return demuxerServer_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);

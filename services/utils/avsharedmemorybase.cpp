@@ -85,7 +85,7 @@ int32_t AVSharedMemoryBase::Init()
 {
     ON_SCOPE_EXIT(0) {
         AVCODEC_LOGE("create avsharedmemory failed, name = %{public}s, size = %{public}d, "
-                   "flags = 0x%{public}x, fd = %{public}d", name_.c_str(), capacity_, flags_, fd_);
+                     "flags = 0x%{public}x, fd = %{public}d", name_.c_str(), capacity_, flags_, fd_);
         Close();
     };
 

@@ -80,7 +80,6 @@ static const std::map<std::string, VideoBitStreamFormat> videoBitStreamFormatStr
                                                             {"HVCC", VideoBitStreamFormat::HVCC},
                                                             {"ANNEXB", VideoBitStreamFormat::ANNEXB},
 };
-
 }
 
 inline int64_t AvTime2Ms(int64_t hTime)
@@ -228,7 +227,6 @@ int32_t FFmpegDemuxerPlugin::UnselectSourceTrackByID(uint32_t trackIndex)
 
     auto index = std::find_if(selectedTrackIds_.begin(), selectedTrackIds_.end(),
                               [trackIndex](uint32_t selectedId) {return trackIndex == selectedId; });
-
     if (index != selectedTrackIds_.end()) {
         selectedTrackIds_.erase(index);
     } else {
@@ -387,13 +385,13 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
         trackVec = selectedTrackIds_;
     }
     
-    for (size_t i = 0; i < trackVec.size(); i++){
+    for (size_t i = 0; i < trackVec.size(); i++) {
         int trackIndex = trackVec[i];
         auto avStream = formatContext_->streams[trackIndex];
         int64_t ffTime = ConvertTimeToFFmpeg(mSeconds*1000*1000, avStream->time_base);
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            if (ffTime > avStream->duration){
-                AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64, 
+            if (ffTime > avStream->duration) {
+                AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
                              ffTime, avStream->duration);
                 return AVCS_ERR_SEEK_FAILED;
             }

@@ -68,7 +68,7 @@ namespace {
         { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
     };
 
-    const std::map<OHOS::Media::CodecServer::CodecType, 
+    const std::map<OHOS::Media::CodecServer::CodecType,
         std::vector<std::pair<std::string_view, const std::string>>> CODEC_DUMP_TABLE = {
         { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_DEFAULT, DEFAULT_DUMP_TABLE },
         { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_VIDEO, VIDEO_DUMP_TABLE },
@@ -324,33 +324,32 @@ int32_t CodecServer::DumpInfo(int32_t fd)
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Get codec format failed.");
     CodecType codecType = GetCodecType();
     auto it = CODEC_DUMP_TABLE.find(codecType);
-    auto &dumpTable = 
-        it != CODEC_DUMP_TABLE.end() ? it->second : DEFAULT_DUMP_TABLE;
+    auto &dumpTable = it != CODEC_DUMP_TABLE.end() ? it->second : DEFAULT_DUMP_TABLE;
     AVCodecDumpControler dumpControler;
     std::string codecInfo;
 
     switch (codecType) {
-    case CODEC_TYPE_VIDEO:
-        codecInfo = "Video_Codec_Info";
-        break;
-    case CODEC_TYPE_DEFAULT:
-        codecInfo = "Codec_Info";
-        break;
-    default:
-        codecInfo = "Audio_Codec_Info";
-        break;
+        case CODEC_TYPE_VIDEO:
+            codecInfo = "Video_Codec_Info";
+            break;
+        case CODEC_TYPE_DEFAULT:
+            codecInfo = "Codec_Info";
+            break;
+        default:
+            codecInfo = "Audio_Codec_Info";
+            break;
     }
 
     dumpControler.AddInfo(DUMP_CODEC_INFO_INDEX, codecInfo);
-    dumpControler.AddInfo(DUMP_STATUS_INDEX, 
+    dumpControler.AddInfo(DUMP_STATUS_INDEX,
         "Status", CODEC_STATE_MAP.find(status_)->second);
-    dumpControler.AddInfo(DUMP_LAST_ERROR_INDEX, 
+    dumpControler.AddInfo(DUMP_LAST_ERROR_INDEX,
         "Last_Error", lastErrMsg_.size() ? lastErrMsg_ : "Null");
 
     int32_t dumpIndex = 3;
     for (auto iter : dumpTable) {
         dumpControler.AddInfoFromFormat(
-            DUMP_CODEC_INFO_INDEX + (dumpIndex << DUMP_OFFSET_8), 
+            DUMP_CODEC_INFO_INDEX + (dumpIndex << DUMP_OFFSET_8),
             codecFormat, iter.first, iter.second);
         dumpIndex++;
     }

@@ -167,7 +167,7 @@ int32_t SourceServiceStub::SetTrackFormat(MessageParcel &data, MessageParcel &re
     (void)AVCodecParcel::Unmarshalling(data, param);
     uint32_t trackIndex = data.ReadUint32();
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SetTrackFormat(param, trackIndex)), AVCS_ERR_UNKNOWN,
-                           "Reply SetTrackFormat failed");
+                             "Reply SetTrackFormat failed");
     return AVCS_ERR_OK;
 }
 

@@ -592,7 +592,6 @@ int32_t Source::InitAVFormatContext()
     formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
     int32_t ret = -1;
     ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
-
     if (ret == 0) {
         formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
             if (ptr) {

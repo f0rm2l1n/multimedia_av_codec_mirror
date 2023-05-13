@@ -52,7 +52,7 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
 {
     AVCodecTrace trace("AVSourceFactory::CreateWithFD");
 
-    AVCODEC_LOGI("create source with fd: fd=%{private}d, offset=%{public}" PRId64 ", size=%{public}" PRId64, 
+    AVCODEC_LOGI("create source with fd: fd=%{private}d, offset=%{public}" PRId64 ", size=%{public}" PRId64,
         fd, offset, size);
 
     CHECK_AND_RETURN_RET_LOG(fd > 2, nullptr,

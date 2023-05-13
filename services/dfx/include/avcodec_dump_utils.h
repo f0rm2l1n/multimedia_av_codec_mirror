@@ -25,9 +25,10 @@ namespace OHOS {
 namespace Media {
 class __attribute__((visibility("default"))) AVCodecDumpControler {
 public:
-    int32_t AddInfo(const uint32_t dumpIdx, const std::string &name, const std::string &value = "");  // dumpIdx 每个字节对应一个级别序号
-    int32_t AddInfoFromFormat(const uint32_t dumpIdx, const Format &format, const std::string_view &key, const std::string &name);
-    int32_t GetDumpString(std::string &dumpString); 
+    int32_t AddInfo(const uint32_t dumpIdx, const std::string &name, const std::string &value = "");
+    int32_t AddInfoFromFormat(const uint32_t dumpIdx, const Format &format,
+                              const std::string_view &key, const std::string &name);
+    int32_t GetDumpString(std::string &dumpString);
 
 private:
     uint32_t GetLevel(const uint32_t dumpIdx);

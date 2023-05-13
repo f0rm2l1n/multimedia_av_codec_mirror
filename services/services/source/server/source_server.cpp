@@ -148,10 +148,10 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
     Format sourceFormat, trackFormat;
     uint32_t trackCount = 0;
     int32_t ret = this->GetTrackCount(trackCount);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, 
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
         AVCS_ERR_INVALID_OPERATION, "Get track count failed!");
     ret = GetSourceFormat(sourceFormat);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, 
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
         AVCS_ERR_INVALID_OPERATION, "Get track format failed!");
     AVCodecDumpControler dumpControler;
 
@@ -161,7 +161,7 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
     dumpControler.AddInfo(DUMP_SOURCE_INFO_INDEX, "Source_Info");
     for (auto iter : SOURCE_DUMP_TABLE) {
         dumpControler.AddInfoFromFormat(
-            DUMP_SOURCE_INFO_INDEX + (sourceDumpIndex << DUMP_OFFSET_8), 
+            DUMP_SOURCE_INFO_INDEX + (sourceDumpIndex << DUMP_OFFSET_8),
             sourceFormat, iter.first, iter.second);
         sourceDumpIndex++;
     }
@@ -169,28 +169,28 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
     dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX, "Track_Info");
     for (int32_t idx = 0; idx < trackCount; idx++) {
         ret = GetTrackFormat(trackFormat, idx);
-        CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, 
+        CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
             AVCS_ERR_INVALID_OPERATION, "Get track format failed!");
 
         int32_t trackDumpIndex = 1;
         int32_t trackListIndex = (idx + 1) << DUMP_OFFSET_8;
         std::string trackType;
         trackFormat.GetStringValue("track/type", trackType);
-        std::string indexString = 
+        std::string indexString =
             std::string("Index ") + std::to_string(idx) + std::string(" _ ") + trackType;
         dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX + trackListIndex, indexString);
-        auto &dumpTable = 
+        auto &dumpTable =
             trackType == "audio" ? AUDIO_TRACK_DUMP_TABLE : VIDEO_TRACK_DUMP_TABLE;
         for (auto iter : dumpTable) {
             dumpControler.AddInfoFromFormat(
-                DUMP_TRACK_INFO_INDEX + trackListIndex + trackDumpIndex, 
+                DUMP_TRACK_INFO_INDEX + trackListIndex + trackDumpIndex,
                 trackFormat, iter.first, iter.second);
             trackDumpIndex++;
         }
     }
     
     ret = dumpControler.GetDumpString(dumpInfo);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, 
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
         AVCS_ERR_INVALID_OPERATION, "Get dump string failed!");
     return AVCS_ERR_OK;
 }
