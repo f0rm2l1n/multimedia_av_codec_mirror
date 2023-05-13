@@ -1,0 +1,66 @@
+# Copyright (C) 2023-2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+declare_args() {
+  multimedia_av_codec_support_capi = true
+  multimedia_av_codec_support_codec = true
+  multimedia_av_codec_support_codeclist = true
+  multimedia_av_codec_support_demuxer = true
+  multimedia_av_codec_support_source = true
+  multimedia_av_codec_support_muxer = true
+  multimedia_av_codec_support_ffmpeg_demuxer = true
+  multimedia_av_codec_support_test = true
+}
+
+av_codec_root_dir = "//foundation/multimedia/av_codec"
+av_codec_defines = []
+
+if (multimedia_av_codec_support_capi) {
+  av_codec_defines += [ "SUPPORT_CAPI" ]
+} else {
+  av_codec_defines += [ "UNSUPPORT_CAPI" ]
+}
+
+if (multimedia_av_codec_support_codec) {
+  av_codec_defines += [ "SUPPORT_CODEC" ]
+} else {
+  av_codec_defines += [ "UNSUPPORT_CODEC" ]
+}
+
+if (multimedia_av_codec_support_codeclist) {
+  av_codec_defines += [ "SUPPORT_CODECLIST" ]
+} else {
+  av_codec_defines += [ "UNSUPPORT_CODECLIST" ]
+}
+
+if (multimedia_av_codec_support_demuxer) {
+  av_codec_defines += [ "SUPPORT_DEMUXER" ]
+} else {
+  av_codec_defines += [ "UNSUPPORT_DEMUXER" ]
+}
+
+if (multimedia_av_codec_support_muxer) {
+  av_codec_defines += [ "SUPPORT_MUXER" ]
+} else {
+  av_codec_defines += [ "UNSUPPORT_MUXER" ]
+}
+
+if (multimedia_av_codec_support_source) {
+  av_codec_defines += [ "SUPPORT_SOURCE" ]
+} else {
+  av_codec_defines += [ "UNSUPPORT_SOURCE" ]
+}
+
+if (multimedia_av_codec_support_ffmpeg_demuxer) {
+  av_codec_defines += [ "FFMPEG_DEMUXER_ENABLE" ]
+}
