@@ -16,17 +16,16 @@
 #ifndef CODEC_UTILS_H
 #define CODEC_UTILS_H
 
-#include "avcodec_errors.h"
-#include "avsharedmemorybase.h"
 #include "surface.h"
+#include "avcodec_errors.h"
 #include "surface_memory.h"
-
+#include "avsharedmemorybase.h"
+#include "format.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
 };
-
 namespace OHOS {
 namespace Media {
 namespace Codec {
@@ -35,7 +34,6 @@ enum struct VideoFormat : uint8_t {
     H264 = 1,
     MPEG4 = 2,
 };
-
 enum struct VideoPixelFormat : uint32_t {
     UNKNOWN,
     YUV420P, ///< planar YUV 4:2:0, 1 Cr & Cb sample per 2x2 Y samples
@@ -71,16 +69,14 @@ AVPixelFormat ConvertPixelFormatToFFmpeg(VideoPixelFormat pixelFormat);
 int32_t ConvertVideoFrame(std::shared_ptr<Scale> scale, std::shared_ptr<AVFrame> frame, uint8_t **dstData,
                           int32_t *dstLineSize, AVPixelFormat dstPixFmt);
 int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData,
-                           int32_t *scaleLineSize, VideoPixelFormat pixFmt, int32_t stride, int32_t height);
+                           int32_t *scaleLineSize, int32_t stride, const Format &format);
 int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase> &frameBuffer, uint8_t **scaleData,
-                     int32_t *scaleLineSize, VideoPixelFormat pixFmt, int32_t height, int32_t width);
+                     int32_t *scaleLineSize, const Format &format);
 int32_t WriteRgbData(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData, int32_t *scaleLineSize,
-                     VideoPixelFormat pixFmt, int32_t height, int32_t width);
-
+                     const Format &format);
 std::string AVStrError(int errnum);
 bool IsYuvFormat(AVPixelFormat format);
 bool IsRgbFormat(AVPixelFormat format);
-
 } // namespace Codec
 } // namespace Media
 } // namespace OHOS

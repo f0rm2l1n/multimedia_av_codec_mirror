@@ -31,13 +31,14 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::Media::Codec;
-
 namespace {
 const string CODEC_NAME = "video_decoder.avc";
 constexpr uint32_t DEFAULT_WIDTH = 480;
 constexpr uint32_t DEFAULT_HEIGHT = 272;
 } // namespace
 
+namespace OHOS {
+namespace Media {
 class VDecSignal {
 public:
     std::mutex inMutex_;
@@ -503,6 +504,8 @@ HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_08, TestSize.Level1)
 
 int main(int argc, char *argv[])
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
+}
 }

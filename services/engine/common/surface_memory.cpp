@@ -13,15 +13,14 @@
  * limitations under the License.
  */
 
-#include "surface_memory.h"
 #include "avcodec_log.h"
-#include "native_averrors.h"
 #include "securec.h"
 #include <memory>
+#include "native_averrors.h"
+#include "surface_memory.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-SurfaceMemory"};
-
 }
 namespace OHOS {
 namespace Media {
@@ -36,19 +35,16 @@ std::shared_ptr<SurfaceMemory> SurfaceMemory::Create()
                              "surface config invalid");
     std::shared_ptr<SurfaceMemory> buffer = std::make_shared<SurfaceMemory>();
     buffer->AllocSurfaceBuffer();
-
     return buffer;
 }
 
-SurfaceMemory::~SurfaceMemory()
-{
+SurfaceMemory::~SurfaceMemory() {
     ReleaseSurfaceBuffer();
 }
 
-size_t SurfaceMemory::Write(const uint8_t *in, size_t writeSize, size_t position)
+size_t SurfaceMemory::Write(const uint8_t* in, size_t writeSize, size_t position)
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
-
     size_t start = 0;
     size_t capacity = GetSize();
     if (position == INVALID_POSITION) {
@@ -60,12 +56,11 @@ size_t SurfaceMemory::Write(const uint8_t *in, size_t writeSize, size_t position
     if (memcpy_s(GetBase() + start, length, in, length) != EOK) {
         return 0;
     }
-
     size_ = start + length;
     return length;
 }
 
-size_t SurfaceMemory::Read(uint8_t *out, size_t readSize, size_t position)
+size_t SurfaceMemory::Read(uint8_t* out, size_t readSize, size_t position)
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
     size_t start = 0;
@@ -102,7 +97,7 @@ void SurfaceMemory::AllocSurfaceBuffer()
         surfaceMem_->CancelBuffer(surfaceBuffer_);
         return;
     }
-    sptr<SyncFence> autoFence = new (std::nothrow) SyncFence(releaseFence);
+    sptr<SyncFence> autoFence = new(std::nothrow) SyncFence(releaseFence);
     if (autoFence != nullptr) {
         autoFence->Wait(100); // 100ms
     }
@@ -123,9 +118,9 @@ void SurfaceMemory::AllocSurfaceBuffer()
 
 void SurfaceMemory::ReleaseSurfaceBuffer()
 {
-    if (surfaceBuffer_ == nullptr)
+    if (surfaceBuffer_ == nullptr) {
         return;
-
+    }
     if (!needRender_) {
         auto ret = surfaceMem_->CancelBuffer(surfaceBuffer_);
         if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
@@ -186,12 +181,14 @@ void SurfaceMemory::SetSurface(sptr<Surface> surface)
 void SurfaceMemory::SetConfig(int32_t width, int32_t height, int32_t format, uint64_t usage, int32_t strideAlign,
                               int32_t timeout)
 {
-    requestConfig_ = {.width = width,
-                      .height = height,
-                      .strideAlignment = strideAlign,
-                      .format = format,
-                      .usage = usage,
-                      .timeout = timeout};
+    requestConfig_ = {
+        .width=width,
+        .height=height,
+        .strideAlignment=strideAlign,
+        .format=format,
+        .usage=usage,
+        .timeout=timeout
+    };
 }
 
 void SurfaceMemory::SetScaleType(ScalingMode videoScaleMode)
@@ -199,10 +196,10 @@ void SurfaceMemory::SetScaleType(ScalingMode videoScaleMode)
     scalingMode_ = videoScaleMode;
 }
 
-uint8_t *SurfaceMemory::GetBase() const
+uint8_t* SurfaceMemory::GetBase() const
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, nullptr, "surfaceBuffer is nullptr");
-    return static_cast<uint8_t *>(surfaceBuffer_->GetVirAddr());
+    return static_cast<uint8_t*>(surfaceBuffer_->GetVirAddr());
 }
 
 int32_t SurfaceMemory::GetUsedSize() const
@@ -222,6 +219,5 @@ uint32_t SurfaceMemory::GetFlags() const
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
     return FLAGS_READ_WRITE;
 }
-
-} // namespace Media
 } // namespace OHOS
+} // namespace Media

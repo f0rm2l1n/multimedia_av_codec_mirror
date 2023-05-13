@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "codec_utils.h"
 #include "avcodec_log.h"
+#include "media_description.h"
+#include "codec_utils.h"
 
 namespace OHOS {
 namespace Media {
 namespace Codec {
-
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
 std::map<VideoPixelFormat, AVPixelFormat> g_pixelFormatMap = {
@@ -36,12 +36,12 @@ int32_t ConvertVideoFrame(std::shared_ptr<Scale> scale, std::shared_ptr<AVFrame>
 {
     if (scale == nullptr) {
         scale = std::make_shared<Scale>();
-        ScalePara scalePara{static_cast<int32_t>(frame->width), 
-                            static_cast<int32_t>(frame->height),
-                            static_cast<AVPixelFormat>(frame->format),
-                            static_cast<int32_t>(frame->width),
-                            static_cast<int32_t>(frame->height),
-                            dstPixFmt};
+        ScalePara scalePara {static_cast<int32_t>(frame->width),
+                             static_cast<int32_t>(frame->height),
+                             static_cast<AVPixelFormat>(frame->format),
+                             static_cast<int32_t>(frame->width),
+                             static_cast<int32_t>(frame->height),
+                             dstPixFmt};
         CHECK_AND_RETURN_RET_LOG(scale->Init(scalePara, dstData, dstLineSize) == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
                                  "Scale init error");
     }
@@ -49,8 +49,13 @@ int32_t ConvertVideoFrame(std::shared_ptr<Scale> scale, std::shared_ptr<AVFrame>
 }
 
 int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData,
-                           int32_t *scaleLineSize, VideoPixelFormat pixFmt, int32_t stride, int32_t height)
+                           int32_t *scaleLineSize, int32_t stride, const Format &format)
 {
+    int32_t height;
+    int32_t fmt;
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, fmt);
+    VideoPixelFormat pixFmt = static_cast<VideoPixelFormat>(fmt);
     if (pixFmt == VideoPixelFormat::RGBA || pixFmt == VideoPixelFormat::BGRA) {
         size_t srcPos = 0;
         size_t dstPos = 0;
@@ -67,8 +72,13 @@ int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, ui
 }
 
 int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase> &frameBuffer, uint8_t **scaleData,
-                     int32_t *scaleLineSize, VideoPixelFormat pixFmt, int32_t height, int32_t width)
+                     int32_t *scaleLineSize, const Format &format)
 {
+    int32_t height;
+    int32_t fmt;
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, fmt);
+    VideoPixelFormat pixFmt = static_cast<VideoPixelFormat>(fmt);
     size_t ySize = static_cast<size_t>(scaleLineSize[0] * height);      // yuv420: 411 nv21
     size_t uvSize = static_cast<size_t>(scaleLineSize[1] * height / 2); // 2
     size_t frameSize = 0;
@@ -95,13 +105,19 @@ int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase> &frameBuffer, uin
 }
 
 int32_t WriteRgbData(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData, int32_t *scaleLineSize,
-                     VideoPixelFormat pixFmt, int32_t height, int32_t width)
+                     const Format &format)
 {
+    int32_t width;
+    int32_t height;
+    int32_t fmt;
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_WIDTH, width);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, fmt);
+    VideoPixelFormat pixFmt = static_cast<VideoPixelFormat>(fmt);
     uint32_t stride = frameBuffer->GetSurfaceBufferStride();
-    if (width != 0 && stride % width) {
-        return WriteRgbDataStride(frameBuffer, scaleData, scaleLineSize, pixFmt, stride, height);
+    if (stride % width) {
+        return WriteRgbDataStride(frameBuffer, scaleData, scaleLineSize, stride, format);
     }
-
     size_t frameSize = static_cast<size_t>(scaleLineSize[0] * height);
     CHECK_AND_RETURN_RET_LOG(frameBuffer->GetSize() >= frameSize, AVCS_ERR_NO_MEMORY,
                              "output buffer size is not enough: real[%{public}zu], need[%{public}zu]",
@@ -209,7 +225,6 @@ int32_t Scale::Convert(uint8_t **srcData, const int32_t *srcLineSize, uint8_t **
     }
     return AVCS_ERR_OK;
 }
-
 } // namespace Codec
 } // namespace Media
 } // namespace OHOS

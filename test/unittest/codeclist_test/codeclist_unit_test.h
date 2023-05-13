@@ -36,16 +36,16 @@ public:
     void TearDown(void);
 
 protected:
-    std::string codecMimeKey_{ MediaDescriptionKey::MD_KEY_CODEC_MIME };
-    std::string bitrateKey_{ MediaDescriptionKey::MD_KEY_BITRATE };
-    std::string widthKey_{ MediaDescriptionKey::MD_KEY_WIDTH };
-    std::string heightKey_{ MediaDescriptionKey::MD_KEY_HEIGHT };
-    std::string pixelFormatKey_{ MediaDescriptionKey::MD_KEY_PIXEL_FORMAT };
-    std::string frameRateKey_{ MediaDescriptionKey::MD_KEY_FRAME_RATE };
-    std::string channelCountKey_{ MediaDescriptionKey::MD_KEY_CHANNEL_COUNT };
-    std::string sampleRateKey_{ "samplerate" }; // { MediaDescriptionKey::MD_KEY_SAMPLE_RATE }
-    std::string bitDepthKey_{ MediaDescriptionKey::MD_KEY_SAMPLE_RATE };
-    std::shared_ptr<CodecListMock> codeclist_{ nullptr };
+    std::string codecMimeKey_ {MediaDescriptionKey::MD_KEY_CODEC_MIME};
+    std::string bitrateKey_ {MediaDescriptionKey::MD_KEY_BITRATE};
+    std::string widthKey_ {MediaDescriptionKey::MD_KEY_WIDTH};
+    std::string heightKey_ {MediaDescriptionKey::MD_KEY_HEIGHT};
+    std::string pixelFormatKey_ {MediaDescriptionKey::MD_KEY_PIXEL_FORMAT};
+    std::string frameRateKey_ {MediaDescriptionKey::MD_KEY_FRAME_RATE};
+    std::string channelCountKey_ {MediaDescriptionKey::MD_KEY_CHANNEL_COUNT};
+    std::string sampleRateKey_ {"samplerate"}; // MediaDescriptionKey::MD_KEY_SAMPLE_RATE
+    std::string bitDepthKey_ {MediaDescriptionKey::MD_KEY_SAMPLE_RATE};
+    std::shared_ptr<CodecListMock> codeclist_ {nullptr};
 };
 } // namespace Media
 } // namespace OHOS
