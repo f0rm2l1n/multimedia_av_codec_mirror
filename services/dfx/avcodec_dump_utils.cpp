@@ -26,7 +26,6 @@ namespace {
     constexpr uint32_t DUMP_OFFSET_24 = 24;
     constexpr uint32_t DUMP_OFFSET_16 = 16;
     constexpr uint32_t DUMP_OFFSET_8 = 8;
-
 }
 
 namespace OHOS {

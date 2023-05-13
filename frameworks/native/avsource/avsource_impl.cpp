@@ -202,7 +202,7 @@ int32_t AVSourceImpl::SetTrackFormat(const Format &format, uint32_t trackIndex)
     bool allKeySupported = true;
     for (auto pair : formatMap) {
         auto index = std::find_if(setTrackFormatSupportedList.begin(), setTrackFormatSupportedList.end(),
-                         [pair](std::string_view support) { return pair.first == support; });
+                                  [pair](std::string_view support) { return pair.first == support; });
         if (index == setTrackFormatSupportedList.end()) {
             AVCODEC_LOGE("key %{punlic}s is not supported to set!", pair.first.c_str());
             allKeySupported = false;
@@ -256,7 +256,7 @@ int32_t AVSourceTrackImpl::SetTrackFormat(const Format &format)
 }
 
 int32_t AVSourceTrackImpl::GetTrackFormat(Format &format)
-{   
+{
     AVCodecTrace trace("AVSourceTrack::GetTrackFormat");
 
     return sourceImpl_->GetTrackFormat(format, trackIndex_);

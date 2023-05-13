@@ -104,7 +104,7 @@ int32_t AVDemuxerImpl::UnselectSourceTrackByID(uint32_t trackIndex)
 }
 
 int32_t AVDemuxerImpl::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                      AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag)
+                                      AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     AVCodecTrace trace("AVDemuxer::CopyNextSample");
 

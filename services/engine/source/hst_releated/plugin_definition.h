@@ -35,7 +35,7 @@ enum struct Status : int32_t {
     NO_ERROR = OK,                    ///< Same as Status::OK
     ERROR_UNKNOWN = -1,               ///< An unknown error occurred.
     ERROR_PLUGIN_ALREADY_EXISTS = -2, ///< The plugin already exists, usually occurs when in plugin registered.
-    ERROR_INCOMPATIBLE_VERSION = -3,  
+    ERROR_INCOMPATIBLE_VERSION = -3,
                         ///< Incompatible version, may occur during plugin registration or function calling.
     ERROR_NO_MEMORY = -4,             ///< The system memory is insufficient.
     ERROR_WRONG_STATE = -5,           ///< The function is called in an invalid state.

@@ -39,7 +39,6 @@ namespace {
     constexpr uint32_t DUMP_OUTPUT_FORMAT_INDEX = 0x01010200;
     constexpr uint32_t DUMP_OFFSET_8 = 8;
 
-
     const std::map<OHOS::Media::OutputFormat, const std::string> OutputFormatStringMap = {
         { OHOS::Media::OutputFormat::OUTPUT_FORMAT_M4A, "m4a" },
         { OHOS::Media::OutputFormat::OUTPUT_FORMAT_MPEG_4, "mp4" },
@@ -65,7 +64,7 @@ namespace {
         { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
     };
 
-    const std::map<OHOS::Media::MuxerEngineImpl::TrackMimeType, 
+    const std::map<OHOS::Media::MuxerEngineImpl::TrackMimeType,
         std::vector<std::pair<std::string_view, const std::string>>> MUXER_DUMP_TABLE = {
         { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_AUDIO, AUDIO_DUMP_TABLE },
         { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_VIDEO, VIDEO_DUMP_TABLE },
@@ -275,7 +274,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
         TrackMimeType mimeType = GetTrackMimeType(codecMime);
         auto &dumpTable = MUXER_DUMP_TABLE.at(mimeType);
         
-        dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << DUMP_OFFSET_8), 
+        dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << DUMP_OFFSET_8),
             std::string("Track_") + std::to_string(mediaDescIdx) + "_Info");
         for (auto iter : dumpTable) {
             dumpControler.AddInfoFromFormat(

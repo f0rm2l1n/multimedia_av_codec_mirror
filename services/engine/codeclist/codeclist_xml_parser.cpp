@@ -508,8 +508,8 @@ bool CodeclistXmlParser::SetCapabilityData(CapabilityData &data, const string &c
 {
     std::unordered_map<string, string &> capabilityStringMap = {
         {"codecName", data.codecName}, {"mimeType", data.mimeType}};
-    std::unordered_map<string, int32_t &> capIntMap =
-        {{"codecType", data.codecType}, {"maxInstance", data.maxInstance}};
+    std::unordered_map<string, int32_t &> capIntMap = {
+        {"codecType", data.codecType}, {"maxInstance", data.maxInstance}};
     std::unordered_map<string, bool &> capabilityBoolMap = {
         {"isVendor", data.isVendor}, {"supportSwapWidthHeight", data.supportSwapWidthHeight}};
     std::unordered_map<string, ImgSize &> capSizeMap = {{"blockSize", data.blockSize}, {"alignment", data.alignment}};

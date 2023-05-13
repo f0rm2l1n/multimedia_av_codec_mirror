@@ -38,7 +38,8 @@ std::shared_ptr<SurfaceMemory> SurfaceMemory::Create()
     return buffer;
 }
 
-SurfaceMemory::~SurfaceMemory() {
+SurfaceMemory::~SurfaceMemory()
+{
     ReleaseSurfaceBuffer();
 }
 

@@ -174,13 +174,12 @@ int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
             if (tag == nullptr) {
                 AVCODEC_LOGW("SetBitStreamFormat failed, Output stream format will not change!");
             } else if (auto value = videoBitStreamFormatStringMap.at(tag->value)) {
-                    videoBitStreamFormat_[i] = value;
-                    AVCODEC_LOGD("SetBitStreamFormat successful, track %{public}d, %{public}s", i, tag->value);
+                videoBitStreamFormat_[i] = value;
+                AVCODEC_LOGD("SetBitStreamFormat successful, track %{public}d, %{public}s", i, tag->value);
+            } else {
+                AVCODEC_LOGW("SetBitStreamFormat failed, %{public}s is not supported, \
+                             Output stream format will not change!", tag->value);
             }
-            else {
-                    AVCODEC_LOGW("SetBitStreamFormat failed, %{public}s is not supported, \
-                                 Output stream format will not change!", tag->value);
-                }
         }
     }
     std::string videoBitStreamFormatString = "";
@@ -379,7 +378,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
     std::vector<uint32_t> trackVec;
     if (selectedTrackIds_.empty()) {
         for (uint32_t trackIndex = 0; trackIndex < formatContext_.get()->nb_streams; trackIndex++) {
-             trackVec.push_back(trackIndex);
+            trackVec.push_back(trackIndex);
         }
     } else {
         trackVec = selectedTrackIds_;
@@ -415,7 +414,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
         int64_t realSeekTime = ConvertTimeFromFFmpeg(ffTime, avStream->time_base);
         AVCODEC_LOGD("realSeekTime: %{public}" PRId64, realSeekTime);
         AVCODEC_LOGD("seek param: trackIndex=%{public}d, ffTime=%{public}" PRId64 ", \
-                     realSeekTime=%{public}" PRId64 ", flags=%{public}d", 
+                     realSeekTime=%{public}" PRId64 ", flags=%{public}d",
                      trackIndex, ffTime, realSeekTime, flags);
 
         auto rtv = av_seek_frame(formatContext_.get(), trackIndex, ffTime, flags);
