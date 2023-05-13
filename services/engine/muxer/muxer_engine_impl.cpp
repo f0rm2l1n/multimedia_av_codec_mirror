@@ -17,12 +17,15 @@
 #include <set>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string>
+#include <vector>
 #include "securec.h"
 #include "avcodec_log.h"
 #include "muxer_factory.h"
 #include "avcodec_dfx.h"
 #include "avcodec_info.h"
 #include "avcodec_errors.h"
+#include "avcodec_dump_utils.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "MuxerEngineImpl"};
@@ -31,6 +34,43 @@ namespace {
     constexpr int32_t MAX_LONGITUDE = 180;
     constexpr int32_t MIN_LONGITUDE = -180;
     constexpr int32_t ERR_TRACK_INDEX = -1;
+    constexpr uint32_t DUMP_MUXER_INFO_INDEX = 0x01010000;
+    constexpr uint32_t DUMP_STATUS_INDEX = 0x01010100;
+    constexpr uint32_t DUMP_OUTPUT_FORMAT_INDEX = 0x01010200;
+    constexpr uint32_t DUMP_OFFSET_8 = 8;
+
+
+    const std::map<OHOS::Media::OutputFormat, const std::string> OutputFormatStringMap = {
+        { OHOS::Media::OutputFormat::OUTPUT_FORMAT_M4A, "m4a" },
+        { OHOS::Media::OutputFormat::OUTPUT_FORMAT_MPEG_4, "mp4" },
+    };
+
+    const std::vector<std::pair<std::string_view, const std::string>> AUDIO_DUMP_TABLE = {
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
+    };
+
+    const std::vector<std::pair<std::string_view, const std::string>> VIDEO_DUMP_TABLE = {
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+    };
+
+    const std::vector<std::pair<std::string_view, const std::string>> IMAGE_DUMP_TABLE = {
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
+    };
+
+    const std::map<OHOS::Media::MuxerEngineImpl::TrackMimeType, 
+        std::vector<std::pair<std::string_view, const std::string>>> MUXER_DUMP_TABLE = {
+        { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_AUDIO, AUDIO_DUMP_TABLE },
+        { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_VIDEO, VIDEO_DUMP_TABLE },
+        { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_IMAGE, IMAGE_DUMP_TABLE },
+    };
 }
 
 namespace OHOS {
@@ -169,7 +209,7 @@ int32_t MuxerEngineImpl::Start()
         "The state is not INITIALIZED, the interface must be called after AddTrack() and before WriteSampleBuffer(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracks_.size() > 0, AVCS_ERR_INVALID_OPERATION,
-        "The track count is error, count is %{public}d", tracks_.size());
+        "The track count is error, count is %{public}zu", tracks_.size());
     Plugin::Status ret = muxer_->Start();
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "Start failed");
     state_ = State::STARTED;
@@ -217,72 +257,42 @@ int32_t MuxerEngineImpl::Stop()
 
 int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
 {
-    AVCODEC_LOGI("DumpInfo fd:%{public}d", fd);
-    std::string dumpString;
-    dumpString += "In MuxerEngine::DumpInfo\n";
-    dumpString += "Current MuxerEngine state is: " + ConvertStateToString(state_) + "\n";
-    dumpString += "Current MuxerEngine output format is: " + std::to_string(format_) + "\n";
-    dumpString += "\nCurrent MuxerEngine media description is:\n";
-    if (fd < 0) {
-        AVCODEC_LOGI("%{public}s", dumpString.c_str());
-    } else {
-        write(fd, dumpString.c_str(), dumpString.size());
+    AVCodecDumpControler dumpControler;
+    
+    dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX, "Muxer_Info");
+    dumpControler.AddInfo(DUMP_STATUS_INDEX, "Status", ConvertStateToString(state_));
+    dumpControler.AddInfo(DUMP_OUTPUT_FORMAT_INDEX, 
+        "Output_Format", OutputFormatStringMap.at(format_));
+
+    int32_t dumpTrackIndex = 3;
+    for (auto it = mediaDescMap_.begin(); it != mediaDescMap_.end(); ++it) {
+        int mediaDescIdx = 0;
+        auto mediaDesc = it->second;
+        int32_t dumpInfoIndex = 1;
+        std::string codecMime;
+        bool ret = mediaDesc.GetStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, codecMime);
+        CHECK_AND_CONTINUE_LOG(ret == true, "Get codec mime from format failed.");
+        TrackMimeType mimeType = GetTrackMimeType(codecMime);
+        auto &dumpTable = MUXER_DUMP_TABLE.at(mimeType);
+        
+        dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << DUMP_OFFSET_8), 
+            std::string("Track_") + std::to_string(mediaDescIdx) + "_Info");
+        for (auto iter : dumpTable) {
+            dumpControler.AddInfoFromFormat(
+                DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << 8) + dumpInfoIndex, 
+                mediaDesc, iter.first, iter.second);
+            dumpInfoIndex++;
+        }
+        dumpTrackIndex++;
+        mediaDescIdx++;
     }
 
-    for (auto it = mediaDescMap_.begin(); it != mediaDescMap_.end(); ++it) {
-        dumpString = "Track id: " + std::to_string(it->first) + "\n";
-        if (fd < 0) {
-            AVCODEC_LOGI("%{public}s", dumpString.c_str());
-        } else {
+    std::string dumpString;
+    dumpControler.GetDumpString(dumpString);
+    CHECK_AND_RETURN_RET_LOG(fd != -1, AVCS_ERR_INVALID_VAL, "Get a invalid fd.");
             write(fd, dumpString.c_str(), dumpString.size());
-        }
-        DumpMediaDescription(fd, it->second);
-    }
 
     return AVCS_ERR_OK;
-}
-
-void MuxerEngineImpl::DumpMediaDescription(int32_t fd, const MediaDescription &trackDesc)
-{
-    std::string dumpString;
-    auto dataMap = trackDesc.GetFormatMap();
-    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
-        switch (it->second.type) {
-            case FORMAT_TYPE_INT32:
-                dumpString = it->first + ": " + std::to_string(it->second.val.int32Val) + "\n";
-                break;
-            case FORMAT_TYPE_INT64:
-                dumpString = it->first + ": " + std::to_string(it->second.val.int64Val) + "\n";
-                break;
-            case FORMAT_TYPE_FLOAT:
-                dumpString = it->first + ": " + std::to_string(it->second.val.floatVal) + "\n";
-                break;
-            case FORMAT_TYPE_DOUBLE:
-                dumpString = it->first + ": " + std::to_string(it->second.val.doubleVal) + "\n";
-                break;
-            case FORMAT_TYPE_STRING:
-                dumpString = it->first + ": " + it->second.stringVal + "\n";
-                break;
-            case FORMAT_TYPE_ADDR:
-                dumpString = it->first + " size:" + std::to_string(it->second.size) + " buffer:\n";
-                if (fd < 0) {
-                    AVCODEC_LOGI("%{public}s", dumpString.c_str());
-                } else {
-                    write(fd, dumpString.c_str(), dumpString.size());
-                    write(fd, it->second.addr, it->second.size);
-                }
-                dumpString = "\n";
-                break;
-            default:
-                AVCODEC_LOGE("DumpMediaDescription fail to Marshalling Key: %{public}s", it->first.c_str());
-                continue;
-        }
-        if (fd < 0) {
-            AVCODEC_LOGI("%{public}s", dumpString.c_str());
-        } else {
-            write(fd, dumpString.c_str(), dumpString.size());
-        }
-    }
 }
 
 int32_t MuxerEngineImpl::StartThread(std::string name)
@@ -424,6 +434,20 @@ int32_t MuxerEngineImpl::TranslatePluginStatus(Plugin::Status error)
         return AVCS_ERR_UNKNOWN;
     }
     return ite->second;
+}
+
+MuxerEngineImpl::TrackMimeType MuxerEngineImpl::GetTrackMimeType(const std::string &mime)
+{
+    TrackMimeType type;
+    if (mime.find("audio") != mime.npos) {
+        type = TRACK_MIME_TYPE_AUDIO;
+    } else if (mime.find("video") != mime.npos) {
+        type = TRACK_MIME_TYPE_VIDEO;
+    } else {
+        type = TRACK_MIME_TYPE_IMAGE;
+    }
+
+    return type;
 }
 } // Media
 } // OHOS

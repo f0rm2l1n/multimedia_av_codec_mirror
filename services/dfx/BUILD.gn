@@ -32,6 +32,7 @@ ohos_shared_library("av_codec_service_dfx") {
     "avcodec_dfx.cpp",
     "avcodec_log_dump.cpp",
     "avcodec_xcollie.cpp",
+    "avcodec_dump_utils.cpp",
   ]
 
   include_dirs = [
@@ -66,6 +67,10 @@ ohos_shared_library("av_codec_service_dfx") {
     "-Wimplicit-fallthrough",
     "-Wsign-compare",
     "-Wunused-parameter",
+  ]
+
+  deps = [
+    "$av_codec_root_dir/services/utils:av_codec_format",
   ]
 
   external_deps = [

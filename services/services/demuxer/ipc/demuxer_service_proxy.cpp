@@ -71,7 +71,7 @@ int32_t DemuxerServiceProxy::SelectSourceTrackByID(uint32_t trackIndex)
 
     int32_t error = Remote()->SendRequest(SELECT_SOURCE_TRACK_BY_ID, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error,
-                           "Failed to call SelectSourceTrackByID, error: %{public}d", error);
+        "Failed to call SelectSourceTrackByID, error: %{public}d", error);
     return reply.ReadInt32();
 }
 int32_t DemuxerServiceProxy::UnselectSourceTrackByID(uint32_t trackIndex)
@@ -84,7 +84,7 @@ int32_t DemuxerServiceProxy::UnselectSourceTrackByID(uint32_t trackIndex)
 
     int32_t error = Remote()->SendRequest(UNSELECT_SOURCE_TRACK_BY_ID, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error,
-                           "Failed to call UnselectSourceTrackByID, error: %{public}d", error);
+        "Failed to call UnselectSourceTrackByID, error: %{public}d", error);
     return reply.ReadInt32();
 }
 int32_t DemuxerServiceProxy::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,

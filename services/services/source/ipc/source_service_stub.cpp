@@ -14,7 +14,6 @@
  */
 
 #include "source_service_stub.h"
-#include "unistd.h"
 #include "avcodec_server_manager.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -134,13 +133,8 @@ uint64_t SourceServiceStub::GetSourceAddr()
 
 int32_t SourceServiceStub::DumpInfo(int32_t fd)
 {
-    std::string dumpInfo;
-    GetDumpInfo(dumpInfo);
-
-    CHECK_AND_RETURN_RET_LOG(fd != -1, AVCS_ERR_INVALID_VAL, "Attempt to write to a invalid fd: %{public}d", fd);
-    write(fd, dumpInfo.c_str(), dumpInfo.size());
-
-    return AVCS_ERR_OK;
+    CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
+    return std::static_pointer_cast<SourceServer>(sourceServer_)->DumpInfo(fd);
 }
 
 int32_t SourceServiceStub::DestroyStub(MessageParcel &data, MessageParcel &reply)
@@ -203,12 +197,6 @@ int32_t SourceServiceStub::GetSourceAddr(MessageParcel &data, MessageParcel &rep
     (void)data;
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint64(GetSourceAddr()), AVCS_ERR_UNKNOWN, "Reply GetSourceAddr failed!");
-    return AVCS_ERR_OK;
-}
-
-int32_t SourceServiceStub::GetDumpInfo(std::string& dumpInfo)
-{
-    (void)dumpInfo;
     return AVCS_ERR_OK;
 }
 }  // namespace Media

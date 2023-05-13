@@ -46,7 +46,6 @@ private:
     int32_t GetTrackFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetSourceFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetSourceAddr(MessageParcel &data, MessageParcel &reply);
-    int32_t GetDumpInfo(std::string& dumpInfo);
     int32_t DestroyStub(MessageParcel &data, MessageParcel &reply);
     std::mutex mutex_;
     std::shared_ptr<ISourceService> sourceServer_ = nullptr;

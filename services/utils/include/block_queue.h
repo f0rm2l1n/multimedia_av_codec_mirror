@@ -89,7 +89,7 @@ public:
             condEmpty_.wait(lock, [this] { return !isActive_ || !que_.empty(); });
         }
         if (que_.empty()) {
-            AVCODEC_LOGD("block queue %{public}s: inactive: %{public}d, size: %{public}d.",
+            AVCODEC_LOGD("block queue %{public}s: inactive: %{public}d, size: %{public}zu.",
                 name_.c_str(), isActive_.load(), que_.size());
             return {};
         }

@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Media {
-class TaskThread {
+class __attribute__((visibility("default"))) TaskThread {
 public:
     explicit TaskThread(std::string_view name);
 

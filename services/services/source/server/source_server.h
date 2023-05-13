@@ -34,9 +34,12 @@ public:
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     int32_t GetSourceFormat(Format &format) override;
     uint64_t GetSourceAddr() override;
+    int32_t DumpInfo(int32_t fd);
 
 private:
+    int32_t GetDumpInfo(std::string &dumpInfo);
     std::shared_ptr<ISourceEngine> sourceEngine_ = nullptr;
+    std::string uri_;
     int32_t appUid_ = 0;
     int32_t appPid_ = 0;
 };

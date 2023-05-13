@@ -15,13 +15,21 @@
 
 #include "codec_server.h"
 #include <map>
+#include <vector>
 #include "avcodec_dfx.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "codec_factory.h"
+#include "avcodec_dump_utils.h"
+#include "media_description.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecServer"};
+    constexpr uint32_t DUMP_CODEC_INFO_INDEX = 0x01010000;
+    constexpr uint32_t DUMP_STATUS_INDEX = 0x01010100;
+    constexpr uint32_t DUMP_LAST_ERROR_INDEX = 0x01010200;
+    constexpr uint32_t DUMP_OFFSET_8 = 8;
+
     const std::map<OHOS::Media::CodecServer::CodecStatus, std::string> CODEC_STATE_MAP = {
         {OHOS::Media::CodecServer::UNINITIALIZED, "uninitialized"},
         {OHOS::Media::CodecServer::INITIALIZED, "initialized"},
@@ -30,6 +38,41 @@ namespace {
         {OHOS::Media::CodecServer::FLUSHED, "flushed"},
         {OHOS::Media::CodecServer::END_OF_STREAM, "end of stream"},
         {OHOS::Media::CodecServer::ERROR, "error"},
+    };
+
+    const std::vector<std::pair<std::string_view, const std::string>> DEFAULT_DUMP_TABLE = {
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+    };
+            
+    const std::vector<std::pair<std::string_view, const std::string>> VIDEO_DUMP_TABLE = {
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_FRAME_RATE, "Frame_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, "Pixel_Format" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_SCALE_TYPE, "Scale_Type" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, "Rotation_Angle" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT, "Max_Input_Buffer_Count" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT, "Max_Output_Buffer_Count" },
+    };
+
+    const std::vector<std::pair<std::string_view, const std::string>> AUDIO_DUMP_TABLE = {
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_CONFIG, "Codec_Config" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
+    };
+
+    const std::map<OHOS::Media::CodecServer::CodecType, 
+        std::vector<std::pair<std::string_view, const std::string>>> CODEC_DUMP_TABLE = {
+        { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_DEFAULT, DEFAULT_DUMP_TABLE },
+        { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_VIDEO, VIDEO_DUMP_TABLE },
+        { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_AUDIO, AUDIO_DUMP_TABLE },
     };
 }
 
@@ -78,6 +121,7 @@ int32_t CodecServer::Init(AVCodecType type, bool isMimeType, const std::string &
         codecBase_ = CodecFactory::Instance().CreateCodecByName(name);
     }
     CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "CodecBase is nullptr");
+    codecName_ = name;
     std::shared_ptr<AVCodecCallback> callback = std::make_shared<CodecBaseCallback>(shared_from_this());
     int32_t ret = codecBase_->SetCallback(callback);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "CodecBase SetCallback failed");
@@ -275,15 +319,45 @@ int32_t CodecServer::SetCallback(const std::shared_ptr<AVCodecCallback> &callbac
 
 int32_t CodecServer::DumpInfo(int32_t fd)
 {
-    std::string dumpString;
-    dumpString += "In CodecServer::DumpInfo\n";
-    dumpString += "Current CodecServer state is: " + std::to_string(status_) + "\n";
-    if (lastErrMsg_.size() != 0) {
-        dumpString += "CodecServer last error is: " + lastErrMsg_ + "\n";
-    }
-    dumpString += config_.Stringify();
-    write(fd, dumpString.c_str(), dumpString.size());
+    Format codecFormat;
+    int32_t ret = codecBase_->GetOutputFormat(codecFormat);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Get codec format failed.");
+    CodecType codecType = GetCodecType();
+    auto it = CODEC_DUMP_TABLE.find(codecType);
+    auto &dumpTable = 
+        it != CODEC_DUMP_TABLE.end() ? it->second : DEFAULT_DUMP_TABLE;
+    AVCodecDumpControler dumpControler;
+    std::string codecInfo;
 
+    switch (codecType) {
+    case CODEC_TYPE_VIDEO:
+        codecInfo = "Video_Codec_Info";
+        break;
+    case CODEC_TYPE_DEFAULT:
+        codecInfo = "Codec_Info";
+        break;
+    default:
+        codecInfo = "Audio_Codec_Info";
+        break;
+    }
+
+    dumpControler.AddInfo(DUMP_CODEC_INFO_INDEX, codecInfo);
+    dumpControler.AddInfo(DUMP_STATUS_INDEX, 
+        "Status", CODEC_STATE_MAP.find(status_)->second);
+    dumpControler.AddInfo(DUMP_LAST_ERROR_INDEX, 
+        "Last_Error", lastErrMsg_.size() ? lastErrMsg_ : "Null");
+
+    int32_t dumpIndex = 3;
+    for (auto iter : dumpTable) {
+        dumpControler.AddInfoFromFormat(
+            DUMP_CODEC_INFO_INDEX + (dumpIndex << DUMP_OFFSET_8), 
+            codecFormat, iter.first, iter.second);
+        dumpIndex++;
+    }
+        
+    std::string dumpString;
+    dumpControler.GetDumpString(dumpString);
+    write(fd, dumpString.c_str(), dumpString.size());
     return AVCS_ERR_OK;
 }
 
@@ -394,6 +468,21 @@ void CodecBaseCallback::OnOutputBufferAvailable(uint32_t index, AVCodecBufferInf
     if (codec_ != nullptr) {
         codec_->OnOutputBufferAvailable(index, info, flag);
     }
+}
+
+CodecServer::CodecType CodecServer::GetCodecType()
+{
+    CodecType codecType;
+    
+    if (codecName_.find("video") != codecName_.npos) {
+        codecType = CodecType::CODEC_TYPE_VIDEO;
+    } else if (codecName_.find("audio") != codecName_.npos) {
+        codecType = CodecType::CODEC_TYPE_AUDIO;
+    } else {
+        codecType = CodecType::CODEC_TYPE_DEFAULT;
+    }
+
+    return codecType;
 }
 } // namespace Media
 } // namespace OHOS

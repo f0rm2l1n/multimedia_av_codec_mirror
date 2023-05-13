@@ -46,15 +46,21 @@ public:
         STOPPED
     };
 
+    enum TrackMimeType {
+        TRACK_MIME_TYPE_AUDIO = 0,
+        TRACK_MIME_TYPE_VIDEO,
+        TRACK_MIME_TYPE_IMAGE
+    };
+
 private:
     int32_t StartThread(std::string name);
     int32_t StopThread() noexcept;
     void ThreadProcessor();
-    void DumpMediaDescription(int32_t fd, const MediaDescription &trackDesc);
     bool CanAddTrack(std::string &mimeType);
     bool CheckKeys(std::string &mimeType, const MediaDescription &trackDesc);
     std::string ConvertStateToString(State state);
     int32_t TranslatePluginStatus(Plugin::Status error);
+    TrackMimeType GetTrackMimeType(const std::string &mime);
 
     struct BlockBuffer {
         std::shared_ptr<AVSharedMemory> buffer_;

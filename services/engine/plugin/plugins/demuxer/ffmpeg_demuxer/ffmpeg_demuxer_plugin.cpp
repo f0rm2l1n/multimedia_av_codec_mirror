@@ -386,13 +386,14 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
     } else {
         trackVec = selectedTrackIds_;
     }
-    for (uint32_t i = 0; i<trackVec.size(); i++) {
+    
+    for (size_t i = 0; i < trackVec.size(); i++){
         int trackIndex = trackVec[i];
         auto avStream = formatContext_->streams[trackIndex];
         int64_t ffTime = ConvertTimeToFFmpeg(mSeconds*1000*1000, avStream->time_base);
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            if (ffTime > avStream->duration) {
-                AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}lld failed, max = %{public}lld",
+            if (ffTime > avStream->duration){
+                AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64, 
                              ffTime, avStream->duration);
                 return AVCS_ERR_SEEK_FAILED;
             }
@@ -401,7 +402,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
                 flags = seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
             }
             if (ffTime < 0) {
-                AVCODEC_LOGW("invalid ffmpeg time: %{public}lld ms, will be set to 0", ffTime);
+                AVCODEC_LOGW("invalid ffmpeg time: %{public}" PRId64 " ms, will be set to 0", ffTime);
                 ffTime = 0;
             }
             int keyFrameIdx = av_index_search_timestamp(avStream, ffTime, flags);
@@ -414,8 +415,11 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
             }
         }
         int64_t realSeekTime = ConvertTimeFromFFmpeg(ffTime, avStream->time_base);
-        AVCODEC_LOGD("seek param: trackIndex=%{public}d, ffTime=%{public}lld,\
-                     realSeekTime=%{public}lld,flags=%{public}d", trackIndex, ffTime, realSeekTime, flags);
+        AVCODEC_LOGD("realSeekTime: %{public}" PRId64, realSeekTime);
+        AVCODEC_LOGD("seek param: trackIndex=%{public}d, ffTime=%{public}" PRId64 ", \
+                     realSeekTime=%{public}" PRId64 ", flags=%{public}d", 
+                     trackIndex, ffTime, realSeekTime, flags);
+
         auto rtv = av_seek_frame(formatContext_.get(), trackIndex, ffTime, flags);
         if (rtv < 0) {
             AVCODEC_LOGE("seek failed, return value: %{public}d", rtv);

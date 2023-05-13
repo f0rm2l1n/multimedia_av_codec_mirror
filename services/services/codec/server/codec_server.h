@@ -39,6 +39,12 @@ public:
         ERROR,
     };
 
+    enum CodecType {
+        CODEC_TYPE_DEFAULT = 0,
+        CODEC_TYPE_VIDEO,
+        CODEC_TYPE_AUDIO
+    };
+
     int32_t Init(AVCodecType type, bool isMimeType, const std::string &name) override;
     int32_t Configure(const Format &format) override;
     int32_t Start() override;
@@ -68,6 +74,7 @@ private:
     int32_t InitServer();
     void ExitProcessor();
     const std::string &GetStatusDescription(OHOS::Media::CodecServer::CodecStatus status);
+    CodecType GetCodecType();
 
     CodecStatus status_ = UNINITIALIZED;
     
@@ -78,6 +85,7 @@ private:
     std::mutex cbMutex_;
     Format config_;
     std::string lastErrMsg_;
+    std::string codecName_;
     int32_t firstFrameTraceId_ = 0;
     bool isFirstFrameIn_ = true;
     bool isFirstFrameOut_ = true;

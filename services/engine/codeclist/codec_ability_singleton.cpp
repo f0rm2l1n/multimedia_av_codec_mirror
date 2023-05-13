@@ -59,7 +59,7 @@ bool CodecAbilitySingleton::ParseCodecXml()
     std::vector<CapabilityData> data = xmlParser.GetCapabilityDataArray();
     capabilityDataArray_.insert(capabilityDataArray_.end(), data.begin(), data.end());
     isParsered_ = true;
-    AVCODEC_LOGE("Parse codec xml successful, num = %{public}d", capabilityDataArray_.size());
+    AVCODEC_LOGE("Parse codec xml successful, num = %{public}zu", capabilityDataArray_.size());
     return true;
 }
 

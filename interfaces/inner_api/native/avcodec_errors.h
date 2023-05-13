@@ -27,7 +27,7 @@ using AVCSErrCode = ErrCode;
 
 // bit 28~21 is subsys, bit 20~16 is Module. bit 15~0 is code
 // confirm module offset
-constexpr AVCSErrCode AVCS_MODULE = 0X01000;
+constexpr AVCSErrCode AVCS_MODULE = 10;
 constexpr AVCSErrCode AVCS_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMEDIA, AVCS_MODULE);
 typedef enum AVCodecServiceErrCode : ErrCode {
     AVCS_ERR_OK = ERR_OK,

@@ -104,7 +104,7 @@ int32_t AVDemuxerImpl::UnselectSourceTrackByID(uint32_t trackIndex)
 }
 
 int32_t AVDemuxerImpl::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                    AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag)
+                                      AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag)
 {
     AVCodecTrace trace("AVDemuxer::CopyNextSample");
 
@@ -144,7 +144,7 @@ int32_t AVDemuxerImpl::SeekToTime(int64_t mSeconds, AVSeekMode mode)
 {
     AVCodecTrace trace("AVDemuxer::SeekToTime");
 
-    AVCODEC_LOGI("seek to time: mSeconds=%{public}lld; mode=%{public}d", mSeconds, mode);
+    AVCODEC_LOGI("seek to time: mSeconds=%{public}" PRId64 "; mode=%{public}d", mSeconds, mode);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION, "demuxer service died when seek!");
 

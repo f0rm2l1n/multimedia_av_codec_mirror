@@ -55,6 +55,7 @@ public:
 
 private:
     AVCodecServerManager();
+    void PrintDumpMenu(int32_t fd);
 
 #ifdef SUPPORT_DEMUXER
     sptr<IRemoteObject> CreateDemuxerStubObject();

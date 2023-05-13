@@ -88,7 +88,7 @@ void SurfaceMemory::AllocSurfaceBuffer()
         if (ret == OHOS::SurfaceError::SURFACE_ERROR_NO_BUFFER) {
             AVCODEC_LOGE("buffer queue is no more buffers");
         } else {
-            AVCODEC_LOGE("surface RequestBuffer fail, ret: %{public}llu", static_cast<uint64_t>(ret));
+            AVCODEC_LOGE("surface RequestBuffer fail, ret: %{public}" PRIu64, static_cast<uint64_t>(ret));
         }
         return;
     }
@@ -124,7 +124,7 @@ void SurfaceMemory::ReleaseSurfaceBuffer()
     if (!needRender_) {
         auto ret = surfaceMem_->CancelBuffer(surfaceBuffer_);
         if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
-            AVCODEC_LOGE("surface CancelBuffer fail, ret:  %{public}llu", static_cast<uint64_t>(ret));
+            AVCODEC_LOGE("surface CancelBuffer fail, ret:  %{public}" PRIu64, static_cast<uint64_t>(ret));
         }
     }
     surfaceBuffer_ = nullptr;
@@ -169,7 +169,7 @@ void SurfaceMemory::UpdateSurfaceBufferScaleMode()
 
     auto ret = surfaceMem_->SetScalingMode(surfaceBuffer_->GetSeqNum(), scalingMode_);
     if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
-        AVCODEC_LOGE("update surface buffer scaling mode fail, ret: %{public}llu", static_cast<uint64_t>(ret));
+        AVCODEC_LOGE("update surface buffer scaling mode fail, ret: %{public}" PRIu64, static_cast<uint64_t>(ret));
     }
 }
 

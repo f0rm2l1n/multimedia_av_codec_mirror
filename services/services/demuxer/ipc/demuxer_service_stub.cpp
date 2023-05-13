@@ -149,7 +149,7 @@ int32_t DemuxerServiceStub::SelectSourceTrackByID(MessageParcel &data, MessagePa
     uint32_t trackIndex = data.ReadUint32();
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SelectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
-                           "Reply SelectSourceTrackByID failed!");
+        "Reply SelectSourceTrackByID failed!");
     return AVCS_ERR_OK;
 }
 
@@ -158,7 +158,7 @@ int32_t DemuxerServiceStub::UnselectSourceTrackByID(MessageParcel &data, Message
     uint32_t trackIndex = data.ReadUint32();
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(UnselectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
-                           "Reply UnselectSourceTrackByID failed!");
+        "Reply UnselectSourceTrackByID failed!");
     return AVCS_ERR_OK;
 }
 
@@ -174,11 +174,11 @@ int32_t DemuxerServiceStub::CopyNextSample(MessageParcel &data, MessageParcel &r
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackIndex), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN,
-                           "Reply CopyNextSample failed!");
+        "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(static_cast<uint32_t>(flag)), AVCS_ERR_UNKNOWN,
-                           "Reply CopyNextSample failed!");
+        "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
     return AVCS_ERR_OK;
 }
@@ -189,7 +189,7 @@ int32_t DemuxerServiceStub::SeekToTime(MessageParcel &data, MessageParcel &reply
     AVSeekMode seekMode = static_cast<AVSeekMode>(data.ReadInt32());
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(mSeconds, seekMode)),
-                           AVCS_ERR_UNKNOWN, "Reply SeekToTime failed!");
+        AVCS_ERR_UNKNOWN, "Reply SeekToTime failed!");
     return AVCS_ERR_OK;
 }
 

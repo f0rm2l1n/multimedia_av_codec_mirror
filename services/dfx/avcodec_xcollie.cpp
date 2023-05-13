@@ -42,8 +42,12 @@ void AVCodecXCollie::TimerCallback(void *data)
 
 int32_t AVCodecXCollie::Dump(int32_t fd)
 {
+    if (dfxDumper_.empty()) {
+        return AVCS_ERR_OK;
+    }
+    
     std::lock_guard<std::mutex> lock(mutex_);
-    std::string dumpString = "------------------AVCodecXCollie------------------\n";
+    std::string dumpString = "[AVCodec_XCollie]\n";
     for (const auto &iter : dfxDumper_) {
         dumpString += "WaitTask-----";
         dumpString += iter.second;

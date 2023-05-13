@@ -610,10 +610,10 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(size_t index)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), nullptr, "Get input buffer failed: not in Running or Flushed state");
     std::vector<std::shared_ptr<AVBuffer>> &avBuffers = buffers_[INDEX_INPUT];
-    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr, "Get buffer failed with bad index, index=%{public}d",
-                             index);
+    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr,
+                             "Get buffer failed with bad index, index=%{public}zu", index);
     CHECK_AND_RETURN_RET_LOG(avBuffers[index]->owner_ == AVBuffer::OWNED_BY_USER, nullptr,
-                             "Get buffer failed with index=%{public}d, buffer is not available", index);
+                             "Get buffer failed with index=%{public}zu, buffer is not available", index);
     std::shared_lock<std::shared_mutex> iLock(inputMutex_);
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
 }
@@ -625,10 +625,10 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(size_t index)
                              "Get output buffer failed: not in Running/Flushed/EOS state");
     CHECK_AND_RETURN_RET_LOG(CodecSurface_ == nullptr, nullptr, "Get output buffer failed: surface output");
     std::vector<std::shared_ptr<AVBuffer>> &avBuffers = buffers_[INDEX_OUTPUT];
-    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr, "Get buffer failed with bad index, index=%{public}d",
-                             index);
+    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr,
+                             "Get buffer failed with bad index, index=%{public}zu", index);
     CHECK_AND_RETURN_RET_LOG(avBuffers[index]->owner_ == AVBuffer::OWNED_BY_USER, nullptr,
-                             "Get buffer failed with index=%{public}d, buffer is not available", index);
+                             "Get buffer failed with index=%{public}zu, buffer is not available", index);
 
     std::unique_lock<std::mutex> oLock(outputMutex_);
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
@@ -641,10 +641,10 @@ int32_t FCodec::QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AV
                              "Queue input buffer failed: not in Running or Flushed state");
     std::vector<std::shared_ptr<AVBuffer>> &inBuffers = buffers_[INDEX_INPUT];
     CHECK_AND_RETURN_RET_LOG(index < inBuffers.size(), AVCS_ERR_INVALID_VAL,
-                             "Queue input buffer failed with bad index, index=%{public}d, buffer_size=%{public}d",
+                             "Queue input buffer failed with bad index, index=%{public}zu, buffer_size=%{public}zu",
                              index, inBuffers.size());
     CHECK_AND_RETURN_RET_LOG(inBuffers[index]->owner_ == AVBuffer::OWNED_BY_USER, AVCS_ERR_INVALID_OPERATION,
-                             "Queue input buffer failed: buffer with index=%{public}d is not available", index);
+                             "Queue input buffer failed: buffer with index=%{public}zu is not available", index);
     std::unique_lock<std::shared_mutex> iLock(inputMutex_);
     inBufQue_.emplace_back(index);
     inBuffers[index]->owner_ = AVBuffer::OWNED_BY_CODEC;
@@ -858,7 +858,7 @@ void FCodec::RenderFrame()
         if (surfaceMemory->GetSurfaceBuffer() == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         } else {
-            AVCODEC_LOGD("render frame success, index=%{public}d", index);
+            AVCODEC_LOGD("render frame success, index=%{public}zu", index);
             std::lock_guard<std::mutex> oLock(outputMutex_);
             codecAvailBuffers_.emplace_back(index);
             renderBuffers_.pop_front();
@@ -886,7 +886,7 @@ int32_t FCodec::ReleaseOutputBuffer(size_t index)
         }
         return AVCS_ERR_OK;
     } else {
-        AVCODEC_LOGE("Release output buffer failed: check your index=%{public}d", index);
+        AVCODEC_LOGE("Release output buffer failed: check your index=%{public}zu", index);
         return AVCS_ERR_INVALID_VAL;
     }
 }
@@ -935,7 +935,7 @@ int32_t FCodec::RenderOutputBuffer(size_t index)
         renderBuffers_.emplace_back(index);
         return AVCS_ERR_OK;
     } else {
-        AVCODEC_LOGE("Failed to render output buffer with bad index, index=%{public}d", index);
+        AVCODEC_LOGE("Failed to render output buffer with bad index, index=%{public}zu", index);
         return AVCS_ERR_INVALID_VAL;
     }
 }
