@@ -25,13 +25,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Su
 }
 namespace OHOS {
 namespace Media {
-sptr<Surface> SurfaceMemory::surface_ = nullptr;
+sptr<Surface> SurfaceMemory::surfaceMem_ = nullptr;
 BufferRequestConfig SurfaceMemory::requestConfig_ = {0};
 ScalingMode SurfaceMemory::scalingMode_ = {ScalingMode::SCALING_MODE_SCALE_TO_WINDOW};
 
 std::shared_ptr<SurfaceMemory> SurfaceMemory::Create()
 {
-    CHECK_AND_RETURN_RET_LOG(surface_ != nullptr, nullptr, "surface is nullptr");
+    CHECK_AND_RETURN_RET_LOG(surfaceMem_ != nullptr, nullptr, "surface is nullptr");
     CHECK_AND_RETURN_RET_LOG(requestConfig_.width != 0 && requestConfig_.height != 0, nullptr,
                              "surface config invalid");
     std::shared_ptr<SurfaceMemory> buffer = std::make_shared<SurfaceMemory>();
@@ -83,12 +83,12 @@ size_t SurfaceMemory::Read(uint8_t *out, size_t readSize, size_t position)
 
 void SurfaceMemory::AllocSurfaceBuffer()
 {
-    if (surface_ == nullptr || surfaceBuffer_ != nullptr) {
+    if (surfaceMem_ == nullptr || surfaceBuffer_ != nullptr) {
         AVCODEC_LOGE("surface is nullptr or surfaceBuffer is not nullptr");
         return;
     }
     int32_t releaseFence = -1;
-    auto ret = surface_->RequestBuffer(surfaceBuffer_, releaseFence, requestConfig_);
+    auto ret = surfaceMem_->RequestBuffer(surfaceBuffer_, releaseFence, requestConfig_);
     if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK || surfaceBuffer_ == nullptr) {
         if (ret == OHOS::SurfaceError::SURFACE_ERROR_NO_BUFFER) {
             AVCODEC_LOGE("buffer queue is no more buffers");
@@ -99,17 +99,17 @@ void SurfaceMemory::AllocSurfaceBuffer()
     }
     if (surfaceBuffer_->Map() != OHOS::SurfaceError::SURFACE_ERROR_OK) {
         AVCODEC_LOGE("surface buffer Map failed");
-        surface_->CancelBuffer(surfaceBuffer_);
+        surfaceMem_->CancelBuffer(surfaceBuffer_);
         return;
     }
     sptr<SyncFence> autoFence = new (std::nothrow) SyncFence(releaseFence);
     if (autoFence != nullptr) {
         autoFence->Wait(100); // 100ms
     }
-    ret = surface_->SetScalingMode(surfaceBuffer_->GetSeqNum(), scalingMode_);
+    ret = surfaceMem_->SetScalingMode(surfaceBuffer_->GetSeqNum(), scalingMode_);
     if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
         AVCODEC_LOGE("surface buffer set scaling mode failed");
-        surface_->CancelBuffer(surfaceBuffer_);
+        surfaceMem_->CancelBuffer(surfaceBuffer_);
         return;
     }
 
@@ -127,7 +127,7 @@ void SurfaceMemory::ReleaseSurfaceBuffer()
         return;
 
     if (!needRender_) {
-        auto ret = surface_->CancelBuffer(surfaceBuffer_);
+        auto ret = surfaceMem_->CancelBuffer(surfaceBuffer_);
         if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
             AVCODEC_LOGE("surface CancelBuffer fail, ret:  %{public}llu", static_cast<uint64_t>(ret));
         }
@@ -172,7 +172,7 @@ void SurfaceMemory::UpdateSurfaceBufferScaleMode()
         return;
     }
 
-    auto ret = surface_->SetScalingMode(surfaceBuffer_->GetSeqNum(), scalingMode_);
+    auto ret = surfaceMem_->SetScalingMode(surfaceBuffer_->GetSeqNum(), scalingMode_);
     if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
         AVCODEC_LOGE("update surface buffer scaling mode fail, ret: %{public}llu", static_cast<uint64_t>(ret));
     }
@@ -180,7 +180,7 @@ void SurfaceMemory::UpdateSurfaceBufferScaleMode()
 
 void SurfaceMemory::SetSurface(sptr<Surface> surface)
 {
-    surface_ = surface;
+    surfaceMem_ = surface;
 }
 
 void SurfaceMemory::SetConfig(int32_t width, int32_t height, int32_t format, uint64_t usage, int32_t strideAlign,

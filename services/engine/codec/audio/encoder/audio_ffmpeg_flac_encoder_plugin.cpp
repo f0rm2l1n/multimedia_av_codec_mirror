@@ -19,11 +19,13 @@
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
 
-namespace {
+namespace
+{
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
 }
 
-namespace {
+namespace 
+{
     constexpr int minChannel = 1;
     constexpr int maxChannel = 8;
     constexpr int getInputBufferSize_ = 65536;
@@ -37,15 +39,19 @@ namespace {
 namespace OHOS {
 namespace Media {
 AudioFFMpegFlacEncoderPlugin::AudioFFMpegFlacEncoderPlugin()
-    : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>()) {}
+    : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>())
+{
+}
 
-AudioFFMpegFlacEncoderPlugin::~AudioFFMpegFlacEncoderPlugin() {
+AudioFFMpegFlacEncoderPlugin::~AudioFFMpegFlacEncoderPlugin()
+{
     basePlugin->Release();
     basePlugin.reset();
     basePlugin = nullptr;
 }
 
-static bool isTrueSampleRate(int sample) {
+static bool isTrueSampleRate(int sample)
+{
     for (auto i : flac_encoder_sample_rate_table) {
         if (i == sample) {
             return true;
@@ -54,7 +60,8 @@ static bool isTrueSampleRate(int sample) {
     return false;
 }
 
-static bool isTrueBitsPerSample(int bits_per_coded_sample) {
+static bool isTrueBitsPerSample(int bits_per_coded_sample)
+{
     for (auto i : flac_encoder_bits_sample_table) {
         if (i == bits_per_coded_sample) {
             return true;
@@ -63,7 +70,8 @@ static bool isTrueBitsPerSample(int bits_per_coded_sample) {
     return false;
 }
 
-int32_t AudioFFMpegFlacEncoderPlugin::init(const Format &format) {
+int32_t AudioFFMpegFlacEncoderPlugin::init(const Format &format)
+{
     int32_t channels, sample_rate;
     int32_t bits_per_coded_sample;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
@@ -107,27 +115,33 @@ int32_t AudioFFMpegFlacEncoderPlugin::init(const Format &format) {
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioFFMpegFlacEncoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) {
+int32_t AudioFFMpegFlacEncoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+{
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegFlacEncoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer) {
+int32_t AudioFFMpegFlacEncoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+{
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegFlacEncoderPlugin::reset() {
+int32_t AudioFFMpegFlacEncoderPlugin::reset()
+{
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegFlacEncoderPlugin::release() {
+int32_t AudioFFMpegFlacEncoderPlugin::release()
+{
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegFlacEncoderPlugin::flush() {
+int32_t AudioFFMpegFlacEncoderPlugin::flush()
+{
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegFlacEncoderPlugin::getInputBufferSize() const {
+uint32_t AudioFFMpegFlacEncoderPlugin::getInputBufferSize() const
+{
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > getInputBufferSize_) {
         maxSize = getInputBufferSize_;
@@ -135,11 +149,13 @@ uint32_t AudioFFMpegFlacEncoderPlugin::getInputBufferSize() const {
     return maxSize;
 }
 
-uint32_t AudioFFMpegFlacEncoderPlugin::getOutputBufferSize() const {
+uint32_t AudioFFMpegFlacEncoderPlugin::getOutputBufferSize() const
+{
     return getOutputBufferSize_;
 }
 
-Format AudioFFMpegFlacEncoderPlugin::GetFormat() const noexcept {
+Format AudioFFMpegFlacEncoderPlugin::GetFormat() const noexcept
+{
     return basePlugin->GetFormat();
 }
 } // namespace Media

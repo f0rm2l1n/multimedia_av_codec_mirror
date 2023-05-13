@@ -33,9 +33,9 @@ protected:
     virtual void DoRunMultiThreadCase()= 0;
     virtual int DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info) = 0;
     virtual int DoAddTrack(int32_t &trackIndex, MediaDescription &trackDesc) = 0;
-    int AddVideoTrack(VideoTrackParam *param);
-    int AddAudioTrack(AudioTrackParam *param);
-    int AddCoverTrack(VideoTrackParam *param);
+    int AddVideoTrack(const VideoTrackParam *param);
+    int AddAudioTrack(const AudioTrackParam *param);
+    int AddCoverTrack(const VideoTrackParam *param);
     void WriteTrackSample();
     void WriteAvTrackSample();
     void WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<std::ifstream> file);
@@ -51,9 +51,9 @@ protected:
     static void MulThdWriteTrackSample(AVMuxerDemoBase *muxerBase, uint32_t trackId,
         std::shared_ptr<std::ifstream> file);
 
-    static AudioTrackParam *audioParams_;
-    static VideoTrackParam *videoParams_;
-    static VideoTrackParam *coverParams_;
+    const static AudioTrackParam *audioParams_;
+    const static VideoTrackParam *videoParams_;
+    const static VideoTrackParam *coverParams_;
     static std::string videoType_;
     static std::string audioType_;
     static std::string coverType_;

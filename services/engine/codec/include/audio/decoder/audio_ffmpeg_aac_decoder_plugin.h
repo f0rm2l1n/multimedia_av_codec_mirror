@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Media {
-
 class AudioFFMpegAacDecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegAacDecoderPlugin> {
 public:
     AudioFFMpegAacDecoderPlugin();
@@ -45,7 +44,6 @@ public:
 private:
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif

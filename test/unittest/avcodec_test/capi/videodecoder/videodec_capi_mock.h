@@ -17,10 +17,10 @@
 #ifndef VIDEODEC_CAPI_MOCK_H
 #define VIDEODEC_CAPI_MOCK_H
 
-#include "avcodec_mock.h"
-#include "native_avcodec_videodecoder.h"
 #include <map>
 #include <mutex>
+#include "avcodec_mock.h"
+#include "native_avcodec_videodecoder.h"
 
 
 namespace OHOS {

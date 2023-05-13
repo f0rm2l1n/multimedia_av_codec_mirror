@@ -23,8 +23,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "libavcodec/avcodec.h"
 #include <libavutil/opt.h>
+#include "libavcodec/avcodec.h"
 #ifdef __cplusplus
 };
 #endif

@@ -96,9 +96,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
 
     std::cout << "start muxer success" << std::endl;
 
-    if (coverParams_ != nullptr) {
-        WriteCoverSample();
-    }
+    WriteCoverSample();
     
     std::cout<<"AVMuxerDemo::DoRunMuxer runMode is : "<<runMode<<std::endl;
     if (runMode.compare(RUN_NORMAL) == 0) {

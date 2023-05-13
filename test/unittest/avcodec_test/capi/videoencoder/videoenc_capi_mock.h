@@ -16,10 +16,10 @@
 #ifndef VIDEOENC_CAPI_MOCK_H
 #define VIDEOENC_CAPI_MOCK_H
 
-#include "avcodec_mock.h"
-#include "native_avcodec_videoencoder.h"
 #include <map>
 #include <mutex>
+#include "avcodec_mock.h"
+#include "native_avcodec_videoencoder.h"
 
 namespace OHOS {
 namespace Media {

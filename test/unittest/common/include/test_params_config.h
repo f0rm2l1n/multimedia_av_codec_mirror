@@ -112,6 +112,9 @@ constexpr uint32_t ES_LENGTH_MPEG4 = sizeof(ES_MPEG4) / sizeof(uint32_t);
 const std::string MPEG4_SRC_PATH = "/data/test/media/mpeg4_320_240.es";
 } // namespace VCodecTestParam
 namespace ACodecTestParam {
+constexpr int32_t MAX_CHANNEL = 2;            // max channel count of avdec_mp3
+constexpr int32_t DEFAULT_SAMPLERATE = 44100; // one of sample_rate that meets avdec_mp3
+constexpr int32_t DEFAULT_BITRATE = 97496;    // one of bitrate that meets avdec_mp3
 constexpr uint32_t SAMPLE_DURATION_US = 23000;
 constexpr bool NEED_DUMP = true;
 const std::string MIME_TYPE = "audio/mp4a-latm";
@@ -182,6 +185,21 @@ namespace FormatTestParam {
     constexpr float EPSINON_FLOAT = 0.0001;
     constexpr double EPSINON_DOUBLE = 0.0001;
 } // namespace FormatTestParam
+
+namespace CodecListTestParam {
+    constexpr uint32_t DEFAULT_WIDTH = 1920;
+    constexpr uint32_t DEFAULT_HEIGHT = 1080;
+    constexpr uint32_t MIN_WIDTH = 2;
+    constexpr uint32_t MIN_HEIGHT = 2;
+    constexpr uint32_t MAX_WIDTH = 3840;
+    constexpr uint32_t MAX_HEIGHT = 2160;
+    constexpr uint32_t MAX_FRAME_RATE = 30;
+    constexpr uint32_t MAX_VIDEO_BITRATE = 3000000;
+    constexpr uint32_t MAX_AUDIO_BITRATE = 384000;
+    constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
+    constexpr uint32_t MAX_CHANNEL_COUNT = 2;
+    constexpr uint32_t MAX_CHANNEL_COUNT_VORBIS = 7;
+} // namespace CodecListTestParam
 } // namespace Media
 } // namespace OHOS
 

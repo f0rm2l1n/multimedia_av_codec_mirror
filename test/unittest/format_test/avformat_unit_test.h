@@ -16,8 +16,8 @@
 #ifndef FORMAT_UNIT_TEST_H
 #define FORMAT_UNIT_TEST_H
 
-#include "avformat_mock.h"
 #include "gtest/gtest.h"
+#include "avformat_mock.h"
 
 namespace OHOS {
 namespace Media {

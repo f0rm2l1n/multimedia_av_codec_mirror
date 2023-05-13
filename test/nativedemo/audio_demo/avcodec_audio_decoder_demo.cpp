@@ -16,8 +16,8 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "avcodec_audio_codec_key.h"
 #include "avcodec_audio_decoder_demo.h"
+#include "avcodec_audio_codec_key.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "demo_log.h"

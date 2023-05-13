@@ -66,7 +66,7 @@ static int32_t GetAdtsHeader(std::string &adtsHeader, uint32_t &headerSize, std:
 
 static bool CheckSampleFormat(const std::shared_ptr<AVCodec> &codec, AVSampleFormat sample_fmt)
 {
-    const enum AVSampleFormat *p = codec->sample_fmts;
+    const AVSampleFormat *p = codec->sample_fmts;
     while (*p != AV_SAMPLE_FMT_NONE) { // 通过AV_SAMPLE_FMT_NONE作为结束符
         if (*p == sample_fmt) {
             return true;

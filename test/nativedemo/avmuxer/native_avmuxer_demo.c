@@ -52,11 +52,11 @@ struct MuxerParam {
     char outputFormatType[TYPE_BUFFER_SIZE];
     int runMode;
     char runModeType[TYPE_BUFFER_SIZE];
-    AudioTrackParam *audioParams;
+    const AudioTrackParam *audioParams;
     char audioType[TYPE_BUFFER_SIZE];
-    VideoTrackParam *videoParams;
+    const VideoTrackParam *videoParams;
     char videoType[TYPE_BUFFER_SIZE];
-    VideoTrackParam *coverParams;
+    const VideoTrackParam *coverParams;
     char coverType[TYPE_BUFFER_SIZE];
 };
 
@@ -362,11 +362,15 @@ int GetInputNum(int defaultNum)
     if (num == '\n') { // default
         return defaultNum;
     }
-    ungetc(num, stdin);
-    if (scanf_s("%d", &num) != EOK) {
+    if (ungetc(num, stdin) == EOF) {
+        printf("GetInputNum ungetc failed!");
+    }
+    if (scanf_s("%d", &num) <= 0) {
         num = defaultNum;
     }
-    fflush(stdin);
+    if (fflush(stdin) != 0) {
+        printf("GetInputNum fflush failed!");
+    }
     return num;
 }
 
@@ -630,11 +634,10 @@ int RunNativeMuxer(const char *out)
     }
 
     char outFileName[CONFIG_BUFFER_SIZE] = {0};
-    errno_t err = EOK;
-    err = snprintf_s(outFileName, sizeof(outFileName), sizeof(outFileName) - 1, "%s_%s_%s_%s_%s.%s",
+    int err = snprintf_s(outFileName, sizeof(outFileName), sizeof(outFileName) - 1, "%s_%s_%s_%s_%s.%s",
         out, g_muxerParam.runModeType, g_muxerParam.audioType, g_muxerParam.videoType,
         g_muxerParam.coverType, g_muxerParam.outputFormatType);
-    if (err != EOK) {
+    if (err <= 0) {
         CloseAllFd(&fdStr);
         return -1;
     }

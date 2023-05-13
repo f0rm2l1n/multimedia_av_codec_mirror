@@ -14,6 +14,7 @@
  */
 
 #include "videoenc_capi_mock.h"
+#include <iostream>
 #include "avcodec_errors.h"
 #include "avcodec_video_encoder.h"
 #include "avformat_capi_mock.h"
@@ -21,7 +22,6 @@
 #include "native_avcodec_base.h"
 #include "surface_capi_mock.h"
 #include "window.h"
-#include <iostream>
 
 using namespace std;
 

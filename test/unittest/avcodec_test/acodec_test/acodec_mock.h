@@ -16,10 +16,6 @@
 #ifndef ACODEC_MOCK_H
 #define ACODEC_MOCK_H
 
-#include "avcodec_mock.h"
-#include "securec.h"
-#include "test_params_config.h"
-#include "unittest_log.h"
 #include <atomic>
 #include <fstream>
 #include <iostream>
@@ -27,6 +23,10 @@
 #include <queue>
 #include <string>
 #include <thread>
+#include "avcodec_mock.h"
+#include "securec.h"
+#include "test_params_config.h"
+#include "unittest_log.h"
 
 namespace OHOS {
 namespace Media {

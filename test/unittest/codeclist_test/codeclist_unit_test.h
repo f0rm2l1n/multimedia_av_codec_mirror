@@ -16,26 +16,14 @@
 #ifndef CODECLIST_UNIT_TEST_H
 #define CODECLIST_UNIT_TEST_H
 
+#include <vector>
+#include "gtest/gtest.h"
 #include "avcodec_info.h"
 #include "codeclist_mock.h"
 #include "media_description.h"
-#include "gtest/gtest.h"
-#include <vector>
 
 namespace OHOS {
 namespace Media {
-constexpr uint32_t DEFAULT_WIDTH = 1920;
-constexpr uint32_t DEFAULT_HEIGHT = 1080;
-constexpr uint32_t MIN_WIDTH = 2;
-constexpr uint32_t MIN_HEIGHT = 2;
-constexpr uint32_t MAX_WIDTH = 3840;
-constexpr uint32_t MAX_HEIGHT = 2160;
-constexpr uint32_t MAX_FRAME_RATE = 30;
-constexpr uint32_t MAX_VIDEO_BITRATE = 3000000;
-constexpr uint32_t MAX_AUDIO_BITRATE = 384000;
-constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
-constexpr uint32_t MAX_CHANNEL_COUNT = 2;
-constexpr uint32_t MAX_CHANNEL_COUNT_VORBIS = 7;
 class CodecListUnitTest : public testing::Test {
 public:
     // SetUpTestCase: Called before all test cases
@@ -48,17 +36,16 @@ public:
     void TearDown(void);
 
 protected:
-    std::string codecMimeKey_{MediaDescriptionKey::MD_KEY_CODEC_MIME};
-    std::string bitrateKey_{MediaDescriptionKey::MD_KEY_BITRATE};
-    std::string widthKey_{MediaDescriptionKey::MD_KEY_WIDTH};
-    std::string heightKey_{MediaDescriptionKey::MD_KEY_HEIGHT};
-    std::string pixelFormatKey_{MediaDescriptionKey::MD_KEY_PIXEL_FORMAT};
-    std::string frameRateKey_{MediaDescriptionKey::MD_KEY_FRAME_RATE};
-    std::string channelCountKey_{MediaDescriptionKey::MD_KEY_CHANNEL_COUNT};
-    std::string sampleRateKey_{"samplerate"}; //{MediaDescriptionKey::MD_KEY_SAMPLE_RATE};
-    std::string bitDepthKey_{MediaDescriptionKey::MD_KEY_SAMPLE_RATE};
-
-    std::shared_ptr<CodecListMock> codeclist_{nullptr};
+    std::string codecMimeKey_{ MediaDescriptionKey::MD_KEY_CODEC_MIME };
+    std::string bitrateKey_{ MediaDescriptionKey::MD_KEY_BITRATE };
+    std::string widthKey_{ MediaDescriptionKey::MD_KEY_WIDTH };
+    std::string heightKey_{ MediaDescriptionKey::MD_KEY_HEIGHT };
+    std::string pixelFormatKey_{ MediaDescriptionKey::MD_KEY_PIXEL_FORMAT };
+    std::string frameRateKey_{ MediaDescriptionKey::MD_KEY_FRAME_RATE };
+    std::string channelCountKey_{ MediaDescriptionKey::MD_KEY_CHANNEL_COUNT };
+    std::string sampleRateKey_{ "samplerate" }; // { MediaDescriptionKey::MD_KEY_SAMPLE_RATE }
+    std::string bitDepthKey_{ MediaDescriptionKey::MD_KEY_SAMPLE_RATE };
+    std::shared_ptr<CodecListMock> codeclist_{ nullptr };
 };
 } // namespace Media
 } // namespace OHOS

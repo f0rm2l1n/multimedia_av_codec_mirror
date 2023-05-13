@@ -46,7 +46,6 @@ constexpr uint32_t DEFAULT_AAC_LATM_TYPE = 2;
 
 namespace OHOS {
 namespace Media {
-std::string g_codecName = CODEC_MP3_NAME;
 
 class ADecSignal {
 public:
@@ -118,6 +117,7 @@ protected:
 
     FILE *inFile_ {nullptr};
     FILE *dumpFd_ {nullptr};
+    std::string codecName_ {CODEC_MP3_NAME};
 
     OHOS::Media::Format format_;
     std::shared_ptr<OHOS::Media::CodecBase> adec_ {nullptr};
@@ -136,7 +136,7 @@ void AudioCodeDecoderUnitTest::TearDownTestCase(void)
 void AudioCodeDecoderUnitTest::SetUp(void)
 {
     cout << "[SetUp]: SetUp!!!" << endl;
-    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(g_codecName);
+    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(codecName_);
     ASSERT_NE(nullptr, adec_);
 
     signal_ = new ADecSignal();
@@ -184,7 +184,7 @@ int32_t AudioCodeDecoderUnitTest::ProceAacFunc(void)
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
 
     if (adec_->Configure(format_) != AVCodecServiceErrCode::AVCS_ERR_OK) {
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
@@ -458,7 +458,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_ReleaseOutputBuffer_01, Test
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_SetCodecName_01, TestSize.Level1)
 {
-    g_codecName = CODEC_FLAC_NAME;
+    codecName_ = CODEC_FLAC_NAME;
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_01, TestSize.Level1)
@@ -728,7 +728,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_ReleaseOutputBuffer_01, Tes
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_SetCodecName_02, TestSize.Level1)
 {
-    g_codecName = CODEC_AAC_NAME;
+    codecName_ = CODEC_AAC_NAME;
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_01, TestSize.Level1)
@@ -744,7 +744,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_02, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -755,7 +755,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_03, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -765,7 +765,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_04, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -775,7 +775,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_05, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, INVALID_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, INVALID_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -785,7 +785,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_06, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_LATM_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_LATM_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -796,7 +796,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_07, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_LATM_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_LATM_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -806,7 +806,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_08, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_LATM_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_LATM_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -816,7 +816,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_09, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, INVALID_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, INVALID_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_LATM_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_LATM_TYPE);
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
@@ -881,7 +881,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Stop_02, TestSize.Level1)
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
 }
@@ -913,7 +913,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Reset_02, TestSize.Level1)
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
@@ -937,7 +937,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Release_02, TestSize.Level1)
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_.PutIntValue(MediaDescriptionKey::MD_AAC_TYPE_KEY, DEFAULT_AAC_TYPE);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }

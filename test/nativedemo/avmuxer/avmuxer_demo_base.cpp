@@ -29,9 +29,9 @@ namespace {
 
 namespace OHOS {
 namespace Media {
-AudioTrackParam *AVMuxerDemoBase::audioParams_ = nullptr;
-VideoTrackParam *AVMuxerDemoBase::videoParams_ = nullptr;
-VideoTrackParam *AVMuxerDemoBase::coverParams_ = nullptr;
+const AudioTrackParam *AVMuxerDemoBase::audioParams_ = nullptr;
+const VideoTrackParam *AVMuxerDemoBase::videoParams_ = nullptr;
+const VideoTrackParam *AVMuxerDemoBase::coverParams_ = nullptr;
 std::string AVMuxerDemoBase::videoType_ = std::string("");
 std::string AVMuxerDemoBase::audioType_ = std::string("");
 std::string AVMuxerDemoBase::coverType_ = std::string("");
@@ -422,6 +422,9 @@ void AVMuxerDemoBase::MulThdWriteTrackSample(AVMuxerDemoBase *muxerBase, uint32_
 
 void AVMuxerDemoBase::WriteCoverSample()
 {
+    if (coverParams_ == nullptr) {
+        return;
+    }
     std::cout<<"AVMuxerDemoBase::WriteCoverSample"<<std::endl;
     if (coverFile_ == nullptr) {
         std::cout<<"AVMuxerDemoBase::WriteCoverSample coverFile_ is nullptr!"<<std::endl;
@@ -446,7 +449,7 @@ void AVMuxerDemoBase::WriteCoverSample()
     delete [] avMuxerDemoBuffer;
 }
 
-int AVMuxerDemoBase::AddVideoTrack(VideoTrackParam *param)
+int AVMuxerDemoBase::AddVideoTrack(const VideoTrackParam *param)
 {
     if (param == nullptr) {
         std::cout<<"AVMuxerDemoBase::AddVideoTrack video is not select!"<<std::endl;
@@ -474,7 +477,7 @@ int AVMuxerDemoBase::AddVideoTrack(VideoTrackParam *param)
     return 0;
 }
 
-int AVMuxerDemoBase::AddAudioTrack(AudioTrackParam *param)
+int AVMuxerDemoBase::AddAudioTrack(const AudioTrackParam *param)
 {
     if (param == nullptr) {
         std::cout<<"AVMuxerDemoBase::AddAudioTrack audio is not select!"<<std::endl;
@@ -503,7 +506,7 @@ int AVMuxerDemoBase::AddAudioTrack(AudioTrackParam *param)
     return 0;
 }
 
-int AVMuxerDemoBase::AddCoverTrack(VideoTrackParam *param)
+int AVMuxerDemoBase::AddCoverTrack(const VideoTrackParam *param)
 {
     if (param == nullptr) {
         std::cout<<"AVMuxerDemoBase::AddCoverTrack cover is not select!"<<std::endl;

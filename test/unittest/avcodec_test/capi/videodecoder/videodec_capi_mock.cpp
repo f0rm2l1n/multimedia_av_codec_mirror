@@ -14,13 +14,13 @@
  */
 
 #include "videodec_capi_mock.h"
+#include <iostream>
 #include "avcodec_video_decoder.h"
 #include "avformat_capi_mock.h"
 #include "avmemory_capi_mock.h"
 #include "native_avcodec_base.h"
 #include "surface_capi_mock.h"
 #include "window.h"
-#include <iostream>
 
 using namespace std;
 

@@ -16,9 +16,9 @@
 #ifndef AVCODEC_MOCK_H
 #define AVCODEC_MOCK_H
 
+#include <string>
 #include "enum_mock.h"
 #include "nocopyable.h"
-#include <string>
 
 
 namespace OHOS {

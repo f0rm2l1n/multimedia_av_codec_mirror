@@ -106,8 +106,10 @@ void AVMuxerFFmpegDemo::DoRunMuxer()
 
     AddAudioTrack(audioParams_);
     AddVideoTrack(videoParams_);
+    AddCoverTrack(coverParams_);
 
     ffmpegMuxer_->Start();
+    WriteCoverSample();
     WriteTrackSample();
     ffmpegMuxer_->Stop();
 }

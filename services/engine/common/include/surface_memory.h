@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Media {
-
 namespace {
 constexpr uint64_t USAGE = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
 constexpr int32_t SURFACE_STRIDE_ALIGN = 8;
@@ -57,14 +56,12 @@ public:
     virtual uint32_t GetFlags() const final;
 
 private:
-    // Allocated memory size.
     sptr<SurfaceBuffer> surfaceBuffer_{nullptr};
-    size_t size_{0};
-    int32_t fence_{-1};
-    uint32_t stride_{0};
-    bool needRender_{false};
-
-    static sptr<Surface> surface_;
+    size_t size_ = 0;
+    int32_t fence_ = -1;
+    uint32_t stride_ = 0;
+    bool needRender_ = false;
+    static sptr<Surface> surfaceMem_;
     static BufferRequestConfig requestConfig_;
     static ScalingMode scalingMode_;
     static constexpr size_t INVALID_POSITION = -1;

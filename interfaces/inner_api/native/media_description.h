@@ -170,7 +170,7 @@ public:
     /**
      * Key for aac type, value type is uint32_t
      */
-    static constexpr std::string_view MD_AAC_TYPE_KEY = "aac-type";
+    static constexpr std::string_view MD_KEY_AAC_IS_ADTS = "aac_is_adts";
 
 private:
     MediaDescriptionKey() = delete;

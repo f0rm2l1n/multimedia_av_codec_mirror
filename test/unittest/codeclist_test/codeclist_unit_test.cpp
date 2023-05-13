@@ -20,9 +20,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "test_params_config.h"
+
 
 using namespace testing::ext;
 using namespace OHOS::Media;
+using namespace OHOS::Media::CodecListTestParam;
 
 template <typename TCodecMock>
 void ReleaseCodec(vector<TCodecMock> &codecLst)

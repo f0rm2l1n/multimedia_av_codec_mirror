@@ -28,11 +28,6 @@ namespace Media {
 static constexpr uint32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
 static constexpr uint32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
 
-enum AacType : int {
-    AAC = 1,
-    AAC_LATM = 2
-};
-
 AudioFFMpegAacDecoderPlugin::AudioFFMpegAacDecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>()) {}
 
 AudioFFMpegAacDecoderPlugin::~AudioFFMpegAacDecoderPlugin()
@@ -45,11 +40,11 @@ AudioFFMpegAacDecoderPlugin::~AudioFFMpegAacDecoderPlugin()
 int32_t AudioFFMpegAacDecoderPlugin::init(const Format &format)
 {
     int type;
-    format.GetIntValue("aac-type", type);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, type);
     int32_t ret = AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
-    if (type == static_cast<int>(AacType::AAC)) {
+    if (type == 1) {
         ret = basePlugin->AllocateContext("aac");
-    } else if (type == static_cast<int>(AacType::AAC_LATM)) {
+    } else if (type == 0) {
         ret = basePlugin->AllocateContext("aac_latm");
     }
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {

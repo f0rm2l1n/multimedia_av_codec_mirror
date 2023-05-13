@@ -16,9 +16,9 @@
 #ifndef FORMAT_UNIT_TEST_H
 #define FORMAT_UNIT_TEST_H
 
+#include "gtest/gtest.h"
 #include "avcodec_mock.h"
 #include "test_params_config.h"
-#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Media {

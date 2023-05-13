@@ -432,6 +432,6 @@ OH_AVErrCode OH_AudioDecoder_IsValid(OH_AVCodec *codec, bool *isVaild)
 
 #ifdef __cplusplus
  };
- #endif
+#endif
 } // namesapce Media
 } // OHOS

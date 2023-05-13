@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Media {
-
 class AudioFFMpegVorbisDecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegVorbisDecoderPlugin> {
 public:
     AudioFFMpegVorbisDecoderPlugin();

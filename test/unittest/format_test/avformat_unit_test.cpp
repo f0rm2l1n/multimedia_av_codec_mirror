@@ -14,19 +14,18 @@
  */
 
 #include "avformat_unit_test.h"
+#include <cmath>
+#include "gtest/gtest.h"
 #include "avcodec_errors.h"
 #include "securec.h"
-#include "gtest/gtest.h"
-#include <cmath>
 
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace testing::ext;
-namespace {
+
 constexpr float EPSINON_FLOAT = 0.0001;
 constexpr double EPSINON_DOUBLE = 0.0001;
-} // namespace
 
 void AVFormatUnitTest::SetUpTestCase(void) {}
 
