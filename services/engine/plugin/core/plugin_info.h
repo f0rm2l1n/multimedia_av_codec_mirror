@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-
 /**
  * PluginInfo, which describes static information for a plugin, including basic plugin information,
  * such as the type, name, rank.

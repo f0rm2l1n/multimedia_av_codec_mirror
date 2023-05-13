@@ -32,14 +32,13 @@ static std::string g_libFileTail = ".z.so";
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "Source"};
 
     inline bool FileIsExists (const char* name)
     {
         struct stat buffer;
-        return (stat(name, &buffer) == 0); 
+        return (stat(name, &buffer) == 0);
     }
 
     static std::map<std::string, std::string> pluginMap = {
@@ -122,14 +121,11 @@ namespace {
             !strcmp(name, "mulaw") || !strcmp(name, "alaw")) {
             return false;
         }
-
-        /* no network demuxers */
         if (!strcmp(name, "sdp") || !strcmp(name, "rtsp") || !strcmp(name, "applehttp")) {
             return false;
         }
         return true;
     }
-
 
     void ReplaceDelimiter(const std::string& delmiters, char newDelimiter, std::string& str)
     {
@@ -190,7 +186,7 @@ int32_t Source::SetTrackFormat(const Format &format, uint32_t trackIndex)
     }
     AVStream *stream = formatContext_->streams[trackIndex];
     CHECK_AND_RETURN_RET_LOG(stream != nullptr, AVCS_ERR_INVALID_OPERATION,
-                            "streams %{public}d is nullptr!", trackIndex);
+                             "streams %{public}d is nullptr!", trackIndex);
     Format::FormatDataMap formatMap = format.GetFormatMap();
     AVDictionary *streamMetadata = stream->metadata;
     for (auto iter = formatMap.rbegin(); iter != formatMap.rend(); iter++) {
@@ -201,7 +197,7 @@ int32_t Source::SetTrackFormat(const Format &format, uint32_t trackIndex)
             }
             int32_t streamFormat = iter->second.val.int32Val;
             AVCODEC_LOGD("SetTrackFormat format: streamFormat: %{public}d, codec_id: %{public}d",
-                        streamFormat, stream->codecpar->codec_id);
+                         streamFormat, stream->codecpar->codec_id);
             if ((streamFormat == VideoBitStreamFormat::AVCC && stream->codecpar->codec_id != AV_CODEC_ID_H264) ||
                  (streamFormat == VideoBitStreamFormat::HVCC && stream->codecpar->codec_id != AV_CODEC_ID_HEVC)) {
                 return AVCS_ERR_INVALID_OPERATION;
@@ -216,7 +212,7 @@ int32_t Source::SetTrackFormat(const Format &format, uint32_t trackIndex)
 void Source::GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format)
 {
     int32_t ret;
-    AVDictionaryEntry *valPtr;
+    AVDictionaryEntry *valPtr = nullptr;
     valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_IGNORE_SUFFIX);
     if (valPtr == nullptr) {
         AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
@@ -260,7 +256,7 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
     AVCODEC_LOGI("Source::GetTrackFormat is on call");
     int ret = -1;
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-                            "GetTrackFormat failed, formatContext_ is nullptr!");
+                             "GetTrackFormat failed, formatContext_ is nullptr!");
     if (trackIndex < 0 || trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {
         AVCODEC_LOGE("trackIndex is invalid!");
         return AVCS_ERR_INVALID_VAL;
@@ -307,7 +303,7 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
 uintptr_t Source::GetSourceAddr()
 {
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-                            "GetSourceAddr failed, formatContext_ is nullptr!");
+                             "GetSourceAddr failed, formatContext_ is nullptr!");
     return (uintptr_t)(formatContext_.get());
 }
 
@@ -317,30 +313,30 @@ int32_t Source::Create(std::string& uri)
     AVCODEC_LOGI("Source::Create is called");
     int32_t ret = LoadDynamicPlugin(uri);
     CHECK_AND_RETURN_RET_LOG(ret != AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                            "create source failed when load source plugin!");
+                             "create source failed when load source plugin!");
     std::shared_ptr<MediaSource> mediaSource = std::make_shared<MediaSource>(uri);
     AVCODEC_LOGD("mediaSource Init: %{public}s", mediaSource->GetSourceUri().c_str());
-    if(sourcePlugin_ == nullptr) {
+    if (sourcePlugin_ == nullptr) {
         AVCODEC_LOGE("load sourcePlugin_ fail !");
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-        "create source failed when set data source for plugin!");
+                             "create source failed when set data source for plugin!");
     ret = LoadDemuxerList();
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                            "create source failed when load demuxerlist!");
+                             "create source failed when load demuxerlist!");
     ret = SniffInputFormat(uri);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                            "create source failed when find input format!");
+                             "create source failed when find input format!");
     CHECK_AND_RETURN_RET_LOG(inputFormat_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                            "create source failed when find input format, cannnot match any input format!");
+                             "create source failed when find input format, cannnot match any input format!");
 
     ret = InitAVFormatContext();
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                            "create source failed when parse source info!");
+                             "create source failed when parse source info!");
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-        "create source failed when init AVFormatContext!");
+                             "create source failed when init AVFormatContext!");
     return AVCS_ERR_OK;
 }
 
@@ -348,10 +344,11 @@ int32_t Source::Create(std::string& uri)
 int32_t Source::LoadDemuxerList()
 {
     const AVInputFormat* plugin = nullptr;
+    constexpr size_t strMax = 4;
     void* i = nullptr;
     while ((plugin = av_demuxer_iterate(&i))) {
         if (plugin->long_name != nullptr) {
-            if (!strncmp(plugin->long_name, "pcm ", 4)) {
+            if (!strncmp(plugin->long_name, "pcm ", strMax)) {
                 continue;
             }
         }
@@ -485,7 +482,6 @@ void Source::InitAVIOContext(int flags)
     if (buffer == nullptr) {
         AVCODEC_LOGE("AllocAVIOContext failed to av_malloc...");
         return;
-
     }
     avioContext_ = avio_alloc_context(buffer, bufferSize, flags & AVIO_FLAG_WRITE,
                                     (void*)(&customIOContext_), AVReadPacket, NULL, AVSeek);
@@ -493,7 +489,7 @@ void Source::InitAVIOContext(int flags)
     if (avioContext_ == nullptr) {
         AVCODEC_LOGE("AllocAVIOContext failed to avio_alloc_context...");
         av_free(buffer);
-
+        return;
     }
     Seekable seekable = sourcePlugin_->GetSeekable();
     AVCODEC_LOGD("seekable_ is %{public}d", (int)seekable);
@@ -544,7 +540,7 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
     if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize!=0)) {
         if (customIOContext->offset > customIOContext->fileSize) {
             AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}zu",
-                customIOContext->offset, customIOContext->fileSize);
+                         customIOContext->offset, customIOContext->fileSize);
             return AVCS_ERR_SEEK_FAILED;
         }
         if (static_cast<size_t>(customIOContext->offset+bufSize) > customIOContext->fileSize) {
@@ -555,23 +551,21 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
             readSize = (readSize > memSize) ? memSize : readSize;
         }
         if (customIOContext->position != customIOContext->offset) {
-            int err = (int)customIOContext->sourcePlugin->SeekTo(customIOContext->offset);
-            if(err < 0) {
-                AVCODEC_LOGD("ERROR: Seek to %{public}zu fail,err=%{public}d\n", customIOContext->offset,err);
+            int32_t err = static_cast<int32_t>(customIOContext->sourcePlugin->SeekTo(customIOContext->offset));
+            if (err < 0) {
+                AVCODEC_LOGD("ERROR: Seek to %{public}zu fail,err=%{public}d\n", customIOContext->offset, err);
                 return AVCS_ERR_SEEK_FAILED;
             }
             customIOContext->position = customIOContext->offset;
         }
-        int result = static_cast<int>(
+        int32_t result = static_cast<int32_t>(
                     customIOContext->sourcePlugin->Read(bufferVector, static_cast<size_t>(readSize)));
         AVCODEC_LOGD("AVReadPacket read data size = %{public}d",
-                        static_cast<int>(bufferVector->GetMemory()->GetSize()));
+                     static_cast<int32_t>(bufferVector->GetMemory()->GetSize()));
         if (result == 0) {
             rtv = bufferVector->GetMemory()->GetSize();
-
             customIOContext->offset += rtv;
             customIOContext->position += rtv;
-            
         } else if (static_cast<int>(result) == 1) {
             customIOContext->eof=true;
             rtv = AVERROR_EOF;
@@ -596,8 +590,8 @@ int32_t Source::InitAVFormatContext()
     }
     formatContext->pb = avioContext_;
     formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
-    int ret = -1;
-    ret = avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr);
+    int32_t ret = -1;
+    ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
 
     if (ret == 0) {
         formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {

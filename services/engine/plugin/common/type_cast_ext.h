@@ -16,8 +16,6 @@
 #define TYPE_CAST_EXT_H
 
 #include <cstring>
-#include <memory>
-#include <typeinfo>
 
 namespace OHOS {
 namespace Media {

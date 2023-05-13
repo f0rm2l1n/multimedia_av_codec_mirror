@@ -22,8 +22,8 @@
 #include "native_avformat.h"
 #include "demo_log.h"
 #include "native_avcodec_base.h"
-#include "avcodec_audio_encoder_demo.h"
 #include "avcodec_audio_codec_key.h"
+#include "avcodec_audio_encoder_demo.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;

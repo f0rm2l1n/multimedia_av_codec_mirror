@@ -71,7 +71,7 @@ std::shared_ptr<Demuxer> DemuxerFactory::CreatePlugin(uintptr_t sourceAddr)
             return nullptr;
         }
         AVCODEC_LOGD("create demuxer plugin successful! pluginName %{public}s(maxRank %{public}d)",
-                        pluginName.c_str(), maxRank);
+                     pluginName.c_str(), maxRank);
         return std::shared_ptr<Demuxer>(
                 new Demuxer(regInfo->packageDef->pkgVersion, regInfo->info->apiVersion, plugin));
     } else {

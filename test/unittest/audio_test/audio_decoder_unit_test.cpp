@@ -46,7 +46,6 @@ constexpr uint32_t DEFAULT_AAC_LATM_TYPE = 2;
 
 namespace OHOS {
 namespace Media {
-
 class ADecSignal {
 public:
     std::mutex inMutex_;

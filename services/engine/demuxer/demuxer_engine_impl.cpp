@@ -27,11 +27,11 @@ namespace {
 
 namespace OHOS {
 namespace Media {
-std::shared_ptr<IDemuxerEngine> IDemuxerEngineFactory::CreateDemuxerEngine(int32_t appUid, int32_t appPid,
-                                                                            uintptr_t sourceAddr)
+std::shared_ptr<IDemuxerEngine> IDemuxerEngineFactory::CreateDemuxerEngine(
+    int32_t appUid, int32_t appPid, uintptr_t sourceAddr)
 {
     AVCodecTrace trace("IDemuxerEngineFactory::CreateDemuxerEngine");
-    std::shared_ptr<IDemuxerEngine> demuxerEngineImpl = 
+    std::shared_ptr<IDemuxerEngine> demuxerEngineImpl =
         std::make_shared<DemuxerEngineImpl>(appUid, appPid, sourceAddr);
     CHECK_AND_RETURN_RET_LOG(demuxerEngineImpl != nullptr, nullptr, "create MuxerEngine implementation failed");
     return demuxerEngineImpl;
@@ -74,8 +74,8 @@ int32_t DemuxerEngineImpl::UnselectSourceTrackByID(uint32_t trackIndex)
     return demuxer_->UnselectSourceTrackByID(trackIndex);
 }
 
-int32_t DemuxerEngineImpl::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,
-                                        AVCodecBufferFlag &flag)
+int32_t DemuxerEngineImpl::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                                          AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     AVCodecTrace trace("DemuxerEngineImpl::CopyNextSample");
     AVCODEC_LOGI("CopyNextSample");

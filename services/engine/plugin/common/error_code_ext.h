@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef ERROR_CODE_EXT_H
+#define ERROR_CODE_EXT_H
 
-#include <map>
 #include "plugin_definition.h"
 #include "avcodec_errors.h"
 
@@ -54,3 +55,5 @@ int32_t TranslatePluginStatus(Plugin::Status error)
 }
 } // namespace Media
 } // namespace OHOS
+
+#endif // ERROR_CODE_EXT_H
