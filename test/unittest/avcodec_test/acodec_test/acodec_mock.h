@@ -16,17 +16,17 @@
 #ifndef ACODEC_MOCK_H
 #define ACODEC_MOCK_H
 
-#include <iostream>
+#include "avcodec_mock.h"
+#include "securec.h"
+#include "test_params_config.h"
+#include "unittest_log.h"
 #include <atomic>
 #include <fstream>
-#include <thread>
+#include <iostream>
 #include <mutex>
 #include <queue>
 #include <string>
-#include "avcodec_mock.h"
-#include "unittest_log.h"
-#include "test_params_config.h"
-#include "securec.h"
+#include <thread>
 
 namespace OHOS {
 namespace Media {
@@ -36,8 +36,8 @@ public:
     std::condition_variable inCondDec_;
     std::queue<uint32_t> inQueueDec_;
     std::queue<uint32_t> outQueueDec_;
-    std::queue<uint32_t>  sizeQueueDec_;
-    std::queue<uint32_t>  flagQueueDec_;
+    std::queue<uint32_t> sizeQueueDec_;
+    std::queue<uint32_t> flagQueueDec_;
     std::queue<std::shared_ptr<AVMemoryMock>> inBufferQueueDec_;
     std::queue<std::shared_ptr<AVMemoryMock>> outBufferQueueDec_;
 
@@ -47,8 +47,8 @@ public:
     std::condition_variable outCondEnc_;
     std::queue<uint32_t> inQueueEnc_;
     std::queue<uint32_t> outQueueEnc_;
-    std::queue<uint32_t>  sizeQueueEnc_;
-    std::queue<uint32_t>  flagQueueEnc_;
+    std::queue<uint32_t> sizeQueueEnc_;
+    std::queue<uint32_t> flagQueueEnc_;
     std::queue<std::shared_ptr<AVMemoryMock>> inBufferQueueEnc_;
     std::queue<std::shared_ptr<AVMemoryMock>> outBufferQueueEnc_;
     int32_t errorNum_ = 0;
@@ -63,6 +63,7 @@ public:
     void OnStreamChanged(std::shared_ptr<FormatMock> format);
     void OnNeedInputData(uint32_t index, std::shared_ptr<AVMemoryMock> data);
     void OnNewOutputData(uint32_t index, std::shared_ptr<AVMemoryMock> data, AVCodecBufferAttrMock attr);
+
 private:
     std::shared_ptr<ACodecSignal> acodecSignal_;
 };
@@ -75,13 +76,14 @@ public:
     void OnStreamChanged(std::shared_ptr<FormatMock> format);
     void OnNeedInputData(uint32_t index, std::shared_ptr<AVMemoryMock> data);
     void OnNewOutputData(uint32_t index, std::shared_ptr<AVMemoryMock> data, AVCodecBufferAttrMock attr);
+
 private:
     std::shared_ptr<ACodecSignal> acodecSignal_;
 };
 
 class ACodecMock : public NoCopyable {
 public:
-    ACodecMock(std::shared_ptr<ACodecSignal> signal);
+    explicit ACodecMock(std::shared_ptr<ACodecSignal> signal);
     ~ACodecMock();
 
     bool CreateAudioDecMockByMime(const std::string &mime);
@@ -117,8 +119,8 @@ public:
     void SetOutPath(const std::string &path);
 
 private:
-    void clearIntQueue (std::queue<uint32_t>& q);
-    void clearBufferQueue (std::queue<std::shared_ptr<AVMemoryMock>>& q);
+    void clearIntQueue(std::queue<uint32_t> &q);
+    void clearBufferQueue(std::queue<std::shared_ptr<AVMemoryMock>> &q);
     std::shared_ptr<AudioDecMock> audioDec_;
     std::shared_ptr<ACodecSignal> acodecSignal_;
     void InputFuncDec();
@@ -148,6 +150,6 @@ private:
     int64_t timeStampEnc_ = 0;
     std::string outPath_ = "/data/test/media/out.es";
 };
-}
-}
+} // namespace Media
+} // namespace OHOS
 #endif // ACODEC_MOCK_H

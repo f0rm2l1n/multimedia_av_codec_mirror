@@ -62,6 +62,8 @@ int AVMuxerFFmpegDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &param)
 
 void AVMuxerFFmpegDemo::DoRunMuxer()
 {
+    constexpr float latitude = 50.5;
+    constexpr float longitude = 60.6;
     GetFfmpegRegister();
     if (register_->plugins.size() <= 0) {
         std::cout<<"regist muxers failed!"<<std::endl;
@@ -99,7 +101,7 @@ void AVMuxerFFmpegDemo::DoRunMuxer()
         return;
     }
 
-    ffmpegMuxer_->SetLocation(TEST_LATITUDE, TEST_LONGITUDE);
+    ffmpegMuxer_->SetLocation(latitude, longitude);
     ffmpegMuxer_->SetRotation(0);
 
     AddAudioTrack(audioParams_);
@@ -118,7 +120,7 @@ void AVMuxerFFmpegDemo::DoRunMultiThreadCase()
 
 int AVMuxerFFmpegDemo::DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info)
 {
-    if(ffmpegMuxer_ != nullptr &&
+    if (ffmpegMuxer_ != nullptr &&
         ffmpegMuxer_->WriteSampleBuffer(sampleBuffer, info) == Status::NO_ERROR) {
         return 0;
     }

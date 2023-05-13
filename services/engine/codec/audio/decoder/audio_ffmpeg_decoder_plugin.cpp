@@ -25,7 +25,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-
 AudioFfmpegDecoderPlugin::AudioFfmpegDecoderPlugin()
     : hasExtra_(false),
       maxInputSize_(-1),
@@ -240,7 +239,6 @@ int32_t AudioFfmpegDecoderPlugin::AllocateContext(const std::string &name)
     AVCodecContext *context = nullptr;
     {
         std::unique_lock lock(avMutext_);
-        // FALSE_RETURN_V(avCodec_ != nullptr, Status::ERROR_WRONG_STATE);
         context = avcodec_alloc_context3(avCodec_.get());
 
         avCodecContext_ = std::shared_ptr<AVCodecContext>(context, [](AVCodecContext *ptr) {
@@ -318,6 +316,5 @@ int32_t AudioFfmpegDecoderPlugin::CloseCtxLocked()
     }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
-
 } // namespace Media
 } // namespace OHOS

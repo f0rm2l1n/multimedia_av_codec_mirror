@@ -15,10 +15,10 @@
 #ifndef CODECBASE_H
 #define CODECBASE_H
 
+#include <string>
 #include "avcodec_common.h"
 #include "avsharedmemorybase.h"
 #include "surface.h"
-#include <string>
 
 namespace OHOS {
 namespace Media {

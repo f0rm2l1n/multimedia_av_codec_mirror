@@ -309,7 +309,7 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
 int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile, unsigned char *&buffer,
     uint32_t &curSize, TrackSampleInfo &info)
 {
-    int32_t dataSize = 0;
+    uint32_t dataSize = 0;
     uint32_t flags = 0;
     if (audioPts_ > videoPts_) {
         curFile = videoFile_;
@@ -346,7 +346,7 @@ int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile,
     }
 
     curFile->read((char *)buffer, dataSize);
-    if(curFile->eof()) {
+    if (curFile->eof()) {
         return -1;
     }
     info.size = dataSize;
@@ -358,7 +358,7 @@ void AVMuxerDemoBase::WriteAvTrackSample()
     if (audioFile_ == nullptr || videoFile_ == nullptr) {
         return;
     }
-    TrackSampleInfo info {0, 0, 0 ,0};
+    TrackSampleInfo info {0, 0, 0, 0};
     std::shared_ptr<std::ifstream> curFile = nullptr;
     unsigned char *avMuxerDemoBuffer = nullptr;
     uint32_t avMuxerDemoBufferSize = 0;

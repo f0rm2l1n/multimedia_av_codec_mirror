@@ -24,7 +24,6 @@ const std::string AVCODEC_CAPS_FILE = "/etc/codec/avcodec_caps.xml";
 
 namespace OHOS {
 namespace Media {
-
 const std::unordered_map<std::string, int> VIDEO_PROFILE_MAP = {
     // H263
     {"H263BackwardCompatible", H263_PROFILE_BACKWARD_COMPATIBLE},
@@ -227,16 +226,14 @@ bool CodeclistXmlParser::ParseInternal(xmlNode *node)
     for (; currNode != nullptr; currNode = currNode->next) {
         if (currNode->type == XML_ELEMENT_NODE) {
             switch (GetNodeNameAsInt(currNode)) {
-            case AUDIO_DECODER:
-            case AUDIO_ENCODER:
-            case VIDEO_DECODER:
-            case VIDEO_ENCODER: {
-                ParseData(currNode);
-                break;
-            }
-            default:
-                ParseInternal(currNode->children);
-                break;
+                case AUDIO_DECODER:
+                case AUDIO_ENCODER:
+                case VIDEO_DECODER:
+                case VIDEO_ENCODER: {
+                    ParseData(currNode);
+                    break;
+                }
+                default: ParseInternal(currNode->children); break;
             }
         }
     }
@@ -307,14 +304,13 @@ std::vector<int32_t> CodeclistXmlParser::TransStrAsIntegerArray(const std::vecto
     return array;
 }
 
-std::vector<int32_t>
-CodeclistXmlParser::TransMapAsIntegerArray(const std::unordered_map<std::string, int> &capabilityMap,
-                                           const std::vector<std::string> &spilt)
+std::vector<int32_t> CodeclistXmlParser::TransMapAsIntegerArray(const std::unordered_map<std::string, int> &capMap,
+                                                                const std::vector<std::string> &spilt)
 {
     std::vector<int32_t> res;
     for (auto iter = spilt.begin(); iter != spilt.end(); iter++) {
-        if (capabilityMap.find(*iter) != capabilityMap.end()) {
-            res.emplace_back(capabilityMap.at(*iter));
+        if (capMap.find(*iter) != capMap.end()) {
+            res.emplace_back(capMap.at(*iter));
         } else {
             AVCODEC_LOGD("can not find %{public}s in capabilityMap", iter->c_str());
         }
@@ -511,41 +507,23 @@ bool CodeclistXmlParser::SetCapabilityVectorData(std::unordered_map<std::string,
 bool CodeclistXmlParser::SetCapabilityData(CapabilityData &data, const std::string &capabilityKey,
                                            const std::string &capabilityValue) const
 {
-    std::unordered_map<std::string, std::string &> capabilityStringMap = {{"codecName", data.codecName},
-                                                                          {"mimeType", data.mimeType}};
-
-    std::unordered_map<std::string, int32_t &> capabilityIntMap = {{"codecType", data.codecType},
-                                                                   {"maxInstance", data.maxInstance}};
-
+    std::unordered_map<std::string, std::string &> capabilityStringMap = {
+        {"codecName", data.codecName}, {"mimeType", data.mimeType}};
+    std::unordered_map<std::string, int32_t &> capabilityIntMap = {{"codecType", data.codecType}, {"maxInstance", data.maxInstance}};
     std::unordered_map<std::string, bool &> capabilityBoolMap = {
-        {"isVendor", data.isVendor},
-        {"supportSwapWidthHeight", data.supportSwapWidthHeight}};
-
-    std::unordered_map<std::string, ImgSize &> capabilitySizeMap = {{"blockSize", data.blockSize},
-                                                                    {"alignment", data.alignment}};
-
+        {"isVendor", data.isVendor}, {"supportSwapWidthHeight", data.supportSwapWidthHeight}};
+    std::unordered_map<std::string, ImgSize &> capabilitySizeMap = {{"blockSize", data.blockSize}, {"alignment", data.alignment}};
     std::unordered_map<std::string, std::map<ImgSize, Range> &> capabilityHashRangeMap = {
         {"measuredFrameRate", data.measuredFrameRate}};
-
-    std::unordered_map<std::string, Range &> capabilityRangeMap = {{"bitrate", data.bitrate},
-                                                                   {"channels", data.channels},
-                                                                   {"complexity", data.complexity},
-                                                                   {"width", data.width},
-                                                                   {"height", data.height},
-                                                                   {"frameRate", data.frameRate},
-                                                                   {"encodeQuality", data.encodeQuality},
-                                                                   {"blockPerFrame", data.blockPerFrame},
-                                                                   {"blockPerSecond", data.blockPerSecond}};
-
-    std::unordered_map<std::string, std::vector<int32_t> &> capabilityVectorMap = {{"sampleRate", data.sampleRate},
-                                                                                   {"pixFormat", data.pixFormat},
-                                                                                   {"bitDepth", data.bitDepth},
-                                                                                   {"profiles", data.profiles},
-                                                                                   {"bitrateMode", data.bitrateMode}};
-
+    std::unordered_map<std::string, Range &> capabilityRangeMap = {
+        {"bitrate", data.bitrate}, {"complexity", data.complexity}, {"frameRate", data.frameRate},
+        {"width", data.width}, {"height", data.height}, {"blockPerFrame", data.blockPerFrame},
+        {"channels", data.channels}, {"encodeQuality", data.encodeQuality}, {"blockPerSecond", data.blockPerSecond}};
+    std::unordered_map<std::string, std::vector<int32_t> &> capabilityVectorMap = {
+        {"sampleRate", data.sampleRate}, {"pixFormat", data.pixFormat}, {"bitDepth", data.bitDepth},
+        {"profiles", data.profiles}, {"bitrateMode", data.bitrateMode}};
     std::unordered_map<std::string, std::map<int32_t, std::vector<int32_t>> &> capabilityHashVectorMap = {
         {"profileLevelsMap", data.profileLevelsMap}};
-
     bool ret = false;
     if (capabilityStringMap.find(capabilityKey) != capabilityStringMap.end()) {
         ret = SetCapabilityStringData(capabilityStringMap, capabilityKey, capabilityValue);

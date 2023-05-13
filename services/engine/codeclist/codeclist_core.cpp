@@ -88,27 +88,27 @@ bool CodecListCore::CheckVideoFrameRate(const Format &format, const CapabilityDa
     }
 
     switch (format.GetValueType(std::string_view("frame_rate"))) {
-    case FORMAT_TYPE_INT32: {
-        int32_t targetFrameRateInt;
-        (void)format.GetIntValue("frame_rate", targetFrameRateInt);
-        if (data.frameRate.minVal > targetFrameRateInt || data.frameRate.maxVal < targetFrameRateInt) {
-            return false;
+        case FORMAT_TYPE_INT32: {
+            int32_t targetFrameRateInt;
+            (void)format.GetIntValue("frame_rate", targetFrameRateInt);
+            if (data.frameRate.minVal > targetFrameRateInt || data.frameRate.maxVal < targetFrameRateInt) {
+                return false;
+            }
+            break;
         }
-        break;
-    }
-    case FORMAT_TYPE_DOUBLE: {
-        double targetFrameRateDouble;
-        (void)format.GetDoubleValue("frame_rate", targetFrameRateDouble);
-        double minValDouble{data.frameRate.minVal};
-        double maxValDouble{data.frameRate.maxVal};
-        if ((minValDouble > targetFrameRateDouble && fabs(minValDouble - targetFrameRateDouble) >= EPSINON) ||
-            (maxValDouble < targetFrameRateDouble && fabs(maxValDouble - targetFrameRateDouble) >= EPSINON)) {
-            return false;
+        case FORMAT_TYPE_DOUBLE: {
+            double targetFrameRateDouble;
+            (void)format.GetDoubleValue("frame_rate", targetFrameRateDouble);
+            double minValDouble {data.frameRate.minVal};
+            double maxValDouble {data.frameRate.maxVal};
+            if ((minValDouble > targetFrameRateDouble && fabs(minValDouble - targetFrameRateDouble) >= EPSINON) ||
+                (maxValDouble < targetFrameRateDouble && fabs(maxValDouble - targetFrameRateDouble) >= EPSINON)) {
+                return false;
+            }
+            break;
         }
-        break;
-    }
-    default:
-        break;
+        default:
+            break;
     }
     return true;
 }
@@ -186,7 +186,6 @@ std::string CodecListCore::FindCodec(const Format &format, bool isEncoder)
             ++iter;
             continue;
         }
-
         if (isVideo) {
             if (IsVideoCapSupport(format, *iter)) {
                 return (*iter).codecName;
@@ -229,6 +228,5 @@ CapabilityData CodecListCore::CreateCapability(std::string codecName)
     }
     return capData;
 }
-
 } // namespace Media
 } // namespace OHOS

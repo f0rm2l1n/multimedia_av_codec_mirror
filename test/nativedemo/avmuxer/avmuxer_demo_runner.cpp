@@ -30,11 +30,13 @@ constexpr int DEMO_THREAD_COUNT = 10;
 
 static int RunLoopNativeMuxer(string out)
 {
-    time_t startTime = time(nullptr);
-    time_t curTime = time(nullptr);
+    time_t startTime = 0;
+    time_t curTime = 0;
+    (void)time(&startTime);
+    (void)time(&curTime);
     while (difftime(curTime, startTime) < RUN_TIME) {
         RunNativeMuxer(out.c_str());
-        time(&curTime);
+        (void)time(&curTime);
     }
     return 0;
 }
@@ -90,8 +92,10 @@ static int RunEngineMuxer()
 
 static int RunLoopEngineMuxer()
 {
-    time_t startTime = time(nullptr);
-    time_t curTime = time(nullptr);
+    time_t startTime = 0;
+    time_t curTime = 0;
+    (void)time(&startTime);
+    (void)time(&curTime);
     while (difftime(curTime, startTime) < RUN_TIME) {
         RunEngineMuxer();
         (void)time(&curTime);
@@ -99,7 +103,7 @@ static int RunLoopEngineMuxer()
     return 0;
 }
 
-void AvmuxerDemoCase()
+void AvmuxerDemoCase(void)
 {
     cout << "Please select a muxer demo(default native muxer demo): " << endl;
     cout << "0:native_muxer" << endl;

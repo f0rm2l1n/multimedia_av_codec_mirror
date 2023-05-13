@@ -22,7 +22,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecBase"
 
 namespace OHOS {
 namespace Media {
-
 int32_t CodecBase::NotifyEos()
 {
     AVCODEC_LOGW("NotifyEos is not supported");
@@ -54,6 +53,5 @@ int32_t CodecBase::SignalRequestIDRFrame()
     AVCODEC_LOGW("SignalRequestIDRFrame is not supported");
     return 0;
 }
-
 } // namespace Media
 } // namespace OHOS

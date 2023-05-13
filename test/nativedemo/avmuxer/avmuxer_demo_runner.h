@@ -16,6 +16,6 @@
 #ifndef AVMUXER_DEMO_RUNNER_H
 #define AVMUXER_DEMO_RUNNER_H
 
-void AvmuxerDemoCase();
+void AvmuxerDemoCase(void);
 
 #endif  // AVMUXER_DEMO_RUNNER_H

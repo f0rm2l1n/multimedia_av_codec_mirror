@@ -43,7 +43,8 @@ int32_t AVMuxerCapiMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMoc
     return OH_AVMuxer_AddTrack(muxer_, &trackIndex, formatMock->GetFormat());
 }
 
-int32_t AVMuxerCapiMock::WriteSampleBuffer(uint32_t trackIndex, uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
+int32_t AVMuxerCapiMock::WriteSampleBuffer(uint32_t trackIndex,
+    uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
 {
     OH_AVCodecBufferAttr bufferAttr;
     bufferAttr.pts = info.pts;

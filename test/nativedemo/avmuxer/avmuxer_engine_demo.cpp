@@ -60,6 +60,8 @@ int AVMuxerEngineDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &trackDe
 
 void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
 {
+    constexpr float latitude = 50.5;
+    constexpr float longitude = 60.6;
     std::string outFileName = "engine_mux_" + runMode + "_" + audioType_ + "_"
         + videoType_ + "_" + coverType_ + "." + format_;
     outFd_ = open(outFileName.c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
@@ -76,7 +78,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
     }
     std::cout << "create muxer success " << avmuxer_ << std::endl;
 
-    if (avmuxer_->SetLocation(TEST_LATITUDE, TEST_LONGITUDE) != AVCS_ERR_OK
+    if (avmuxer_->SetLocation(latitude, longitude) != AVCS_ERR_OK
         || avmuxer_->SetRotation(0) != AVCS_ERR_OK) {
         std::cout<<"set failed!"<<std::endl;
         return;

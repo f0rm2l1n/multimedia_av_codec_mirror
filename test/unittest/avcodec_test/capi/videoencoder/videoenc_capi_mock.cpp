@@ -14,15 +14,14 @@
  */
 
 #include "videoenc_capi_mock.h"
-#include <iostream>
+#include "avcodec_errors.h"
+#include "avcodec_video_encoder.h"
 #include "avformat_capi_mock.h"
 #include "avmemory_capi_mock.h"
-#include "surface_capi_mock.h"
-#include "avcodec_errors.h"
 #include "native_avcodec_base.h"
+#include "surface_capi_mock.h"
 #include "window.h"
-#include "avcodec_video_encoder.h"
-
+#include <iostream>
 
 using namespace std;
 
@@ -58,8 +57,8 @@ void VideoEncCapiMock::OnNeedInputData(OH_AVCodec *codec, uint32_t index, OH_AVM
     }
 }
 
-void VideoEncCapiMock::OnNewOutputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data,
-    OH_AVCodecBufferAttr *attr, void *userData)
+void VideoEncCapiMock::OnNewOutputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
+                                       void *userData)
 {
     (void)data;
     (void)userData;
@@ -219,5 +218,5 @@ int32_t VideoEncCapiMock::FreeOutputData(uint32_t index)
     }
     return AV_ERR_OPERATE_NOT_PERMIT;
 }
-}
-}
+} // namespace Media
+} // namespace OHOS

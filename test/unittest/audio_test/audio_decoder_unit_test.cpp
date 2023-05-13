@@ -44,7 +44,9 @@ constexpr uint32_t DEFAULT_AAC_TYPE = 1;
 constexpr uint32_t DEFAULT_AAC_LATM_TYPE = 2;
 } // namespace
 
-static std::string codecName = CODEC_MP3_NAME;
+namespace OHOS {
+namespace Media {
+std::string g_codecName = CODEC_MP3_NAME;
 
 class ADecSignal {
 public:
@@ -134,7 +136,7 @@ void AudioCodeDecoderUnitTest::TearDownTestCase(void)
 void AudioCodeDecoderUnitTest::SetUp(void)
 {
     cout << "[SetUp]: SetUp!!!" << endl;
-    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(codecName);
+    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(g_codecName);
     ASSERT_NE(nullptr, adec_);
 
     signal_ = new ADecSignal();
@@ -456,7 +458,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_ReleaseOutputBuffer_01, Test
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_SetCodecName_01, TestSize.Level1)
 {
-    codecName = CODEC_FLAC_NAME;
+    g_codecName = CODEC_FLAC_NAME;
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_01, TestSize.Level1)
@@ -726,7 +728,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_ReleaseOutputBuffer_01, Tes
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_SetCodecName_02, TestSize.Level1)
 {
-    codecName = CODEC_AAC_NAME;
+    g_codecName = CODEC_AAC_NAME;
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_01, TestSize.Level1)
@@ -1043,3 +1045,5 @@ int main(int argc, char *argv[])
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+}  // namespace Media
+}  // namespace OHOS

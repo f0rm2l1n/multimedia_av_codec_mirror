@@ -20,7 +20,7 @@
 #include "media_description.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegDecoderAdapter"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegAdapter"};
 }
 
 namespace OHOS {
@@ -206,7 +206,7 @@ int32_t AudioFFMpegAdapter::Release()
     }
     AVCODEC_LOGI("adapter Release, state from %{public}s to RRELEASING", stateToString(state_).data());
     state_ = CodecState::RRELEASING;
-    auto ret = doRelease(); // todo:异步调用
+    auto ret = doRelease();
     return ret;
 }
 
@@ -228,6 +228,9 @@ int32_t AudioFFMpegAdapter::GetOutputFormat(Format &format)
 {
     AVCODEC_SYNC_TRACE;
     format = audioCodec->GetFormat();
+    if (!format.ContainKey(MediaDescriptionKey::MD_KEY_CODEC_NAME)) {
+        format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_NAME, name_);
+    }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 

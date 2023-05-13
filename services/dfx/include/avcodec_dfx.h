@@ -42,7 +42,7 @@ __attribute__((visibility("default"))) void BehaviorEventWrite(std::string statu
 __attribute__((visibility("default"))) void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle);
 __attribute__((visibility("default"))) void StatisticEventWrite(std::string msg, std::string moudle);
 
-#define AVCODEC_SYNC_TRACE AVCodecTrace trace(std::string(__FUNCTION__));
+#define AVCODEC_SYNC_TRACE AVCodecTrace trace(std::string(__FUNCTION__))
 
 class __attribute__((visibility("default"))) AVCodecTrace : public NoCopyable {
 public:

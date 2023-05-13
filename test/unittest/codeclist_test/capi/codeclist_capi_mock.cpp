@@ -34,8 +34,7 @@ std::string CodecListCapiMock::FindEncoder(std::shared_ptr<FormatMock> &format)
 
 CapabilityData CodecListCapiMock::CreateCapability(const std::string codecName)
 {
-    // TODO: 接口还在评审
-    // return *OH_AVCodec_CreateCapability(codecName.c_str());
+    // 接口还在评审: *OH_AVCodec_CreateCapability(codecName.c_str());
     CapabilityData capability;
     return capability;
 }

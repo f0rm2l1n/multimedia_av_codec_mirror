@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "gtest/gtest.h"
-#include "avcodec_errors.h"
 #include "acodec_unit_test.h"
+#include "avcodec_errors.h"
+#include "gtest/gtest.h"
 
 using namespace std;
 using namespace OHOS;
@@ -42,9 +42,9 @@ void ACodecUnitTest::SetUp(void)
 
     defaultFormat_ = AVCodecMockFactory::CreateFormat();
     ASSERT_NE(nullptr, defaultFormat_);
-    (void)defaultFormat_->PutIntValue("channel_count", 2);
-    (void)defaultFormat_->PutIntValue("sample_rate", 44100);
-    (void)defaultFormat_->PutLongValue("bitrate", 97496);
+    (void)defaultFormat_->PutIntValue("channel_count", 2);   // max channel count of avdec_mp3
+    (void)defaultFormat_->PutIntValue("sample_rate", 44100); // one of sample_rate that meets avdec_mp3
+    (void)defaultFormat_->PutLongValue("bitrate", 97496);    // one of bitrate that meets avdec_mp3
     (void)defaultFormat_->PutIntValue("aac-type", 1);
 
     testInfo_ = ::testing::UnitTest::GetInstance()->current_test_info();

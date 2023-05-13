@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
-
 #include "format_unit_test.h"
-#include <cmath>
-#include "gtest/gtest.h"
 #include "avcodec_errors.h"
 #include "securec.h"
+#include "gtest/gtest.h"
+#include <cmath>
 
 using namespace std;
 using namespace OHOS;
@@ -26,17 +25,17 @@ using namespace OHOS::Media;
 using namespace testing::ext;
 using namespace OHOS::Media::FormatTestParam;
 
-void FormatUnitTest::SetUpTestCase(void) {}
+void AVFormatUnitTest::SetUpTestCase(void) {}
 
-void FormatUnitTest::TearDownTestCase(void) {}
+void AVFormatUnitTest::TearDownTestCase(void) {}
 
-void FormatUnitTest::SetUp(void)
+void AVFormatUnitTest::SetUp(void)
 {
     format_ = AVCodecMockFactory::CreateFormat();
     ASSERT_NE(nullptr, format_);
 }
 
-void FormatUnitTest::TearDown(void)
+void AVFormatUnitTest::TearDown(void)
 {
     if (format_ != nullptr) {
         format_->Destroy();
@@ -49,7 +48,7 @@ void FormatUnitTest::TearDown(void)
  * @tc.type: FUNC
  * @tc.require: issueI5OWXY issueI5OXCD
  */
-HWTEST_F(FormatUnitTest, format_value_0100, TestSize.Level0)
+HWTEST_F(AVFormatUnitTest, format_value_0100, TestSize.Level0)
 {
     const std::string_view intKey = "IntKey";
     const std::string_view longKey = "LongKey";
@@ -67,7 +66,7 @@ HWTEST_F(FormatUnitTest, format_value_0100, TestSize.Level0)
     float getFloatValue = 0.0;
     double getDoubleValue = 0.0;
     std::string getStringValue = "";
-    
+
     ASSERT_TRUE(format_->PutIntValue(intKey, intValue));
     ASSERT_TRUE(format_->GetIntValue(intKey, getIntValue));
     ASSERT_TRUE(intValue == getIntValue);
@@ -95,7 +94,7 @@ HWTEST_F(FormatUnitTest, format_value_0100, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: issueI5OWXY issueI5OXCD
  */
-HWTEST_F(FormatUnitTest, format_buffer_0100, TestSize.Level0)
+HWTEST_F(AVFormatUnitTest, format_buffer_0100, TestSize.Level0)
 {
     constexpr int32_t num = 10;
     const std::string_view key = "BufferKey";
@@ -120,7 +119,7 @@ HWTEST_F(FormatUnitTest, format_buffer_0100, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: issueI5OWXY issueI5OXCD
  */
-HWTEST_F(FormatUnitTest, format_dump_info_0100, TestSize.Level0)
+HWTEST_F(AVFormatUnitTest, format_dump_info_0100, TestSize.Level0)
 {
     ASSERT_TRUE(format_->PutIntValue("width", 1));
     ASSERT_TRUE(format_->PutIntValue("height", 1));

@@ -218,9 +218,7 @@ void ADecDemo::InputFunc()
 
         uint32_t index = signal_->inQueue_.front();
         auto buffer = signal_->inBufferQueue_.front();
-
         int32_t ret = av_read_frame(fmpt_ctx, &pkt);
-
         if (ret < 0) {
             OH_AVCodecBufferAttr info;
             info.size = 0;

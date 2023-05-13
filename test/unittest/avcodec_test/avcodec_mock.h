@@ -16,9 +16,10 @@
 #ifndef AVCODEC_MOCK_H
 #define AVCODEC_MOCK_H
 
-#include <string>
 #include "enum_mock.h"
 #include "nocopyable.h"
+#include <string>
+
 
 namespace OHOS {
 namespace Media {
@@ -231,10 +232,11 @@ public:
     static std::shared_ptr<AVCodecListMock> CreateAVCodecList();
     static std::shared_ptr<VideoCapsMock> CreateVideoCaps();
     static std::shared_ptr<EnumMock> CreateEnum();
+
 private:
     AVCodecMockFactory() = delete;
     ~AVCodecMockFactory() = delete;
 };
-} // Media
-} // OHOS
+} // namespace Media
+} // namespace OHOS
 #endif // AVCODEC_MOCK_H

@@ -68,6 +68,5 @@ CapabilityData AVCodecListImpl::CreateCapability(std::string codecName)
 {
     return codecListService_->CreateCapability(codecName);
 }
-
 } // namespace Media
 } // namespace OHOS

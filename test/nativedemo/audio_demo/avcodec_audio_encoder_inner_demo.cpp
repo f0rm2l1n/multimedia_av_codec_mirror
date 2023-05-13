@@ -15,13 +15,14 @@
 
 #include <iostream>
 #include <unistd.h>
-#include "avcodec_audio_encoder_inner_demo.h"
+
 #include "avcodec_audio_codec_key.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "demo_log.h"
 #include "media_description.h"
 #include "securec.h"
+#include "avcodec_audio_encoder_inner_demo.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -42,6 +43,7 @@ constexpr uint32_t BITS_RATE = 112000; // for aac encoding
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr uint32_t DEFAULT_SAMPLE_FORMATE_VALE = 8;
 constexpr uint32_t DEFAULT_CHANNEL_LAYOUT_COUNT = 3;
+constexpr uint32_t DEFAULT_SLEEP_TIME = 30;
 } // namespace
 
 void AEnInnerDemo::RunCase()
@@ -58,7 +60,7 @@ void AEnInnerDemo::RunCase()
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
-    sleep(30);
+    sleep(DEFAULT_SLEEP_TIME);
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }

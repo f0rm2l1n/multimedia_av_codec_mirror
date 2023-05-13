@@ -21,10 +21,6 @@
 #include "avmuxer_demo_common.h"
 namespace OHOS {
 namespace Media {
-
-constexpr float TEST_LATITUDE = 50.5;
-constexpr float TEST_LONGITUDE = 60.6;
-
 class AVMuxerDemoBase {
 public:
     AVMuxerDemoBase();

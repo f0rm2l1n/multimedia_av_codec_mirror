@@ -24,26 +24,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-static constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
-static constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 8192;
-static constexpr uint32_t ADTS_HEADER_SIZE = 7;
+constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
+constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 8192;
+constexpr uint32_t ADTS_HEADER_SIZE = 7;
 
-static constexpr uint8_t SAMPLE_FREQUENCY_INDEX_DEFAULT = 4;
-static std::map<int32_t, uint8_t> sampleFreqMap = {
-    {96000, 0},
-    {88200, 1},
-    {64000, 2},
-    {48000, 3},
-    {44100, 4},
-    {32000, 5},
-    {24000, 6},
-    {22050, 7},
-    {16000, 8},
-    {12000, 9},
-    {11025, 10},
-    {8000, 11},
-    {7350, 12}
-};
+constexpr uint8_t SAMPLE_FREQUENCY_INDEX_DEFAULT = 4;
+static std::map<int32_t, uint8_t> sampleFreqMap = {{96000, 0},  {88200, 1}, {64000, 2}, {48000, 3}, {44100, 4},
+                                                   {32000, 5},  {24000, 6}, {22050, 7}, {16000, 8}, {12000, 9},
+                                                   {11025, 10}, {8000, 11}, {7350, 12}};
 
 AudioFFMpegAacEncoderPlugin::AudioFFMpegAacEncoderPlugin() : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>()) {}
 
@@ -76,9 +64,9 @@ static int32_t GetAdtsHeader(std::string &adtsHeader, uint32_t &headerSize, std:
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-static bool CheckSampleFormat(const std::shared_ptr<AVCodec> &codec, enum AVSampleFormat sample_fmt)
+static bool CheckSampleFormat(const std::shared_ptr<AVCodec> &codec, AVSampleFormat sample_fmt)
 {
-    const enum AVSampleFormat* p = codec->sample_fmts;
+    const enum AVSampleFormat *p = codec->sample_fmts;
     while (*p != AV_SAMPLE_FMT_NONE) { // 通过AV_SAMPLE_FMT_NONE作为结束符
         if (*p == sample_fmt) {
             return true;
@@ -90,7 +78,7 @@ static bool CheckSampleFormat(const std::shared_ptr<AVCodec> &codec, enum AVSamp
 
 static bool CheckSampleRate(const std::shared_ptr<AVCodec> &codec, const int sample_rate)
 {
-    const int* p = codec->supported_samplerates;
+    const int *p = codec->supported_samplerates;
     while (*p != 0) { // 0作为退出条件，比如libfdk-aacenc.c的aac_sample_rates
         if (*p == sample_rate) {
             return true;
@@ -103,7 +91,7 @@ static bool CheckSampleRate(const std::shared_ptr<AVCodec> &codec, const int sam
 static bool CheckChannelLayout(const std::shared_ptr<AVCodec> &codec, const uint64_t channel_layout)
 {
     // 不是每个codec都给出支持的channel_layout
-    const uint64_t* p = codec->channel_layouts;
+    const uint64_t *p = codec->channel_layouts;
     if (!p) {
         AVCODEC_LOGI("The encoder %{public}s do not set channel_layouts", codec->name);
         return true;

@@ -16,11 +16,11 @@
 #ifndef CODECLIST_UNIT_TEST_H
 #define CODECLIST_UNIT_TEST_H
 
-#include <vector>
-#include "gtest/gtest.h"
 #include "avcodec_info.h"
-#include "media_description.h"
 #include "codeclist_mock.h"
+#include "media_description.h"
+#include "gtest/gtest.h"
+#include <vector>
 
 namespace OHOS {
 namespace Media {
@@ -48,34 +48,17 @@ public:
     void TearDown(void);
 
 protected:
-    std::string codecMimeKey_ {MediaDescriptionKey::MD_KEY_CODEC_MIME};
-    std::string bitrateKey_ {MediaDescriptionKey::MD_KEY_BITRATE};
-    std::string widthKey_ {MediaDescriptionKey::MD_KEY_WIDTH};
-    std::string heightKey_ {MediaDescriptionKey::MD_KEY_HEIGHT};
-    std::string pixelFormatKey_ {MediaDescriptionKey::MD_KEY_PIXEL_FORMAT};
-    std::string frameRateKey_ {MediaDescriptionKey::MD_KEY_FRAME_RATE};
-    std::string channelCountKey_ {MediaDescriptionKey::MD_KEY_CHANNEL_COUNT};
-    std::string sampleRateKey_ {"samplerate"};//{MediaDescriptionKey::MD_KEY_SAMPLE_RATE};
-    std::string bitDepthKey_ {MediaDescriptionKey::MD_KEY_SAMPLE_RATE};
+    std::string codecMimeKey_{MediaDescriptionKey::MD_KEY_CODEC_MIME};
+    std::string bitrateKey_{MediaDescriptionKey::MD_KEY_BITRATE};
+    std::string widthKey_{MediaDescriptionKey::MD_KEY_WIDTH};
+    std::string heightKey_{MediaDescriptionKey::MD_KEY_HEIGHT};
+    std::string pixelFormatKey_{MediaDescriptionKey::MD_KEY_PIXEL_FORMAT};
+    std::string frameRateKey_{MediaDescriptionKey::MD_KEY_FRAME_RATE};
+    std::string channelCountKey_{MediaDescriptionKey::MD_KEY_CHANNEL_COUNT};
+    std::string sampleRateKey_{"samplerate"}; //{MediaDescriptionKey::MD_KEY_SAMPLE_RATE};
+    std::string bitDepthKey_{MediaDescriptionKey::MD_KEY_SAMPLE_RATE};
 
-    std::shared_ptr<CodecListMock> codeclist_ {nullptr};
-
-    // void CheckAVDecH264(const std::shared_ptr<VideoCaps> &videoCaps) const;
-    // void CheckAVDecH263(const std::shared_ptr<VideoCaps> &videoCaps) const;
-    // void CheckAVDecMpeg2Video(const std::shared_ptr<VideoCaps> &videoCaps) const;
-    // void CheckAVDecMpeg4(const std::shared_ptr<VideoCaps> &videoCaps) const;
-    // void CheckAVEncMpeg4(const std::shared_ptr<VideoCaps> &videoCaps) const;
-    // void CheckVideoCaps(const std::shared_ptr<VideoCaps> &videoCaps) const;
-    // void CheckVideoCapsArray(const std::vector<std::shared_ptr<VideoCaps>> &videoCapsArray) const;
-    // void CheckAVDecMP3(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAVDecAAC(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAVDecVorbis(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAVDecFlac(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAVDecOpus(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAVEncAAC(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAVEncOpus(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAudioCaps(const std::shared_ptr<AudioCaps> &audioCaps) const;
-    // void CheckAudioCapsArray(const std::vector<std::shared_ptr<AudioCaps>> &audioCapsArray) const;
+    std::shared_ptr<CodecListMock> codeclist_{nullptr};
 };
 } // namespace Media
 } // namespace OHOS

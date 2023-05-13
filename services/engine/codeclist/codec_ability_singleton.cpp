@@ -24,7 +24,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecAbili
 
 namespace OHOS {
 namespace Media {
-
 CodecAbilitySingleton &CodecAbilitySingleton::GetInstance()
 {
     AVCODEC_LOGE("CodecAbilitySingleton entered: start getting ins");
@@ -86,6 +85,5 @@ std::vector<CapabilityData> CodecAbilitySingleton::GetCapabilityArray()
     std::lock_guard<std::mutex> lock(mutex_);
     return capabilityDataArray_;
 }
-// #endif
 } // namespace Media
 } // namespace OHOS

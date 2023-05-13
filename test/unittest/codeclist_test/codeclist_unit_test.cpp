@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
+#include "codeclist_unit_test.h"
+#include <fcntl.h>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
-#include <fcntl.h>
-#include "codeclist_unit_test.h"
 
 using namespace testing::ext;
 using namespace OHOS::Media;
 
-template<typename TCodecMock>
+template <typename TCodecMock>
 void ReleaseCodec(vector<TCodecMock> &codecLst)
 {
     uint32_t ret;
@@ -86,7 +86,7 @@ HWTEST_F(CodecListUnitTest, CodecList_FindVideoDecoder_002, TestSize.Level0)
     (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
     (void)format->PutIntValue(widthKey_, DEFAULT_WIDTH);
     (void)format->PutIntValue(heightKey_, DEFAULT_HEIGHT);
-    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT);// Negative parameters
+    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT); // Negative parameters
     (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
     codecName = codeclist_->FindDecoder(format);
     EXPECT_EQ("", codecName);
@@ -107,7 +107,7 @@ HWTEST_F(CodecListUnitTest, CodecList_FindVideoDecoder_003, TestSize.Level0)
     (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
     (void)format->PutIntValue(widthKey_, 15361);
     (void)format->PutIntValue(heightKey_, DEFAULT_HEIGHT);
-    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT);// Negative parameters
+    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT); // Negative parameters
     (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
     codecName = codeclist_->FindDecoder(format);
     EXPECT_EQ("", codecName);
@@ -128,32 +128,11 @@ HWTEST_F(CodecListUnitTest, CodecList_FindVideoDecoder_004, TestSize.Level0)
     (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
     (void)format->PutIntValue(widthKey_, DEFAULT_WIDTH);
     (void)format->PutIntValue(heightKey_, 31);
-    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT);// Negative parameters
+    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT); // Negative parameters
     (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
     codecName = codeclist_->FindDecoder(format);
     EXPECT_EQ("", codecName);
 }
-
-// /**
-//  * @tc.name: CodecList_FindVideoEncoder_001
-//  * @tc.desc: CodecList FindVideoEncoder
-//  * @tc.type: FUNC
-//  * @tc.require:
-//  */
-// HWTEST_F(CodecListUnitTest, CodecList_FindVideoEncoder_001, TestSize.Level0)
-// {
-//     std::string codecName;
-//     std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-//     ASSERT_NE(nullptr, format);
-//     (void)format->PutStringValue(codecMimeKey_, CodecMimeType::VIDEO_MPEG4);
-//     (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
-//     (void)format->PutIntValue(widthKey_, DEFAULT_WIDTH);
-//     (void)format->PutIntValue(heightKey_, DEFAULT_HEIGHT);
-//     (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::NV21);
-//     (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
-//     codecName = codeclist_->FindEncoder(format);
-//     EXPECT_EQ("video/mp4v-es", codecName);
-// }
 
 /**
  * @tc.name: CodecList_FindAudioDecoder_001
@@ -257,7 +236,7 @@ HWTEST_F(CodecListUnitTest, CodecList_FindAudioDecoder_006, TestSize.Level0)
     std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
     (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_OPUS);
     (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT + 1);// Negative parameters
+    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT + 1); // Negative parameters
     (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);
     codecName = codeclist_->FindDecoder(format);
     EXPECT_EQ("", codecName);
@@ -312,7 +291,7 @@ HWTEST_F(CodecListUnitTest, CodecList_FindAudioEncoder_003, TestSize.Level0)
     (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_OPUS);
     (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
     (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);// Negative parameters
+    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE); // Negative parameters
     codecName = codeclist_->FindEncoder(format);
     EXPECT_EQ("", codecName);
 }

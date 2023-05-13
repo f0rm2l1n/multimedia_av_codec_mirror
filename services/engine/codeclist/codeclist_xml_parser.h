@@ -49,7 +49,7 @@ private:
     static bool IsNumberArray(const std::vector<std::string> &strArray);
     static bool TransStrAsRange(const std::string &str, Range &range);
     static bool TransStrAsSize(const std::string &str, ImgSize &size);
-    static std::vector<int32_t> TransMapAsIntegerArray(const std::unordered_map<std::string, int> &capabilityMap,
+    static std::vector<int32_t> TransMapAsIntegerArray(const std::unordered_map<std::string, int> &capMap,
                                                        const std::vector<std::string> &spilt);
     static std::vector<int32_t> TransStrAsIntegerArray(const std::vector<std::string> &spilt);
     static bool SpiltKeyList(const std::string &str, const std::string &delim, std::vector<std::string> &spilt);

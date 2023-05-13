@@ -193,8 +193,6 @@ public:
      * @version 3.1
      */
     virtual int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) = 0;
-
-    
 };
 
 class __attribute__((visibility("default"))) VideoDecoderFactory {

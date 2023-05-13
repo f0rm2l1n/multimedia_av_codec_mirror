@@ -12,20 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifndef CODECLIST_DEMO_H
+#define CODECLIST_DEMO_H
 #include "native_avcodec_list.h"
 
 namespace OHOS {
 namespace Media {
-
 class CodecListDemo {
-private:
-    /* data */
 public:
     CodecListDemo() = default;
     ~CodecListDemo() = default;
     void RunCase();
 };
-
 } // namespace Media
 } // namespace OHOS
+#endif

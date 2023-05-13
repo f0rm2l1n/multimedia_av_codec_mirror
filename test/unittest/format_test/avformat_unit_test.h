@@ -16,11 +16,12 @@
 #ifndef FORMAT_UNIT_TEST_H
 #define FORMAT_UNIT_TEST_H
 
-#include "gtest/gtest.h"
 #include "avformat_mock.h"
+#include "gtest/gtest.h"
+
 namespace OHOS {
 namespace Media {
-class FormatUnitTest : public testing::Test {
+class AVFormatUnitTest : public testing::Test {
 public:
     // SetUpTestCase: Called before all test cases
     static void SetUpTestCase(void);

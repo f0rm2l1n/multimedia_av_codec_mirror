@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Media {
-
 void CodecListDemo::RunCase()
 {
     std::cout << "===== ============== ======" << std::endl;

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "avformat_mock.h"
 #include "avformat_inner_mock.h"
 
 namespace OHOS {
@@ -22,5 +21,5 @@ std::shared_ptr<FormatMock> FormatMockFactory::CreateFormat()
 {
     return std::make_shared<AVFormatInnerMock>();
 }
-}  // namespace Media
-}  // namespace OHOS
+} // namespace Media
+} // namespace OHOS

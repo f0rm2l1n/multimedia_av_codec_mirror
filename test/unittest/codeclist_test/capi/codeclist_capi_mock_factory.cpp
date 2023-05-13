@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "codeclist_mock.h"
 #include "codeclist_capi_mock.h"
 
 namespace OHOS {
@@ -26,5 +25,5 @@ std::shared_ptr<CodecListMock> CodecListMockFactory::CreateCodecList()
     }
     return nullptr;
 }
-}  // namespace Media
-}  // namespace OHOS
+} // namespace Media
+} // namespace OHOS

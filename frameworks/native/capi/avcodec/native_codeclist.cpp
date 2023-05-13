@@ -24,7 +24,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeCode
 }
 
 using namespace OHOS::Media;
-
 const char *OH_AVCodec_FindEncoder(const OH_AVFormat *format)
 {
     std::shared_ptr<AVCodecList> codeclist = AVCodecListFactory::CreateAVCodecList();

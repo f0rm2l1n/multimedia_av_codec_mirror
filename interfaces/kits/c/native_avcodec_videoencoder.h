@@ -208,7 +208,7 @@ OH_AVErrCode OH_VideoEncoder_FreeOutputData(OH_AVCodec *codec, uint32_t index);
 OH_AVErrCode OH_VideoEncoder_NotifyEndOfStream(OH_AVCodec *codec);
 
 /**
- * @brief Submit the input buffer filled with data to the video encoder.  
+ * @brief Submit the input buffer filled with data to the video encoder.
  * @syscap SystemCapability.Multimedia.Media.VideoEncoder
  * @param codec Pointer to an OH_AVCodec instance
  * @param index Enter the index value corresponding to the Buffer
@@ -221,12 +221,12 @@ OH_AVErrCode OH_VideoEncoder_NotifyEndOfStream(OH_AVCodec *codec);
 OH_AVErrCode OH_VideoEncoder_PushInputData(OH_AVCodec *codec, uint32_t index, OH_AVCodecBufferAttr attr);
 
 /**
- * @brief Check whether the current codec instance is valid. It can be used fault recovery or app 
+ * @brief Check whether the current codec instance is valid. It can be used fault recovery or app
  * switchback from the background
  * @syscap SystemCapability.Multimedia.Media.VideoEncoder
  * @param codec Pointer to an OH_AVCodec instance
  * @param isVaild Pointer to an bool instance, true: the codec instance is vaild, false: the codec
- * instance is invalid  
+ * instance is invalid
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10

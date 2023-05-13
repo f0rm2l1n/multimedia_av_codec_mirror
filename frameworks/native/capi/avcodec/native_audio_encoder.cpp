@@ -169,6 +169,12 @@ private:
     std::mutex mutex_;
 };
 
+namespace OHOS {
+namespace Media {
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 struct OH_AVCodec *OH_AudioEncoder_CreateByMime(const char *mime)
 {
     CHECK_AND_RETURN_RET_LOG(mime != nullptr, nullptr, "input mime is nullptr!");
@@ -339,7 +345,7 @@ OH_AVErrCode OH_AudioEncoder_PushInputData(struct OH_AVCodec *codec, uint32_t in
     bufferInfo.presentationTimeUs = attr.pts;
     bufferInfo.size = attr.size;
     bufferInfo.offset = attr.offset;
-    enum AVCodecBufferFlag bufferFlag = static_cast<enum AVCodecBufferFlag>(attr.flags);
+    AVCodecBufferFlag bufferFlag = static_cast<AVCodecBufferFlag>(attr.flags);
 
     int32_t ret = audioEncObj->audioEncoder_->QueueInputBuffer(index, bufferInfo, bufferFlag);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "audioEncoder QueueInputBuffer failed!");
@@ -420,3 +426,9 @@ OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec *codec, bool *isVaild)
 {
     return AV_ERR_UNSUPPORT;
 }
+
+#ifdef __cplusplus
+ };
+ #endif
+} // namesapce Media
+} // OHOS

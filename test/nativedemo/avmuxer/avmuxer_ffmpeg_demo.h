@@ -25,14 +25,15 @@
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-class AVMuxerFFmpegDemo /* : public NoCopyable */ : public AVMuxerDemoBase {
+class AVMuxerFFmpegDemo : public AVMuxerDemoBase {
 public:
     AVMuxerFFmpegDemo();
     ~AVMuxerFFmpegDemo() = default;
 private:
     struct FfmpegRegister : PackageRegister {
         Status AddPlugin(const PluginDefBase& def) override;
-        Status AddPackage(const PackageDef& def) override {
+        Status AddPackage(const PackageDef& def) override
+        {
             (void)def;
             return Status::NO_ERROR;
         }

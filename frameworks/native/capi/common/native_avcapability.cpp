@@ -13,27 +13,16 @@
  * limitations under the License.
  */
 
-#include "native_avcapability.h"
 #include <algorithm>
 #include "native_avmagic.h"
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
-
-// namespace {
-// constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "OH_AVCapability"};
-// }
+#include "native_avcapability.h"
 
 using namespace OHOS::Media;
+OH_AVCapability::OH_AVCapability(const CapabilityData &capabilityData) : capabilityData_(capabilityData) {}
 
-OH_AVCapability::OH_AVCapability(const CapabilityData &capabilityData)
-    : capabilityData_(capabilityData)
-{
-}
-
-OH_AVCapability::~OH_AVCapability()
-{
-
-}
+OH_AVCapability::~OH_AVCapability() {}
 
 bool OH_AVCapability_IsHardware(OH_AVCapability *capability)
 {
@@ -50,7 +39,7 @@ const char *OH_AVCapability_GetMimeType(OH_AVCapability *capability)
         return empty.data();
     }
 
-    return capability->capabilityData_.mimeType.data(); //TODO: string data是否安全 
+    return capability->capabilityData_.mimeType.data();
 }
 
 int32_t OH_AVCapability_GetMaxSupportedInstances(OH_AVCapability *capability)
@@ -62,8 +51,8 @@ int32_t OH_AVCapability_GetMaxSupportedInstances(OH_AVCapability *capability)
     return capability->capabilityData_.maxInstance;
 }
 
-OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability,
-    const int32_t **profiles, uint32_t *profileNum)
+OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability, const int32_t **profiles,
+                                                  uint32_t *profileNum)
 {
     if (capability == nullptr) {
         std::vector<int32_t> empty;
@@ -71,15 +60,15 @@ OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability,
         *profileNum = empty.size();
         return AV_ERR_INVALID_VAL;
     }
-    
+
     auto &vec = capability->capabilityData_.profiles;
     *profiles = vec.data();
     *profileNum = vec.size();
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capability,
-    int32_t profile, const int32_t **levels, uint32_t *levelNum) 
+OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capability, int32_t profile,
+                                                          const int32_t **levels, uint32_t *levelNum)
 {
     std::vector<int32_t> empty;
     *levels = empty.data();
@@ -98,8 +87,7 @@ OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capab
     return AV_ERR_OK;
 }
 
-bool OH_AVCapability_ValidateProfileAndLevel(OH_AVCapability *capability,
-    int32_t profile, int32_t level)
+bool OH_AVCapability_ValidateProfileAndLevel(OH_AVCapability *capability, int32_t profile, int32_t level)
 {
     if (capability == nullptr) {
         return false;
@@ -109,12 +97,11 @@ bool OH_AVCapability_ValidateProfileAndLevel(OH_AVCapability *capability,
     if (levels == profileLevelsMap.end()) {
         return false;
     }
- 
+
     return find(levels->second.begin(), levels->second.end(), level) != levels->second.end();
 }
 
-OH_AVErrCode OH_AVCapability_GetEncoderBitrateRange(OH_AVCapability *capability,
-    OH_AVRange *bitrateRange)
+OH_AVErrCode OH_AVCapability_GetEncoderBitrateRange(OH_AVCapability *capability, OH_AVRange *bitrateRange)
 {
     if (capability == nullptr) {
         bitrateRange->minVal = 0;
@@ -126,8 +113,7 @@ OH_AVErrCode OH_AVCapability_GetEncoderBitrateRange(OH_AVCapability *capability,
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetEncoderQualityRange(OH_AVCapability *capability,
-    OH_AVRange *qualityRange)
+OH_AVErrCode OH_AVCapability_GetEncoderQualityRange(OH_AVCapability *capability, OH_AVRange *qualityRange)
 {
     if (capability == nullptr) {
         qualityRange->minVal = 0;
@@ -139,8 +125,7 @@ OH_AVErrCode OH_AVCapability_GetEncoderQualityRange(OH_AVCapability *capability,
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetEncoderComplexityRange(OH_AVCapability *capability,
-    OH_AVRange *complexityRange)
+OH_AVErrCode OH_AVCapability_GetEncoderComplexityRange(OH_AVCapability *capability, OH_AVRange *complexityRange)
 {
     if (capability == nullptr) {
         complexityRange->minVal = 0;
@@ -152,8 +137,7 @@ OH_AVErrCode OH_AVCapability_GetEncoderComplexityRange(OH_AVCapability *capabili
     return AV_ERR_OK;
 }
 
-bool OH_AVCapability_ValidateVideoEncoderBitrateMode(OH_AVCapability *capability,
-    OH_BitrateMode bitrateMode)
+bool OH_AVCapability_ValidateVideoEncoderBitrateMode(OH_AVCapability *capability, OH_BitrateMode bitrateMode)
 {
     if (capability == nullptr) {
         return false;
@@ -162,8 +146,8 @@ bool OH_AVCapability_ValidateVideoEncoderBitrateMode(OH_AVCapability *capability
     return find(bitrateModeVec.begin(), bitrateModeVec.end(), bitrateMode) != bitrateModeVec.end();
 }
 
-OH_AVErrCode OH_AVCapability_GetAudioSupportedSampleRates(OH_AVCapability *capability,
-    const int32_t **sampleRates, uint32_t *sampleRateNum)
+OH_AVErrCode OH_AVCapability_GetAudioSupportedSampleRates(OH_AVCapability *capability, const int32_t **sampleRates,
+                                                          uint32_t *sampleRateNum)
 {
     if (capability == nullptr) {
         std::vector<int32_t> empty;
@@ -171,15 +155,14 @@ OH_AVErrCode OH_AVCapability_GetAudioSupportedSampleRates(OH_AVCapability *capab
         *sampleRateNum = empty.size();
         return AV_ERR_INVALID_VAL;
     }
-    
+
     auto &vec = capability->capabilityData_.sampleRate;
     *sampleRates = vec.data();
     *sampleRateNum = vec.size();
     return AV_ERR_OK;
 }
 
-bool OH_AVCapability_ValidateAudioSampleRate(OH_AVCapability *capability,
-    int32_t sampleRate)
+bool OH_AVCapability_ValidateAudioSampleRate(OH_AVCapability *capability, int32_t sampleRate)
 {
     if (capability == nullptr) {
         return false;
@@ -188,8 +171,7 @@ bool OH_AVCapability_ValidateAudioSampleRate(OH_AVCapability *capability,
     return find(sampeleRateVec.begin(), sampeleRateVec.end(), sampleRate) != sampeleRateVec.end();
 }
 
-OH_AVErrCode OH_AVCapability_GetAudioChannelsRange(OH_AVCapability *capability,
-    OH_AVRange *channelsRange)
+OH_AVErrCode OH_AVCapability_GetAudioChannelsRange(OH_AVCapability *capability, OH_AVRange *channelsRange)
 {
     if (capability == nullptr) {
         channelsRange->minVal = 0;
@@ -201,8 +183,8 @@ OH_AVErrCode OH_AVCapability_GetAudioChannelsRange(OH_AVCapability *capability,
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoSupportedPixFormats(OH_AVCapability *capability,
-    const int32_t **pixFormats, uint32_t *pixFormatNum)
+OH_AVErrCode OH_AVCapability_GetVideoSupportedPixFormats(OH_AVCapability *capability, const int32_t **pixFormats,
+                                                         uint32_t *pixFormatNum)
 {
     if (capability == nullptr) {
         std::vector<int32_t> empty;
@@ -216,8 +198,7 @@ OH_AVErrCode OH_AVCapability_GetVideoSupportedPixFormats(OH_AVCapability *capabi
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoWidthAlignment(OH_AVCapability *capability,
-    int32_t *widthAlignment)
+OH_AVErrCode OH_AVCapability_GetVideoWidthAlignment(OH_AVCapability *capability, int32_t *widthAlignment)
 {
     if (capability == nullptr) {
         *widthAlignment = 0;
@@ -227,8 +208,7 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthAlignment(OH_AVCapability *capability,
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoHeightAlignment(OH_AVCapability *capability,
-    int32_t *heightAlignment)
+OH_AVErrCode OH_AVCapability_GetVideoHeightAlignment(OH_AVCapability *capability, int32_t *heightAlignment)
 {
     if (capability == nullptr) {
         *heightAlignment = 0;
@@ -238,32 +218,29 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightAlignment(OH_AVCapability *capability
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoWidthRangeForHeight(OH_AVCapability *capability,
-    int32_t height, OH_AVRange *widthRange)
+OH_AVErrCode OH_AVCapability_GetVideoWidthRangeForHeight(OH_AVCapability *capability, int32_t height,
+                                                         OH_AVRange *widthRange)
 {
     if (capability == nullptr) {
         widthRange->minVal = 0;
         widthRange->maxVal = 0;
         return AV_ERR_INVALID_VAL;
     }
-    // TODO
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoHeightRangeForWidth(OH_AVCapability *capability,
-    int32_t width, OH_AVRange *heightRange)
+OH_AVErrCode OH_AVCapability_GetVideoHeightRangeForWidth(OH_AVCapability *capability, int32_t width,
+                                                         OH_AVRange *heightRange)
 {
     if (capability == nullptr) {
         heightRange->minVal = 0;
         heightRange->maxVal = 0;
         return AV_ERR_INVALID_VAL;
     }
-    // TODO
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoWidthRange(OH_AVCapability *capability,
-    OH_AVRange *widthRange)
+OH_AVErrCode OH_AVCapability_GetVideoWidthRange(OH_AVCapability *capability, OH_AVRange *widthRange)
 {
     if (capability == nullptr) {
         widthRange->minVal = 0;
@@ -275,8 +252,7 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthRange(OH_AVCapability *capability,
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoHeightRange(OH_AVCapability *capability,
-    OH_AVRange *heightRange)
+OH_AVErrCode OH_AVCapability_GetVideoHeightRange(OH_AVCapability *capability, OH_AVRange *heightRange)
 {
     if (capability == nullptr) {
         heightRange->minVal = 0;
@@ -288,24 +264,22 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightRange(OH_AVCapability *capability,
     return AV_ERR_OK;
 }
 
-bool OH_AVCapability_ValidateVideoSize(OH_AVCapability *capability,
-    int32_t width, int32_t height)
+bool OH_AVCapability_ValidateVideoSize(OH_AVCapability *capability, int32_t width, int32_t height)
 {
     if (capability == nullptr) {
         return false;
     }
 
     auto &alignment = capability->capabilityData_.alignment;
-    if (width == 0 || height == 0 ||
-        alignment.width == 0 || alignment.height == 0 ||
-        width % alignment.width != 0 || height % alignment.height != 0) {
+    if (width == 0 || height == 0 || alignment.width == 0 || alignment.height == 0 || width % alignment.width != 0 ||
+        height % alignment.height != 0) {
         return false;
     }
 
     auto &widthRange = capability->capabilityData_.width;
     auto &heightRange = capability->capabilityData_.height;
-    if (width < widthRange.minVal || width > widthRange.maxVal ||
-        height < heightRange.minVal || height > heightRange.maxVal) {
+    if (width < widthRange.minVal || width > widthRange.maxVal || height < heightRange.minVal ||
+        height > heightRange.maxVal) {
         return false;
     }
 
@@ -313,9 +287,9 @@ bool OH_AVCapability_ValidateVideoSize(OH_AVCapability *capability,
     if (blockSize.width == 0 || blockSize.height == 0) {
         return false;
     }
-    int blockNum = ((width + blockSize.width - 1) / blockSize.width) * 
-        ((height + blockSize.height - 1) / blockSize.height);
-    
+    int blockNum =
+        ((width + blockSize.width - 1) / blockSize.width) * ((height + blockSize.height - 1) / blockSize.height);
+
     auto &blockPerFrame = capability->capabilityData_.blockPerFrame;
     if (blockNum < blockPerFrame.minVal || blockNum > blockPerFrame.maxVal) {
         return false;
@@ -324,8 +298,7 @@ bool OH_AVCapability_ValidateVideoSize(OH_AVCapability *capability,
     return true;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoFrameRateRange(OH_AVCapability *capability,
-    OH_AVRange *frameRateRange)
+OH_AVErrCode OH_AVCapability_GetVideoFrameRateRange(OH_AVCapability *capability, OH_AVRange *frameRateRange)
 {
     if (capability == nullptr) {
         frameRateRange->minVal = 0;
@@ -337,8 +310,8 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRange(OH_AVCapability *capability,
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capability, 
-    int32_t width, int32_t height, OH_AVRange *frameRateRange)
+OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capability, int32_t width, int32_t height,
+                                                           OH_AVRange *frameRateRange)
 {
     frameRateRange->minVal = 0;
     frameRateRange->maxVal = 0;
@@ -346,18 +319,17 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capa
         return AV_ERR_INVALID_VAL;
     }
 
-    if (OH_AVCapability_ValidateVideoSize(capability, width, height)!= AV_ERR_OK) {
+    if (OH_AVCapability_ValidateVideoSize(capability, width, height) != AV_ERR_OK) {
         return AV_ERR_INVALID_VAL;
     }
 
     auto &blockSize = capability->capabilityData_.blockSize;
     auto &blockPerSecond = capability->capabilityData_.blockPerSecond;
-    if (blockSize.width == 0 || blockSize.height == 0 ||
-        blockPerSecond.minVal <= 0 || blockPerSecond.maxVal <= 0) {
+    if (blockSize.width == 0 || blockSize.height == 0 || blockPerSecond.minVal <= 0 || blockPerSecond.maxVal <= 0) {
         return AV_ERR_UNKNOWN;
     }
-    int blockNum = ((width + blockSize.width - 1) / blockSize.width) *
-        ((height + blockSize.height - 1) / blockSize.height);
+    int blockNum =
+        ((width + blockSize.width - 1) / blockSize.width) * ((height + blockSize.height - 1) / blockSize.height);
 
     auto &fpsRange = capability->capabilityData_.frameRate;
     frameRateRange->minVal = std::max((blockPerSecond.minVal + blockNum - 1) / blockNum, fpsRange.minVal);
@@ -365,8 +337,8 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capa
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapability *capability,
-    int32_t width, int32_t height, OH_AVRange *frameRateRange)
+OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapability *capability, int32_t width,
+                                                                   int32_t height, OH_AVRange *frameRateRange)
 {
     frameRateRange->minVal = 0;
     frameRateRange->maxVal = 0;
@@ -374,7 +346,7 @@ OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapabili
         return AV_ERR_INVALID_VAL;
     }
 
-    if (OH_AVCapability_ValidateVideoSize(capability, width, height)!= AV_ERR_OK) {
+    if (OH_AVCapability_ValidateVideoSize(capability, width, height) != AV_ERR_OK) {
         return AV_ERR_INVALID_VAL;
     }
 
@@ -382,8 +354,8 @@ OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapabili
     if (blockSize.width == 0 || blockSize.height == 0) {
         return AV_ERR_UNKNOWN;
     }
-    int32_t blockNum = ((width + blockSize.width - 1) / blockSize.width) *
-        ((height + blockSize.height - 1) / blockSize.height);
+    int32_t blockNum =
+        ((width + blockSize.width - 1) / blockSize.width) * ((height + blockSize.height - 1) / blockSize.height);
 
     int32_t minDiff = INT32_MAX;
     Range fpsRange;
@@ -393,7 +365,7 @@ OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapabili
     auto iter = measureFps.begin();
     while (iter != measureFps.end()) {
         int32_t curBlockNum = (iter->first.width + blockSize.width - 1) / blockSize.width *
-            ((iter->first.height + blockSize.height - 1) / blockSize.height);
+                              ((iter->first.height + blockSize.height - 1) / blockSize.height);
         int32_t curDiff = std::abs(curBlockNum - blockNum);
         if (curDiff < minDiff) {
             minDiff = curDiff;
@@ -408,26 +380,24 @@ OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapabili
     return AV_ERR_OK;
 }
 
-bool OH_AVCapability_ValidateVideoSizeAndFrameRate(OH_AVCapability *capability,
-    int32_t width, int32_t height, int32_t frameRate)
+bool OH_AVCapability_ValidateVideoSizeAndFrameRate(OH_AVCapability *capability, int32_t width, int32_t height,
+                                                   int32_t frameRate)
 {
     if (capability == nullptr) {
         return false;
     }
 
     auto &alignment = capability->capabilityData_.alignment;
-    if (width == 0 || height == 0 ||
-        alignment.width == 0 || alignment.height == 0 ||
-        width % alignment.width != 0 || height % alignment.height != 0) {
+    if (width == 0 || height == 0 || alignment.width == 0 || alignment.height == 0 || width % alignment.width != 0 ||
+        height % alignment.height != 0) {
         return false;
     }
 
     auto &widthRange = capability->capabilityData_.width;
     auto &heightRange = capability->capabilityData_.height;
     auto &fpsRange = capability->capabilityData_.frameRate;
-    if (width < widthRange.minVal || width > widthRange.maxVal ||
-        height < heightRange.minVal || height > heightRange.maxVal ||
-        frameRate < fpsRange.minVal || frameRate > fpsRange.maxVal) {
+    if (width < widthRange.minVal || width > widthRange.maxVal || height < heightRange.minVal ||
+        height > heightRange.maxVal || frameRate < fpsRange.minVal || frameRate > fpsRange.maxVal) {
         return false;
     }
 
@@ -435,15 +405,14 @@ bool OH_AVCapability_ValidateVideoSizeAndFrameRate(OH_AVCapability *capability,
     if (blockSize.width == 0 || blockSize.height == 0) {
         return false;
     }
-    int blockNum = ((width + blockSize.width - 1) / blockSize.width) *
-        ((height + blockSize.height - 1) / blockSize.height);
+    int blockNum =
+        ((width + blockSize.width - 1) / blockSize.width) * ((height + blockSize.height - 1) / blockSize.height);
     int blockOneSecond = blockNum * frameRate;
     auto &blockPerFrame = capability->capabilityData_.blockPerFrame;
     auto &blockPerSecond = capability->capabilityData_.blockPerSecond;
-    if (blockNum < blockPerFrame.minVal || blockNum > blockPerFrame.maxVal ||
-        blockOneSecond < blockPerSecond.minVal || blockOneSecond > blockPerSecond.maxVal ) {
+    if (blockNum < blockPerFrame.minVal || blockNum > blockPerFrame.maxVal || blockOneSecond < blockPerSecond.minVal ||
+        blockOneSecond > blockPerSecond.maxVal) {
         return false;
     }
     return true;
 }
-

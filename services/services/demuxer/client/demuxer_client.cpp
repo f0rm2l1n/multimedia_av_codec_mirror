@@ -78,7 +78,7 @@ int32_t DemuxerClient::UnselectSourceTrackByID(uint32_t index)
     return demuxerProxy_->UnselectSourceTrackByID(index);
 }
 int32_t DemuxerClient::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                        AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+                                    AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");

@@ -51,7 +51,8 @@ int32_t AVMuxerInnerMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMo
     return AV_ERR_UNKNOWN;
 }
                          
-int32_t AVMuxerInnerMock::WriteSampleBuffer(uint32_t trackIndex, uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
+int32_t AVMuxerInnerMock::WriteSampleBuffer(uint32_t trackIndex,
+    uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
 {
     if (muxer_ != nullptr) {
         TrackSampleInfo sampleInfo;

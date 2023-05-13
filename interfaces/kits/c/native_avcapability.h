@@ -20,11 +20,10 @@
 #include "native_averrors.h"
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 typedef struct OH_AVCapability OH_AVCapability;
-
 /**
  * @brief The bitrate mode of video encoder.
  * @since 10
@@ -59,7 +58,7 @@ typedef struct OH_AVRange {
  * @return true indicate vendor codec, false indicate software codec
  * @since 10
  * @version 1.0
-*/
+ */
 bool OH_AVCapability_IsHardwareAccelerated(OH_AVCapability *capability);
 
 /**
@@ -68,7 +67,7 @@ bool OH_AVCapability_IsHardwareAccelerated(OH_AVCapability *capability);
  * @return mime type string
  * @since 10
  * @version 1.0
-*/
+ */
 const char *OH_AVCapability_GetMimeType(OH_AVCapability *capability);
 
 /**
@@ -77,7 +76,7 @@ const char *OH_AVCapability_GetMimeType(OH_AVCapability *capability);
  * @return instance count
  * @since 10
  * @version 1.0
-*/
+ */
 int32_t OH_AVCapability_GetMaxSupportedInstances(OH_AVCapability *capability);
 
 /**
@@ -89,9 +88,9 @@ int32_t OH_AVCapability_GetMaxSupportedInstances(OH_AVCapability *capability);
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability,
-    const int32_t **profiles, uint32_t *profileNum);
+ */
+OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability, const int32_t **profiles,
+                                                  uint32_t *profileNum);
 
 /**
  * @brief Get levels array for a specified profile.
@@ -103,9 +102,9 @@ OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capability,
-    int32_t profile, const int32_t **levels, uint32_t *levelNum);
+ */
+OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capability, int32_t profile,
+                                                          const int32_t **levels, uint32_t *levelNum);
 
 /**
  * @brief Check whether the profile and level is supported.
@@ -115,9 +114,8 @@ OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capab
  * @return true indicate supported, false indicate not supported
  * @since 10
  * @version 1.0
-*/
-bool OH_AVCapability_ValidateProfileAndLevel(OH_AVCapability *capability,
-    int32_t profile, int32_t level);
+ */
+bool OH_AVCapability_ValidateProfileAndLevel(OH_AVCapability *capability, int32_t profile, int32_t level);
 
 /**
  * @brief Get encoder bitrate range
@@ -127,9 +125,8 @@ bool OH_AVCapability_ValidateProfileAndLevel(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetEncoderBitrateRange(OH_AVCapability *capability,
-    OH_AVRange *bitrateRange);
+ */
+OH_AVErrCode OH_AVCapability_GetEncoderBitrateRange(OH_AVCapability *capability, OH_AVRange *bitrateRange);
 
 /**
  * @brief Get encoder quality range
@@ -139,9 +136,8 @@ OH_AVErrCode OH_AVCapability_GetEncoderBitrateRange(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetEncoderQualityRange(OH_AVCapability *capability,
-    OH_AVRange *qualityRange);
+ */
+OH_AVErrCode OH_AVCapability_GetEncoderQualityRange(OH_AVCapability *capability, OH_AVRange *qualityRange);
 
 /**
  * @brief Get encoder complexity range
@@ -151,9 +147,8 @@ OH_AVErrCode OH_AVCapability_GetEncoderQualityRange(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetEncoderComplexityRange(OH_AVCapability *capability,
-    OH_AVRange *complexityRange);
+ */
+OH_AVErrCode OH_AVCapability_GetEncoderComplexityRange(OH_AVCapability *capability, OH_AVRange *complexityRange);
 
 /**
  * @brief Check whether is this bitrate mode supported, only used for video encoder codecs.
@@ -162,9 +157,8 @@ OH_AVErrCode OH_AVCapability_GetEncoderComplexityRange(OH_AVCapability *capabili
  * @return true indicate supported, false indicate not supported
  * @since 10
  * @version 1.0
-*/
-bool OH_AVCapability_ValidateVideoEncoderBitrateMode(OH_AVCapability *capability,
-    OH_BitrateMode bitrateMode);
+ */
+bool OH_AVCapability_ValidateVideoEncoderBitrateMode(OH_AVCapability *capability, OH_BitrateMode bitrateMode);
 
 /**
  * @brief Get sampleRate array, only used for audio codecs
@@ -175,9 +169,9 @@ bool OH_AVCapability_ValidateVideoEncoderBitrateMode(OH_AVCapability *capability
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetAudioSupportedSampleRates(OH_AVCapability *capability,
-    const int32_t **sampleRates, uint32_t *sampleRateNum);
+ */
+OH_AVErrCode OH_AVCapability_GetAudioSupportedSampleRates(OH_AVCapability *capability, const int32_t **sampleRates,
+                                                          uint32_t *sampleRateNum);
 
 /**
  * @brief Check whether is this sampleRate supported, only used for audio codecs
@@ -186,9 +180,8 @@ OH_AVErrCode OH_AVCapability_GetAudioSupportedSampleRates(OH_AVCapability *capab
  * @return true indicate supported, false indicate not supported
  * @since 10
  * @version 1.0
-*/
-bool OH_AVCapability_ValidateAudioSampleRate(OH_AVCapability *capability,
-    int32_t sampleRate);
+ */
+bool OH_AVCapability_ValidateAudioSampleRate(OH_AVCapability *capability, int32_t sampleRate);
 
 /**
  * @brief Get channels range, only used for audio codecs
@@ -198,10 +191,8 @@ bool OH_AVCapability_ValidateAudioSampleRate(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetAudioChannelsRange(OH_AVCapability *capability,
-    OH_AVRange *channelsRange);
-
+ */
+OH_AVErrCode OH_AVCapability_GetAudioChannelsRange(OH_AVCapability *capability, OH_AVRange *channelsRange);
 
 /**
  * @brief Get supported pixFormat array, only used for video codecs
@@ -212,9 +203,9 @@ OH_AVErrCode OH_AVCapability_GetAudioChannelsRange(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoSupportedPixFormats(OH_AVCapability *capability,
-    const int32_t **pixFormats, uint32_t *pixFormatNum);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoSupportedPixFormats(OH_AVCapability *capability, const int32_t **pixFormats,
+                                                         uint32_t *pixFormatNum);
 
 /**
  * @brief Get width alignment, only used for video codecs
@@ -224,9 +215,8 @@ OH_AVErrCode OH_AVCapability_GetVideoSupportedPixFormats(OH_AVCapability *capabi
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoWidthAlignment(OH_AVCapability *capability,
-    int32_t *widthAlignment);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoWidthAlignment(OH_AVCapability *capability, int32_t *widthAlignment);
 
 /**
  * @brief Get height alignment, only used for video codecs
@@ -236,9 +226,8 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthAlignment(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoHeightAlignment(OH_AVCapability *capability,
-    int32_t *heightAlignment);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoHeightAlignment(OH_AVCapability *capability, int32_t *heightAlignment);
 
 /**
  * @brief Get width range for a specified height, only used for video codecs
@@ -248,9 +237,9 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightAlignment(OH_AVCapability *capability
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoWidthRangeForHeight(OH_AVCapability *capability,
-    int32_t height, OH_AVRange *widthRange);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoWidthRangeForHeight(OH_AVCapability *capability, int32_t height,
+                                                         OH_AVRange *widthRange);
 
 /**
  * @brief Get height range for a specified width, only used for video codecs
@@ -260,9 +249,9 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthRangeForHeight(OH_AVCapability *capabi
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoHeightRangeForWidth(OH_AVCapability *capability,
-    int32_t width, OH_AVRange *heightRange);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoHeightRangeForWidth(OH_AVCapability *capability, int32_t width,
+                                                         OH_AVRange *heightRange);
 
 /**
  * @brief Get width range, only used for video codecs
@@ -272,9 +261,8 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightRangeForWidth(OH_AVCapability *capabi
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoWidthRange(OH_AVCapability *capability,
-    OH_AVRange *widthRange);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoWidthRange(OH_AVCapability *capability, OH_AVRange *widthRange);
 
 /**
  * @brief Get height range, only used for video codecs
@@ -284,9 +272,8 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthRange(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoHeightRange(OH_AVCapability *capability,
-    OH_AVRange *heightRange);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoHeightRange(OH_AVCapability *capability, OH_AVRange *heightRange);
 
 /**
  * @brief Check whether is this video size supported, only used for video codecs
@@ -296,9 +283,8 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightRange(OH_AVCapability *capability,
  * @return true indicate supported, false indicate not supported
  * @since 10
  * @version 1.0
-*/
-bool OH_AVCapability_ValidateVideoSize(OH_AVCapability *capability,
-    int32_t width, int32_t height);
+ */
+bool OH_AVCapability_ValidateVideoSize(OH_AVCapability *capability, int32_t width, int32_t height);
 
 /**
  * @brief Get frame rate range, only used for video codecs
@@ -308,9 +294,8 @@ bool OH_AVCapability_ValidateVideoSize(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoFrameRateRange(OH_AVCapability *capability,
-    OH_AVRange *frameRateRange);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoFrameRateRange(OH_AVCapability *capability, OH_AVRange *frameRateRange);
 
 /**
  * @brief Get frame rate range for a specified video size, only used for video codecs
@@ -322,12 +307,12 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRange(OH_AVCapability *capability,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capability, 
-    int32_t width, int32_t height, OH_AVRange *frameRateRange);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capability, int32_t width, int32_t height,
+                                                           OH_AVRange *frameRateRange);
 
 /**
- * @brief Get measured frame rate range for a specified video size, 
+ * @brief Get measured frame rate range for a specified video size,
  * these frame rates is reachable, only used for video codecs
  * @param capability codec capability get from OH_AVCodec_GetCapability
  * @param width video width
@@ -337,9 +322,9 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capa
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
-*/
-OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapability *capability,
-    int32_t width, int32_t height, OH_AVRange *frameRateRange);
+ */
+OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapability *capability, int32_t width,
+                                                                   int32_t height, OH_AVRange *frameRateRange);
 
 /**
  * @brief Check whether are this video size and fps supported.
@@ -350,12 +335,10 @@ OH_AVErrCode OH_AVCapability_GetVideoMeasuredFrameRateRangeForSize(OH_AVCapabili
  * @return true indicate supported, false indicate not supported
  * @since 10
  * @version 1.0
-*/
-bool OH_AVCapability_ValidateVideoSizeAndFrameRate(OH_AVCapability *capability,
-    int32_t width, int32_t height, int32_t frameRate);
-
+ */
+bool OH_AVCapability_ValidateVideoSizeAndFrameRate(OH_AVCapability *capability, int32_t width, int32_t height,
+                                                   int32_t frameRate);
 #ifdef __cplusplus
 }
 #endif
-
 #endif // NATIVE_AVCAPABILITY_H

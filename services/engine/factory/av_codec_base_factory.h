@@ -23,20 +23,8 @@
 
 namespace OHOS {
 namespace Media {
-
 template <typename I, typename Identity, typename... Args>
 class AVCodecBaseFactory {
-private:
-    friend I;
-    AVCodecBaseFactory() = default;
-    using builder = std::function<std::shared_ptr<I>(Args...)>;
-
-    static auto &builders()
-    {
-        static std::unordered_map<Identity, builder> container;
-        return container;
-    }
-
 public:
     using self = AVCodecBaseFactory<I, Identity, Args...>;
 
@@ -68,13 +56,23 @@ public:
             (void)registered;
         }
     };
+
+private:
+    friend I;
+    AVCodecBaseFactory() = default;
+    using builder = std::function<std::shared_ptr<I>(Args...)>;
+
+    static auto &builders()
+    {
+        static std::unordered_map<Identity, builder> container;
+        return container;
+    }
 };
 
 template <typename I, typename Identify, typename... Args>
 template <typename T>
 bool AVCodecBaseFactory<I, Identify, Args...>::CodecRegister<T>::registered =
     AVCodecBaseFactory<I, Identify, Args...>::CodecRegister<T>::avRegister();
-
 } // namespace Media
 } // namespace OHOS
 

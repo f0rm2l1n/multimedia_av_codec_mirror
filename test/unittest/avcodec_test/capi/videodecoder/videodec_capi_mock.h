@@ -17,10 +17,11 @@
 #ifndef VIDEODEC_CAPI_MOCK_H
 #define VIDEODEC_CAPI_MOCK_H
 
-#include <mutex>
-#include <map>
 #include "avcodec_mock.h"
 #include "native_avcodec_videodecoder.h"
+#include <map>
+#include <mutex>
+
 
 namespace OHOS {
 namespace Media {
@@ -47,8 +48,8 @@ private:
     static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData);
     static void OnStreamChanged(OH_AVCodec *codec, OH_AVFormat *format, void *userData);
     static void OnNeedInputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData);
-    static void OnNewOutputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data,
-        OH_AVCodecBufferAttr *attr, void *userData);
+    static void OnNewOutputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
+                                void *userData);
     static void SetCallback(OH_AVCodec *codec, std::shared_ptr<AVCodecCallbackMock> cb);
     static void DelCallback(OH_AVCodec *codec);
     static std::shared_ptr<AVCodecCallbackMock> GetCallback(OH_AVCodec *codec);

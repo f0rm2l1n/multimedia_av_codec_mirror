@@ -33,7 +33,7 @@ private:
     bool ParseCodecXml();
     std::vector<CapabilityData> capabilityDataArray_;
     std::mutex mutex_;
-    bool isParsered_{false};
+    bool isParsered_ {false};
 };
 } // namespace Media
 } // namespace OHOS

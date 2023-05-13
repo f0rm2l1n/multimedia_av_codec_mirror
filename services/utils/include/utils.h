@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <unistd.h>
-#include <memory>
 
 namespace OHOS {
 namespace Media {
-
 inline void SleepFor(unsigned ms)
 {
     constexpr int factor = 1000;
@@ -41,6 +42,6 @@ inline std::shared_ptr<T> ReinterpretPointerCast(const std::shared_ptr<U>& ptr) 
 {
     return std::shared_ptr<T>(ptr, reinterpret_cast<T*>(ptr.get()));
 }
-
 } // namespace Media
 } // namespace OHOS
+#endif

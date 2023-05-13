@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_FFMPEG_MP3_DECODER_PLUGIN_H
-#define AUDIO_FFMPEG_MP3_DECODER_PLUGIN_H
+#ifndef AUDIO_FFMPEG_FLAC_ENCODER_PLUGIN_H
+#define AUDIO_FFMPEG_FLAC_ENCODER_PLUGIN_H
 
 #include "audio_ffmpeg_base_codec.h"
-#include "audio_ffmpeg_decoder_plugin.h"
+#include "audio_ffmpeg_encoder_plugin.h"
 #include "avcodec_audio_codec_key.h"
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegMp3DecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegMp3DecoderPlugin> {
+class AudioFFMpegFlacEncoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegFlacEncoderPlugin> {
 public:
-    AudioFFMpegMp3DecoderPlugin();
-    ~AudioFFMpegMp3DecoderPlugin() override;
+    AudioFFMpegFlacEncoderPlugin();
+    ~AudioFFMpegFlacEncoderPlugin() override;
 
     int32_t init(const Format &format) override;
     int32_t processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) override;
@@ -39,15 +39,11 @@ public:
 
     const static std::string identify()
     {
-        return std::string(AVCodecAudioCodecKey::AUDIO_DECODER_MP3_NAME_KEY);
+        return std::string(AVCodecAudioCodecKey::AUDIO_ENCODER_FLAC_NAME_KEY);
     }
 
 private:
-    int32_t checkinit(const Format &format);
-    int channels;
-    int sample_rate;
-    int64_t bit_rate;
-    std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
+    std::unique_ptr<AudioFfmpegEncoderPlugin> basePlugin;
 };
 } // namespace Media
 } // namespace OHOS

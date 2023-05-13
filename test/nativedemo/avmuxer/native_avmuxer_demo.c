@@ -30,6 +30,10 @@
 
 #define NORMAL 0
 #define THREAD 1
+#define MODE_ZERO 0
+#define MODE_ONE 1
+#define MODE_TWO 2
+#define MODE_THREE 3
 #define TYPE_BUFFER_SIZE 20
 #define CONFIG_BUFFER_SIZE 100
 
@@ -205,8 +209,6 @@ static int UpDateWriteBufferInfo(int fd, unsigned char **buffer, int *curSize, O
         return -1;
     }
     info->size = dataSize;
-
-
     return 0;
 }
 
@@ -358,12 +360,13 @@ int GetInputNum(int defaultNum)
     int num = defaultNum;
     num = getchar();
     if (num == '\n') { // default
-        num = defaultNum;
-    } else {
-        ungetc(num, stdin);
-        scanf_s("%d", &num, sizeof(num));
-        fflush(stdin);
+        return defaultNum;
     }
+    ungetc(num, stdin);
+    if (scanf_s("%d", &num) != EOK) {
+        num = defaultNum;
+    }
+    fflush(stdin);
     return num;
 }
 
@@ -375,11 +378,11 @@ void NativeSelectMuxerType(void)
     printf("\nplese select muxer type : 0.mp4 1.m4a\n");
     num = GetInputNum(0);
     switch (num) {
-        case 0:
+        case MODE_ZERO:
             g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_MPEG_4;
             (void)snprintf_s(g_muxerParam.outputFormatType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mp4");
             break;
-        case 1:
+        case MODE_ONE:
             g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_M4A;
             (void)snprintf_s(g_muxerParam.outputFormatType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "m4a");
             break;
@@ -400,11 +403,11 @@ void NativeSelectRunMode(void)
     printf("1. audio video write in different thread\n");
     num = GetInputNum(0);
     switch (num) {
-        case 0:
+        case MODE_ZERO:
             g_muxerParam.runMode = NORMAL;
             (void)snprintf_s(g_muxerParam.runModeType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", RUN_NORMAL);
             break;
-        case 1:
+        case MODE_ONE:
             g_muxerParam.runMode = THREAD;
             (void)snprintf_s(g_muxerParam.runModeType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", RUN_MUL_THREAD);
             break;
@@ -423,11 +426,11 @@ void NativeSelectAudio(void)
     printf("\nplese select audio mode: 0.noAudio 1.aac 2.mpeg\n");
     num = GetInputNum(1);
     switch (num) {
-        case 1:
+        case MODE_ONE:
             g_muxerParam.audioParams = &g_audioAacPar;
             (void)snprintf_s(g_muxerParam.audioType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "aac");
             break;
-        case 2:
+        case MODE_TWO:
             g_muxerParam.audioParams = &g_audioMpegPar;
             (void)snprintf_s(g_muxerParam.audioType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mpeg");
             break;
@@ -446,11 +449,11 @@ void NativeSelectVideo(void)
     printf("\nplese select video mode: 0.noVideo 1.h264 2.mpeg4\n");
     num = GetInputNum(1);
     switch (num) {
-        case 1:
+        case MODE_ONE:
             g_muxerParam.videoParams = &g_videoH264Par;
             (void)snprintf_s(g_muxerParam.videoType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "h264");
             break;
-        case 2:
+        case MODE_TWO:
             g_muxerParam.videoParams = &g_videoMpeg4Par;
             (void)snprintf_s(g_muxerParam.videoType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mpeg4");
             break;
@@ -469,15 +472,15 @@ void NativeSelectCover(void)
     printf("\nplese select cover mode: 0.noCover 1.jpg 2.png 3.bmp\n");
     num = GetInputNum(1);
     switch (num) {
-        case 1:
+        case MODE_ONE:
             g_muxerParam.coverParams = &g_jpegCoverPar;
             (void)snprintf_s(g_muxerParam.coverType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "jpg");
             break;
-        case 2:
+        case MODE_TWO:
             g_muxerParam.coverParams = &g_pngCoverPar;
             (void)snprintf_s(g_muxerParam.coverType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "png");
             break;
-        case 3:
+        case MODE_THREE:
             g_muxerParam.coverParams = &g_bmpCoverPar;
             (void)snprintf_s(g_muxerParam.coverType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "bmp");
             break;
@@ -627,9 +630,14 @@ int RunNativeMuxer(const char *out)
     }
 
     char outFileName[CONFIG_BUFFER_SIZE] = {0};
-    (void)snprintf_s(outFileName, sizeof(outFileName), sizeof(outFileName) - 1, "%s_%s_%s_%s_%s.%s", 
+    errno_t err = EOK;
+    err = snprintf_s(outFileName, sizeof(outFileName), sizeof(outFileName) - 1, "%s_%s_%s_%s_%s.%s",
         out, g_muxerParam.runModeType, g_muxerParam.audioType, g_muxerParam.videoType,
         g_muxerParam.coverType, g_muxerParam.outputFormatType);
+    if (err != EOK) {
+        CloseAllFd(&fdStr);
+        return -1;
+    }
 
     fdStr.outputFd = open(outFileName, O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
     if (fdStr.outputFd < 0) {

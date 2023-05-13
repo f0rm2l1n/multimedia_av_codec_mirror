@@ -85,8 +85,7 @@ int32_t AVSharedMemoryBase::Init()
 {
     ON_SCOPE_EXIT(0) {
         AVCODEC_LOGE("create avsharedmemory failed, name = %{public}s, size = %{public}d, "
-                   "flags = 0x%{public}x, fd = %{public}d",
-                   name_.c_str(), capacity_, flags_, fd_);
+                   "flags = 0x%{public}x, fd = %{public}d", name_.c_str(), capacity_, flags_, fd_);
         Close();
     };
 
@@ -95,8 +94,8 @@ int32_t AVSharedMemoryBase::Init()
     bool isRemote = false;
     if (fd_ > 0) {
         int size = AshmemGetSize(fd_);
-        CHECK_AND_RETURN_RET_LOG(size == capacity_, AVCS_ERR_INVALID_VAL, "size not equal capacity_, size = %{public}d, "
-                                "capacity_ = %{public}d", size, capacity_);
+        CHECK_AND_RETURN_RET_LOG(size == capacity_, AVCS_ERR_INVALID_VAL,
+            "size not equal capacity_, size = %{public}d, capacity_ = %{public}d", size, capacity_);
         isRemote = true;
     } else {
         fd_ = AshmemCreate(name_.c_str(), static_cast<size_t>(capacity_));
@@ -163,7 +162,8 @@ int32_t AVSharedMemoryBase::Write(const uint8_t *in, int32_t writeSize, int32_t 
     CHECK_AND_RETURN_RET_LOG(dstPtr != nullptr, 0, "Inner dstPtr is nullptr");
 
     auto error = memcpy_s(dstPtr, length, in, length);
-    CHECK_AND_RETURN_RET_LOG(error == EOK, 0, "Inner memcpy_s failed,name:%{public}s, %{public}s", name_.c_str(), strerror(error));
+    CHECK_AND_RETURN_RET_LOG(error == EOK, 0, "Inner memcpy_s failed,name:%{public}s, %{public}s",
+        name_.c_str(), strerror(error));
     size_ = start + length;
     return length;
 }
@@ -184,7 +184,8 @@ int32_t AVSharedMemoryBase::Read(uint8_t *out, int32_t readSize, int32_t positio
     uint8_t *srcPtr = base_ + start;
     CHECK_AND_RETURN_RET_LOG(srcPtr != nullptr, 0, "Inner srcPtr is nullptr");
     auto error = memcpy_s(out, length, srcPtr, length);
-    CHECK_AND_RETURN_RET_LOG(error == EOK, 0, "Inner memcpy_s failed,name:%{public}s, %{public}s", name_.c_str(), strerror(error));
+    CHECK_AND_RETURN_RET_LOG(error == EOK, 0, "Inner memcpy_s failed,name:%{public}s, %{public}s",
+        name_.c_str(), strerror(error));
     return length;
 }
 

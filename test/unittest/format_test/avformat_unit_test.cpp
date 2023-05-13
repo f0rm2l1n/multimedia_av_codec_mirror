@@ -13,33 +13,32 @@
  * limitations under the License.
  */
 
-
 #include "avformat_unit_test.h"
-#include <cmath>
-#include "gtest/gtest.h"
 #include "avcodec_errors.h"
 #include "securec.h"
+#include "gtest/gtest.h"
+#include <cmath>
 
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace testing::ext;
 namespace {
-    constexpr float EPSINON_FLOAT = 0.0001;
-    constexpr double EPSINON_DOUBLE = 0.0001;
-} // namespace FormatTestParam
+constexpr float EPSINON_FLOAT = 0.0001;
+constexpr double EPSINON_DOUBLE = 0.0001;
+} // namespace
 
-void FormatUnitTest::SetUpTestCase(void) {}
+void AVFormatUnitTest::SetUpTestCase(void) {}
 
-void FormatUnitTest::TearDownTestCase(void) {}
+void AVFormatUnitTest::TearDownTestCase(void) {}
 
-void FormatUnitTest::SetUp(void)
+void AVFormatUnitTest::SetUp(void)
 {
     format_ = FormatMockFactory::CreateFormat();
     ASSERT_NE(nullptr, format_);
 }
 
-void FormatUnitTest::TearDown(void)
+void AVFormatUnitTest::TearDown(void)
 {
     if (format_ != nullptr) {
         format_->Destroy();
@@ -52,7 +51,7 @@ void FormatUnitTest::TearDown(void)
  * @tc.type: FUNC
  * @tc.require: issueI5OX06 issueI5P8N0
  */
-HWTEST_F(FormatUnitTest, Format_Value_001, TestSize.Level0)
+HWTEST_F(AVFormatUnitTest, Format_Value_001, TestSize.Level0)
 {
     const std::string_view intKey = "IntKey";
     const std::string_view longKey = "LongKey";
@@ -71,7 +70,7 @@ HWTEST_F(FormatUnitTest, Format_Value_001, TestSize.Level0)
     float getFloatValue = 0.0;
     double getDoubleValue = 0.0;
     std::string getStringValue = "";
-    
+
     EXPECT_TRUE(format_->PutIntValue(intKey, intValue));
     EXPECT_TRUE(format_->GetIntValue(intKey, getIntValue));
     EXPECT_TRUE(intValue == getIntValue);
@@ -103,7 +102,7 @@ HWTEST_F(FormatUnitTest, Format_Value_001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: issueI5OWXY issueI5OXCD
  */
-HWTEST_F(FormatUnitTest, Format_Buffer_001, TestSize.Level0)
+HWTEST_F(AVFormatUnitTest, Format_Buffer_001, TestSize.Level0)
 {
     constexpr size_t size = 3;
     const std::string_view key = "BufferKey";

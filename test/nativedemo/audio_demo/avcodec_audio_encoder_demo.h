@@ -16,7 +16,6 @@
 #ifndef AVCODEC_AUDIO_ENCODER_DEMO_H
 #define AVCODEC_AUDIO_ENCODER_DEMO_H
 
-#include "native_avcodec_audioencoder.h"
 #include <atomic>
 #include <condition_variable>
 #include <fstream>
@@ -24,6 +23,7 @@
 #include <string>
 #include <thread>
 #include "nocopyable.h"
+#include "native_avcodec_audioencoder.h"
 
 namespace OHOS {
 namespace Media {
@@ -57,6 +57,7 @@ private:
     int32_t Release();
     void InputFunc();
     void OutputFunc();
+    void HandleEOS(const uint32_t &index);
 
     std::atomic<bool> isRunning_;
     std::unique_ptr<std::ifstream> inputFile_;
@@ -69,7 +70,7 @@ private:
     int64_t timeStamp_ = 0;
     uint32_t frameCount_ = 0;
 };
-} // AudioDemo
-} // namespace AV_Codec
+} // namespace AudioDemo
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_DECODER_DEMO_H

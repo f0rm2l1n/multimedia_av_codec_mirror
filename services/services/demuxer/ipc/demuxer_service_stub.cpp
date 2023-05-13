@@ -113,7 +113,7 @@ int32_t DemuxerServiceStub::UnselectSourceTrackByID(uint32_t trackIndex)
 }
 
 int32_t DemuxerServiceStub::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+                                         AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
     return demuxerServer_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
@@ -140,7 +140,7 @@ int32_t DemuxerServiceStub::DumpInfo(int32_t fd)
 int32_t DemuxerServiceStub::Init(MessageParcel &data, MessageParcel &reply)
 {
     uint64_t sourceAddr = data.ReadUint64();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(sourceAddr)), AVCS_ERR_UNKNOWN, "Reply Init failed!");   
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(sourceAddr)), AVCS_ERR_UNKNOWN, "Reply Init failed!");
     return AVCS_ERR_OK;
 }
 
@@ -149,7 +149,7 @@ int32_t DemuxerServiceStub::SelectSourceTrackByID(MessageParcel &data, MessagePa
     uint32_t trackIndex = data.ReadUint32();
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SelectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
-                            "Reply SelectSourceTrackByID failed!");
+                           "Reply SelectSourceTrackByID failed!");
     return AVCS_ERR_OK;
 }
 
@@ -158,7 +158,7 @@ int32_t DemuxerServiceStub::UnselectSourceTrackByID(MessageParcel &data, Message
     uint32_t trackIndex = data.ReadUint32();
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(UnselectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
-                            "Reply UnselectSourceTrackByID failed!");  
+                           "Reply UnselectSourceTrackByID failed!");
     return AVCS_ERR_OK;
 }
 
@@ -173,11 +173,12 @@ int32_t DemuxerServiceStub::CopyNextSample(MessageParcel &data, MessageParcel &r
     int32_t ret = CopyNextSample(trackIndex, buffer, info, flag);
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackIndex), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteUnpadBuffer(buffer, sizeof(buffer)), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN,
+                           "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(static_cast<uint32_t>(flag)), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(static_cast<uint32_t>(flag)), AVCS_ERR_UNKNOWN,
+                           "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
     return AVCS_ERR_OK;
 }
@@ -188,7 +189,7 @@ int32_t DemuxerServiceStub::SeekToTime(MessageParcel &data, MessageParcel &reply
     AVSeekMode seekMode = static_cast<AVSeekMode>(data.ReadInt32());
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(mSeconds, seekMode)),
-                            AVCS_ERR_UNKNOWN, "Reply SeekToTime failed!");
+                           AVCS_ERR_UNKNOWN, "Reply SeekToTime failed!");
     return AVCS_ERR_OK;
 }
 

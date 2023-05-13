@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +14,14 @@
  */
 
 #include "videodec_capi_mock.h"
-#include <iostream>
+#include "avcodec_video_decoder.h"
 #include "avformat_capi_mock.h"
 #include "avmemory_capi_mock.h"
-#include "surface_capi_mock.h"
 #include "native_avcodec_base.h"
+#include "surface_capi_mock.h"
 #include "window.h"
-#include "avcodec_video_decoder.h"
+#include <iostream>
+
 using namespace std;
 
 namespace OHOS {
@@ -56,8 +57,8 @@ void VideoDecCapiMock::OnNeedInputData(OH_AVCodec *codec, uint32_t index, OH_AVM
     }
 }
 
-void VideoDecCapiMock::OnNewOutputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data,
-    OH_AVCodecBufferAttr *attr, void *userData)
+void VideoDecCapiMock::OnNewOutputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
+                                       void *userData)
 {
     (void)data;
     (void)userData;
@@ -113,7 +114,7 @@ int32_t VideoDecCapiMock::SetOutputSurface(std::shared_ptr<SurfaceMock> surface)
 {
     if (codec_ != nullptr && surface != nullptr) {
         auto surfaceMock = std::static_pointer_cast<SurfaceCapiMock>(surface);
-        OHNativeWindow *nativeWindow  = surfaceMock->GetSurface();
+        OHNativeWindow *nativeWindow = surfaceMock->GetSurface();
         if (nativeWindow != nullptr) {
             return OH_VideoDecoder_SetSurface(codec_, nativeWindow);
         }
@@ -228,5 +229,5 @@ int32_t VideoDecCapiMock::FreeOutputData(uint32_t index)
     }
     return AV_ERR_OPERATE_NOT_PERMIT;
 }
-}
-}
+} // namespace Media
+} // namespace OHOS

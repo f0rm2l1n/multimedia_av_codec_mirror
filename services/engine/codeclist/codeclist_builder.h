@@ -21,19 +21,16 @@
 
 namespace OHOS {
 namespace Media {
-
 class VideoCodecList : public CodecListBase {
 public:
     ~VideoCodecList() override = default;
     int32_t GetCapabilityList(std::vector<CapabilityData> &caps) override;
 };
-
 class AudioCodecList : public CodecListBase {
 public:
     ~AudioCodecList() override = default;
     int32_t GetCapabilityList(std::vector<CapabilityData> &caps) override;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif // CODECLIST_BUILDER_H

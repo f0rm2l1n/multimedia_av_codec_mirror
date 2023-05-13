@@ -100,7 +100,6 @@ public:
      */
     static constexpr std::string_view MD_KEY_ROTATION_ANGLE = "rotation_angle";
 
-
     /**
      * Key for video frame rate, value type is double.
      */

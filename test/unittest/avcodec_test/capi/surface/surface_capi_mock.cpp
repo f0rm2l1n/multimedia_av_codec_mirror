@@ -17,9 +17,9 @@
 
 namespace OHOS {
 namespace Media {
-OHNativeWindow* SurfaceCapiMock::GetSurface()
+OHNativeWindow *SurfaceCapiMock::GetSurface()
 {
     return nativeWindow_;
 }
-} // Media
-} // OHOS
+} // namespace Media
+} // namespace OHOS

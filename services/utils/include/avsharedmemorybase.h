@@ -89,7 +89,6 @@ public:
 
     void ClearUsedSize();
 
-
     /**
      * @brief Get the memory's virtual address
      * @return the memory's virtual address if the memory is valid, otherwise nullptr.

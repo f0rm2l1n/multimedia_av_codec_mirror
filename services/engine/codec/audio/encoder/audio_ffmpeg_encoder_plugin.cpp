@@ -21,8 +21,9 @@
 #include "securec.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegEncoderPlugin"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegEncoderPlugin"};
 }
+
 namespace OHOS {
 namespace Media {
 AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin() {}
@@ -61,13 +62,13 @@ int32_t AudioFfmpegEncoderPlugin::PcmFillFrame(const std::shared_ptr<AudioBuffer
     auto bytesPerSample = av_get_bytes_per_sample(avCodecContext_->sample_fmt);
     if (!av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
         auto ret = av_samples_fill_arrays(cachedFrame_->data, cachedFrame_->linesize, ptr, cachedFrame_->channels,
-            cachedFrame_->nb_samples, (AVSampleFormat)cachedFrame_->format, 0);
+                                          cachedFrame_->nb_samples, (AVSampleFormat)cachedFrame_->format, 0);
         if (ret < 0) {
             AVCODEC_LOGE("Samples fill arrays failed: %{public}s", AVStrError(ret).c_str());
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
         return AVCodecServiceErrCode::AVCS_ERR_OK;
-    } 
+    }
     for (int i = 0; i < cachedFrame_->nb_samples; i++) {
         for (int j = 0; j < cachedFrame_->channels; j++) {
             auto ret = memcpy_s((void *)(&cachedFrame_->data[j][i * bytesPerSample]), bytesPerSample,
@@ -165,21 +166,25 @@ int32_t AudioFfmpegEncoderPlugin::ReceivePacketSucc(std::shared_ptr<AudioBufferI
             AVCODEC_LOGE("Get header failed.");
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
-        memcpy_s(memory->GetBase(), memory->GetSize(), header.c_str(), headerSize);
+        auto len = memory->Write((uint8_t *)header.c_str(), headerSize);
+        if (len < headerSize) {
+            AVCODEC_LOGE("Write header failed, len = %{public}d", len);
+            return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+        }
     }
 
     int32_t outputSize = avPacket_->size + headerSize;
-    if (outBuffer->GetBuffer()->GetSize() < outputSize) {
+    if (memory->GetSize() < outputSize) {
         AVCODEC_LOGW("Output buffer capacity is not enough");
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }
 
-    auto ret = memcpy_s(memory->GetBase() + headerSize, memory->GetSize() - headerSize, avPacket_->data,
-                        avPacket_->size);
-    if (ret != EOK) {
-        AVCODEC_LOGE("Memory copy failed, errno = %{public}d", ret);
+    auto len = memory->Write(avPacket_->data, avPacket_->size);
+    if (len < avPacket_->size) {
+        AVCODEC_LOGE("write packet data failed, len = %{public}d", len);
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
+
     auto attr = outBuffer->GetBufferAttr();
     attr.size = avPacket_->size + headerSize;
     outBuffer->SetBufferAttr(attr);
@@ -244,10 +249,10 @@ int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
 
     int64_t layout;
     format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, layout);
-    avCodecContext_->channel_layout = layout; // layout
+    avCodecContext_->channel_layout = layout;
 
     int32_t sampleFormat;
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, sampleFormat); // for aac is AV_SMAPLE_FORMAT_FLTP
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, sampleFormat);
     avCodecContext_->sample_fmt = (AVSampleFormat)sampleFormat;
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
@@ -326,6 +331,5 @@ void AudioFfmpegEncoderPlugin::RegisterHeaderFunc(HeaderFunc headerFunc)
     GetHeaderFunc_ = headerFunc;
     headerFuncValid_ = true;
 }
-
 } // namespace Media
 } // namespace OHOS

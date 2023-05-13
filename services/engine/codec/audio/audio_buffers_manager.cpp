@@ -22,8 +22,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-constexpr short DEFALT_BUFFER_LENGTH{8};
-constexpr short DEFALT_SLEEP_TIME{500};
+constexpr short DEFALT_BUFFER_LENGTH = 8;
+constexpr short DEFALT_SLEEP_TIME = 500;
 
 AudioBuffersManager::~AudioBuffersManager() {}
 
