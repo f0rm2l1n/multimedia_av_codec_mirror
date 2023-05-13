@@ -19,13 +19,8 @@
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
 
-namespace
-{
+namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
-}
-
-namespace 
-{
     constexpr int minChannel = 1;
     constexpr int maxChannel = 8;
     constexpr int getInputBufferSize_ = 65536;

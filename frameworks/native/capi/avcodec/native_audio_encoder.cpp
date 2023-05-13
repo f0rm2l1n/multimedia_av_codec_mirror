@@ -32,7 +32,9 @@ class NativeAudioEncoderCallback;
 
 struct AudioEncoderObject : public OH_AVCodec {
     explicit AudioEncoderObject(const std::shared_ptr<AVCodecAudioEncoder> &encoder)
-        : OH_AVCodec(AVMagic::AVCODEC_MAGIC_AUDIO_ENCODER), audioEncoder_(encoder) {}
+        : OH_AVCodec(AVMagic::AVCODEC_MAGIC_AUDIO_ENCODER), audioEncoder_(encoder)
+    {
+    }
     ~AudioEncoderObject() = default;
 
     const std::shared_ptr<AVCodecAudioEncoder> audioEncoder_;
@@ -46,7 +48,9 @@ struct AudioEncoderObject : public OH_AVCodec {
 class NativeAudioEncoderCallback : public AVCodecCallback {
 public:
     NativeAudioEncoderCallback(OH_AVCodec *codec, struct OH_AVCodecAsyncCallback cb, void *userData)
-        : codec_(codec), callback_(cb), userData_(userData) {}
+        : codec_(codec), callback_(cb), userData_(userData)
+    {
+    }
     virtual ~NativeAudioEncoderCallback() = default;
 
     void OnError(AVCodecErrorType errorType, int32_t errorCode) override
@@ -63,7 +67,7 @@ public:
     {
         std::unique_lock<std::mutex> lock(mutex_);
         if (codec_ != nullptr && callback_.onStreamChanged != nullptr) {
-            OHOS::sptr<OH_AVFormat> object = new(std::nothrow) OH_AVFormat(format);
+            OHOS::sptr<OH_AVFormat> object = new (std::nothrow) OH_AVFormat(format);
             // The object lifecycle is controlled by the current function stack
             callback_.onStreamChanged(codec_, reinterpret_cast<OH_AVFormat *>(object.GetRefPtr()), userData_);
         }
@@ -132,7 +136,7 @@ private:
             }
         }
 
-        OHOS::sptr<OH_AVMemory> object = new(std::nothrow) OH_AVMemory(memory);
+        OHOS::sptr<OH_AVMemory> object = new (std::nothrow) OH_AVMemory(memory);
         CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "failed to new OH_AVMemory");
 
         audioEncObj->memoryObjList_.push_back(object);
@@ -156,7 +160,7 @@ private:
             }
         }
 
-        OHOS::sptr<OH_AVMemory> object = new(std::nothrow) OH_AVMemory(memory);
+        OHOS::sptr<OH_AVMemory> object = new (std::nothrow) OH_AVMemory(memory);
         CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "failed to new OH_AVMemory");
 
         audioEncObj->memoryObjList_.push_back(object);
@@ -172,7 +176,7 @@ private:
 namespace OHOS {
 namespace Media {
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 struct OH_AVCodec *OH_AudioEncoder_CreateByMime(const char *mime)
@@ -182,7 +186,7 @@ struct OH_AVCodec *OH_AudioEncoder_CreateByMime(const char *mime)
     std::shared_ptr<AVCodecAudioEncoder> audioEncoder = AudioEncoderFactory::CreateByMime(mime);
     CHECK_AND_RETURN_RET_LOG(audioEncoder != nullptr, nullptr, "failed to AudioEncoderFactory::CreateByMime");
 
-    struct AudioEncoderObject *object = new(std::nothrow) AudioEncoderObject(audioEncoder);
+    struct AudioEncoderObject *object = new (std::nothrow) AudioEncoderObject(audioEncoder);
     CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "failed to new AudioEncoderObject");
 
     return object;
@@ -195,7 +199,7 @@ struct OH_AVCodec *OH_AudioEncoder_CreateByName(const char *name)
     std::shared_ptr<AVCodecAudioEncoder> audioEncoder = AudioEncoderFactory::CreateByName(name);
     CHECK_AND_RETURN_RET_LOG(audioEncoder != nullptr, nullptr, "failed to AudioEncoderFactory::CreateByMime");
 
-    struct AudioEncoderObject *object = new(std::nothrow) AudioEncoderObject(audioEncoder);
+    struct AudioEncoderObject *object = new (std::nothrow) AudioEncoderObject(audioEncoder);
     CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "failed to new AudioEncoderObject");
 
     return object;
@@ -405,8 +409,8 @@ OH_AVErrCode OH_AudioEncoder_SetParameter(struct OH_AVCodec *codec, struct OH_AV
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AudioEncoder_SetCallback(
-    struct OH_AVCodec *codec, struct OH_AVCodecAsyncCallback callback, void *userData)
+OH_AVErrCode OH_AudioEncoder_SetCallback(struct OH_AVCodec *codec, struct OH_AVCodecAsyncCallback callback,
+                                         void *userData)
 {
     CHECK_AND_RETURN_RET_LOG(codec != nullptr, AV_ERR_INVALID_VAL, "input codec is nullptr!");
     CHECK_AND_RETURN_RET_LOG(codec->magic_ == AVMagic::AVCODEC_MAGIC_AUDIO_ENCODER, AV_ERR_INVALID_VAL, "magic error!");
@@ -428,7 +432,7 @@ OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec *codec, bool *isVaild)
 }
 
 #ifdef __cplusplus
- };
+};
 #endif
-} // namesapce Media
-} // OHOS
+} // namespace Media
+} // namespace OHOS

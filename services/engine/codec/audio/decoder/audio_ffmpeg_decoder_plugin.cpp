@@ -117,13 +117,13 @@ int32_t AudioFfmpegDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBuffer
         AVCODEC_LOGE("outBuffer is nullptr");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
+    if (avCodecContext_ == nullptr) {
+        AVCODEC_LOGE("avCodecContext_ is nullptr");
+        return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
+    }
     int32_t status;
     {
         std::unique_lock l(avMutext_);
-        if (avCodecContext_ == nullptr) {
-            AVCODEC_LOGE("avCodecContext_ is nullptr");
-            return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
-        }
         status = ReceiveBuffer(outBuffer);
     }
     return status;

@@ -23,6 +23,7 @@
 #include "demo_log.h"
 #include "native_avcodec_base.h"
 #include "avcodec_audio_encoder_demo.h"
+#include "avcodec_audio_codec_key.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -130,7 +131,7 @@ AEncDemo::~AEncDemo()
 
 int32_t AEncDemo::CreateEnc()
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName("OH.Media.Codec.FLAC.FFMPEGFlacEncoder");
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_DECODER_FLAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();
