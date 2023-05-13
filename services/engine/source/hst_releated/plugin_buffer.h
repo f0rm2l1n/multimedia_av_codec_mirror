@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "plugin_memory.h"
-// #include "tag_map.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -109,7 +108,6 @@ public:
 private:
     /// Data described by this buffer.
     std::vector<std::shared_ptr<Memory>> data {};
-
 };
 } // namespace Plugin
 } // namespace Media

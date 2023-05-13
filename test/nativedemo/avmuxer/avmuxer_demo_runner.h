@@ -12,19 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef AVCODECLISTBASE_H
-#define AVCODECLISTBASE_H
 
-#include <string>
-#include "avcodec_info.h"
+#ifndef AVMUXER_DEMO_RUNNER_H
+#define AVMUXER_DEMO_RUNNER_H
 
-namespace OHOS {
-namespace Media {
-class CodecListBase {
-public:
-    virtual ~CodecListBase() = default;
-    virtual int32_t GetCapabilityList(std::vector<CapabilityData> &caps) = 0;
-};
-} // namespace Media
-} // namespace OHOS
-#endif // CODECLISTBASE_H
+void AvmuxerDemoCase();
+
+#endif  // AVMUXER_DEMO_RUNNER_H

@@ -35,12 +35,7 @@ public:
     /**
      * IPC code ID
      */
-    enum AVCodecListServiceMsg : int32_t {
-        FIND_DECODER,
-        FIND_ENCODER,
-        CREATE_CAPABILITY,
-        DESTROY
-    };
+    enum AVCodecListServiceMsg { FIND_DECODER = 0, FIND_ENCODER, CREATE_CAPABILITY, DESTROY };
 
     DECLARE_INTERFACE_DESCRIPTOR(u"IStandardCodecListService");
 };

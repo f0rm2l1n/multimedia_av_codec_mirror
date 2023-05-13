@@ -426,17 +426,6 @@ OH_AVErrCode OH_VideoEncoder_PushInputData(struct OH_AVCodec *codec, uint32_t in
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_VideoEncoder_GetPersistentSurface(OHNativeWindow **window)
-{
-    return AV_ERR_UNSUPPORT;
-}
-
-OH_AVErrCode OH_VideoEncoder_SetSurface(OH_AVCodec *codec, OHNativeWindow *window)
-{
-    return AV_ERR_UNSUPPORT;
-}
-
-
 OH_AVErrCode OH_VideoEncoder_IsValid(OH_AVCodec *codec, bool *isVaild)
 {
     return AV_ERR_UNSUPPORT;

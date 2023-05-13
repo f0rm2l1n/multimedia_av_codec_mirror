@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-
 /**
  * @enum source input type.
  *

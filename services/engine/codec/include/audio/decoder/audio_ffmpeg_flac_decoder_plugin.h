@@ -20,17 +20,9 @@
 #include "audio_ffmpeg_decoder_plugin.h"
 #include "avcodec_audio_codec_key.h"
 
-constexpr int minChannels = 1;
-constexpr int maxChannels = 8;
-int ff_flac_sample_rate_table[] = {
-    0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
-};
-int sample_size_table[] = {16, 32};
-
 namespace OHOS {
 namespace Media {
-
-class AudioFFMpegFlacDecoderPlugin : public IAudioFFMpegBaseCodec::CodecRegister<AudioFFMpegFlacDecoderPlugin> {
+class AudioFFMpegFlacDecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegFlacDecoderPlugin> {
 public:
     AudioFFMpegFlacDecoderPlugin();
     ~AudioFFMpegFlacDecoderPlugin() override;
@@ -52,7 +44,6 @@ public:
 private:
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif

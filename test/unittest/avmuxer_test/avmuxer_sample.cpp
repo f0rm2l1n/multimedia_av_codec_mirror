@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "nocopyable.h"
 #include "avmuxer_sample.h"
+#include "nocopyable.h"
 using namespace std;
 namespace OHOS {
 namespace Media {

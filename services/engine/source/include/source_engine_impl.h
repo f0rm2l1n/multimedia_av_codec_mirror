@@ -19,12 +19,10 @@
 #include <map>
 #include <atomic>
 #include <thread>
-// #include <mutex>
 #include <condition_variable>
 #include "i_source_engine.h"
 #include "plugin_definition.h"
 #include "source.h"
-
 #include "block_queue.h"
 #include "avcodec_common.h"
 

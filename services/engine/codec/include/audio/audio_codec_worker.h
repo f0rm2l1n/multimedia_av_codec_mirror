@@ -29,10 +29,9 @@
 
 namespace OHOS {
 namespace Media {
-
 class AudioCodecWorker : public NoCopyable {
 public:
-    AudioCodecWorker(const std::shared_ptr<IAudioFFMpegBaseCodec> &codec,
+    AudioCodecWorker(const std::shared_ptr<AudioFFMpegBaseCodec> &codec,
                      const std::shared_ptr<AVCodecCallback> &callback);
 
     ~AudioCodecWorker();
@@ -68,7 +67,7 @@ private:
 private:
     std::atomic<bool> isRunning;
     std::atomic<bool> isProduceInput;
-    std::shared_ptr<IAudioFFMpegBaseCodec> codec_;
+    std::shared_ptr<AudioFFMpegBaseCodec> codec_;
     uint32_t inputBufferSize;
     uint32_t outputBufferSize;
     std::mutex stateMutex_;
@@ -84,7 +83,6 @@ private:
     std::shared_ptr<AudioBuffersManager> outputBuffer_;
     std::queue<uint32_t> inBufIndexQue_;
 };
-
 } // namespace Media
 } // namespace OHOS
 

@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
-#include "avcodec_audio_decoder_demo.h"
+#include <iostream>
+#include <unistd.h>
+
 #include "avcodec_audio_codec_key.h"
+#include "avcodec_audio_decoder_demo.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "demo_log.h"
@@ -22,8 +25,6 @@
 #include "native_avcodec_base.h"
 #include "native_avformat.h"
 #include "securec.h"
-#include <iostream>
-#include <unistd.h>
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -135,7 +136,6 @@ ADecDemo::~ADecDemo()
 
 int32_t ADecDemo::CreateDec()
 {
-    // const char *name = "avdec_mp3";
     audioDec_ = OH_AudioDecoder_CreateByName((AVCodecAudioCodecKey::AUDIO_DECODER_MP3_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
@@ -252,7 +252,6 @@ void ADecDemo::InputFunc()
             ret = OH_AudioDecoder_PushInputData(audioDec_, index, info);
         }
 
-        // free(fileBuffer);
         timeStamp_ += FRAME_DURATION_US;
         signal_->inQueue_.pop();
         signal_->inBufferQueue_.pop();

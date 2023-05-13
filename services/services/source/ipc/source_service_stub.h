@@ -29,30 +29,25 @@ public:
     virtual ~SourceServiceStub();
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     using SourceStubFunc = int32_t(SourceServiceStub::*)(MessageParcel &data, MessageParcel &reply);
-
     int32_t Init(const std::string &uri) override;
     int32_t GetTrackCount(uint32_t &trackCount) override;
     int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     int32_t GetSourceFormat(Format &format) override;
     uint64_t GetSourceAddr() override;
-
     int32_t DumpInfo(int32_t fd);
     int32_t DestroyStub() override;
 private:
     SourceServiceStub();
     int32_t InitStub();
-
     int32_t Init(MessageParcel &data, MessageParcel &reply);
     int32_t GetTrackCount(MessageParcel &data, MessageParcel &reply);
     int32_t SetTrackFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetTrackFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetSourceFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetSourceAddr(MessageParcel &data, MessageParcel &reply);
-
     int32_t GetDumpInfo(std::string& dumpInfo);
     int32_t DestroyStub(MessageParcel &data, MessageParcel &reply);
-
     std::mutex mutex_;
     std::shared_ptr<ISourceService> sourceServer_ = nullptr;
     std::map<uint32_t, SourceStubFunc> sourceFuncs_;

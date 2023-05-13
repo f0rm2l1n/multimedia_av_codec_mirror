@@ -133,7 +133,7 @@ public:
     static constexpr std::string_view SOURCE_LYRICS        = "lyrics";           // std::string, cyrics
     static constexpr std::string_view SOURCE_DURATION      = "duration";         // int64_t, duration based on
                                                                                  // {@link HST_TIME_BASE}
-    static constexpr std::string_view SOURCE_TYPE          = "type";             // std::string, sourece type
+    static constexpr std::string_view SOURCE_TYPE          = "media_type";       // std::string, sourece type
 private:
     AVSourceFormat() = delete;
     ~AVSourceFormat() = delete;

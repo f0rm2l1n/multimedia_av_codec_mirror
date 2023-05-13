@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#include "avcodec_audio_decoder_inner_demo.h"
+#include <iostream>
+#include <unistd.h>
+
 #include "avcodec_errors.h"
 #include "avcodec_common.h"
 #include "demo_log.h"
 #include "media_description.h"
 #include "securec.h"
-#include <iostream>
-#include <unistd.h>
+#include "avcodec_audio_decoder_inner_demo.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -135,24 +136,48 @@ int32_t ADecInnerDemo::Release()
     return audioDec_->Release();
 }
 
+void ADecInnerDemo::HandleInputEOS(const uint32_t &index)
+{
+    AVCodecBufferInfo attr;
+    AVCodecBufferFlag flag;
+    attr.presentationTimeUs = 0;
+    attr.size = 0;
+    attr.offset = 0;
+    flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
+    (void)audioDec_->QueueInputBuffer(index, attr, flag);
+    signal_->inQueue_.pop();
+    std::cout << "end buffer\n";
+}
+
+int32_t ADecInnerDemo::HandleNormalInput(const uint32_t &index, const int64_t &pts, const size_t &size)
+{
+    AVCodecBufferInfo attr;
+    AVCodecBufferFlag flag;
+    attr.presentationTimeUs = pts;
+    attr.size = size;
+    attr.offset = 0;
+    flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
+    frameCount_++;
+    auto result = audioDec_->QueueInputBuffer(index, attr, flag);
+    signal_->inQueue_.pop();
+    return result;
+}
+
 void ADecInnerDemo::InputFunc()
 {
     AVFormatContext *fmpt_ctx;
     AVPacket pkt;
     if (avformat_open_input(&fmpt_ctx, inputFilePath.data(), NULL, NULL) < 0) {
-        std::cout << "open file failed"
-                  << "\n";
+        std::cout << "open file failed\n";
         return;
     }
     if (avformat_find_stream_info(fmpt_ctx, NULL) < 0) {
-        std::cout << "get file stream failed"
-                  << "\n";
+        std::cout << "get file stream failed\n";
         return;
     }
     av_init_packet(&pkt);
     pkt.data = NULL;
     pkt.size = 0;
-
     while (true) {
         if (!isRunning_.load()) {
             break;
@@ -162,7 +187,6 @@ void ADecInnerDemo::InputFunc()
         if (!isRunning_.load()) {
             break;
         }
-
         uint32_t index = signal_->inQueue_.front();
         std::shared_ptr<AVSharedMemory> buffer = audioDec_->GetInputBuffer(index);
         if (buffer == nullptr) {
@@ -172,32 +196,16 @@ void ADecInnerDemo::InputFunc()
         }
         int ret = av_read_frame(fmpt_ctx, &pkt);
         if (ret < 0) {
-            AVCodecBufferInfo attr;
-            AVCodecBufferFlag flag;
-            attr.presentationTimeUs = 0;
-            attr.size = 0;
-            attr.offset = 0;
-            flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
+            HandleInputEOS(index);
             av_packet_unref(&pkt);
-            (void)audioDec_->QueueInputBuffer(index, attr, flag);
-            signal_->inQueue_.pop();
-            std::cout << "end buffer\n";
             break;
         }
         if (memcpy_s(buffer->GetBase(), buffer->GetSize(), pkt.data, pkt.size) != EOK) {
             cout << "Fatal: memcpy fail" << endl;
             break;
         }
-        AVCodecBufferInfo attr;
-        AVCodecBufferFlag flag;
-        attr.presentationTimeUs = pkt.pts;
-        attr.size = pkt.size;
-        attr.offset = 0;
-        flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
+        auto result = HandleNormalInput(index, pkt.pts, pkt.size);
         av_packet_unref(&pkt);
-        frameCount_++;
-        auto result = audioDec_->QueueInputBuffer(index, attr, flag);
-        signal_->inQueue_.pop();
         if (result != AVCS_ERR_OK) {
             std::cout << "QueueInputBuffer error:\n";
             isRunning_ = false;
@@ -234,7 +242,7 @@ void ADecInnerDemo::OutputFunc()
             cout << "decode eos" << endl;
             isRunning_.store(false);
         }
-        outputFile.write((char*)buffer->GetBase(), attr.size);
+        outputFile.write((char *)buffer->GetBase(), attr.size);
         if (audioDec_->ReleaseOutputBuffer(index) != AVCS_ERR_OK) {
             cout << "Fatal: ReleaseOutputBuffer fail" << endl;
             break;

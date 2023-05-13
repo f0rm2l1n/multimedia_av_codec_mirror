@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Media {
-class AVMuxerEngineDemo /*: public NoCopyable*/ : public AVMuxerDemoBase {
+class AVMuxerEngineDemo /* : public NoCopyable */ : public AVMuxerDemoBase {
 public:
     AVMuxerEngineDemo() = default;
     ~AVMuxerEngineDemo() = default;
@@ -32,7 +32,6 @@ private:
     void DoRunMuxer(const std::string &runMode);
     std::shared_ptr<IMuxerEngine> avmuxer_;
 };
-
 }  // namespace Media
 }  // namespace OHOS
 #endif  // AVMUXER_DEMO_H

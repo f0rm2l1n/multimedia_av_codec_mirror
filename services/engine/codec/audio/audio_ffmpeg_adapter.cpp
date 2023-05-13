@@ -25,7 +25,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-
 AudioFFMpegAdapter::AudioFFMpegAdapter(const std::string &name) : state_(CodecState::RELEASED), name_(name)
 {
     AVCODEC_LOGD("enter constructor of adapter,name:%{public}s,name after:%{public}s", name.data(), name_.data());
@@ -43,7 +42,7 @@ AudioFFMpegAdapter::~AudioFFMpegAdapter()
 
 int32_t AudioFFMpegAdapter::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     callback_ = callback;
     AVCODEC_LOGD("SetCallback success");
     return AVCodecServiceErrCode::AVCS_ERR_OK;
@@ -51,7 +50,7 @@ int32_t AudioFFMpegAdapter::SetCallback(const std::shared_ptr<AVCodecCallback> &
 
 int32_t AudioFFMpegAdapter::Configure(const Format &format)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Configure enter");
 
     if (!format.ContainKey(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT)) {
@@ -78,7 +77,6 @@ int32_t AudioFFMpegAdapter::Configure(const Format &format)
                  stateToString(state_).data(), name_.data(), name_.size());
     state_ = CodecState::INITLIZING;
     auto ret = doInit();
-
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         return ret;
     }
@@ -132,7 +130,7 @@ int32_t AudioFFMpegAdapter::Resume()
 }
 int32_t AudioFFMpegAdapter::Stop()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Stop enter");
     if (!callback_) {
         AVCODEC_LOGE("Stop failed, call back not initlized.");
@@ -152,7 +150,7 @@ int32_t AudioFFMpegAdapter::Stop()
 
 int32_t AudioFFMpegAdapter::Flush()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("adapter Flush enter");
     if (!callback_) {
         AVCODEC_LOGE("adapter flush error, call back not initlized .");
@@ -175,7 +173,7 @@ int32_t AudioFFMpegAdapter::Flush()
 
 int32_t AudioFFMpegAdapter::Reset()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("adapter Reset enter");
     if (worker_) {
         worker_->Release();
@@ -188,7 +186,7 @@ int32_t AudioFFMpegAdapter::Reset()
 
 int32_t AudioFFMpegAdapter::Release()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("adapter Release enter");
     if (state_ == CodecState::RELEASED || state_ == CodecState::RRELEASING) {
         AVCODEC_LOGW("adapter Release, state isnot completely correct, state =%{public}s .",
@@ -214,28 +212,28 @@ int32_t AudioFFMpegAdapter::Release()
 
 int32_t AudioFFMpegAdapter::NotifyEos()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     Flush();
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
 int32_t AudioFFMpegAdapter::SetParameter(const Format &format)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     (void)format;
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
 int32_t AudioFFMpegAdapter::GetOutputFormat(Format &format)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     format = audioCodec->GetFormat();
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
 std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetInputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("adapter GetInputBuffer enter");
     if (!callback_) {
         AVCODEC_LOGE("adapter get input buffer error, call back not initlized .");
@@ -265,7 +263,7 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetInputBuffer(size_t in
 
 int32_t AudioFFMpegAdapter::QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("adapter QueueInputBuffer enter");
     if (!callback_) {
         AVCODEC_LOGE("adapter queue input buffer error, call back not initlized .");
@@ -301,7 +299,7 @@ int32_t AudioFFMpegAdapter::QueueInputBuffer(size_t index, const AVCodecBufferIn
 
 std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetOutputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("adapter GetOutputBuffer enter");
     if (!callback_) {
         AVCODEC_LOGE("adapter get output buffer error, call back not initlized .");
@@ -331,7 +329,7 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetOutputBuffer(size_t i
 
 int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("adapter ReleaseOutputBuffer enter");
     if (!callback_) {
         AVCODEC_LOGE("adapter release output buffer error, call back not initlized .");
@@ -359,7 +357,6 @@ int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(size_t index)
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }
     bool result = outBuffer->RelaseBuffer(index);
-
     if (!result) {
         AVCODEC_LOGE("RelaseBuffer failed");
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
@@ -375,7 +372,7 @@ int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(size_t index)
 
 int32_t AudioFFMpegAdapter::doInit()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (name_.empty()) {
         state_ = CodecState::RELEASED;
         AVCODEC_LOGE("doInit failed, because name is empty");
@@ -383,8 +380,7 @@ int32_t AudioFFMpegAdapter::doInit()
     }
 
     AVCODEC_LOGI("adapter doInit, codec name:%{public}s", name_.data());
-    audioCodec = IAudioFFMpegBaseCodec::make_sharePtr(name_);
-
+    audioCodec = AudioFFMpegBaseCodec::make_sharePtr(name_);
     if (audioCodec == nullptr) {
         state_ = CodecState::RELEASED;
         AVCODEC_LOGE("Initlize failed, because create codec failed. name: %{public}s.", name_.data());
@@ -397,7 +393,7 @@ int32_t AudioFFMpegAdapter::doInit()
 
 int32_t AudioFFMpegAdapter::doConfigure(const Format &format)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (state_ != CodecState::INITLIZED) {
         AVCODEC_LOGE("adapter configure failed because state is incrrect,state:%{public}d.",
                      static_cast<int>(state_.load()));
@@ -422,7 +418,7 @@ int32_t AudioFFMpegAdapter::doConfigure(const Format &format)
 
 int32_t AudioFFMpegAdapter::doStart()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (state_ != CodecState::STARTING) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE);
         AVCODEC_LOGE("doStart failed, state = %{public}s", stateToString(state_).data());
@@ -448,7 +444,7 @@ int32_t AudioFFMpegAdapter::doResume()
 
 int32_t AudioFFMpegAdapter::doStop()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (state_ == CodecState::RRELEASING) {
         AVCODEC_LOGW("adapter doStop, state is not completely correct, state_=%{public}s .",
                      stateToString(state_).data());
@@ -470,7 +466,7 @@ int32_t AudioFFMpegAdapter::doStop()
 
 int32_t AudioFFMpegAdapter::doFlush()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (state_ != CodecState::FLUSHING) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE);
         AVCODEC_LOGE("doFlush failed, state_=%{public}s", stateToString(state_).data());
@@ -492,7 +488,7 @@ int32_t AudioFFMpegAdapter::doFlush()
 
 int32_t AudioFFMpegAdapter::doRelease()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (state_ == CodecState::RELEASED) {
         AVCODEC_LOGW("adapter doRelease, state is not completely correct, state_=%{public}s .",
                      stateToString(state_).data());
@@ -520,6 +516,5 @@ std::string_view AudioFFMpegAdapter::stateToString(CodecState state)
     };
     return stateStrMap[state];
 }
-
 } // namespace Media
 } // namespace OHOS

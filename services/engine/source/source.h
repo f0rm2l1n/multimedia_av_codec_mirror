@@ -26,18 +26,12 @@ extern "C" {
 #endif
 
 #include <thread>
-
 #include "avcodec_errors.h"
 #include "source_plugin.h"
 #include "plugin_types.h"
 #include "plugin_buffer.h"
 #include "plugin_definition.h"
 #include "sourcebase.h"
-
-// #include <atomic>
-// #include <mutex>
-// #include <condition_variable>
-// #include "block_queue.h"
 
 namespace OHOS {
 namespace Media {
@@ -63,7 +57,8 @@ public:
     int32_t GetSourceFormat(Format &format) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     uintptr_t GetSourceAddr() override;
-    std::shared_ptr<SourcePlugin> GetSourcePlugin(){
+    std::shared_ptr<SourcePlugin> GetSourcePlugin()
+    {
         return sourcePlugin_;
     }
 
@@ -76,44 +71,24 @@ private:
         size_t fileSize = 0;
         AVIOContext* avioContext = nullptr;
         std::shared_ptr<Buffer> bufMemory;
-
     };
 
     std::shared_ptr<AVFormatContext> formatContext_;
     std::map<uint32_t, AVDictionary*> trackParam_;
     std::shared_ptr<AVInputFormat> inputFormat_;
     std::shared_ptr<SourcePlugin> sourcePlugin_;
-
     std::shared_ptr<FfmpegRegister> register_;
     CustomIOContext customIOContext_;
     AVIOContext* avioContext_ = nullptr;
-
     int32_t LoadDemuxerList();
     int32_t LoadDynamicPlugin(const std::string& path);
     int32_t GuessInputFormat(const std::string& uri,  std::shared_ptr<AVInputFormat>& bestInputFormat);
     int32_t SniffInputFormat(const std::string& uri);
-
-    static int AVReadPacket(void* opaque, uint8_t* buf, int bufSize); // NOLINT: void*
-    static int64_t AVSeek(void* opaque, int64_t offset, int whence); // NOLINT: void*
-    void InitAVIOContext(int flags) ;
+    static int AVReadPacket(void* opaque, uint8_t* buf, int bufSize);
+    static int64_t AVSeek(void* opaque, int64_t offset, int whence);
+    void InitAVIOContext(int flags);
     int32_t InitAVFormatContext();
-
-    void ReadLoop();
-
-    // enum State {
-    //     UNINITIALIZED,
-    //     INITIALIZED,
-    //     STARTED,
-    //     STOPPED
-    // };
-    // std::atomic<State> state_ = UNINITIALIZED;
-    // BlockQueue<std::shared_ptr<BlockBuffer>> que_;
-    // std::string threadName_;
-    // std::mutex mutex_;
-    // std::condition_variable cond_;
-    // std::unique_ptr<std::thread> thread_ = nullptr;
-    // bool isThreadExit_ = true;
-
+    void GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format);
 };
 } // namespace Plugin
 } // namespace Media

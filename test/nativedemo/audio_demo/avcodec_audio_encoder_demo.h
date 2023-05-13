@@ -38,17 +38,17 @@ public:
     std::queue<uint32_t> outQueue_;
     std::queue<OH_AVMemory *> inBufferQueue_;
     std::queue<OH_AVMemory *> outBufferQueue_;
-    std::queue<OH_AVCodecBufferAttr *> attrQueue_;
+    std::queue<OH_AVCodecBufferAttr> attrQueue_;
 };
 
 class AEncDemo : public NoCopyable {
 public:
-    AEncDemo() = default;
+    AEncDemo();
     virtual ~AEncDemo();
     void RunCase();
 
 private:
-    int32_t CreateDec();
+    int32_t CreateEnc();
     int32_t Configure(OH_AVFormat *format);
     int32_t Start();
     int32_t Stop();
@@ -58,8 +58,8 @@ private:
     void InputFunc();
     void OutputFunc();
 
-    std::atomic<bool> isRunning_ = false;
-    std::unique_ptr<std::ifstream> testFile_;
+    std::atomic<bool> isRunning_;
+    std::unique_ptr<std::ifstream> inputFile_;
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
     OH_AVCodec *audioEnc_;

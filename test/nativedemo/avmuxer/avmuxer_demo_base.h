@@ -21,6 +21,10 @@
 #include "avmuxer_demo_common.h"
 namespace OHOS {
 namespace Media {
+
+constexpr float TEST_LATITUDE = 50.5;
+constexpr float TEST_LONGITUDE = 60.6;
+
 class AVMuxerDemoBase {
 public:
     AVMuxerDemoBase();
@@ -40,10 +44,16 @@ protected:
     void WriteAvTrackSample();
     void WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<std::ifstream> file);
     void WriteCoverSample();
+    void SelectFormatMode();
+    void SelectAudioVideoMode();
+    void SelectCoverMode();
     int SelectMode();
     int SelectModeAndOpenFile();
+    int ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile, unsigned char *&buffer,
+        uint32_t &curSize, TrackSampleInfo &info);
     void Reset();
-    static void MulThdWriteTrackSample(AVMuxerDemoBase *muxerBase, uint32_t trackId, std::shared_ptr<std::ifstream> file);
+    static void MulThdWriteTrackSample(AVMuxerDemoBase *muxerBase, uint32_t trackId,
+        std::shared_ptr<std::ifstream> file);
 
     static AudioTrackParam *audioParams_;
     static VideoTrackParam *videoParams_;
@@ -62,6 +72,8 @@ protected:
     std::shared_ptr<std::ifstream> videoFile_ {nullptr};
     std::shared_ptr<std::ifstream> coverFile_ {nullptr};
     int32_t outFd_ {-1};
+    uint64_t audioPts_ {0};
+    uint64_t videoPts_ {0};
 };
 } // Media
 } // OHOS

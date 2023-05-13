@@ -15,7 +15,6 @@
 
 #include "plugin_buffer.h"
 
-
 namespace OHOS {
 namespace Media {
 namespace Plugin {
@@ -29,7 +28,7 @@ Memory::Memory(size_t capacity, std::shared_ptr<Allocator> allocator, size_t ali
     : memoryType(type), capacity(capacity), alignment(align), offset(0),
       size(0), allocator(std::move(allocator)), addr(nullptr)
 {
-    if (!allocMem) { // SurfaceMemory alloc mem in subclass
+    if (!allocMem) {
         return;
     }
     size_t allocSize = align ? (capacity + align - 1) : capacity;
@@ -125,10 +124,8 @@ MemoryType Memory::GetMemoryType()
     return memoryType;
 }
 
-
 Buffer::Buffer(BufferMetaType type) : trackID(0), pts(0), dts(0), duration(0), flag (0)
 {
-    // TODO
     (void)type;
 }
 
@@ -143,9 +140,8 @@ std::shared_ptr<Buffer> Buffer::CreateDefaultBuffer(BufferMetaType type, size_t 
 
 std::shared_ptr<Memory> Buffer::WrapMemory(uint8_t* dataptr, size_t capacity, size_t size)
 {
-    // TODO
-    // auto memory = std::shared_ptr<Memory>(new Memory(capacity, std::shared_ptr<uint8_t>(data, [](void* ptr) {})));
-    auto memory = std::shared_ptr<Memory>(new Memory(capacity, std::shared_ptr<uint8_t>(dataptr, [](void* ptr) {(void)ptr;})));
+    auto memory = std::shared_ptr<Memory>(
+            new Memory(capacity, std::shared_ptr<uint8_t>(dataptr, [](void* ptr) {(void)ptr;})));
     memory->size = size;
     this->data.push_back(memory);
     return memory;

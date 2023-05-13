@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <iostream>
+#include <unistd.h>
 #include "avcodec_audio_encoder_inner_demo.h"
 #include "avcodec_audio_codec_key.h"
 #include "avcodec_common.h"
@@ -20,8 +22,6 @@
 #include "demo_log.h"
 #include "media_description.h"
 #include "securec.h"
-#include <iostream>
-#include <unistd.h>
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -40,6 +40,8 @@ constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 112000; // for aac encoding
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
+constexpr uint32_t DEFAULT_SAMPLE_FORMATE_VALE = 8;
+constexpr uint32_t DEFAULT_CHANNEL_LAYOUT_COUNT = 3;
 } // namespace
 
 void AEnInnerDemo::RunCase()
@@ -51,12 +53,12 @@ void AEnInnerDemo::RunCase()
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, SAMPLE_RATE);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, BITS_RATE);
     format.PutIntValue(MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY, BITS_PER_CODED_RATE);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, 8);
-    format.PutLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, 3);
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, DEFAULT_SAMPLE_FORMATE_VALE);
+    format.PutLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, DEFAULT_CHANNEL_LAYOUT_COUNT);
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
-    sleep(30); // start run 3s
+    sleep(30);
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }

@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
-
-#include "native_avcodec_list.h"
 #include "native_avmagic.h"
 #include "avcodec_list.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
+#include "native_avcodec_list.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeCodecList"};
@@ -30,7 +29,7 @@ const char *OH_AVCodec_FindEncoder(const OH_AVFormat *format)
 {
     std::shared_ptr<AVCodecList> codeclist = AVCodecListFactory::CreateAVCodecList();
     std::string strname = codeclist->FindEncoder(format->format_);
-    char *ret = new char[strname.length()+1];
+    char *ret = new char[strname.length() + 1];
     std::strcpy(ret, strname.c_str());
     AVCODEC_LOGD("get codecname: %{public}s", ret);
     return ret;
@@ -40,7 +39,7 @@ const char *OH_AVCodec_FindDecoder(const OH_AVFormat *format)
 {
     std::shared_ptr<AVCodecList> codeclist = AVCodecListFactory::CreateAVCodecList();
     std::string strname = codeclist->FindDecoder(format->format_);
-    char *ret = new char[strname.length()+1];
+    char *ret = new char[strname.length() + 1];
     std::strcpy(ret, strname.c_str());
     AVCODEC_LOGD("get codecname: %{public}s", ret);
     return ret;
@@ -50,7 +49,7 @@ OH_AVCapability *OH_AVCodec_CreateCapability(const char *name)
 {
     std::shared_ptr<AVCodecList> codeclist = AVCodecListFactory::CreateAVCodecList();
     CapabilityData capabilityData = codeclist->CreateCapability(name);
-    return new(std::nothrow) OH_AVCapability(capabilityData);
+    return new (std::nothrow) OH_AVCapability(capabilityData);
 }
 
 OH_AVErrCode OH_AVCodec_DestroyCapability(OH_AVCapability *capability)
@@ -61,6 +60,3 @@ OH_AVErrCode OH_AVCodec_DestroyCapability(OH_AVCapability *capability)
     delete capability;
     return AV_ERR_OK;
 }
-
-
-

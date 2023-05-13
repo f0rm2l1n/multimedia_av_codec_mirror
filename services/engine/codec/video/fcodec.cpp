@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <iostream>
 #include <set>
 #include <thread>
@@ -41,7 +55,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
 
 FCodec::FCodec(const std::string &name)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_LOG(!name.empty(), "Create codec failed:  empty name");
     std::string fcodecName;
     for (size_t i = 0; i < numSupportCodec; ++i) {
@@ -59,7 +73,7 @@ FCodec::FCodec(const std::string &name)
 
 FCodec::FCodec(bool isEncoder, const std::string &mime)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_LOG(!mime.empty(), "Create codec failed:  empty mime");
     std::string fcodecName;
     for (size_t i = 0; i < numSupportCodec; ++i) {
@@ -87,7 +101,7 @@ FCodec::~FCodec()
 
 int32_t FCodec::Init(const std::string &name)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     avCodec_ =
         std::shared_ptr<AVCodec>(const_cast<AVCodec *>(avcodec_find_decoder_by_name(name.c_str())), [](void *ptr) {});
     CHECK_AND_RETURN_RET_LOG(avCodec_ != nullptr, AVCS_ERR_INVALID_VAL,
@@ -104,7 +118,7 @@ int32_t FCodec::Init(const std::string &name)
 
 int32_t FCodec::Configure(const Format &format)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((state_ == State::Initialized), AVCS_ERR_INVALID_STATE,
                              "Configure codec failed:  not in Initialized state");
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_VIDEO_WIDTH);
@@ -255,7 +269,7 @@ void FCodec::ResetContext(bool isFlush)
 
 int32_t FCodec::Start()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(callback_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Start codec failed: callback is null");
     CHECK_AND_RETURN_RET_LOG((state_ == State::Configured || state_ == State::Flushed), AVCS_ERR_INVALID_STATE,
                              "Start codec failed: not in Configured or Flushed state");
@@ -303,7 +317,7 @@ int32_t FCodec::Start()
 
 int32_t FCodec::Stop()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(state_ != State::Configured, AVCS_ERR_OK, "Stop codec successful, state: Configured");
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Stop codec failed: not in running or Eos state");
@@ -338,7 +352,7 @@ int32_t FCodec::Stop()
 
 int32_t FCodec::Flush()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Flush codec failed: not in running or Eos state");
     state_ = State::Flushing;
@@ -373,7 +387,7 @@ int32_t FCodec::Flush()
 
 int32_t FCodec::Reset()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(Release() == AVCS_ERR_OK, AVCS_ERR_UNKNOWN, "Reset codec failed: cannot release codec");
     int32_t ret = Init(codecName_);
     if (ret != AVCS_ERR_OK) {
@@ -385,7 +399,7 @@ int32_t FCodec::Reset()
 
 int32_t FCodec::Release()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(state_ != State::Uninitialized, AVCS_ERR_OK, "Release codec successful");
     state_ = State::Releasing;
     if (sendTask_ != nullptr) {
@@ -415,7 +429,7 @@ int32_t FCodec::Release()
 
 int32_t FCodec::SetParameter(const Format &format)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), AVCS_ERR_INVALID_STATE, "Set parameter failed: not in Running or Flushed state");
     int32_t val32 = 0;
     for (auto &it : format.GetFormatMap()) {
@@ -472,7 +486,7 @@ int32_t FCodec::SetParameter(const Format &format)
 
 int32_t FCodec::GetOutputFormat(Format &format)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     format = format_;
     AVCODEC_LOGI("Get outputFormat successful");
     return AVCS_ERR_OK;
@@ -598,7 +612,7 @@ int32_t FCodec::ReleaseBuffers(bool isFlush)
 
 std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), nullptr, "Get input buffer failed: not in Running or Flushed state");
     std::vector<std::shared_ptr<AVBuffer>> &avBuffers = buffers_[INDEX_INPUT];
     CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr,
@@ -611,7 +625,7 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(size_t index)
 
 std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), nullptr, "Get output buffer failed: not in Running/Flushed/EOS state");
     //CHECK_AND_RETURN_RET_LOG(surface_ == nullptr, nullptr, "Get output buffer failed: surface output");
     std::vector<std::shared_ptr<AVBuffer>> &avBuffers = buffers_[INDEX_OUTPUT];
@@ -626,7 +640,7 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(size_t index)
 
 int32_t FCodec::QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), AVCS_ERR_INVALID_STATE,
                              "Queue input buffer failed: not in Running or Flushed state");
     std::vector<std::shared_ptr<AVBuffer>> &inBuffers = buffers_[INDEX_INPUT];
@@ -645,7 +659,7 @@ int32_t FCodec::QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AV
 
 void FCodec::sendFrame()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if(!IsActive()){
         AVCODEC_LOGD("Cannot send frame to codec: not in Running or Flushed state");
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
@@ -760,7 +774,7 @@ int32_t FCodec::FillFrameBuffer(const std::shared_ptr<AVBuffer> &frameBuffer)
 
 void FCodec::receiveFrame()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (!IsActive()) {
         AVCODEC_LOGD("Cannot recevie frame from codec: not in Running or Flushed state");
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
@@ -832,7 +846,7 @@ void FCodec::receiveFrame()
 
 void FCodec::renderFrame()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     if (!IsActive()) {
         AVCODEC_LOGD("Failed to render frame to codec: not in Running or Flushed state");
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
@@ -871,7 +885,7 @@ void FCodec::renderFrame()
 
 int32_t FCodec::ReleaseOutputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Release output buffer failed: not in Running/Flushed/EOS");
     std::unique_lock<std::mutex> oLock(outputMutex_);
@@ -912,7 +926,7 @@ int32_t FCodec::UpdateSurfaceMemory(std::shared_ptr<SurfaceMemory> &surfaceMemor
 
 int32_t FCodec::RenderOutputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Failed to render output buffer: invalid state");
 
@@ -941,7 +955,7 @@ int32_t FCodec::RenderOutputBuffer(size_t index)
 
 int32_t FCodec::SetOutputSurface(sptr<Surface> surface)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((!IsActive()), AVCS_ERR_INVALID_STATE,
                              "Set output surface failed: not in Running/Flushed state");
     CHECK_AND_RETURN_RET_LOG(surface != nullptr, AVCS_ERR_INVALID_VAL, "Set output surface failed: surface is NULL");
@@ -958,7 +972,7 @@ int32_t FCodec::SetOutputSurface(sptr<Surface> surface)
 
 int32_t FCodec::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((!IsActive()), AVCS_ERR_INVALID_STATE,
                              "Set callback failed: not in Running/Flushed state");
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "Set callback failed: callback is NULL");

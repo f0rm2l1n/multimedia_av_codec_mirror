@@ -168,6 +168,11 @@ public:
      */
     static constexpr std::string_view MD_BITS_PER_CODED_SAMPLE_KEY = "bits_per_coded_sample";
 
+    /**
+     * Key for aac type, value type is uint32_t
+     */
+    static constexpr std::string_view MD_AAC_TYPE_KEY = "aac-type";
+
 private:
     MediaDescriptionKey() = delete;
     ~MediaDescriptionKey() = delete;

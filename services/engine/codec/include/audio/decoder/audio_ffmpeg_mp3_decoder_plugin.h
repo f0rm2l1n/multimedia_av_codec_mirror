@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Media {
 
-class AudioFFMpegMp3DecoderPlugin : public IAudioFFMpegBaseCodec::CodecRegister<AudioFFMpegMp3DecoderPlugin> {
+class AudioFFMpegMp3DecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegMp3DecoderPlugin> {
 public:
     AudioFFMpegMp3DecoderPlugin();
     ~AudioFFMpegMp3DecoderPlugin() override;
@@ -50,7 +50,6 @@ private:
     int64_t bit_rate;
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif

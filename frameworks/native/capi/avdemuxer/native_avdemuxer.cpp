@@ -15,12 +15,12 @@
 
 #include <memory>
 #include "avdemuxer.h"
-#include "native_avdemuxer.h"
 #include "native_avmagic.h"
 #include "avcodec_errors.h"
 #include "native_object.h"
 #include "avcodec_log.h"
 #include "av_common.h"
+#include "native_avdemuxer.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeAVDemuxer"};
@@ -53,7 +53,8 @@ struct OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source)
 
 OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer)
 {
-    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL, "Destroy demuxer failed because input demuxer is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
+        "Destroy demuxer failed because input demuxer is nullptr!");
 
     delete demuxer;
     return AV_ERR_OK;
@@ -61,11 +62,13 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer)
 
 OH_AVErrCode OH_AVDemuxer_SelectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
 {
-    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL, "Add sourceTrack failed because input demuxer is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
+        "Add sourceTrack failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
-    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL, "New DemuxerObject failed when add sourceTrack!");
+    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
+        "New DemuxerObject failed when add sourceTrack!");
 
     int32_t ret = demuxerObj->demuxer_->SelectSourceTrackByID(trackIndex);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SelectSourceTrackByID failed!");
@@ -75,11 +78,13 @@ OH_AVErrCode OH_AVDemuxer_SelectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_t 
 
 OH_AVErrCode OH_AVDemuxer_UnselectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
 {
-    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL, "Remove sourceTrack failed because input demuxer is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
+        "Remove sourceTrack failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
     
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
-    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL, "New DemuxerObject failed when remove sourceTrack!");
+    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
+        "New DemuxerObject failed when remove sourceTrack!");
 
     int32_t ret = demuxerObj->demuxer_->UnselectSourceTrackByID(trackIndex);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ UnselectSourceTrackByID failed!");
@@ -87,23 +92,28 @@ OH_AVErrCode OH_AVDemuxer_UnselectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackIndex, uint8_t *buffer, OH_AVCodecBufferAttr *bufferInfo)
+OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackIndex,
+                                        uint8_t *buffer, OH_AVCodecBufferAttr *bufferInfo)
 {
-    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL, "Copy sample failed because input demuxer is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
+        "Copy sample failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
     
-    CHECK_AND_RETURN_RET_LOG(trackIndex != nullptr, AV_ERR_INVALID_VAL, "Copy sample failed because input trackIndex is nullptr!");
-    CHECK_AND_RETURN_RET_LOG(buffer != nullptr, AV_ERR_INVALID_VAL, "Copy sample failed because input buffer is nullptr!");
-    CHECK_AND_RETURN_RET_LOG(bufferInfo != nullptr, AV_ERR_INVALID_VAL, "Copy sample failed because input attr is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(trackIndex != nullptr, AV_ERR_INVALID_VAL,
+        "Copy sample failed because input trackIndex is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(buffer != nullptr, AV_ERR_INVALID_VAL,
+        "Copy sample failed because input buffer is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(bufferInfo != nullptr, AV_ERR_INVALID_VAL,
+        "Copy sample failed because input attr is nullptr!");
 
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
-    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL, "New DemuxerObject failed when copy sample!");
+    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
+        "New DemuxerObject failed when copy sample!");
 
     struct AVCodecBufferInfo bufferInfoInner;
-    // enum AVCodecBufferFlag bufferFlag = static_cast<enum AVCodecBufferFlag>(attr.flags);
-    enum AVCodecBufferFlag *flag=nullptr;
+    enum AVCodecBufferFlag *flag = nullptr;
     *flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
-    int32_t ret = demuxerObj->demuxer_->CopyNextSample(*trackIndex, buffer, bufferInfoInner,*flag);
+    int32_t ret = demuxerObj->demuxer_->CopyNextSample(*trackIndex, buffer, bufferInfoInner, *flag);
     bufferInfo->pts = bufferInfoInner.presentationTimeUs;
     bufferInfo->size = bufferInfoInner.size;
     bufferInfo->offset = bufferInfoInner.offset;
@@ -121,7 +131,8 @@ OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t mSeconds, OH
     CHECK_AND_RETURN_RET_LOG(mSeconds >= 0, AV_ERR_INVALID_VAL, "Seek failed because input mSeconds is negative!");
 
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
-    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL, "New DemuxerObject failed when seek!");
+    CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
+        "New DemuxerObject failed when seek!");
 
     int32_t ret = demuxerObj->demuxer_->SeekToTime(mSeconds, static_cast<AVSeekMode>(mode));
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SeekToTime failed!");

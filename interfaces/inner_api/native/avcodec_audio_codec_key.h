@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef AVCODEC_AUDIO_CODEC_KEY_H
 #define AVCODEC_AUDIO_CODEC_KEY_H
 #include <string_view>
 
 namespace OHOS {
 namespace Media {
-
 class AVCodecAudioCodecKey {
 public:
     static constexpr std::string_view AUDIO_DECODER_MP3_NAME_KEY = "avdec_mp3";
@@ -33,7 +33,6 @@ private:
     AVCodecAudioCodecKey() = delete;
     ~AVCodecAudioCodecKey() = delete;
 };
-
 } // namespace Media
 } // namespace OHOS
 

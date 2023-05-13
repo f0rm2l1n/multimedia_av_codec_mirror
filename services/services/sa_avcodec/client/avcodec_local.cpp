@@ -35,6 +35,5 @@ int32_t AVCodecLocal::DestroyDemuxerService(std::shared_ptr<IAVDemuxer> demuxer)
 {
     return AVCS_ERR_OK;
 }
-
 } // namespace Media
 } // namespace OHOS

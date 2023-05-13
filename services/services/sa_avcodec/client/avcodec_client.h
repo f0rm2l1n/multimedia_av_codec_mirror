@@ -31,7 +31,7 @@
 #include "codec_client.h"
 #endif
 
-#ifdef SUPPORT_CODECLIST            
+#ifdef SUPPORT_CODECLIST
 #include "codeclist_client.h"
 #endif
 
@@ -72,7 +72,6 @@ public:
     std::shared_ptr<ISourceService> CreateSourceService() override;
     int32_t DestroySourceService(std::shared_ptr<ISourceService> source) override;
 #endif
-
 
 private:
     sptr<IStandardAVCodecService> GetAVCodecProxy();

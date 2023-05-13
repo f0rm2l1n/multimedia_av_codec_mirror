@@ -13,24 +13,24 @@
  * limitations under the License.
  */
 
-#include "codec_ability_singleton.h"
-#include "codeclist_xml_parser.h"
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
+#include "codeclist_xml_parser.h"
+#include "codec_ability_singleton.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecAbilitySingleton"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecAbilitySingleton"};
 }
 
 namespace OHOS {
 namespace Media {
 
-CodecAbilitySingleton& CodecAbilitySingleton::GetInstance()
+CodecAbilitySingleton &CodecAbilitySingleton::GetInstance()
 {
     AVCODEC_LOGE("CodecAbilitySingleton entered: start getting ins");
     static CodecAbilitySingleton instance;
     bool ret = instance.ParseCodecXml();
-    if(!ret){
+    if (!ret) {
         AVCODEC_LOGE("Parse codec xml failed");
     }
     return instance;
@@ -77,8 +77,7 @@ CodecAbilitySingleton::~CodecAbilitySingleton()
 void CodecAbilitySingleton::RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    capabilityDataArray_.insert(capabilityDataArray_.end(), capaArray.begin(),
-        capaArray.end());
+    capabilityDataArray_.insert(capabilityDataArray_.end(), capaArray.begin(), capaArray.end());
     AVCODEC_LOGD("RegisterCapability success");
 }
 

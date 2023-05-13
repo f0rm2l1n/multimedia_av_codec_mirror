@@ -23,8 +23,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace Media{
-
+namespace Media {
 class AVSourceTrack;
 
 class AVSource {
@@ -33,7 +32,6 @@ public:
 
     /**
      * @brief Count number of the track in source.
-     * 
      * @return Returns the tracks's count.
      * @since 4.0
      * @version 4.0
@@ -42,7 +40,6 @@ public:
 
     /**
      * @brief Return a {@link AVSourceTrack} object.
-     * 
      * @param trackIndex The index of the track.
      * @return Returns {@link AVSourceTrack} if success; returns nullptr otherwise.
      * @since 4.0
@@ -52,7 +49,6 @@ public:
 
     /**
      * @brief Gets the parameters of the source.
-     * 
      * @param format The empty parameters for storing data.
      * @return Returns {@link Format} if success; returns nullptr otherwise.
      * @since 4.0
@@ -62,7 +58,6 @@ public:
 
     /**
      * @brief Gets the address of the source.
-     * 
      * @return Returns {@link Format} if success; returns nullptr otherwise.
      * @since 4.0
      * @version 4.0
@@ -93,7 +88,6 @@ public:
 #else
     /**
      * @brief Instantiate the preferred source of the uri.
-     *
      * @param uri The file's uri.
      * @return Returns the preferred source.
      * @since 4.0
@@ -103,7 +97,6 @@ public:
 
     /**
      * @brief Instantiate the preferred source of the fd.
-     *
      * @param fd The fileDescriptor data source.
      * @param offset The offset into the file where the data be read starts.
      * @param size the length in bytes of the data to be read.
@@ -125,7 +118,6 @@ public:
 
     /**
      * @brief Sets the parameters to the track.
-     * 
      * @param format The parameters to set.
      * @return Returns {@link MSEER_OK} if success; returns nullptr otherwise.
      * @since 4.0
@@ -135,7 +127,6 @@ public:
 
     /**
      * @brief Gets the parameters of the track.
-     * 
      * @param format The empty parameters for storing data.
      * @return Returns {@link Format} if success; returns nullptr otherwise.
      * @since 4.0

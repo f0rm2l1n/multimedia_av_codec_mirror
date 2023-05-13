@@ -23,16 +23,8 @@
 #include <vector>
 #include "avcodec_errors.h"
 
-namespace {
-    extern "C" {
-        extern char *RUN_NORMAL;
-        extern char *RUN_MUL_THREAD;
-    }
-}
-
 namespace OHOS {
 namespace Media {
-
 int AVMuxerDemo::DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info)
 {
     if (avmuxer_ != nullptr &&
@@ -69,7 +61,7 @@ void AVMuxerDemo::DoRunMuxer(const std::string &runMode)
     }
     std::cout << "create muxer success " << avmuxer_ << std::endl;
 
-    if (avmuxer_->SetLocation(10, 10) != AVCS_ERR_OK
+    if (avmuxer_->SetLocation(TEST_LATITUDE, TEST_LONGITUDE) != AVCS_ERR_OK
         || avmuxer_->SetRotation(0) != AVCS_ERR_OK) {
         std::cout<<"set failed!"<<std::endl;
         return;
@@ -120,6 +112,5 @@ void AVMuxerDemo::DoRunMultiThreadCase()
 {
     DoRunMuxer(std::string(RUN_MUL_THREAD));
 }
-
 }  // namespace Media
 }  // namespace OHOS

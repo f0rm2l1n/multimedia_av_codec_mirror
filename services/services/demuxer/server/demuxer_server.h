@@ -31,18 +31,15 @@ public:
     int32_t Init(uintptr_t sourceAddr) override;
     int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
     int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) override;
+    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) override;
 
 private:
     std::shared_ptr<IDemuxerEngine> demuxerEngine_ = nullptr;
     int32_t appUid_ = 0;
     int32_t appPid_ = 0;
-    // IDemuxerEngine curState_ = DEMUXER_IDEL;
-    // uint32_t trackNum_ = 0;
-
 };
-
 }  // namespace Media
 }  // namespace OHOS
 #endif  // DEMUXER_SERVER_H

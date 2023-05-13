@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "audio_ffmpeg_aac_encoder_plugin.h"
 #include "avcodec_errors.h"
 #include "avcodec_dfx.h"
@@ -9,10 +24,31 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
+static constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
+static constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 8192;
+static constexpr uint32_t ADTS_HEADER_SIZE = 7;
+
+static constexpr uint8_t SAMPLE_FREQUENCY_INDEX_DEFAULT = 4;
+static std::map<int32_t, uint8_t> sampleFreqMap = {
+    {96000, 0},
+    {88200, 1},
+    {64000, 2},
+    {48000, 3},
+    {44100, 4},
+    {32000, 5},
+    {24000, 6},
+    {22050, 7},
+    {16000, 8},
+    {12000, 9},
+    {11025, 10},
+    {8000, 11},
+    {7350, 12}
+};
 
 AudioFFMpegAacEncoderPlugin::AudioFFMpegAacEncoderPlugin() : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>()) {}
 
-AudioFFMpegAacEncoderPlugin::~AudioFFMpegAacEncoderPlugin() {
+AudioFFMpegAacEncoderPlugin::~AudioFFMpegAacEncoderPlugin()
+{
     basePlugin->Release();
     basePlugin.reset();
     basePlugin = nullptr;
@@ -21,33 +57,21 @@ AudioFFMpegAacEncoderPlugin::~AudioFFMpegAacEncoderPlugin() {
 static int32_t GetAdtsHeader(std::string &adtsHeader, uint32_t &headerSize, std::shared_ptr<AVCodecContext> ctx,
                              int aacLength)
 {
-    uint8_t freqIdx = 0;    //0: 96000 Hz  3: 48000 Hz 4: 44100 Hz
-    switch (ctx->sample_rate) {
-    case 96000: freqIdx = 0; break;
-    case 88200: freqIdx = 1; break;
-    case 64000: freqIdx = 2; break;
-    case 48000: freqIdx = 3; break;
-    case 44100: freqIdx = 4; break;
-    case 32000: freqIdx = 5; break;
-    case 24000: freqIdx = 6; break;
-    case 22050: freqIdx = 7; break;
-    case 16000: freqIdx = 8; break;
-    case 12000: freqIdx = 9; break;
-    case 11025: freqIdx = 10; break;
-    case 8000: freqIdx = 11; break;
-    case 7350: freqIdx = 12; break;
-    default: freqIdx = 4; break;
+    uint8_t freqIdx = SAMPLE_FREQUENCY_INDEX_DEFAULT; // 0: 96000 Hz  3: 48000 Hz 4: 44100 Hz
+    auto iter = sampleFreqMap.find(ctx->sample_rate);
+    if (iter != sampleFreqMap.end()) {
+        freqIdx = iter->second;
     }
     uint8_t chanCfg = ctx->channels;
-    uint32_t frameLength = aacLength + 7;
+    uint32_t frameLength = aacLength + ADTS_HEADER_SIZE;
     adtsHeader += 0xFF;
     adtsHeader += 0xF1;
-    adtsHeader += ((ctx->profile) << 6) + (freqIdx << 2) + (chanCfg >> 2);
-    adtsHeader += (((chanCfg & 3) << 6) + (frameLength >> 11));
-    adtsHeader += ((frameLength & 0x7FF) >> 3);
-    adtsHeader += (((frameLength & 7) << 5) + 0x1F);
+    adtsHeader += ((ctx->profile) << 0x6) + (freqIdx << 0x2) + (chanCfg >> 0x2);
+    adtsHeader += (((chanCfg & 0x3) << 0x6) + (frameLength >> 0xB));
+    adtsHeader += ((frameLength & 0x7FF) >> 0x3);
+    adtsHeader += (((frameLength & 0x7) << 0x5) + 0x1F);
     adtsHeader += 0xFC;
-    headerSize = 7;
+    headerSize = ADTS_HEADER_SIZE;
 
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
@@ -56,8 +80,9 @@ static bool CheckSampleFormat(const std::shared_ptr<AVCodec> &codec, enum AVSamp
 {
     const enum AVSampleFormat* p = codec->sample_fmts;
     while (*p != AV_SAMPLE_FMT_NONE) { // 通过AV_SAMPLE_FMT_NONE作为结束符
-        if (*p == sample_fmt)
+        if (*p == sample_fmt) {
             return true;
+        }
         p++;
     }
     return false;
@@ -66,9 +91,10 @@ static bool CheckSampleFormat(const std::shared_ptr<AVCodec> &codec, enum AVSamp
 static bool CheckSampleRate(const std::shared_ptr<AVCodec> &codec, const int sample_rate)
 {
     const int* p = codec->supported_samplerates;
-    while (*p != 0) {// 0作为退出条件，比如libfdk-aacenc.c的aac_sample_rates
-        if (*p == sample_rate)
+    while (*p != 0) { // 0作为退出条件，比如libfdk-aacenc.c的aac_sample_rates
+        if (*p == sample_rate) {
             return true;
+        }
         p++;
     }
     return false;
@@ -83,8 +109,9 @@ static bool CheckChannelLayout(const std::shared_ptr<AVCodec> &codec, const uint
         return true;
     }
     while (*p != 0) { // 0作为退出条件，比如libfdk-aacenc.c的aac_channel_layout
-        if (*p == channel_layout)
+        if (*p == channel_layout) {
             return true;
+        }
         p++;
     }
     return false;
@@ -124,7 +151,8 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
     return true;
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::init(const Format &format) {
+int32_t AudioFFMpegAacEncoderPlugin::init(const Format &format)
+{
     int32_t ret = basePlugin->AllocateContext("aac");
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         AVCODEC_LOGE("Allocat aac context failed, ret = %{publid}d", ret);
@@ -156,41 +184,48 @@ int32_t AudioFFMpegAacEncoderPlugin::init(const Format &format) {
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) {
+int32_t AudioFFMpegAacEncoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+{
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer) {
+int32_t AudioFFMpegAacEncoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+{
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::reset() {
+int32_t AudioFFMpegAacEncoderPlugin::reset()
+{
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::release() {
+int32_t AudioFFMpegAacEncoderPlugin::release()
+{
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::flush() {
+int32_t AudioFFMpegAacEncoderPlugin::flush()
+{
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegAacEncoderPlugin::getInputBufferSize() const {
+uint32_t AudioFFMpegAacEncoderPlugin::getInputBufferSize() const
+{
     int32_t maxSize = basePlugin->GetMaxInputSize();
-    if (maxSize < 0 || maxSize > 8192) {
-        maxSize = 4 * 1024 * 8;
+    if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
+        maxSize = INPUT_BUFFER_SIZE_DEFAULT;
     }
     return maxSize;
 }
 
-uint32_t AudioFFMpegAacEncoderPlugin::getOutputBufferSize() const {
-    return 8192;
+uint32_t AudioFFMpegAacEncoderPlugin::getOutputBufferSize() const
+{
+    return OUTPUT_BUFFER_SIZE_DEFAULT;
 }
 
-Format AudioFFMpegAacEncoderPlugin::GetFormat() const noexcept {
+Format AudioFFMpegAacEncoderPlugin::GetFormat() const noexcept
+{
     return basePlugin->GetFormat();
 }
-
 } // namespace Media
 } // namespace OHOS

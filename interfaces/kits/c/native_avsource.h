@@ -22,7 +22,7 @@
 #include <native_avformat.h>
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 typedef struct OH_AVSource OH_AVSource;

@@ -16,9 +16,7 @@
 #include "avmuxer_ffmpeg_demo.h"
 #include <dlfcn.h>
 #include <iostream>
-#include <unistd.h>
 #include <fcntl.h>
-#include <cstdio>
 #include <fstream>
 
 namespace {
@@ -71,7 +69,7 @@ void AVMuxerFFmpegDemo::DoRunMuxer()
     }
 
     int32_t maxProb = 0;
-    MuxerPluginDef pluginDef{};
+    MuxerPluginDef pluginDef {};
     for (auto& plugin : register_->plugins) {
         if (plugin.pluginType == PluginType::MUXER) {
             auto prob = plugin.sniffer(plugin.name, outputFormat_);
@@ -101,8 +99,8 @@ void AVMuxerFFmpegDemo::DoRunMuxer()
         return;
     }
 
-    ffmpegMuxer_->SetLocation(10, 10);
-    ffmpegMuxer_->SetRotation(90);
+    ffmpegMuxer_->SetLocation(TEST_LATITUDE, TEST_LONGITUDE);
+    ffmpegMuxer_->SetRotation(0);
 
     AddAudioTrack(audioParams_);
     AddVideoTrack(videoParams_);
@@ -120,7 +118,7 @@ void AVMuxerFFmpegDemo::DoRunMultiThreadCase()
 
 int AVMuxerFFmpegDemo::DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info)
 {
-    if(ffmpegMuxer_ != nullptr && 
+    if(ffmpegMuxer_ != nullptr &&
         ffmpegMuxer_->WriteSampleBuffer(sampleBuffer, info) == Status::NO_ERROR) {
         return 0;
     }

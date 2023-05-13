@@ -33,7 +33,6 @@ public:
     virtual int32_t GetSourceFormat(Format &format) = 0;
     virtual int32_t GetTrackFormat(Format &format, uint32_t trackIndex) = 0;
     virtual uintptr_t GetSourceAddr() = 0;
-
 };
 
 class __attribute__((visibility("default"))) ISourceEngineFactory {

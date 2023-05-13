@@ -23,7 +23,7 @@
 #include "avsource_impl.h"
 
 namespace OHOS {
-namespace Media{
+namespace Media {
 class AVDemuxerImpl : public AVDemuxer, public NoCopyable {
 public:
     AVDemuxerImpl();
@@ -31,7 +31,8 @@ public:
 
     int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
     int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) override;
+    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                            AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) override;
     int32_t Init(AVSource &source);
 

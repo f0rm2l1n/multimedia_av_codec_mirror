@@ -15,9 +15,9 @@
 
 #include "surface_memory.h"
 #include "avcodec_log.h"
+#include "native_averrors.h"
 #include "securec.h"
 #include <memory>
-#include "native_averrors.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-SurfaceMemory"};
@@ -32,19 +32,20 @@ ScalingMode SurfaceMemory::scalingMode_ = {ScalingMode::SCALING_MODE_SCALE_TO_WI
 std::shared_ptr<SurfaceMemory> SurfaceMemory::Create()
 {
     CHECK_AND_RETURN_RET_LOG(surface_ != nullptr, nullptr, "surface is nullptr");
-    CHECK_AND_RETURN_RET_LOG(requestConfig_.width!=0 && requestConfig_.height!=0, nullptr, "surface config invalid");
+    CHECK_AND_RETURN_RET_LOG(requestConfig_.width != 0 && requestConfig_.height != 0, nullptr,
+                             "surface config invalid");
     std::shared_ptr<SurfaceMemory> buffer = std::make_shared<SurfaceMemory>();
     buffer->AllocSurfaceBuffer();
-    
+
     return buffer;
 }
 
-
-SurfaceMemory::~SurfaceMemory() {
+SurfaceMemory::~SurfaceMemory()
+{
     ReleaseSurfaceBuffer();
 }
 
-size_t SurfaceMemory::Write(const uint8_t* in, size_t writeSize, size_t position)
+size_t SurfaceMemory::Write(const uint8_t *in, size_t writeSize, size_t position)
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
 
@@ -64,7 +65,7 @@ size_t SurfaceMemory::Write(const uint8_t* in, size_t writeSize, size_t position
     return length;
 }
 
-size_t SurfaceMemory::Read(uint8_t* out, size_t readSize, size_t position)
+size_t SurfaceMemory::Read(uint8_t *out, size_t readSize, size_t position)
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
     size_t start = 0;
@@ -82,7 +83,7 @@ size_t SurfaceMemory::Read(uint8_t* out, size_t readSize, size_t position)
 
 void SurfaceMemory::AllocSurfaceBuffer()
 {
-    if(surface_==nullptr || surfaceBuffer_ != nullptr) {
+    if (surface_ == nullptr || surfaceBuffer_ != nullptr) {
         AVCODEC_LOGE("surface is nullptr or surfaceBuffer is not nullptr");
         return;
     }
@@ -101,7 +102,7 @@ void SurfaceMemory::AllocSurfaceBuffer()
         surface_->CancelBuffer(surfaceBuffer_);
         return;
     }
-    sptr<SyncFence> autoFence = new(std::nothrow) SyncFence(releaseFence);
+    sptr<SyncFence> autoFence = new (std::nothrow) SyncFence(releaseFence);
     if (autoFence != nullptr) {
         autoFence->Wait(100); // 100ms
     }
@@ -122,8 +123,9 @@ void SurfaceMemory::AllocSurfaceBuffer()
 
 void SurfaceMemory::ReleaseSurfaceBuffer()
 {
-    if(surfaceBuffer_==nullptr) return;
-   
+    if (surfaceBuffer_ == nullptr)
+        return;
+
     if (!needRender_) {
         auto ret = surface_->CancelBuffer(surfaceBuffer_);
         if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
@@ -159,17 +161,17 @@ void SurfaceMemory::ClearUsedSize()
 }
 
 void SurfaceMemory::SetNeedRender(bool needRender)
-{ 
+{
     needRender_ = needRender;
 }
 
 void SurfaceMemory::UpdateSurfaceBufferScaleMode()
 {
-    if(surfaceBuffer_ == nullptr){
+    if (surfaceBuffer_ == nullptr) {
         AVCODEC_LOGE("surfaceBuffer is nullptr");
         return;
     }
-    
+
     auto ret = surface_->SetScalingMode(surfaceBuffer_->GetSeqNum(), scalingMode_);
     if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
         AVCODEC_LOGE("update surface buffer scaling mode fail, ret: %{public}llu", static_cast<uint64_t>(ret));
@@ -181,28 +183,26 @@ void SurfaceMemory::SetSurface(sptr<Surface> surface)
     surface_ = surface;
 }
 
-void SurfaceMemory::SetConfig(int32_t width, int32_t height, int32_t format, uint64_t usage, 
-                        int32_t strideAlign, int32_t timeout)
+void SurfaceMemory::SetConfig(int32_t width, int32_t height, int32_t format, uint64_t usage, int32_t strideAlign,
+                              int32_t timeout)
 {
-    requestConfig_ = {
-        .width=width,
-        .height=height,
-        .strideAlignment=strideAlign,
-        .format=format,
-        .usage=usage,
-        .timeout=timeout
-    };
+    requestConfig_ = {.width = width,
+                      .height = height,
+                      .strideAlignment = strideAlign,
+                      .format = format,
+                      .usage = usage,
+                      .timeout = timeout};
 }
 
 void SurfaceMemory::SetScaleType(ScalingMode videoScaleMode)
 {
     scalingMode_ = videoScaleMode;
-} 
+}
 
-uint8_t* SurfaceMemory::GetBase() const
+uint8_t *SurfaceMemory::GetBase() const
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, nullptr, "surfaceBuffer is nullptr");
-    return static_cast<uint8_t*>(surfaceBuffer_->GetVirAddr());
+    return static_cast<uint8_t *>(surfaceBuffer_->GetVirAddr());
 }
 
 int32_t SurfaceMemory::GetUsedSize() const
@@ -223,5 +223,5 @@ uint32_t SurfaceMemory::GetFlags() const
     return FLAGS_READ_WRITE;
 }
 
-} // namespace OHOS
 } // namespace Media
+} // namespace OHOS

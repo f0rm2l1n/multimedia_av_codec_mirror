@@ -77,9 +77,8 @@ private:
     std::shared_ptr<AVCodecAudioEncoder> audioEn_;
     std::shared_ptr<AEnSignal> signal_;
     std::shared_ptr<AEnDemoCallback> cb_;
-    // uint32_t frameCount_ = 0;
 };
-} // InnerAudioDemo
-} // namespace AV_Codec
+} // namespace InnerAudioDemo
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_DECODER_INNER_DEMO_H

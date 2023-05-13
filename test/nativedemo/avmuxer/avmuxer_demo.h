@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Media {
-class AVMuxerDemo /*: public NoCopyable*/ : public AVMuxerDemoBase {
+class AVMuxerDemo /* : public NoCopyable */ : public AVMuxerDemoBase {
 public:
     AVMuxerDemo() = default;
     ~AVMuxerDemo() = default;

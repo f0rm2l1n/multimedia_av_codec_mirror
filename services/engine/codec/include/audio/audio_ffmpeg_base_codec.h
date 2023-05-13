@@ -16,21 +16,20 @@
 #ifndef BASE_CODER_PLUGIN
 #define BASE_CODER_PLUGIN
 
+#include <string>
+
 #include "audio_buffer_info.h"
 #include "av_codec_base_factory.h"
 #include "format.h"
 #include "nocopyable.h"
-#include <string>
 
 namespace OHOS {
 namespace Media {
-
-class IAudioFFMpegBaseCodec : public AVCodecBaseFactory<IAudioFFMpegBaseCodec, std::string>, public NoCopyable {
-private:
+class AudioFFMpegBaseCodec : public AVCodecBaseFactory<AudioFFMpegBaseCodec, std::string>, public NoCopyable {
 public:
-    IAudioFFMpegBaseCodec() = default;
+    AudioFFMpegBaseCodec() = default;
 
-    virtual ~IAudioFFMpegBaseCodec() = default;
+    virtual ~AudioFFMpegBaseCodec() = default;
 
     virtual int32_t init(const Format &format) = 0;
 
@@ -50,7 +49,6 @@ public:
 
     virtual Format GetFormat() const noexcept = 0;
 };
-
 } // namespace Media
 } // namespace OHOS
 

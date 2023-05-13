@@ -27,14 +27,6 @@
 
 namespace OHOS {
 namespace Media {
-
-namespace {
-    extern "C" {
-        extern char *RUN_NORMAL;
-        extern char *RUN_MUL_THREAD;
-    }
-}
-
 int AVMuxerEngineDemo::DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info)
 {
     std::shared_ptr<AVSharedMemoryBase> sharedSampleBuffer =
@@ -68,7 +60,8 @@ int AVMuxerEngineDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &trackDe
 
 void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
 {
-    std::string outFileName = "engine_mux_" + runMode + "_" + audioType_ + "_" + videoType_ + "_" + coverType_ + "." + format_;
+    std::string outFileName = "engine_mux_" + runMode + "_" + audioType_ + "_"
+        + videoType_ + "_" + coverType_ + "." + format_;
     outFd_ = open(outFileName.c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
     if (outFd_ < 0) {
         std::cout << "Open file failed! filePath is: " << outFileName << std::endl;
@@ -83,7 +76,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
     }
     std::cout << "create muxer success " << avmuxer_ << std::endl;
 
-    if (avmuxer_->SetLocation(10, 10) != AVCS_ERR_OK
+    if (avmuxer_->SetLocation(TEST_LATITUDE, TEST_LONGITUDE) != AVCS_ERR_OK
         || avmuxer_->SetRotation(0) != AVCS_ERR_OK) {
         std::cout<<"set failed!"<<std::endl;
         return;
@@ -134,6 +127,5 @@ void AVMuxerEngineDemo::DoRunMultiThreadCase()
 {
     DoRunMuxer(std::string(RUN_MUL_THREAD));
 }
-
 }  // namespace Media
 }  // namespace OHOS

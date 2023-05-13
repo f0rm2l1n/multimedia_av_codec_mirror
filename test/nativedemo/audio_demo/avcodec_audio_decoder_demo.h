@@ -16,13 +16,14 @@
 #ifndef AVCODEC_AUDIO_DECODER_DEMO_H
 #define AVCODEC_AUDIO_DECODER_DEMO_H
 
-#include "native_avcodec_audiodecoder.h"
-#include "nocopyable.h"
 #include <atomic>
 #include <fstream>
 #include <queue>
 #include <string>
 #include <thread>
+
+#include "native_avcodec_audiodecoder.h"
+#include "nocopyable.h"
 
 #ifdef __cplusplus
 extern "C" {

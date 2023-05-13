@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
+#include "vdec_mock.h"
 #include "nocopyable.h"
 #include "avcodec_errors.h"
 #include "avcodec_common.h"
-#include "vdec_mock.h"
 using namespace std;
 using namespace OHOS::Media::VCodecTestParam;
 namespace OHOS {

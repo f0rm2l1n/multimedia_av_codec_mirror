@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Media {
-int32_t MuxerCapiMock::Destroy()
+int32_t AVMuxerCapiMock::Destroy()
 {
     int ret = OH_AVMuxer_Destroy(muxer_);
     if (ret != AV_ERR_OK) {
@@ -27,39 +27,38 @@ int32_t MuxerCapiMock::Destroy()
     return AV_ERR_OK;
 }
 
-int32_t MuxerCapiMock::Start()
+int32_t AVMuxerCapiMock::Start()
 {
     return OH_AVMuxer_Start(muxer_);
 }
 
-int32_t MuxerCapiMock::Stop()
+int32_t AVMuxerCapiMock::Stop()
 {
     return OH_AVMuxer_Stop(muxer_);
 }
 
-int32_t MuxerCapiMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMock> &trackFormat)
+int32_t AVMuxerCapiMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMock> &trackFormat)
 {
     auto formatMock = std::static_pointer_cast<AVFormatCapiMock>(trackFormat);
     return OH_AVMuxer_AddTrack(muxer_, &trackIndex, formatMock->GetFormat());
 }
 
-int32_t MuxerCapiMock::WriteSampleBuffer(uint32_t trackIndex, uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
+int32_t AVMuxerCapiMock::WriteSampleBuffer(uint32_t trackIndex, uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
 {
     OH_AVCodecBufferAttr bufferAttr;
     bufferAttr.pts = info.pts;
     bufferAttr.size = info.size;
     bufferAttr.offset = info.offset;
     bufferAttr.flags = info.flags;
-    // bufferAttr.trackId = info.trackId;
     return OH_AVMuxer_WriteSampleBuffer(muxer_, trackIndex, sampleBuffer, bufferAttr);
 }
 
-int32_t MuxerCapiMock::SetLocation(float latitude, float longitude)
+int32_t AVMuxerCapiMock::SetLocation(float latitude, float longitude)
 {
     return OH_AVMuxer_SetLocation(muxer_, latitude, longitude);
 }
 
-int32_t MuxerCapiMock::SetRotation(int32_t rotation)
+int32_t AVMuxerCapiMock::SetRotation(int32_t rotation)
 {
     return OH_AVMuxer_SetRotation(muxer_, rotation);
 }

@@ -19,7 +19,6 @@
 #include <errno.h>
 
 namespace OHOS {
-
 /**
  * ErrCode layout
  *
@@ -114,7 +113,5 @@ enum {
 
 #define SUCCEEDED(errCode) ((errCode) == ERR_OK)
 #define FAILED(errCode) ((errCode) != ERR_OK)
-
 }
-
 #endif

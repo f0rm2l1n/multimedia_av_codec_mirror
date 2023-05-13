@@ -19,14 +19,18 @@
 #include "media_description.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
+    constexpr int minChannels = 1;
+    constexpr int maxChannels = 2;
+    constexpr int bitrate_ratio = 150;
+    constexpr int samplerate_ratio = 31;
+    constexpr int bitrate_max = 320000;
+    constexpr int support_sample_rate = 9;
+    constexpr int bufferDiff = 128;
 }
 
 namespace OHOS {
 namespace Media {
-#define BITRATE_RATIO 150
-#define SAMPLERATE_RATIO 31
-#define BITRATE_MAX 320000
 AudioFFMpegMp3DecoderPlugin::AudioFFMpegMp3DecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
     channels = 0;
@@ -43,7 +47,6 @@ AudioFFMpegMp3DecoderPlugin::~AudioFFMpegMp3DecoderPlugin()
 
 int32_t AudioFFMpegMp3DecoderPlugin::init(const Format &format)
 {
-
     int32_t ret = basePlugin->AllocateContext("mp3");
     int32_t checkresult = AudioFFMpegMp3DecoderPlugin::checkinit(format);
     if (checkresult != AVCodecServiceErrCode::AVCS_ERR_OK) {
@@ -88,7 +91,7 @@ int32_t AudioFFMpegMp3DecoderPlugin::flush()
 
 uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
 {
-    auto size = int(bit_rate / BITRATE_RATIO);
+    auto size = int(bit_rate / bitrate_ratio);
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > size) {
         maxSize = size;
@@ -98,7 +101,7 @@ uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
 
 uint32_t AudioFFMpegMp3DecoderPlugin::getOutputBufferSize() const
 {
-    uint32_t size = (int(sample_rate / SAMPLERATE_RATIO) + 128) * channels * sizeof(short);
+    uint32_t size = (int(sample_rate / samplerate_ratio) + bufferDiff) * channels * sizeof(short);
     return size;
 }
 
@@ -109,28 +112,27 @@ Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
 
 int32_t AudioFFMpegMp3DecoderPlugin::checkinit(const Format &format)
 {
-#define SUPPORT_SAMPLE_RATE 9
-    int sample_rate_pick[SUPPORT_SAMPLE_RATE] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
+    int sample_rate_pick[support_sample_rate] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bit_rate);
-    if (channels < 1 || channels > 2) {
-        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
-    }
-    if (bit_rate > BITRATE_MAX) {
+    if (channels < minChannels || channels > maxChannels) {
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
-    for (int i = 0; i < SUPPORT_SAMPLE_RATE; i++) {
+    if (bit_rate > bitrate_max) {
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+    }
+
+    for (int i = 0; i < support_sample_rate; i++) {
         if (sample_rate == sample_rate_pick[i]) {
             break;
-        } else if (i == SUPPORT_SAMPLE_RATE - 1) {
+        } else if (i == support_sample_rate - 1) {
             return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
         }
     }
 
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
-
 } // namespace Media
 } // namespace OHOS

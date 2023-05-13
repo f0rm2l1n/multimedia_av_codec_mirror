@@ -29,7 +29,8 @@ namespace {
 
 namespace OHOS {
 namespace Media {
-std::shared_ptr<ISourceEngine> ISourceEngineFactory::CreateSourceEngine(int32_t appUid, int32_t appPid, const std::string& uri)
+std::shared_ptr<ISourceEngine> ISourceEngineFactory::CreateSourceEngine(int32_t appUid, int32_t appPid,
+                                                                        const std::string& uri)
 {
     AVCodecTrace trace("ISourceEngineFactory::CreateSourceEngine");
     std::shared_ptr<ISourceEngine> sourceEngineImpl = std::make_shared<SourceEngineImpl>(appUid, appPid, uri);

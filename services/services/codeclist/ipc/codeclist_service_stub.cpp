@@ -14,22 +14,22 @@
  */
 
 #include <unistd.h>
-#include "codeclist_service_stub.h"
 #include "avsharedmemory_ipc.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "avcodec_server_manager.h"
 #include "avcodec_xcollie.h"
+#include "codeclist_service_stub.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceStub"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceStub"};
 }
 
 namespace OHOS {
 namespace Media {
 sptr<CodecListServiceStub> CodecListServiceStub::Create()
 {
-    sptr<CodecListServiceStub> codecListStub = new(std::nothrow) CodecListServiceStub();
+    sptr<CodecListServiceStub> codecListStub = new (std::nothrow) CodecListServiceStub();
     CHECK_AND_RETURN_RET_LOG(codecListStub != nullptr, nullptr, "failed to new CodecListServiceStub");
 
     int32_t ret = codecListStub->Init();
@@ -66,7 +66,7 @@ int32_t CodecListServiceStub::DestroyStub()
 }
 
 int CodecListServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-    MessageOption &option)
+                                          MessageOption &option)
 {
     AVCODEC_LOGI("Stub: OnRemoteRequest of code: %{public}u is received", code);
 
@@ -81,8 +81,7 @@ int CodecListServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             int32_t ret = -1;
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply),
-                "CodecListServiceStub::OnRemoteRequest");
+            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), "CodecListServiceStub::OnRemoteRequest");
             if (ret != AVCS_ERR_OK) {
                 AVCODEC_LOGE("calling memberFunc is failed.");
             }
@@ -109,8 +108,7 @@ std::string CodecListServiceStub::FindEncoder(const Format &format)
 CapabilityData CodecListServiceStub::CreateCapability(const std::string codecName)
 {
     CapabilityData capabilityData;
-    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, capabilityData,
-        "avcodeclist server is nullptr");
+    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, capabilityData, "avcodeclist server is nullptr");
     return codecListServer_->CreateCapability(codecName);
 }
 

@@ -124,11 +124,6 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
         return OHOS::INVALID_OPERATION;
     }
 #endif
-    // DUMP实现后打开
-    // if (ServiceDumpManager::GetInstance().Dump(fd, argSets) != OHOS::NO_ERROR) {
-    //     AVCODEC_LOGW("Failed to write dfx dump information");
-    //     return OHOS::INVALID_OPERATION;
-    // }
 
     if (AVCodecXCollie::GetInstance().Dump(fd) != OHOS::NO_ERROR) {
         AVCODEC_LOGW("Failed to write xcollie dump information");

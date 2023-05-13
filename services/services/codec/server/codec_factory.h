@@ -30,7 +30,6 @@ public:
 private:
     CodecFactory() = default;
     ~CodecFactory();
-
 };
 } // namespace Media
 } // namespace OHOS

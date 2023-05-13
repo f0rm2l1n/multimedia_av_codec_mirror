@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "codecbase.h"
 #include "avcodec_log.h"
+#include "codecbase.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecBase"};

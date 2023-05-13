@@ -57,8 +57,7 @@ int32_t SourceClient::Init(const std::string &uri)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    // TODO: 添加LOG描述
-    AVCODEC_LOGD("Init");
+    AVCODEC_LOGD("source client call Init");
     return sourceProxy_->Init(uri);
 }
 
@@ -67,8 +66,7 @@ int32_t SourceClient::GetTrackCount(uint32_t &trackCount)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    // TODO: 添加LOG描述
-    AVCODEC_LOGD("GetTrackCount");
+    AVCODEC_LOGD("source client call GetTrackCount");
     return sourceProxy_->GetTrackCount(trackCount);
 }
 
@@ -77,8 +75,7 @@ int32_t SourceClient::SetTrackFormat(const Format &format, uint32_t trackIndex)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    // TODO: 添加LOG描述
-    AVCODEC_LOGD("SetTrackFormat");
+    AVCODEC_LOGD("source client call SetTrackFormat");
     return sourceProxy_->SetTrackFormat(format, trackIndex);
 }
 
@@ -87,8 +84,7 @@ int32_t SourceClient::GetTrackFormat(Format &format, uint32_t trackIndex)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    // TODO: 添加LOG描述
-    AVCODEC_LOGD("GetTrackFormat");
+    AVCODEC_LOGD("source client call GetTrackFormat");
     return sourceProxy_->GetTrackFormat(format, trackIndex);
 }
 
@@ -97,8 +93,7 @@ int32_t SourceClient::GetSourceFormat(Format &format)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    // TODO: 添加LOG描述
-    AVCODEC_LOGD("GetSourceFormat");
+    AVCODEC_LOGD("source client call GetSourceFormat");
     return sourceProxy_->GetSourceFormat(format);
 }
 
@@ -107,8 +102,7 @@ uint64_t SourceClient::GetSourceAddr()
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    // TODO: 添加LOG描述
-    AVCODEC_LOGD("GetSourceAddr");
+    AVCODEC_LOGD("source client call GetSourceAddr");
     return sourceProxy_->GetSourceAddr();
 }
 }  // namespace Media

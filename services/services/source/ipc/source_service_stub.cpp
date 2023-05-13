@@ -153,14 +153,17 @@ int32_t SourceServiceStub::DestroyStub(MessageParcel &data, MessageParcel &reply
 int32_t SourceServiceStub::Init(MessageParcel &data, MessageParcel &reply)
 {
     std::string uri = data.ReadString();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(uri)), AVCS_ERR_UNKNOWN, "");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(uri)), AVCS_ERR_UNKNOWN, "Reply Init failed");
     return AVCS_ERR_OK;
 }
 
 int32_t SourceServiceStub::GetTrackCount(MessageParcel &data, MessageParcel &reply)
 {
-    uint32_t trackIndex = data.ReadUint32();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(GetTrackCount(trackIndex)), AVCS_ERR_UNKNOWN, "");
+    (void)data;
+    uint32_t trackCount;
+    int32_t ret = GetTrackCount(trackCount);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(trackCount), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
     return AVCS_ERR_OK;
 }
 
@@ -169,7 +172,8 @@ int32_t SourceServiceStub::SetTrackFormat(MessageParcel &data, MessageParcel &re
     Format param;
     (void)AVCodecParcel::Unmarshalling(data, param);
     uint32_t trackIndex = data.ReadUint32();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SetTrackFormat(param, trackIndex)), AVCS_ERR_UNKNOWN, "");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SetTrackFormat(param, trackIndex)), AVCS_ERR_UNKNOWN,
+                            "Reply SetTrackFormat failed");
     return AVCS_ERR_OK;
 }
 
@@ -177,7 +181,8 @@ int32_t SourceServiceStub::GetTrackFormat(MessageParcel &data, MessageParcel &re
 {
     uint32_t trackIndex = data.ReadUint32();
     Format format;
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(GetTrackFormat(format, trackIndex)), AVCS_ERR_UNKNOWN, "");
+    int32_t ret = GetTrackFormat(format, trackIndex);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetTrackFormat failed");
     AVCodecParcel::Marshalling(reply, format);
     return AVCS_ERR_OK;
 }
@@ -187,53 +192,23 @@ int32_t SourceServiceStub::GetSourceFormat(MessageParcel &data, MessageParcel &r
     (void)data;
 
     Format format;
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(GetSourceFormat(format)), AVCS_ERR_UNKNOWN, "");
+    int32_t ret = GetSourceFormat(format);
     AVCodecParcel::Marshalling(reply, format);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetSourceAddr failed");
     return AVCS_ERR_OK;
 }
 
 int32_t SourceServiceStub::GetSourceAddr(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    
-    CHECK_AND_RETURN_RET_LOG(reply.WriteUint64(GetSourceAddr()), AVCS_ERR_UNKNOWN, "");
+
+    CHECK_AND_RETURN_RET_LOG(reply.WriteUint64(GetSourceAddr()), AVCS_ERR_UNKNOWN, "Reply GetSourceAddr failed!");
     return AVCS_ERR_OK;
 }
 
 int32_t SourceServiceStub::GetDumpInfo(std::string& dumpInfo)
 {
-    // dumpInfo += "Input_Url: " + "" + "\n";
-    (void)dumpInfo; 
-    // dumpInfo += "Source_Info\n";
-    // dumpInfo += "\tTitle: " + "" + "\n";
-    // dumpInfo += "\tArtist: " + "" + "\n";
-    // dumpInfo += "\tAlbum: " + "" + "\n";
-    // dumpInfo += "\tAlbum_Artist: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tComment: " + "" + "\n";
-    // dumpInfo += "\tGenre: " + "" + "\n";
-    // dumpInfo += "\tCopyright: " + "" + "\n";
-    // dumpInfo += "\tLanguage: " + "" + "\n";
-    // dumpInfo += "\tDescription: " + "" + "\n";
-    // dumpInfo += "\tLyrics: " + "" + "\n";
-    // dumpInfo += "\tDuration: " + "" + "\n";
-    // dumpInfo += "\tType: " + "" + "\n";
-
-    // dumpInfo += "Video_TrackInfo" + "" + "\n";    
-    // dumpInfo += "\t: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-    // dumpInfo += "\tDate: " + "" + "\n";
-
-
+    (void)dumpInfo;
     return AVCS_ERR_OK;
 }
 }  // namespace Media

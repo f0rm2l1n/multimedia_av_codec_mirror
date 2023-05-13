@@ -14,14 +14,14 @@
  */
 
 #include <cmath> // fabs
-#include "codeclist_core.h"
 #include "codec_ability_singleton.h"
 #include "avcodec_log.h"
+#include "codeclist_core.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListCore"};
-    constexpr float EPSINON = 0.0001;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListCore"};
+constexpr float EPSINON = 0.0001;
+} // namespace
 
 namespace OHOS {
 namespace Media {
@@ -59,8 +59,8 @@ bool CodecListCore::CheckVideoResolution(const Format &format, const CapabilityD
     }
     (void)format.GetIntValue("width", targetWidth);
     (void)format.GetIntValue("height", targetHeight);
-    if (data.width.minVal > targetWidth || data.width.maxVal < targetWidth
-        || data.height.minVal > targetHeight || data.height.maxVal < targetHeight) {
+    if (data.width.minVal > targetWidth || data.width.maxVal < targetWidth || data.height.minVal > targetHeight ||
+        data.height.maxVal < targetHeight) {
         return false;
     }
     return true;
@@ -87,31 +87,28 @@ bool CodecListCore::CheckVideoFrameRate(const Format &format, const CapabilityDa
         return true;
     }
 
-    switch (format.GetValueType(std::string_view("frame_rate"))) {  // TODO : 为啥还有double类型的frameRate
-        case FORMAT_TYPE_INT32: {
-            int32_t targetFrameRateInt;
-            (void)format.GetIntValue("frame_rate", targetFrameRateInt);
-            if (data.frameRate.minVal > targetFrameRateInt ||
-                data.frameRate.maxVal < targetFrameRateInt) {
-                return false;
-            }
-            break;
+    switch (format.GetValueType(std::string_view("frame_rate"))) {
+    case FORMAT_TYPE_INT32: {
+        int32_t targetFrameRateInt;
+        (void)format.GetIntValue("frame_rate", targetFrameRateInt);
+        if (data.frameRate.minVal > targetFrameRateInt || data.frameRate.maxVal < targetFrameRateInt) {
+            return false;
         }
-        case FORMAT_TYPE_DOUBLE: {
-            double targetFrameRateDouble;
-            (void)format.GetDoubleValue("frame_rate", targetFrameRateDouble);
-            double minValDouble{data.frameRate.minVal};
-            double maxValDouble{data.frameRate.maxVal};
-            if ((minValDouble > targetFrameRateDouble &&
-                fabs(minValDouble - targetFrameRateDouble) >= EPSINON) ||
-                (maxValDouble < targetFrameRateDouble &&
-                fabs(maxValDouble - targetFrameRateDouble) >= EPSINON)) {
-                return false;
-            }
-            break;
+        break;
+    }
+    case FORMAT_TYPE_DOUBLE: {
+        double targetFrameRateDouble;
+        (void)format.GetDoubleValue("frame_rate", targetFrameRateDouble);
+        double minValDouble{data.frameRate.minVal};
+        double maxValDouble{data.frameRate.maxVal};
+        if ((minValDouble > targetFrameRateDouble && fabs(minValDouble - targetFrameRateDouble) >= EPSINON) ||
+            (maxValDouble < targetFrameRateDouble && fabs(maxValDouble - targetFrameRateDouble) >= EPSINON)) {
+            return false;
         }
-        default:
-            break;
+        break;
+    }
+    default:
+        break;
     }
     return true;
 }
@@ -144,19 +141,15 @@ bool CodecListCore::CheckAudioSampleRate(const Format &format, const CapabilityD
     return true;
 }
 
-bool CodecListCore::IsVideoCapSupport(const Format &format, const CapabilityData &data) 
+bool CodecListCore::IsVideoCapSupport(const Format &format, const CapabilityData &data)
 {
-    return CheckVideoResolution(format, data) &&
-           CheckVideoPixelFormat(format, data) &&
-           CheckVideoFrameRate(format, data) &&
-           CheckBitrate(format, data);
+    return CheckVideoResolution(format, data) && CheckVideoPixelFormat(format, data) &&
+           CheckVideoFrameRate(format, data) && CheckBitrate(format, data);
 }
 
-bool CodecListCore::IsAudioCapSupport(const Format &format, const CapabilityData &data) 
+bool CodecListCore::IsAudioCapSupport(const Format &format, const CapabilityData &data)
 {
-   return CheckAudioChannel(format, data) &&
-          CheckAudioSampleRate(format, data) &&
-          CheckBitrate(format, data);
+    return CheckAudioChannel(format, data) && CheckAudioSampleRate(format, data) && CheckBitrate(format, data);
 }
 
 // mime是必要参数
@@ -177,9 +170,9 @@ std::string CodecListCore::FindCodec(const Format &format, bool isEncoder)
     if (isVideo) {
         codecType = isEncoder ? AVCODEC_TYPE_VIDEO_ENCODER : AVCODEC_TYPE_VIDEO_DECODER;
     } else {
-        codecType = isEncoder ? AVCODEC_TYPE_AUDIO_ENCODER : AVCODEC_TYPE_AUDIO_DECODER; 
+        codecType = isEncoder ? AVCODEC_TYPE_AUDIO_ENCODER : AVCODEC_TYPE_AUDIO_DECODER;
     }
-    
+
     int isVendor = -1;
     bool isVendorKey = format.ContainKey("codec_vendor_flag");
     if (isVendorKey) {
@@ -188,8 +181,7 @@ std::string CodecListCore::FindCodec(const Format &format, bool isEncoder)
     std::vector<CapabilityData> capabilityDataArray = CodecAbilitySingleton::GetInstance().GetCapabilityArray();
     auto iter = capabilityDataArray.begin();
     while (iter != capabilityDataArray.end()) {
-        if ((*iter).codecType != codecType ||
-            (*iter).mimeType != targetMimeType ||
+        if ((*iter).codecType != codecType || (*iter).mimeType != targetMimeType ||
             (isVendorKey && (*iter).isVendor != isVendor)) {
             ++iter;
             continue;
@@ -199,7 +191,7 @@ std::string CodecListCore::FindCodec(const Format &format, bool isEncoder)
             if (IsVideoCapSupport(format, *iter)) {
                 return (*iter).codecName;
             }
-        } else  {
+        } else {
             if (IsAudioCapSupport(format, *iter)) {
                 return (*iter).codecName;
             }
@@ -220,7 +212,7 @@ std::string CodecListCore::FindDecoder(const Format &format)
 }
 
 CapabilityData CodecListCore::CreateCapability(std::string codecName)
-{              
+{
     std::lock_guard<std::mutex> lock(mutex_);
     CapabilityData capData;
     if (codecName.empty()) {

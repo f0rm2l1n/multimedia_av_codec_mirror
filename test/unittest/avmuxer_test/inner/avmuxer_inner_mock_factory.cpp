@@ -22,7 +22,7 @@ std::shared_ptr<AVMuxerMock> AVMuxerMockFactory::CreateMuxer(int32_t fd, const O
 {
     auto muxer = AVMuxerFactory::CreateAVMuxer(fd, format);
     if (muxer != nullptr) {
-        return std::make_shared<MuxerInnerMock>(muxer);
+        return std::make_shared<AVMuxerInnerMock>(muxer);
     }
     return nullptr;
 }

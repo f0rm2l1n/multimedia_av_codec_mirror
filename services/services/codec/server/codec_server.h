@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Media {
-
 class CodecServer : public std::enable_shared_from_this<CodecServer>, public ICodecService, public NoCopyable {
 public:
     static std::shared_ptr<ICodecService> Create();
@@ -96,7 +95,6 @@ public:
 private:
     std::shared_ptr<CodecServer> codec_ = nullptr;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif // CODEC_SERVER_H

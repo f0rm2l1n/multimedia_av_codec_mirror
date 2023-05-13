@@ -24,7 +24,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-
 AudioBufferInfo::AudioBufferInfo(const uint32_t &bufferSize, const std::string_view &name, const uint32_t &metaSize,
                                  size_t align)
     : isHasMeta_(false),
@@ -146,6 +145,5 @@ bool AudioBufferInfo::ResetBuffer()
     }
     return true;
 }
-
 } // namespace Media
 } // namespace OHOS

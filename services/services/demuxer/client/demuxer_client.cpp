@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "demuxer_client.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -35,8 +50,7 @@ int32_t DemuxerClient::Init(uintptr_t sourceAddr)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    // TODO: 添加LOG描述
-    AVCODEC_LOGD("Init");
+    AVCODEC_LOGD("demuxer client call Init");
     return demuxerProxy_->Init(sourceAddr);
 }
 
@@ -52,7 +66,7 @@ int32_t DemuxerClient::SelectSourceTrackByID(uint32_t index)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
 
-    AVCODEC_LOGD("SelectSourceTrackByID");
+    AVCODEC_LOGD("demuxer client call SelectSourceTrackByID");
     return demuxerProxy_->SelectSourceTrackByID(index);
 }
 int32_t DemuxerClient::UnselectSourceTrackByID(uint32_t index)
@@ -60,23 +74,23 @@ int32_t DemuxerClient::UnselectSourceTrackByID(uint32_t index)
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
     
-    AVCODEC_LOGD("UnselectSourceTrackByID");
+    AVCODEC_LOGD("demuxer client call UnselectSourceTrackByID");
     return demuxerProxy_->UnselectSourceTrackByID(index);
 }
-int32_t DemuxerClient::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag)
+int32_t DemuxerClient::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                                        AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
-    AVCODEC_LOGD("CopyNextSample");
-    return demuxerProxy_->CopyNextSample(trackIndex, buffer, bufferInfo,flag);
+    AVCODEC_LOGD("demuxer client call CopyNextSample");
+    return demuxerProxy_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
 }
 int32_t DemuxerClient::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
-    AVCODEC_LOGD("SeekToTime");
+    AVCODEC_LOGD("demuxer client call SeekToTime");
     return demuxerProxy_->SeekToTime(mSeconds, mode);
 }
-
 }  // namespace Media
 }  // namespace OHOS

@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "codeclist_xml_parser.h"
 #include "avcodec_log.h"
 #include "string_ex.h"
+#include "codeclist_xml_parser.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodeclistXmlParser"};
-    constexpr int32_t PAIR_LENGTH = 2;
-    const std::string AVCODEC_CAPS_FILE = "/etc/codec/avcodec_caps.xml";
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodeclistXmlParser"};
+constexpr int32_t PAIR_LENGTH = 2;
+const std::string AVCODEC_CAPS_FILE = "/etc/codec/avcodec_caps.xml";
+} // namespace
 
 namespace OHOS {
 namespace Media {
@@ -79,69 +79,61 @@ const std::unordered_map<std::string, int> VIDEO_PROFILE_MAP = {
 };
 
 const std::unordered_map<std::string, int> AUDIO_PROFILE_MAP = {
-    {"AAC_LC", AAC_PROFILE_LC},
-    {"AAC_ELD", AAC_PROFILE_ELD},
-    {"AAC_ERLC", AAC_PROFILE_ERLC},
-    {"AAC_HE", AAC_PROFILE_HE},
-    {"AAC_HE_V2", AAC_PROFILE_HE_V2},
-    {"AAC_LD", AAC_PROFILE_LD},
+    {"AAC_LC", AAC_PROFILE_LC},     {"AAC_ELD", AAC_PROFILE_ELD},     {"AAC_ERLC", AAC_PROFILE_ERLC},
+    {"AAC_HE", AAC_PROFILE_HE},     {"AAC_HE_V2", AAC_PROFILE_HE_V2}, {"AAC_LD", AAC_PROFILE_LD},
     {"AAC_Main", AAC_PROFILE_MAIN},
 };
 
 const std::unordered_map<std::string, int> VIDEO_LEVEL_MAP = {
     // H264
-    {"AVC_LEVEL_1",AVC_LEVEL_1},
-    {"AVC_LEVEL_1b",AVC_LEVEL_1b},
-    {"AVC_LEVEL_11",AVC_LEVEL_11},
-    {"AVC_LEVEL_12",AVC_LEVEL_12},
-    {"AVC_LEVEL_13",AVC_LEVEL_13},
-    {"AVC_LEVEL_2",AVC_LEVEL_2},
-    {"AVC_LEVEL_21",AVC_LEVEL_21},
-    {"AVC_LEVEL_22",AVC_LEVEL_22},
-    {"AVC_LEVEL_3",AVC_LEVEL_3},
-    {"AVC_LEVEL_31",AVC_LEVEL_31},
-    {"AVC_LEVEL_32",AVC_LEVEL_32},
-    {"AVC_LEVEL_4",AVC_LEVEL_4},
-    {"AVC_LEVEL_41",AVC_LEVEL_41},
-    {"AVC_LEVEL_42",AVC_LEVEL_42},
-    {"AVC_LEVEL_5",AVC_LEVEL_5},
-    {"AVC_LEVEL_51",AVC_LEVEL_51},
+    {"AVC_LEVEL_1", AVC_LEVEL_1},
+    {"AVC_LEVEL_1b", AVC_LEVEL_1b},
+    {"AVC_LEVEL_11", AVC_LEVEL_11},
+    {"AVC_LEVEL_12", AVC_LEVEL_12},
+    {"AVC_LEVEL_13", AVC_LEVEL_13},
+    {"AVC_LEVEL_2", AVC_LEVEL_2},
+    {"AVC_LEVEL_21", AVC_LEVEL_21},
+    {"AVC_LEVEL_22", AVC_LEVEL_22},
+    {"AVC_LEVEL_3", AVC_LEVEL_3},
+    {"AVC_LEVEL_31", AVC_LEVEL_31},
+    {"AVC_LEVEL_32", AVC_LEVEL_32},
+    {"AVC_LEVEL_4", AVC_LEVEL_4},
+    {"AVC_LEVEL_41", AVC_LEVEL_41},
+    {"AVC_LEVEL_42", AVC_LEVEL_42},
+    {"AVC_LEVEL_5", AVC_LEVEL_5},
+    {"AVC_LEVEL_51", AVC_LEVEL_51},
     // H265
-    {"HEVC_LEVEL_1",HEVC_LEVEL_1},
-    {"HEVC_LEVEL_2",HEVC_LEVEL_2},
-    {"HEVC_LEVEL_21",HEVC_LEVEL_21},
-    {"HEVC_LEVEL_3",HEVC_LEVEL_3},
-    {"HEVC_LEVEL_31",HEVC_LEVEL_31},
-    {"HEVC_LEVEL_4",HEVC_LEVEL_4},
-    {"HEVC_LEVEL_41",HEVC_LEVEL_41},
-    {"HEVC_LEVEL_5",HEVC_LEVEL_5},
-    {"HEVC_LEVEL_51",HEVC_LEVEL_51},
-    {"HEVC_LEVEL_52",HEVC_LEVEL_52},
-    {"HEVC_LEVEL_6",HEVC_LEVEL_6},
-    {"HEVC_LEVEL_61",HEVC_LEVEL_61},
-    {"HEVC_LEVEL_62",HEVC_LEVEL_62},
+    {"HEVC_LEVEL_1", HEVC_LEVEL_1},
+    {"HEVC_LEVEL_2", HEVC_LEVEL_2},
+    {"HEVC_LEVEL_21", HEVC_LEVEL_21},
+    {"HEVC_LEVEL_3", HEVC_LEVEL_3},
+    {"HEVC_LEVEL_31", HEVC_LEVEL_31},
+    {"HEVC_LEVEL_4", HEVC_LEVEL_4},
+    {"HEVC_LEVEL_41", HEVC_LEVEL_41},
+    {"HEVC_LEVEL_5", HEVC_LEVEL_5},
+    {"HEVC_LEVEL_51", HEVC_LEVEL_51},
+    {"HEVC_LEVEL_52", HEVC_LEVEL_52},
+    {"HEVC_LEVEL_6", HEVC_LEVEL_6},
+    {"HEVC_LEVEL_61", HEVC_LEVEL_61},
+    {"HEVC_LEVEL_62", HEVC_LEVEL_62},
 
-    {"MPEG2_LEVEL_LL",MPEG2_LEVEL_LL},
-    {"MPEG2_LEVEL_ML",MPEG2_LEVEL_ML},
-    {"MPEG2_LEVEL_H14",MPEG2_LEVEL_H14},
-    {"MPEG2_LEVEL_HL",MPEG2_LEVEL_HL},
+    {"MPEG2_LEVEL_LL", MPEG2_LEVEL_LL},
+    {"MPEG2_LEVEL_ML", MPEG2_LEVEL_ML},
+    {"MPEG2_LEVEL_H14", MPEG2_LEVEL_H14},
+    {"MPEG2_LEVEL_HL", MPEG2_LEVEL_HL},
 
-    {"MPEG4_LEVEL_0",MPEG4_LEVEL_0},
-    {"MPEG4_LEVEL_0B",MPEG4_LEVEL_0B},
-    {"MPEG4_LEVEL_1",MPEG4_LEVEL_1},
-    {"MPEG4_LEVEL_2",MPEG4_LEVEL_2},
-    {"MPEG4_LEVEL_3",MPEG4_LEVEL_3},
-    {"MPEG4_LEVEL_4",MPEG4_LEVEL_4},
-    {"MPEG4_LEVEL_4A",MPEG4_LEVEL_4A},
-    {"MPEG4_LEVEL_5",MPEG4_LEVEL_5},
+    {"MPEG4_LEVEL_0", MPEG4_LEVEL_0},
+    {"MPEG4_LEVEL_0B", MPEG4_LEVEL_0B},
+    {"MPEG4_LEVEL_1", MPEG4_LEVEL_1},
+    {"MPEG4_LEVEL_2", MPEG4_LEVEL_2},
+    {"MPEG4_LEVEL_3", MPEG4_LEVEL_3},
+    {"MPEG4_LEVEL_4", MPEG4_LEVEL_4},
+    {"MPEG4_LEVEL_4A", MPEG4_LEVEL_4A},
+    {"MPEG4_LEVEL_5", MPEG4_LEVEL_5},
 };
 
 const std::unordered_map<std::string, int> VIDEO_FORMAT_MAP = {
-    {"YUV420P", YUV420P},
-    {"NV12", NV12},
-    {"NV21", NV21},
-    {"RGBA", RGBA},
-    {"BGRA", BGRA},
+    {"YUV420P", YUV420P}, {"NV12", NV12}, {"NV21", NV21}, {"RGBA", RGBA}, {"BGRA", BGRA},
 };
 
 const std::unordered_map<std::string, int> AUDIO_BITDEPTH_MAP = {
@@ -235,16 +227,16 @@ bool CodeclistXmlParser::ParseInternal(xmlNode *node)
     for (; currNode != nullptr; currNode = currNode->next) {
         if (currNode->type == XML_ELEMENT_NODE) {
             switch (GetNodeNameAsInt(currNode)) {
-                case AUDIO_DECODER:
-                case AUDIO_ENCODER:
-                case VIDEO_DECODER:
-                case VIDEO_ENCODER: {
-                    ParseData(currNode);
-                    break;
-                }
-                default:
-                    ParseInternal(currNode->children);
-                    break;
+            case AUDIO_DECODER:
+            case AUDIO_ENCODER:
+            case VIDEO_DECODER:
+            case VIDEO_ENCODER: {
+                ParseData(currNode);
+                break;
+            }
+            default:
+                ParseInternal(currNode->children);
+                break;
             }
         }
     }
@@ -315,9 +307,9 @@ std::vector<int32_t> CodeclistXmlParser::TransStrAsIntegerArray(const std::vecto
     return array;
 }
 
-std::vector<int32_t> CodeclistXmlParser::TransMapAsIntegerArray(
-    const std::unordered_map<std::string, int> &capabilityMap,
-    const std::vector<std::string> &spilt)
+std::vector<int32_t>
+CodeclistXmlParser::TransMapAsIntegerArray(const std::unordered_map<std::string, int> &capabilityMap,
+                                           const std::vector<std::string> &spilt)
 {
     std::vector<int32_t> res;
     for (auto iter = spilt.begin(); iter != spilt.end(); iter++) {
@@ -330,8 +322,7 @@ std::vector<int32_t> CodeclistXmlParser::TransMapAsIntegerArray(
     return res;
 }
 
-bool CodeclistXmlParser::SpiltKeyList(const std::string &str, const std::string &delim,
-    std::vector<std::string> &spilt)
+bool CodeclistXmlParser::SpiltKeyList(const std::string &str, const std::string &delim, std::vector<std::string> &spilt)
 {
     if (str == "") {
         return false;
@@ -352,34 +343,33 @@ bool CodeclistXmlParser::SpiltKeyList(const std::string &str, const std::string 
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilityStringData(std::unordered_map<std::string, std::string&> dataMap,
-    const std::string &capabilityKey, const std::string &capabilityValue)
+bool CodeclistXmlParser::SetCapabilityStringData(std::unordered_map<std::string, std::string &> dataMap,
+                                                 const std::string &capabilityKey, const std::string &capabilityValue)
 {
-    AVCODEC_LOGE("Get %{public}s: %{public}s", capabilityKey.c_str(),capabilityValue.c_str());
+    AVCODEC_LOGE("Get %{public}s: %{public}s", capabilityKey.c_str(), capabilityValue.c_str());
     dataMap.at(capabilityKey) = capabilityValue;
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilityIntData(std::unordered_map<std::string, int32_t&> dataMap,
-    const std::string &capabilityKey, const std::string &capabilityValue)
+bool CodeclistXmlParser::SetCapabilityIntData(std::unordered_map<std::string, int32_t &> dataMap,
+                                              const std::string &capabilityKey, const std::string &capabilityValue)
 {
-    if(capabilityKey == "codecType") {
-        // AVCODEC_LOGE("Get codecType: %{public}s", capabilityValue.c_str());
+    if (capabilityKey == "codecType") {
         if (CODEC_TYPE_MAP.find(capabilityValue) == CODEC_TYPE_MAP.end()) {
             return false;
-        } 
+        }
         dataMap.at(capabilityKey) = CODEC_TYPE_MAP.at(capabilityValue);
         AVCODEC_LOGD("The value of %{public}s in the configuration file is incorrect.", capabilityValue.c_str());
     } else {
-        if(!StrToInt(capabilityValue, dataMap.at(capabilityKey))){
+        if (!StrToInt(capabilityValue, dataMap.at(capabilityKey))) {
             return false;
         }
     }
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilityBoolData(std::unordered_map<std::string, bool&> dataMap,
-    const std::string &capabilityKey, const std::string &capabilityValue)
+bool CodeclistXmlParser::SetCapabilityBoolData(std::unordered_map<std::string, bool &> dataMap,
+                                               const std::string &capabilityKey, const std::string &capabilityValue)
 {
     if (capabilityValue == "true") {
         dataMap.at(capabilityKey) = true;
@@ -392,8 +382,8 @@ bool CodeclistXmlParser::SetCapabilityBoolData(std::unordered_map<std::string, b
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilityRangeData(std::unordered_map<std::string, Range&> dataMap,
-    const std::string &capabilityKey, const std::string &capabilityValue)
+bool CodeclistXmlParser::SetCapabilityRangeData(std::unordered_map<std::string, Range &> dataMap,
+                                                const std::string &capabilityKey, const std::string &capabilityValue)
 {
     Range range;
     bool ret = TransStrAsRange(capabilityValue, range);
@@ -402,8 +392,8 @@ bool CodeclistXmlParser::SetCapabilityRangeData(std::unordered_map<std::string, 
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilitySizeData(std::unordered_map<std::string, ImgSize&> dataMap,
-    const std::string &capabilityKey, const std::string &capabilityValue)
+bool CodeclistXmlParser::SetCapabilitySizeData(std::unordered_map<std::string, ImgSize &> dataMap,
+                                               const std::string &capabilityKey, const std::string &capabilityValue)
 {
     ImgSize size;
     bool ret = TransStrAsSize(capabilityValue, size);
@@ -412,8 +402,9 @@ bool CodeclistXmlParser::SetCapabilitySizeData(std::unordered_map<std::string, I
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilityHashRangeData(std::unordered_map<std::string, std::map<ImgSize, Range>&> dataMap,
-    const std::string &capabilityKey, const std::string &capabilityValue)
+bool CodeclistXmlParser::SetCapabilityHashRangeData(std::unordered_map<std::string, std::map<ImgSize, Range> &> dataMap,
+                                                    const std::string &capabilityKey,
+                                                    const std::string &capabilityValue)
 {
     std::map<ImgSize, Range> resolutionFrameRateMap;
     std::vector<std::string> spilt;
@@ -425,7 +416,7 @@ bool CodeclistXmlParser::SetCapabilityHashRangeData(std::unordered_map<std::stri
         Range frameRate;
         ret = SpiltKeyList(*iter, "@", resolutionFrameRateVector);
         CHECK_AND_RETURN_RET_LOG(ret != false && resolutionFrameRateVector.size() == PAIR_LENGTH, false,
-            "failed:can not trans %{public}s", iter->c_str());
+                                 "failed:can not trans %{public}s", iter->c_str());
         if (!(TransStrAsSize(resolutionFrameRateVector[0], resolution) &&
               TransStrAsRange(resolutionFrameRateVector[1], frameRate))) {
             AVCODEC_LOGD("failed:can not trans %{public}s for resolution or frame rate", iter->c_str());
@@ -437,10 +428,11 @@ bool CodeclistXmlParser::SetCapabilityHashRangeData(std::unordered_map<std::stri
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilityHashVectorData(std::unordered_map<std::string, std::map<int32_t, std::vector<int32_t>>&> dataMap,
+bool CodeclistXmlParser::SetCapabilityHashVectorData(
+    std::unordered_map<std::string, std::map<int32_t, std::vector<int32_t>> &> dataMap,
     const std::string &capabilityKey, const std::string &capabilityValue)
 {
-    std::map<int32_t, std::vector<int32_t>> profileLevelsMap; //profileLevelsMap;
+    std::map<int32_t, std::vector<int32_t>> profileLevelsMap;
     std::vector<std::string> spilt;
     bool ret = SpiltKeyList(capabilityValue, ",", spilt);
     CHECK_AND_RETURN_RET_LOG(ret != false, false, "failed:can not split %{public}s", capabilityValue.c_str());
@@ -451,7 +443,7 @@ bool CodeclistXmlParser::SetCapabilityHashVectorData(std::unordered_map<std::str
         std::vector<int32_t> array;
         ret = SpiltKeyList(*iter, "@", profileLevelsVector);
         CHECK_AND_RETURN_RET_LOG(ret != false && profileLevelsVector.size() == PAIR_LENGTH, false,
-            "failed:can not trans %{public}s", iter->c_str());
+                                 "failed:can not trans %{public}s", iter->c_str());
         if (VIDEO_PROFILE_MAP.find(profileLevelsVector[0]) != VIDEO_PROFILE_MAP.end()) {
             profileKey = VIDEO_PROFILE_MAP.at(profileLevelsVector[0]);
         } else if (AUDIO_PROFILE_MAP.find(profileLevelsVector[0]) != AUDIO_PROFILE_MAP.end()) {
@@ -460,15 +452,15 @@ bool CodeclistXmlParser::SetCapabilityHashVectorData(std::unordered_map<std::str
             return false;
         }
         ret = SpiltKeyList(profileLevelsVector[1], "#", LevelValsVector);
-        CHECK_AND_RETURN_RET_LOG(ret != false && LevelValsVector.size() > 0, false,
-            "failed:can not trans %{public}s", profileLevelsVector[1].c_str());
+        CHECK_AND_RETURN_RET_LOG(ret != false && LevelValsVector.size() > 0, false, "failed:can not trans %{public}s",
+                                 profileLevelsVector[1].c_str());
         std::string lev = LevelValsVector[0];
         if (VIDEO_LEVEL_MAP.find(lev) != VIDEO_LEVEL_MAP.end()) {
             array = TransMapAsIntegerArray(VIDEO_LEVEL_MAP, LevelValsVector);
         }
         profileLevelsMap.insert(std::make_pair(profileKey, array));
-        AVCODEC_LOGE("Profile: %{public}s=%{public}d, level0: %{public}s=%{public}d",
-        profileLevelsVector[0].c_str(),profileKey, profileLevelsVector[1].c_str(), array[0]  );
+        AVCODEC_LOGE("Profile: %{public}s=%{public}d, level0: %{public}s=%{public}d", profileLevelsVector[0].c_str(),
+                     profileKey, profileLevelsVector[1].c_str(), array[0]);
     }
     dataMap.at(capabilityKey) = profileLevelsMap;
     return true;
@@ -486,8 +478,8 @@ bool CodeclistXmlParser::IsNumberArray(const std::vector<std::string> &strArray)
     return true;
 }
 
-bool CodeclistXmlParser::SetCapabilityVectorData(std::unordered_map<std::string, std::vector<int32_t>&> dataMap,
-    const std::string &capabilityKey, const std::string &capabilityValue)
+bool CodeclistXmlParser::SetCapabilityVectorData(std::unordered_map<std::string, std::vector<int32_t> &> dataMap,
+                                                 const std::string &capabilityKey, const std::string &capabilityValue)
 {
     std::vector<std::string> spilt;
     std::vector<int32_t> array;
@@ -517,30 +509,41 @@ bool CodeclistXmlParser::SetCapabilityVectorData(std::unordered_map<std::string,
 }
 
 bool CodeclistXmlParser::SetCapabilityData(CapabilityData &data, const std::string &capabilityKey,
-                                         const std::string &capabilityValue) const
+                                           const std::string &capabilityValue) const
 {
-    std::unordered_map<std::string, std::string&> capabilityStringMap = {
-        {"codecName", data.codecName}, {"mimeType", data.mimeType}};
+    std::unordered_map<std::string, std::string &> capabilityStringMap = {{"codecName", data.codecName},
+                                                                          {"mimeType", data.mimeType}};
 
-    std::unordered_map<std::string, int32_t&> capabilityIntMap = {{"codecType", data.codecType}, {"maxInstance", data.maxInstance}};
+    std::unordered_map<std::string, int32_t &> capabilityIntMap = {{"codecType", data.codecType},
+                                                                   {"maxInstance", data.maxInstance}};
 
-    std::unordered_map<std::string, bool&> capabilityBoolMap = {{"isVendor", data.isVendor}, {"supportSwapWidthHeight", data.supportSwapWidthHeight}};
+    std::unordered_map<std::string, bool &> capabilityBoolMap = {
+        {"isVendor", data.isVendor},
+        {"supportSwapWidthHeight", data.supportSwapWidthHeight}};
 
-    std::unordered_map<std::string, ImgSize&> capabilitySizeMap = {{"blockSize", data.blockSize}, {"alignment", data.alignment}};
+    std::unordered_map<std::string, ImgSize &> capabilitySizeMap = {{"blockSize", data.blockSize},
+                                                                    {"alignment", data.alignment}};
 
-    std::unordered_map<std::string, std::map<ImgSize, Range>&> capabilityHashRangeMap = {
+    std::unordered_map<std::string, std::map<ImgSize, Range> &> capabilityHashRangeMap = {
         {"measuredFrameRate", data.measuredFrameRate}};
 
-    std::unordered_map<std::string, Range&> capabilityRangeMap = {
-        {"bitrate", data.bitrate}, {"channels", data.channels}, {"complexity", data.complexity},
-        {"width", data.width}, {"height", data.height}, {"frameRate", data.frameRate},
-        {"encodeQuality", data.encodeQuality}, {"blockPerFrame", data.blockPerFrame}, {"blockPerSecond", data.blockPerSecond}};
+    std::unordered_map<std::string, Range &> capabilityRangeMap = {{"bitrate", data.bitrate},
+                                                                   {"channels", data.channels},
+                                                                   {"complexity", data.complexity},
+                                                                   {"width", data.width},
+                                                                   {"height", data.height},
+                                                                   {"frameRate", data.frameRate},
+                                                                   {"encodeQuality", data.encodeQuality},
+                                                                   {"blockPerFrame", data.blockPerFrame},
+                                                                   {"blockPerSecond", data.blockPerSecond}};
 
-    std::unordered_map<std::string, std::vector<int32_t>&> capabilityVectorMap = {
-        {"sampleRate", data.sampleRate}, {"pixFormat", data.pixFormat}, {"bitDepth", data.bitDepth},
-        {"profiles", data.profiles}, {"bitrateMode", data.bitrateMode}};
+    std::unordered_map<std::string, std::vector<int32_t> &> capabilityVectorMap = {{"sampleRate", data.sampleRate},
+                                                                                   {"pixFormat", data.pixFormat},
+                                                                                   {"bitDepth", data.bitDepth},
+                                                                                   {"profiles", data.profiles},
+                                                                                   {"bitrateMode", data.bitrateMode}};
 
-    std::unordered_map<std::string, std::map<int32_t, std::vector<int32_t>>&> capabilityHashVectorMap = {
+    std::unordered_map<std::string, std::map<int32_t, std::vector<int32_t>> &> capabilityHashVectorMap = {
         {"profileLevelsMap", data.profileLevelsMap}};
 
     bool ret = false;
@@ -565,7 +568,7 @@ bool CodeclistXmlParser::SetCapabilityData(CapabilityData &data, const std::stri
     } else if (capabilityVectorMap.find(capabilityKey) != capabilityVectorMap.end()) {
         ret = SetCapabilityVectorData(capabilityVectorMap, capabilityKey, capabilityValue);
         CHECK_AND_RETURN_RET_LOG(ret != false, false, "SetCapabilityVectorData failed");
-    }else if (capabilityHashVectorMap.find(capabilityKey) != capabilityHashVectorMap.end()) {
+    } else if (capabilityHashVectorMap.find(capabilityKey) != capabilityHashVectorMap.end()) {
         ret = SetCapabilityHashVectorData(capabilityHashVectorMap, capabilityKey, capabilityValue);
         CHECK_AND_RETURN_RET_LOG(ret != false, false, "SetCapabilityVectorData failed");
     } else {
@@ -580,16 +583,16 @@ bool CodeclistXmlParser::ParseData(xmlNode *node)
     std::string capabilityValue;
     CapabilityData capabilityData;
     for (; child != nullptr; child = child->next) {
-        if (!xmlStrEqual(child->name, reinterpret_cast<const xmlChar*>("Item"))) {
+        if (!xmlStrEqual(child->name, reinterpret_cast<const xmlChar *>("Item"))) {
             continue;
         }
         for (auto it = capabilityKeys_.begin(); it != capabilityKeys_.end(); it++) {
             std::string capabilityKey = *it;
-            if (xmlHasProp(child, reinterpret_cast<xmlChar*>(const_cast<char*>(capabilityKey.c_str())))) {
-                xmlChar *pXmlProp = xmlGetProp(
-                    child, reinterpret_cast<xmlChar*>(const_cast<char*>(capabilityKey.c_str())));
-                CHECK_AND_CONTINUE_LOG(pXmlProp != nullptr, "SetCapabilityData failed"); //TODO
-                capabilityValue = std::string(reinterpret_cast<char*>(pXmlProp));
+            if (xmlHasProp(child, reinterpret_cast<xmlChar *>(const_cast<char *>(capabilityKey.c_str())))) {
+                xmlChar *pXmlProp =
+                    xmlGetProp(child, reinterpret_cast<xmlChar *>(const_cast<char *>(capabilityKey.c_str())));
+                CHECK_AND_CONTINUE_LOG(pXmlProp != nullptr, "SetCapabilityData failed");
+                capabilityValue = std::string(reinterpret_cast<char *>(pXmlProp));
                 bool ret = SetCapabilityData(capabilityData, capabilityKey, capabilityValue);
                 CHECK_AND_RETURN_RET_LOG(ret != false, false, "SetCapabilityData failed");
                 break;
@@ -602,19 +605,19 @@ bool CodeclistXmlParser::ParseData(xmlNode *node)
 
 NodeName CodeclistXmlParser::GetNodeNameAsInt(xmlNode *node)
 {
-    if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar*>("Codecs"))) {
+    if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar *>("Codecs"))) {
         return CODECS;
-    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar*>("AudioCodecs"))) {
+    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar *>("AudioCodecs"))) {
         return AUDIO_CODECS;
-    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar*>("VideoCodecs"))) {
+    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar *>("VideoCodecs"))) {
         return VIDEO_CODECS;
-    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar*>("AudioDecoder"))) {
+    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar *>("AudioDecoder"))) {
         return AUDIO_DECODER;
-    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar*>("AudioEncoder"))) {
+    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar *>("AudioEncoder"))) {
         return AUDIO_ENCODER;
-    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar*>("VideoDecoder"))) {
+    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar *>("VideoDecoder"))) {
         return VIDEO_DECODER;
-    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar*>("VideoEncoder"))) {
+    } else if (xmlStrEqual(node->name, reinterpret_cast<const xmlChar *>("VideoEncoder"))) {
         return VIDEO_ENCODER;
     } else {
         return UNKNOWN;

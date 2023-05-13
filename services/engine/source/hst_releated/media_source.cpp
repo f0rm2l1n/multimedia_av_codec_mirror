@@ -14,7 +14,7 @@
  */
 
 #include "media_source.h"
-#include <type_traits>
+
 namespace OHOS {
 namespace Media {
 namespace Plugin {
@@ -32,7 +32,6 @@ const std::string &MediaSource::GetSourceUri() const
 {
     return uri_;
 }
-
 } // namespace Plugin
 } // namespace Media
 } // namespace OHOS

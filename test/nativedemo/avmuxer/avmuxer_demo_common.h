@@ -15,28 +15,43 @@
 
 #ifndef AVMUXER_DEMO_COMMON_H
 #define AVMUXER_DEMO_COMMON_H
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 // only for demo
-typedef struct AudioTrackParam {
+struct AudioTrackParam {
     const char *fileName;
     const char *mimeType;
     int sampleRate;
     int channels;
-} AudioTrackParam;
+};
 
-typedef struct VideoTrackParam {
+struct VideoTrackParam {
     const char *fileName;
     const char *mimeType;
     int width;
     int height;
-} VideoTrackParam;
+};
 
-typedef struct FdListStr {
+struct FdListStr {
     int start[0];
     int outputFd;
     int inAudioFd;
     int inVideoFd;
     int inCoverFd;
-} FdListStr;
+};
 
+extern struct AudioTrackParam g_audioMpegPar;
+extern struct AudioTrackParam g_audioAacPar;
+extern struct VideoTrackParam g_videoH264Par;
+extern struct VideoTrackParam g_videoMpeg4Par;
+extern struct VideoTrackParam g_jpegCoverPar;
+extern struct VideoTrackParam g_pngCoverPar;
+extern struct VideoTrackParam g_bmpCoverPar;
+extern const char *RUN_NORMAL;
+extern const char *RUN_MUL_THREAD;
+
+#ifdef __cplusplus
+}
+#endif
 #endif

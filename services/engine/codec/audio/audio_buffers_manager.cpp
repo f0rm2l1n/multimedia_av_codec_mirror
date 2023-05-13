@@ -22,8 +22,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-
 constexpr short DEFALT_BUFFER_LENGTH{8};
+constexpr short DEFALT_SLEEP_TIME{500};
 
 AudioBuffersManager::~AudioBuffersManager() {}
 
@@ -83,7 +83,7 @@ bool AudioBuffersManager::RequestAvialbaleIndex(uint32_t *index)
     while (inBufIndexQue_.empty() && isRunning_) {
         AVCODEC_LOGD("Request empty %{public}s buffer", name_.data());
         std::unique_lock aLock(avilableMuxt_);
-        avilableCondition_.wait_for(aLock, std::chrono::milliseconds(500),
+        avilableCondition_.wait_for(aLock, std::chrono::milliseconds(DEFALT_SLEEP_TIME),
                                     [this] { return !inBufIndexQue_.empty() || !isRunning_; });
     }
 
@@ -133,6 +133,5 @@ std::shared_ptr<AudioBufferInfo> AudioBuffersManager::createNewBuffer()
     bufferInfo_.emplace_back(buffer);
     return buffer;
 }
-
 } // namespace Media
 } // namespace OHOS

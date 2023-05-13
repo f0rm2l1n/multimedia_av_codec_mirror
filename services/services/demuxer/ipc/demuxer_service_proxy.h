@@ -23,20 +23,16 @@ class DemuxerServiceProxy : public IRemoteProxy<IStandardDemuxerService>, public
 public:
     explicit DemuxerServiceProxy(const sptr<IRemoteObject> &impl);
     virtual ~DemuxerServiceProxy();
-
-    // 业务
     int32_t Init(uint64_t sourceAddr) override;
     int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
     int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) override;
+    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) override;
-
     int32_t DestroyStub() override;
-
 private:
     static inline BrokerDelegator<DemuxerServiceProxy> delegator_;
 };
-
 }  // namespace Media
 }  // namespace OHOS
 #endif  // DEMUXER_SERVICE_PROXY_H

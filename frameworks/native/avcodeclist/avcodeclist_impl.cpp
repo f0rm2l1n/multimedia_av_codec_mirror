@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "avcodeclist_impl.h"
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
 #include "i_avcodec_service.h"
+#include "avcodeclist_impl.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecListImpl"};
@@ -63,7 +63,6 @@ std::string AVCodecListImpl::FindEncoder(const Format &format)
 {
     return codecListService_->FindEncoder(format);
 }
-
 
 CapabilityData AVCodecListImpl::CreateCapability(std::string codecName)
 {

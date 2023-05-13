@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,17 +16,17 @@
 #ifndef AV_CODEC_BUFFER_INFO_H
 #define AV_CODEC_BUFFER_INFO_H
 
-#include "audio_common_info.h"
-#include "avcodec_common.h"
-#include "avsharedmemorybase.h"
-#include "nocopyable.h"
 #include <atomic>
 #include <memory>
 #include <vector>
 
+#include "audio_common_info.h"
+#include "avcodec_common.h"
+#include "avsharedmemorybase.h"
+#include "nocopyable.h"
+
 namespace OHOS {
 namespace Media {
-
 class AudioBufferInfo : public NoCopyable {
 public:
     AudioBufferInfo(const uint32_t &bufferSize, const std::string_view &name, const uint32_t &metaSize = 0,
@@ -70,7 +70,6 @@ private:
     AVCodecBufferInfo info_;
     AVCodecBufferFlag flag_;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif

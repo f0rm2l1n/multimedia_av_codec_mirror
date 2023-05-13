@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Media {
-
 enum class BufferStatus {
     IDEL,
     OWNE_BY_CLIENT,
@@ -37,7 +36,6 @@ enum class CodecState {
     RESUMING,   // FLUSHED -> RUNNING
     RRELEASING, // {ANY EXCEPT RELEASED} -> RELEASED
 };
-
 } // namespace Media
 } // namespace OHOS
 

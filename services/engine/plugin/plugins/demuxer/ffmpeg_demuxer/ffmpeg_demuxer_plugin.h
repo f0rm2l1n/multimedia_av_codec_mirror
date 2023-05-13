@@ -17,12 +17,12 @@
 #define FFMPEG_DEMUXER_PLUGIN_H
 
 #include <iostream>
-#include <stddef.h>
+#include <cstddef>
 #include <memory>
 #include <vector>
 #include <map>
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 #include "libavformat/avformat.h"
@@ -37,37 +37,36 @@ extern "C" {
 #include "avcodec_common.h"
 #include "avsharedmemory.h"
 
-namespace OHOS{
-namespace Media{
-namespace Plugin{
-namespace FFmpeg{
+namespace OHOS {
+namespace Media {
+namespace Plugin {
+namespace FFmpeg {
 class FFmpegDemuxerPlugin : public DemuxerPlugin {
 public:
     FFmpegDemuxerPlugin();
     ~FFmpegDemuxerPlugin();
-    
     int32_t Create(uintptr_t sourceAddr) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t* buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) override;
+    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t* buffer,
+                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
     int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
     int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
     int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) override;
     std::vector<uint32_t> GetSelectedTrackIds();
-
 private:
     bool IsInSelectedTrack(uint32_t trackIndex);
     AVCodecBufferFlag ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream);
     int64_t GetTotalStreamFrames(int streamIndex);
     int32_t SetBitStreamFormat();
+    int32_t ConvertAVPacketToSample(AVStream* avStream, uint8_t* buffer, AVCodecBufferInfo &bufferInfo,
+                                    AVCodecBufferFlag &flag, AVPacket* pkt);
     void ConvertAvcOrHevcToAnnexb(AVPacket& pkt);
     void InitBitStreamContext(const AVStream& avStream);
-
+    int64_t CalculateTimeByFrameIndex(AVStream* avStream, int keyFrameIdx);
     std::vector<uint32_t> selectedTrackIds_;
-    // OSAL::Mutex mutex_ {};
     std::shared_ptr<AVFormatContext> formatContext_;
     std::shared_ptr<AVBSFContext> avbsfContext_ {nullptr};
     std::map<uint32_t, VideoBitStreamFormat> videoBitStreamFormat_;
     std::map<uint32_t, uint64_t> sampleIndex_;
-
 };
 } // namespace FFmpeg
 } // namespace Plugin

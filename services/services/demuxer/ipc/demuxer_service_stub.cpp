@@ -100,22 +100,23 @@ int32_t DemuxerServiceStub::Init(uint64_t sourceAddr)
     return demuxerServer_->Init(sourceAddr);
 }
 
-int32_t DemuxerServiceStub::SelectSourceTrackByID(uint32_t index)
+int32_t DemuxerServiceStub::SelectSourceTrackByID(uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->SelectSourceTrackByID(index);
+    return demuxerServer_->SelectSourceTrackByID(trackIndex);
 }
 
-int32_t DemuxerServiceStub::UnselectSourceTrackByID(uint32_t index)
+int32_t DemuxerServiceStub::UnselectSourceTrackByID(uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->UnselectSourceTrackByID(index);
+    return demuxerServer_->UnselectSourceTrackByID(trackIndex);
 }
 
-int32_t DemuxerServiceStub::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag)
+int32_t DemuxerServiceStub::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->CopyNextSample(trackIndex, buffer, bufferInfo,flag);
+    return demuxerServer_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
 }
 
 int32_t DemuxerServiceStub::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
@@ -139,53 +140,55 @@ int32_t DemuxerServiceStub::DumpInfo(int32_t fd)
 int32_t DemuxerServiceStub::Init(MessageParcel &data, MessageParcel &reply)
 {
     uint64_t sourceAddr = data.ReadUint64();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(sourceAddr)), AVCS_ERR_UNKNOWN, "");   
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(sourceAddr)), AVCS_ERR_UNKNOWN, "Reply Init failed!");   
     return AVCS_ERR_OK;
 }
 
 int32_t DemuxerServiceStub::SelectSourceTrackByID(MessageParcel &data, MessageParcel &reply)
 {
-    uint32_t index = data.ReadUint32();
+    uint32_t trackIndex = data.ReadUint32();
 
-    // TODO: 添加LOG描述
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SelectSourceTrackByID(index)), AVCS_ERR_UNKNOWN, "");   
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SelectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
+                            "Reply SelectSourceTrackByID failed!");
     return AVCS_ERR_OK;
 }
 
 int32_t DemuxerServiceStub::UnselectSourceTrackByID(MessageParcel &data, MessageParcel &reply)
 {
-    uint32_t index = data.ReadUint32();
+    uint32_t trackIndex = data.ReadUint32();
 
-    // TODO: 添加LOG描述
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(UnselectSourceTrackByID(index)), AVCS_ERR_UNKNOWN, "");   
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(UnselectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
+                            "Reply UnselectSourceTrackByID failed!");  
     return AVCS_ERR_OK;
 }
 
 int32_t DemuxerServiceStub::CopyNextSample(MessageParcel &data, MessageParcel &reply)
 {
+    (void)data;
+    uint32_t trackIndex;
     AVCodecBufferInfo info;
     AVCodecBufferFlag flag;
-    info.presentationTimeUs = data.ReadInt64();
-    info.size = data.ReadInt32();
-    info.offset = data.ReadInt32();
+    uint8_t *buffer = nullptr;
     
-    flag = static_cast<enum AVCodecBufferFlag>(data.ReadUint32());
-    uint8_t *buffer = NULL;
-    uint32_t trackIndex = data.ReadUint32();
+    int32_t ret = CopyNextSample(trackIndex, buffer, info, flag);
 
-    // TODO: 添加LOG描述
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(CopyNextSample(trackIndex, buffer, info,flag)), AVCS_ERR_UNKNOWN, "");   
+    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackIndex), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteUnpadBuffer(buffer, sizeof(buffer)), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(static_cast<uint32_t>(flag)), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
     return AVCS_ERR_OK;
 }
 
 int32_t DemuxerServiceStub::SeekToTime(MessageParcel &data, MessageParcel &reply)
 {
     int64_t mSeconds = data.ReadInt64();
-    int32_t mode = data.ReadInt32();
-    AVSeekMode seekMode = static_cast<AVSeekMode>(mode);
+    AVSeekMode seekMode = static_cast<AVSeekMode>(data.ReadInt32());
 
-    // TODO: 添加LOG描述
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(mSeconds, seekMode)), AVCS_ERR_UNKNOWN, "");   
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(mSeconds, seekMode)),
+                            AVCS_ERR_UNKNOWN, "Reply SeekToTime failed!");
     return AVCS_ERR_OK;
 }
 
@@ -203,4 +206,4 @@ int32_t DemuxerServiceStub::GetDumpInfo(std::string& dumpInfo)
     return AVCS_ERR_OK;
 }
 }  // namespace Media
-}  // namespace OHOS  
+}  // namespace OHOS

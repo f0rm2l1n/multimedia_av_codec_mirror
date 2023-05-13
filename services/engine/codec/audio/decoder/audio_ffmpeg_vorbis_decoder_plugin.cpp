@@ -26,6 +26,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
+static constexpr uint32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
+static constexpr uint32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
+
 AudioFFMpegVorbisDecoderPlugin::AudioFFMpegVorbisDecoderPlugin()
     : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
@@ -139,21 +142,20 @@ int32_t AudioFFMpegVorbisDecoderPlugin::flush()
 uint32_t AudioFFMpegVorbisDecoderPlugin::getInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
-    if (maxSize < 0 || maxSize > 8192) {
-        maxSize = 8192;
+    if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
+        maxSize = INPUT_BUFFER_SIZE_DEFAULT;
     }
     return maxSize;
 }
 
 uint32_t AudioFFMpegVorbisDecoderPlugin::getOutputBufferSize() const
 {
-    return 2 * 4096 * 2;
+    return OUTPUT_BUFFER_SIZE_DEFAULT;
 }
 
 Format AudioFFMpegVorbisDecoderPlugin::GetFormat() const noexcept
 {
     return basePlugin->GetFormat();
 }
-
 } // namespace Media
 } // namespace OHOS

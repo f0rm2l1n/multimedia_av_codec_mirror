@@ -14,13 +14,15 @@
  */
 
 #include "avcodec_audio_encoder_demo.h"
-#include "avcodec_audio_codec_key.h"
-#include "avcodec_common.h"
-#include "avcodec_errors.h"
-#include "demo_log.h"
 #include "securec.h"
 #include <iostream>
 #include <unistd.h>
+#include "avcodec_common.h"
+#include "avcodec_errors.h"
+#include "media_description.h"
+#include "native_avformat.h"
+#include "demo_log.h"
+#include "native_avcodec_base.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -30,10 +32,15 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 169000;
-constexpr uint32_t BITS_PER_CODED_RATE = 4;
+constexpr uint32_t BITS_PER_CODED_RATE = 16;
 constexpr uint32_t FRAME_DURATION_US = 33000;
-constexpr uint32_t DEFAULT_FRAME_COUNT = 1;
-} // namespace
+constexpr uint32_t CHANNEL_LAYOUT = 3;
+constexpr int32_t SAMPLE_FORMAT = 1;
+
+// constexpr uint32_t DEFAULT_FRAME_COUNT = 1;
+constexpr string_view inputFilePath = "/data/encoderTest.pcm";
+constexpr string_view outputFilePath = "/data/encoderTest.flac";
+}
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
 {
@@ -71,8 +78,46 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
     unique_lock<mutex> lock(signal_->outMutex_);
     signal_->outQueue_.push(index);
     signal_->outBufferQueue_.push(data);
-    signal_->attrQueue_.push(attr);
+    if (attr) {
+        cout << "OnOutputBufferAvailable received, index:" << index << ", attr->size:" << attr->size <<", attr->flags:" << attr->flags<< endl;
+        signal_->attrQueue_.push(*attr);
+	} else {
+	    cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
+	}
     signal_->outCond_.notify_all();
+}
+
+void AEncDemo::RunCase()
+{
+    std::cout << "RunCase enter" << std::endl;
+    DEMO_CHECK_AND_RETURN_LOG(CreateEnc() == AVCS_ERR_OK, "Fatal: CreateEnc fail");
+
+    OH_AVFormat *format = OH_AVFormat_Create();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(), BITS_PER_CODED_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+
+    DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
+
+    DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
+
+    while (isRunning_.load()) {
+        sleep(1);
+    }
+
+    DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
+    DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
+}
+
+AEncDemo::AEncDemo()
+{
+    frameCount_ = 0;
+    isRunning_ = false;
+    inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
+    // outputFile_ = std::make_unique<std::ofstream>(outputFilePath, std::ios::binary);
 }
 
 AEncDemo::~AEncDemo()
@@ -84,27 +129,9 @@ AEncDemo::~AEncDemo()
     }
 }
 
-void AEncDemo::RunCase()
+int32_t AEncDemo::CreateEnc()
 {
-    DEMO_CHECK_AND_RETURN_LOG(CreateDec() == AVCS_ERR_OK, "Fatal: CreateDec fail");
-
-    OH_AVFormat *format = OH_AVFormat_Create();
-    OH_AVFormat_SetIntValue(format, "channel_count", CHANNEL_COUNT);
-    OH_AVFormat_SetIntValue(format, "sample_rate", SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, "bits_per_coded-rate", BITS_PER_CODED_RATE);
-    OH_AVFormat_SetLongValue(format, "bitrate", BITS_RATE);
-
-    DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
-
-    DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
-    sleep(3); // start run 3s
-    DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
-    DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
-}
-
-int32_t AEncDemo::CreateDec()
-{
-    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_ENCODER_AAC_NAME_KEY).data());
+    audioEnc_ = OH_AudioEncoder_CreateByName("OH.Media.Codec.FLAC.FFMPEGFlacEncoder");
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();
@@ -126,10 +153,6 @@ int32_t AEncDemo::Start()
 {
     isRunning_.store(true);
 
-    testFile_ = std::make_unique<std::ifstream>();
-    DEMO_CHECK_AND_RETURN_RET_LOG(testFile_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
-    testFile_->open("/data/media/video.pcm", std::ios::in | std::ios::binary);
-
     inputLoop_ = make_unique<thread>(&AEncDemo::InputFunc, this);
     DEMO_CHECK_AND_RETURN_RET_LOG(inputLoop_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
 
@@ -148,7 +171,6 @@ int32_t AEncDemo::Stop()
         signal_->inCond_.notify_all();
         lock.unlock();
         inputLoop_->join();
-        inputLoop_.reset();
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
@@ -156,14 +178,12 @@ int32_t AEncDemo::Stop()
         signal_->outCond_.notify_all();
         lock.unlock();
         outputLoop_->join();
-        outputLoop_.reset();
     }
 
     return OH_AudioEncoder_Stop(audioEnc_);
 }
 
-int32_t AEncDemo::Flush()
-{
+int32_t AEncDemo::Flush() {
     return OH_AudioEncoder_Flush(audioEnc_);
 }
 
@@ -179,13 +199,18 @@ int32_t AEncDemo::Release()
 
 void AEncDemo::InputFunc()
 {
+    DEMO_CHECK_AND_RETURN_LOG(inputFile_ != nullptr && inputFile_->is_open(), "Fatal: open file fail");
+    inputFile_->seekg (0, ios::end);
+    int32_t fsize = inputFile_->tellg();
+    inputFile_->seekg(0, ios::beg);
+
     while (true) {
         if (!isRunning_.load()) {
             break;
         }
 
         unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.wait(lock, [this]() { return signal_->inQueue_.size() > 0; });
+        signal_->inCond_.wait(lock, [this]() { return (signal_->inQueue_.size() > 0 || !isRunning_.load()); });
 
         if (!isRunning_.load()) {
             break;
@@ -194,10 +219,26 @@ void AEncDemo::InputFunc()
         uint32_t index = signal_->inQueue_.front();
         auto buffer = signal_->inBufferQueue_.front();
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
-        DEMO_CHECK_AND_BREAK_LOG(testFile_ != nullptr && testFile_->is_open(), "Fatal: open file fail");
-        constexpr uint32_t bufferSize = 0;
-        (void)testFile_->read((char *)OH_AVMemory_GetAddr(buffer), bufferSize);
 
+        uint32_t bufferSize = fsize > OH_AVMemory_GetSize(buffer) ? OH_AVMemory_GetSize(buffer) : fsize;
+        if(fsize > 0 || !inputFile_->eof() )
+        {
+            (void)inputFile_->read((char *)OH_AVMemory_GetAddr(buffer), bufferSize);
+            fsize = fsize - bufferSize;
+            std::cout << "fsize " << fsize << std::endl;
+        } else {
+            OH_AVCodecBufferAttr info;
+            info.size = 0;
+            info.offset = 0;
+            info.pts = 0;
+            info.flags = AVCODEC_BUFFER_FLAGS_EOS;
+            OH_AudioEncoder_PushInputData(audioEnc_, index, info);
+            std::cout << "end buffer\n";
+            signal_->inQueue_.pop();
+            signal_->inBufferQueue_.pop();
+            break;
+        }
+        DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
         OH_AVCodecBufferAttr info;
         info.size = bufferSize;
         info.offset = 0;
@@ -213,46 +254,63 @@ void AEncDemo::InputFunc()
             ret = OH_AudioEncoder_PushInputData(audioEnc_, index, info);
         }
 
-        // free(fileBuffer);
         timeStamp_ += FRAME_DURATION_US;
         signal_->inQueue_.pop();
         signal_->inBufferQueue_.pop();
         frameCount_++;
-        if (frameCount_ == DEFAULT_FRAME_COUNT) {
-            cout << "Finish decode, exit" << endl;
-            break;
-        }
 
         if (ret != AVCS_ERR_OK) {
             cout << "Fatal error, exit" << endl;
             break;
         }
     }
+    inputFile_->close();
 }
 
-void AEncDemo::OutputFunc()
-{
+void AEncDemo::OutputFunc() {
+    std::ofstream outputFile;
+    outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
+    if (!outputFile.is_open()) {
+        std::cout<<"open " << outputFilePath << " failed!"<<std::endl;
+    }
+
     while (true) {
         if (!isRunning_.load()) {
+            cout << "stop, exit" << endl;
             break;
         }
 
         unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.wait(lock, [this]() { return signal_->outQueue_.size() > 0; });
+        cout << "lock, before" << endl;
+        signal_->outCond_.wait(lock, [this]() { return (signal_->outQueue_.size() > 0 || !isRunning_.load()); });
+        cout << "lock, after" << endl;
 
         if (!isRunning_.load()) {
+            cout << "wait to stop, exit" << endl;
             break;
         }
 
         uint32_t index = signal_->outQueue_.front();
 
-        if (OH_AudioEncoder_FreeOutputData(audioEnc_, index) != AV_ERR_OK) {
-            cout << "Fatal: ReleaseOutputBuffer fail" << endl;
-            break;
+        OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
+        OH_AVMemory *data = signal_->outBufferQueue_.front();
+        if (data != nullptr) {
+            cout << "OutputFunc write file,buffer index" << index  << ", data size = :" << attr.size << endl;
+            outputFile.write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
+        }
+        cout << "attr.flags: " << attr.flags << endl;
+        if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS || attr.size == 0) {
+            cout << "encode eos" << endl;
+            isRunning_.store(false);
         }
 
-        signal_->outQueue_.pop();
         signal_->outBufferQueue_.pop();
         signal_->attrQueue_.pop();
+        signal_->outQueue_.pop();
+        if (OH_AudioEncoder_FreeOutputData(audioEnc_, index) != AV_ERR_OK) {
+            cout << "Fatal: FreeOutputData fail" << endl;
+            break;
+        }
     }
+    outputFile.close();
 }

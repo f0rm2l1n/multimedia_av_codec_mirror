@@ -61,7 +61,7 @@ const char *OH_MD_KEY_LANGUAGE = "language";
 const char *OH_MD_KEY_DESCRIPTION = "description";
 const char *OH_MD_KEY_LYRICS = "lyrics";
 const char *OH_MD_KEY_START_TIME = "start_time";
-const char *OH_MD_KEY_TYPE = "type";
+const char *OH_MD_KEY_TYPE = "media_type";
 #ifdef __cplusplus
 }
 #endif

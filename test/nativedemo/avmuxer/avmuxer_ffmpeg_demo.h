@@ -25,8 +25,7 @@
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-
-class AVMuxerFFmpegDemo /*: public NoCopyable*/ : public AVMuxerDemoBase {
+class AVMuxerFFmpegDemo /* : public NoCopyable */ : public AVMuxerDemoBase {
 public:
     AVMuxerFFmpegDemo();
     ~AVMuxerFFmpegDemo() = default;

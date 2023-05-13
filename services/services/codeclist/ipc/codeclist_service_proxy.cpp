@@ -16,12 +16,11 @@
 #include "codeclist_service_proxy.h"
 #include "avcodec_parcel.h"
 #include "codeclist_parcel.h"
-// #include "avsharedmemory_ipc.h"
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceProxy"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceProxy"};
 }
 
 namespace OHOS {
@@ -82,8 +81,8 @@ CapabilityData CodecListServiceProxy::CreateCapability(std::string codecName)
 
     (void)data.WriteString(codecName);
     int32_t ret = Remote()->SendRequest(CREATE_CAPABILITY, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, capabilityData,
-        "GetCodecCapabilityInfos failed, error: %{public}d", ret);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, capabilityData, "GetCodecCapabilityInfos failed, error: %{public}d",
+                             ret);
     (void)CodecListParcel::Unmarshalling(reply, capabilityData);
 
     return capabilityData;
@@ -99,8 +98,8 @@ int32_t CodecListServiceProxy::DestroyStub()
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
 
     int32_t ret = Remote()->SendRequest(DESTROY, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION,
-        "DestroyStub failed, error: %{public}d", ret);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "DestroyStub failed, error: %{public}d",
+                             ret);
     return reply.ReadInt32();
 }
 } // namespace Media

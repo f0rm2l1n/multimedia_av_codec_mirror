@@ -28,18 +28,15 @@ public:
     Demuxer(const Demuxer &) = delete;
     Demuxer operator=(const Demuxer &) = delete;
     ~Demuxer() = default;
-
     int32_t SelectSourceTrackByID(uint32_t trackIndex);
     int32_t UnselectSourceTrackByID(uint32_t trackIndex);
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag);
+    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag);
     int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode);
 
 private:
     friend class DemuxerFactory;
-    
     Demuxer(uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<DemuxerPlugin> plugin);
-
-private:
     const uint32_t pkgVersion_;
     const uint32_t apiVersion_;
     std::shared_ptr<DemuxerPlugin> demuxer_;

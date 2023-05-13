@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include <iostream>
-#include "demuxer_factory.h"
 #include <utility>
 #include <algorithm>
 #include <dirent.h>
@@ -21,6 +20,7 @@
 #include "avcodec_log.h"
 #include "avcodec_dfx.h"
 #include "avcodec_errors.h"
+#include "demuxer_factory.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "DemuxerFactory"};
@@ -39,14 +39,13 @@ DemuxerFactory::DemuxerFactory()
     RegisterPlugins();
 }
 
-DemuxerFactory::~DemuxerFactory() 
+DemuxerFactory::~DemuxerFactory()
 {
     UnregisterAllPlugins();
 }
 
 std::shared_ptr<Demuxer> DemuxerFactory::CreatePlugin(uintptr_t sourceAddr)
 {
-    
     AVCODEC_LOGD("create demuxer plugin from DemuxerFactory");
     std::string pluginName;
     uint32_t maxRank = 0;
@@ -67,12 +66,12 @@ std::shared_ptr<Demuxer> DemuxerFactory::CreatePlugin(uintptr_t sourceAddr)
         std::shared_ptr<PluginRegInfo> regInfo = registerData_->registerTable[pluginName];
         auto plugin = ReinterpretPointerCast<DemuxerPlugin>(regInfo->creator());
         int32_t ret = plugin->Create(sourceAddr);
-        
-        if ( ret != AVCS_ERR_OK ) {
+        if (ret != AVCS_ERR_OK) {
             AVCODEC_LOGE("Create demuxer plugin failed, cannot create plugin!");
             return nullptr;
         }
-        AVCODEC_LOGD("create demuxer plugin successful! pluginName %{public}s(maxRank %{public}d)", pluginName.c_str(), maxRank);
+        AVCODEC_LOGD("create demuxer plugin successful! pluginName %{public}s(maxRank %{public}d)",
+                        pluginName.c_str(), maxRank);
         return std::shared_ptr<Demuxer>(
                 new Demuxer(regInfo->packageDef->pkgVersion, regInfo->info->apiVersion, plugin));
     } else {
@@ -97,8 +96,7 @@ void DemuxerFactory::RegisterDynamicPlugins(const char* libDirPath)
                 continue;
             }
             std::string libName = lib->d_name;
-            if (libName.find(g_libFileHead) ||  
-                libName.find(g_fileMark) == std::string::npos ||
+            if (libName.find(g_libFileHead) || libName.find(g_fileMark) == std::string::npos ||
                 libName.compare(libName.size() - g_libFileTail.size(), g_libFileTail.size(), g_libFileTail)) {
                 continue;
             }

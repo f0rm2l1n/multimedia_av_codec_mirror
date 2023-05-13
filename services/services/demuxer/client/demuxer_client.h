@@ -26,19 +26,17 @@ public:
     explicit DemuxerClient(const sptr<IStandardDemuxerService> &ipcProxy);
     ~DemuxerClient();
 
-    // 业务
     int32_t Init(uintptr_t sourceAddr) override;
     int32_t SelectSourceTrackByID(uint32_t index) override;
     int32_t UnselectSourceTrackByID(uint32_t index) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) override;
+    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) override;
-    
     void AVCodecServerDied();
 private:
     std::mutex mutex_;
     sptr<IStandardDemuxerService> demuxerProxy_ = nullptr;
 };
-
 }  // namespace Media
 }  // namespace OHOS
 #endif  // DEMUXER_CLIENT_H

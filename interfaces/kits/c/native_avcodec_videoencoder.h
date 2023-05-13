@@ -221,33 +221,6 @@ OH_AVErrCode OH_VideoEncoder_NotifyEndOfStream(OH_AVCodec *codec);
 OH_AVErrCode OH_VideoEncoder_PushInputData(OH_AVCodec *codec, uint32_t index, OH_AVCodecBufferAttr attr);
 
 /**
- * @brief Create a persistent surface that can be used as the input to encoder.
- * Persistent surface can also be set on a new instance via OH_VideoEncoder_SetSurface().
- * A persistent surface can be connected to at most one instance of AVCodec.
- * @syscap SystemCapability.Multimedia.Media.VideoEncoder
- * @param window A pointer to a OHNativeWindow instance, see {@link OHNativeWindow}
- * @return Returns AV_ERR_OK if the execution is successful,
- * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
- * @since 10
- * @version 4.0
- */
-OH_AVErrCode OH_VideoEncoder_GetPersistentSurface(OHNativeWindow **window);
-
-/**
- * @brief Set a persistent surface that can be used as the input to encoder, inplaces of input buffers.
- * this can only be called after OH_AVCodec_Configure()
- * @syscap SystemCapability.Multimedia.Media.VideoEncoder
- * @param codec Pointer to an OH_AVCodec instance
- * @param window A pointer to a OHNativeWindow instance, see {@link OHNativeWindow}, 
- * which must be a presistent surface created by OH_AVCodec_VideoEncoderGetPersistentSurface()
- * @return Returns AV_ERR_OK if the execution is successful,
- * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
- * @since 10
- * @version 4.0
- */
-OH_AVErrCode OH_VideoEncoder_SetSurface(OH_AVCodec *codec, OHNativeWindow *window);
-
-/**
  * @brief Check whether the current codec instance is valid. It can be used fault recovery or app 
  * switchback from the background
  * @syscap SystemCapability.Multimedia.Media.VideoEncoder

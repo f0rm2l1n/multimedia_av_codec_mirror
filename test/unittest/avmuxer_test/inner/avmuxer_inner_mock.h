@@ -23,10 +23,10 @@
 
 namespace OHOS {
 namespace Media {
-class MuxerInnerMock : public AVMuxerMock {
+class AVMuxerInnerMock : public AVMuxerMock {
 public:
-    explicit MuxerInnerMock(std::shared_ptr<AVMuxer> muxer) : muxer_(muxer) {}
-    ~MuxerInnerMock() = default;
+    explicit AVMuxerInnerMock(std::shared_ptr<AVMuxer> muxer) : muxer_(muxer) {}
+    ~AVMuxerInnerMock() = default;
     int32_t Destroy() override;
     int32_t Start() override;
     int32_t Stop() override;

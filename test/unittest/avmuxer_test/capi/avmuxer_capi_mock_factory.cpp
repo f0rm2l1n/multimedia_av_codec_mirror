@@ -22,7 +22,7 @@ std::shared_ptr<AVMuxerMock> AVMuxerMockFactory::CreateMuxer(int32_t fd, const O
 {
     OH_AVMuxer *muxer = OH_AVMuxer_Create(fd, static_cast<OH_AVOutputFormat>(format));
     if (muxer != nullptr) {
-        return std::make_shared<MuxerCapiMock>(muxer);
+        return std::make_shared<AVMuxerCapiMock>(muxer);
     }
     return nullptr;
 }

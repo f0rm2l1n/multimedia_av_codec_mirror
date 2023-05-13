@@ -23,10 +23,10 @@
 
 namespace OHOS {
 namespace Media {
-class MuxerCapiMock : public AVMuxerMock {
+class AVMuxerCapiMock : public AVMuxerMock {
 public:
-    explicit MuxerCapiMock(OH_AVMuxer *muxer) : muxer_(muxer) {}
-    ~MuxerCapiMock() = default;
+    explicit AVMuxerCapiMock(OH_AVMuxer *muxer) : muxer_(muxer) {}
+    ~AVMuxerCapiMock() = default;
     int32_t Destroy() override;
     int32_t Start() override;
     int32_t Stop() override;

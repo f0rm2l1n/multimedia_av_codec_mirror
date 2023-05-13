@@ -25,15 +25,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
+constexpr short DEFAULT_TRY_DECODE_TIME = 10;
+constexpr int timeoutMs = 1000;
+const std::string_view INPUT_BUFFER = "inputBuffer";
+const std::string_view OUTPUT_BUFFER = "outputBuffer";
+const std::string_view ASYNC_HANDLE_INPUT = "AsyncHandleInput";
+const std::string_view ASYNC_DECODE_FRAME = "AsyncDecodeFrame";
 
-constexpr short DEFAULT_TRY_DECODE_TIME{10};
-constexpr int timeoutMs{1000};
-const std::string_view INPUT_BUFFER{"inputBuffer"};
-const std::string_view OUTPUT_BUFFER{"outputBuffer"};
-const std::string_view ASYNC_HANDLE_INPUT{"AsyncHandleInput"};
-const std::string_view ASYNC_DECODE_FRAME{"AsyncDecodeFrame"};
-
-AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<IAudioFFMpegBaseCodec> &codec,
+AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioFFMpegBaseCodec> &codec,
                                    const std::shared_ptr<AVCodecCallback> &callback)
     : isRunning(true),
       isProduceInput(true),
@@ -130,7 +129,7 @@ bool AudioCodecWorker::Configure()
 
 bool AudioCodecWorker::Start()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Worker Start enter");
     if (!callback_) {
         AVCODEC_LOGE("Start failed in worker, callback is nullptr, please check the callback.");
@@ -146,7 +145,7 @@ bool AudioCodecWorker::Start()
 
 bool AudioCodecWorker::Stop()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Worker Stop enter");
     dispose();
 
@@ -167,7 +166,7 @@ bool AudioCodecWorker::Stop()
 
 bool AudioCodecWorker::Pause()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Worker Pause enter");
     dispose();
 
@@ -188,7 +187,7 @@ bool AudioCodecWorker::Pause()
 
 bool AudioCodecWorker::Resume()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Worker Resume enter");
     if (!callback_) {
         AVCODEC_LOGE("Resume failed in worker, callback_ is nullptr, please check the callback_.");
@@ -204,7 +203,7 @@ bool AudioCodecWorker::Resume()
 
 bool AudioCodecWorker::Release()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Worker Release enter");
     dispose();
 
@@ -253,7 +252,7 @@ std::shared_ptr<AudioBufferInfo> AudioCodecWorker::GetInputBufferInfo(const uint
 
 void AudioCodecWorker::produceInputBuffer()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Worker produceInputBuffer enter");
     if (!isRunning) {
         SleepFor(DEFAULT_TRY_DECODE_TIME);
@@ -281,7 +280,7 @@ void AudioCodecWorker::produceInputBuffer()
 
 void AudioCodecWorker::consumerOutputBuffer()
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     AVCODEC_LOGD("Worker consumerOutputBuffer enter");
     if (!isRunning) {
         SleepFor(DEFAULT_TRY_DECODE_TIME);
@@ -313,7 +312,6 @@ void AudioCodecWorker::consumerOutputBuffer()
 
             auto outBuffer = GetOutputBufferInfo(index);
             ret = codec_->processRecieveData(outBuffer);
-
             if (ret == AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA) {
                 AVCODEC_LOGW("current ouput buffer is not enough,skip this frame.");
                 outputBuffer_->RelaseBuffer(index);
@@ -377,6 +375,5 @@ bool AudioCodecWorker::begin()
     outputCondition_.notify_all();
     return true;
 }
-
 } // namespace Media
 } // namespace OHOS

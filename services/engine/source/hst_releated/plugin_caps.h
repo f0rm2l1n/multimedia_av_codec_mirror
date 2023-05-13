@@ -16,7 +16,6 @@
 #ifndef HISTREAMER_PLUGIN_COMMON_CAPS_H
 #define HISTREAMER_PLUGIN_COMMON_CAPS_H
 
-#include <utility>
 #include <vector> // NOLINT: used it
 #include "plugin_tags.h"
 
@@ -77,7 +76,7 @@ struct Capability {
      *
      * @param m mime string
      */
-    explicit Capability(std::string  m):mime(std::move(m)){}
+    explicit Capability(std::string  m):mime(std::move(m)) {}
 
     /**
      * @brief Append one fix key into KeyMap

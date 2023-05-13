@@ -19,10 +19,9 @@
 #include "avsource.h"
 #include "nocopyable.h"
 #include "i_source_service.h"
-// #include "source.h"
 
 namespace OHOS {
-namespace Media{
+namespace Media {
 class AVSourceImpl : public AVSource, public NoCopyable {
 public:
     AVSourceImpl();

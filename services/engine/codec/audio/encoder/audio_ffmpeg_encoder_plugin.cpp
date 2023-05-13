@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "audio_ffmpeg_encoder_plugin.h"
 #include "avcodec_errors.h"
 #include "media_description.h"
@@ -10,7 +25,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 }
 namespace OHOS {
 namespace Media {
-
 AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin() {}
 
 AudioFfmpegEncoderPlugin::~AudioFfmpegEncoderPlugin()
@@ -45,24 +59,24 @@ int32_t AudioFfmpegEncoderPlugin::PcmFillFrame(const std::shared_ptr<AudioBuffer
     auto memory = inputBuffer->GetBuffer();
     const uint8_t *ptr = memory->GetBase();
     auto bytesPerSample = av_get_bytes_per_sample(avCodecContext_->sample_fmt);
-    if (av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
-        for (int i = 0; i < cachedFrame_->nb_samples; i++) {
-            for (int j = 0; j < cachedFrame_->channels; j++) {
-                auto ret = memcpy_s((void *)(&cachedFrame_->data[j][i * bytesPerSample]), bytesPerSample,
-                                    (void *)(&ptr[i * cachedFrame_->channels * bytesPerSample + bytesPerSample * j]),
-                                    bytesPerSample);
-                if (ret != EOK) {
-                    AVCODEC_LOGE("memory copy failed, errno: %{public}d", ret);
-                    return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
-                }
-            }
-        }
-    } else { // aac需要fltp(f32p)格式的数据，不走这个分支，packed数据还没验证过
+    if (!av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
         auto ret = av_samples_fill_arrays(cachedFrame_->data, cachedFrame_->linesize, ptr, cachedFrame_->channels,
-                                     cachedFrame_->nb_samples, (AVSampleFormat)cachedFrame_->format, 0);
+            cachedFrame_->nb_samples, (AVSampleFormat)cachedFrame_->format, 0);
         if (ret < 0) {
             AVCODEC_LOGE("Samples fill arrays failed: %{public}s", AVStrError(ret).c_str());
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+        }
+        return AVCodecServiceErrCode::AVCS_ERR_OK;
+    } 
+    for (int i = 0; i < cachedFrame_->nb_samples; i++) {
+        for (int j = 0; j < cachedFrame_->channels; j++) {
+            auto ret = memcpy_s((void *)(&cachedFrame_->data[j][i * bytesPerSample]), bytesPerSample,
+                                (void *)(&ptr[i * cachedFrame_->channels * bytesPerSample + bytesPerSample * j]),
+                                bytesPerSample);
+            if (ret != EOK) {
+                AVCODEC_LOGE("memory copy failed, errno: %{public}d", ret);
+                return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+            }
         }
     }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
@@ -151,11 +165,7 @@ int32_t AudioFfmpegEncoderPlugin::ReceivePacketSucc(std::shared_ptr<AudioBufferI
             AVCODEC_LOGE("Get header failed.");
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
-        auto ret = memcpy_s(memory->GetBase(), memory->GetSize(), header.c_str(), headerSize);
-        if (ret != EOK) {
-            AVCODEC_LOGE("Memory copy failed, errno = %{public}d", ret);
-            return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
-        }
+        memcpy_s(memory->GetBase(), memory->GetSize(), header.c_str(), headerSize);
     }
 
     int32_t outputSize = avPacket_->size + headerSize;
@@ -227,10 +237,6 @@ int32_t AudioFfmpegEncoderPlugin::AllocateContext(const std::string &name)
 
 int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
 {
-    /**
-     * 1. input pcm sample_format should be checked, if not supported, return error
-     * 2. target sample format shoule be checked, if not supported, should return error
-    */
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avCodecContext_->channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avCodecContext_->sample_rate);
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);

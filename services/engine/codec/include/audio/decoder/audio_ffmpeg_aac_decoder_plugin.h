@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Media {
 
-class AudioFFMpegAacDecoderPlugin : public IAudioFFMpegBaseCodec::CodecRegister<AudioFFMpegAacDecoderPlugin> {
+class AudioFFMpegAacDecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegAacDecoderPlugin> {
 public:
     AudioFFMpegAacDecoderPlugin();
     ~AudioFFMpegAacDecoderPlugin() override;

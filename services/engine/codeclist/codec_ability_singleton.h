@@ -24,7 +24,7 @@ namespace Media {
 class __attribute__((visibility("default"))) CodecAbilitySingleton : public NoCopyable {
 public:
     ~CodecAbilitySingleton();
-    static CodecAbilitySingleton& GetInstance();
+    static CodecAbilitySingleton &GetInstance();
     void RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray);
     std::vector<CapabilityData> GetCapabilityArray();
 

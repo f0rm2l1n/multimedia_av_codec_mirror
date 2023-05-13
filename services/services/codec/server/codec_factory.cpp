@@ -30,7 +30,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecFacto
 
 namespace OHOS {
 namespace Media {
-
 const std::string VIDEOMIMETYPE = "video/avc";
 const std::string VIDEOCODECNAME = "video_decoder.avc";
 
@@ -50,7 +49,7 @@ std::shared_ptr<CodecBase> CodecFactory::CreateCodecByMime(bool isEncoder, const
     std::string codecname;
     Format format;
     format.PutStringValue("codec_mime", mime);
-    if(isEncoder){
+    if (isEncoder) {
         codecname = codecListCore->FindEncoder(format);
     } else {
         codecname = codecListCore->FindDecoder(format);
@@ -63,7 +62,7 @@ std::shared_ptr<CodecBase> CodecFactory::CreateCodecByMime(bool isEncoder, const
 std::shared_ptr<CodecBase> CodecFactory::CreateCodecByName(const std::string &name)
 {
     std::shared_ptr<CodecBase> codec = nullptr;
-    if(name == VIDEOCODECNAME){
+    if (name == VIDEOCODECNAME) {
         codec = std::make_shared<Codec::FCodec>(name);
     } else {
         codec = std::make_shared<AudioFFMpegAdapter>(name);

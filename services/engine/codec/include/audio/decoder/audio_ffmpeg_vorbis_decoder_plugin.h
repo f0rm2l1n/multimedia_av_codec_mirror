@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Media {
 
-class AudioFFMpegVorbisDecoderPlugin : public IAudioFFMpegBaseCodec::CodecRegister<AudioFFMpegVorbisDecoderPlugin> {
+class AudioFFMpegVorbisDecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegVorbisDecoderPlugin> {
 public:
     AudioFFMpegVorbisDecoderPlugin();
     ~AudioFFMpegVorbisDecoderPlugin() override;
@@ -49,7 +49,6 @@ private:
 
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif

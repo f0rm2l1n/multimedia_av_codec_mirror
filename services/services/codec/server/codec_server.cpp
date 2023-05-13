@@ -83,7 +83,6 @@ int32_t CodecServer::Init(AVCodecType type, bool isMimeType, const std::string &
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "CodecBase SetCallback failed");
     status_ = INITIALIZED;
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-    // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
     return AVCS_ERR_OK;
 }
 
@@ -97,7 +96,6 @@ int32_t CodecServer::Configure(const Format &format)
 
     status_ = (ret == AVCS_ERR_OK ? CONFIGURED : ERROR);
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-    // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
     return ret;
 }
 
@@ -114,7 +112,6 @@ int32_t CodecServer::Start()
         status_ = (ret == AVCS_ERR_OK ? FLUSHED : ERROR);
     }
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-    // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
     return ret;
 }
 
@@ -127,7 +124,6 @@ int32_t CodecServer::Stop()
     int32_t ret = codecBase_->Stop();
     status_ = (ret == AVCS_ERR_OK ? CONFIGURED : ERROR);
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-    // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
     return ret;
 }
 
@@ -140,7 +136,6 @@ int32_t CodecServer::Flush()
     int32_t ret = codecBase_->Flush();
     status_ = (ret == AVCS_ERR_OK ? FLUSHED : ERROR);
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-    // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
     return ret;
 }
 
@@ -153,7 +148,6 @@ int32_t CodecServer::NotifyEos()
     if (ret == AVCS_ERR_OK) {
         status_ = END_OF_STREAM;
         AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-        // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
         AVCODEC_LOGI("EOS state");
     }
     return ret;
@@ -166,7 +160,6 @@ int32_t CodecServer::Reset()
     int32_t ret = codecBase_->Reset();
     status_ = (ret == AVCS_ERR_OK ? INITIALIZED : ERROR);
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-    // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
     lastErrMsg_.clear();
     return ret;
 }
@@ -174,12 +167,10 @@ int32_t CodecServer::Reset()
 int32_t CodecServer::Release()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    // AVCodecTrace trace("CodecServer::Release");
     std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(&CodecServer::ExitProcessor, this);
     if (thread != nullptr && thread->joinable()) {
         thread->join();
     }
-    // ResetTrace();
     return AVCS_ERR_OK;
 }
 
@@ -224,7 +215,6 @@ int32_t CodecServer::QueueInputBuffer(uint32_t index, AVCodecBufferInfo info, AV
         if (ret == AVCS_ERR_OK) {
             status_ = END_OF_STREAM;
             AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
-            // BehaviorEventWrite(GetStatusDescription(status_), "AVCodec");
         }
     }
     return ret;
@@ -257,8 +247,7 @@ int32_t CodecServer::ReleaseOutputBuffer(uint32_t index, bool render)
     int32_t ret;
     if (render) {
         ret = codecBase_->RenderOutputBuffer(index);
-    }
-    else {
+    } else {
         ret = codecBase_->ReleaseOutputBuffer(index);
     }
     return ret;
@@ -406,6 +395,5 @@ void CodecBaseCallback::OnOutputBufferAvailable(uint32_t index, AVCodecBufferInf
         codec_->OnOutputBufferAvailable(index, info, flag);
     }
 }
-
 } // namespace Media
 } // namespace OHOS

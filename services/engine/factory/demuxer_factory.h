@@ -16,17 +16,16 @@
 #ifndef DEMUXER_FACTORY_H
 #define DEMUXER_FACTORY_H
 
+#include <map>
+#include <vector>
 #include "plugin_info.h"
 #include "demuxer.h"
 #include "plugin_loader.h"
 #include "plugin_definition.h"
-#include <map>
-#include <vector>
 
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-
 class DemuxerFactory {
 public:
     DemuxerFactory(const DemuxerFactory&) = delete;
@@ -41,8 +40,6 @@ public:
     std::shared_ptr<Demuxer> CreatePlugin(uintptr_t sourceAddr);
     DemuxerFactory();
 private:
-    // DemuxerFactory();
-
     void RegisterPlugins();
     void RegisterDynamicPlugins(const char* libDirPath);
     void UnregisterAllPlugins();

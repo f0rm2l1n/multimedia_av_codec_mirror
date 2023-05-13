@@ -15,6 +15,13 @@
 
 #include "avmuxer_demo_common.h"
 
+enum ModeNum {
+    MODE_ZERO = 0,
+    MODE_ONE = 1,
+    MODE_TWO = 2,
+    MODE_THREE = 3
+};
+
 struct AudioTrackParam g_audioMpegPar = {
     .fileName = "mpeg_44100_2.bin",
     .mimeType = "audio/mpeg",

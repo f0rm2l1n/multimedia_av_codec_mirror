@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
+#include "venc_mock.h"
 #include <sync_fence.h>
 #include "nocopyable.h"
 #include "avcodec_errors.h"
-#include "venc_mock.h"
 using namespace std;
 using namespace OHOS::Media::VCodecTestParam;
 

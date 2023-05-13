@@ -16,11 +16,11 @@
 #ifndef CODECLIST_XML_PARSER_H
 #define CODECLIST_XML_PARSER_H
 
-#include <vector>
-#include <string>
-#include <unordered_map>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
 #include "avcodec_info.h"
 
 namespace OHOS {
@@ -50,29 +50,30 @@ private:
     static bool TransStrAsRange(const std::string &str, Range &range);
     static bool TransStrAsSize(const std::string &str, ImgSize &size);
     static std::vector<int32_t> TransMapAsIntegerArray(const std::unordered_map<std::string, int> &capabilityMap,
-                                                const std::vector<std::string> &spilt);
+                                                       const std::vector<std::string> &spilt);
     static std::vector<int32_t> TransStrAsIntegerArray(const std::vector<std::string> &spilt);
     static bool SpiltKeyList(const std::string &str, const std::string &delim, std::vector<std::string> &spilt);
-    static bool SetCapabilityStringData(std::unordered_map<std::string, std::string&> dataMap,
-                                const std::string &capabilityKey, const std::string &capabilityValue);
-    static bool SetCapabilityIntData(std::unordered_map<std::string, int32_t&> dataMap,
-                                const std::string &capabilityKey, const std::string &capabilityValue);
-    static bool SetCapabilityBoolData(std::unordered_map<std::string, bool&> dataMap,
-                                const std::string &capabilityKey, const std::string &capabilityValue);
-    static bool SetCapabilityRangeData(std::unordered_map<std::string, Range&> dataMap,
-                                const std::string &capabilityKey, const std::string &capabilityValue);
-    static bool SetCapabilityVectorData(std::unordered_map<std::string, std::vector<int32_t>&> dataMap,
-                                const std::string &capabilityKey, const std::string &capabilityValue);
-    static bool SetCapabilitySizeData(std::unordered_map<std::string, ImgSize&> dataMap,
-                                const std::string &capabilityKey, const std::string &capabilityValue);
-    static bool SetCapabilityHashRangeData(std::unordered_map<std::string, std::map<ImgSize, Range>&> dataMap,
-                                const std::string &capabilityKey, const std::string &capabilityValue);
-    static bool SetCapabilityHashVectorData(std::unordered_map<std::string, std::map<int32_t, std::vector<int32_t>>&> dataMap,
+    static bool SetCapabilityStringData(std::unordered_map<std::string, std::string &> dataMap,
+                                        const std::string &capabilityKey, const std::string &capabilityValue);
+    static bool SetCapabilityIntData(std::unordered_map<std::string, int32_t &> dataMap,
+                                     const std::string &capabilityKey, const std::string &capabilityValue);
+    static bool SetCapabilityBoolData(std::unordered_map<std::string, bool &> dataMap, const std::string &capabilityKey,
+                                      const std::string &capabilityValue);
+    static bool SetCapabilityRangeData(std::unordered_map<std::string, Range &> dataMap,
+                                       const std::string &capabilityKey, const std::string &capabilityValue);
+    static bool SetCapabilityVectorData(std::unordered_map<std::string, std::vector<int32_t> &> dataMap,
+                                        const std::string &capabilityKey, const std::string &capabilityValue);
+    static bool SetCapabilitySizeData(std::unordered_map<std::string, ImgSize &> dataMap,
+                                      const std::string &capabilityKey, const std::string &capabilityValue);
+    static bool SetCapabilityHashRangeData(std::unordered_map<std::string, std::map<ImgSize, Range> &> dataMap,
+                                           const std::string &capabilityKey, const std::string &capabilityValue);
+    static bool
+    SetCapabilityHashVectorData(std::unordered_map<std::string, std::map<int32_t, std::vector<int32_t>> &> dataMap,
                                 const std::string &capabilityKey, const std::string &capabilityValue);
 
     static NodeName GetNodeNameAsInt(xmlNode *node);
     bool SetCapabilityData(CapabilityData &data, const std::string &capabilityKey,
-                            const std::string &capabilityValue) const;
+                           const std::string &capabilityValue) const;
     bool ParseInternal(xmlNode *node);
     bool ParseData(xmlNode *node);
     std::vector<CapabilityData> capabilityDataArray_;

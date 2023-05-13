@@ -70,6 +70,8 @@ private:
     int32_t Release();
     void InputFunc();
     void OutputFunc();
+    void HandleInputEOS(const uint32_t &index);
+    int32_t HandleNormalInput(const uint32_t &index, const int64_t &pts, const size_t &size);
 
     std::atomic<bool> isRunning_ = false;
     std::unique_ptr<std::ifstream> testFile_;
@@ -80,7 +82,7 @@ private:
     std::shared_ptr<ADecDemoCallback> cb_;
     uint32_t frameCount_ = 0;
 };
-} // InnerAudioDemo
-} // namespace AV_Codec
+} // namespace InnerAudioDemo
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_DECODER_INNER_DEMO_H

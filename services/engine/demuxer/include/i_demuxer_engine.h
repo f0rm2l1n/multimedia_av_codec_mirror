@@ -28,14 +28,15 @@ public:
     virtual ~IDemuxerEngine() = default;
     virtual int32_t SelectSourceTrackByID(uint32_t trackIndex) = 0;
     virtual int32_t UnselectSourceTrackByID(uint32_t trackIndex) = 0;
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) = 0;
+    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+                                    AVCodecBufferInfo &bufferInfo,AVCodecBufferFlag &flag) = 0;
     virtual int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) = 0;
-
 };
 
 class __attribute__((visibility("default"))) IDemuxerEngineFactory {
 public:
-    static std::shared_ptr<IDemuxerEngine> CreateDemuxerEngine(int32_t appUid, int32_t appPid, uintptr_t sourceAddr);
+    static std::shared_ptr<IDemuxerEngine> CreateDemuxerEngine(int32_t appUid,
+                                                                int32_t appPid, uintptr_t sourceAddr);
 private:
     IDemuxerEngineFactory() = default;
     ~IDemuxerEngineFactory() = default;

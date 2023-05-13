@@ -20,17 +20,11 @@
 #include "avcodec_common.h"
 
 namespace {
-    // constexpr uint32_t DATA_AUDIO_ID = 0;
-    // constexpr uint32_t DATA_VIDEO_ID = 1;
-    extern "C" {
-        extern AudioTrackParam g_audioMpegPar;
-        extern AudioTrackParam g_audioAacPar;
-        extern VideoTrackParam g_videoH264Par;
-        extern VideoTrackParam g_videoMpeg4Par;
-        extern VideoTrackParam g_jpegCoverPar;
-        extern VideoTrackParam g_pngCoverPar;
-        extern VideoTrackParam g_bmpCoverPar;
-    }
+    constexpr int MODE_ZERO = 0;
+    constexpr int MODE_ONE = 1;
+    constexpr int MODE_TWO = 2;
+    constexpr int MODE_THREE = 3;
+    constexpr int CONFIG_BUFFER_SZIE = 100;
 }
 
 namespace OHOS {
@@ -60,104 +54,114 @@ std::shared_ptr<std::ifstream> OpenFile(const std::string &filePath)
     return nullptr;
 }
 
+void AVMuxerDemoBase::SelectFormatMode()
+{
+    int num;
+    std::cout<<"\nplease select muxer type: 0.mp4 1.m4a"<<std::endl;
+    std::cin>>num;
+    switch (num) {
+        case MODE_ZERO:
+            format_ = "mp4";
+            outputFormat_ = OUTPUT_FORMAT_MPEG_4;
+            break;
+        case MODE_ONE:
+            format_ = "m4a";
+            outputFormat_ = OUTPUT_FORMAT_M4A;
+            break;
+        default:
+            format_ = "mp4";
+            outputFormat_ = OUTPUT_FORMAT_MPEG_4;
+            break;
+    }
+}
+
+void AVMuxerDemoBase::SelectAudioVideoMode()
+{
+    int num;
+    std::cout<<"\nplease select audio file: 0.noAudio 1.aac 2.mpeg"<<std::endl;
+    std::cin>>num;
+    switch (num) {
+        case MODE_ZERO:
+            audioType_ = "noAudio";
+            audioParams_ = nullptr;
+            break;
+        case MODE_ONE:
+            audioType_ = "aac";
+            audioParams_ = &g_audioAacPar;
+            break;
+        case MODE_TWO:
+            audioType_ = "mpeg";
+            audioParams_ = &g_audioMpegPar;
+            break;
+        default:
+            videoType_ = "noAudio";
+            audioParams_ = nullptr;
+            std::cout<<"do not support audio type index: "<<num<<", set to noAudio"<<std::endl;
+            break;
+    }
+
+    std::cout<<"please select video file:0.noVideo 1.h264 2.mpeg4"<<std::endl;
+    std::cin>>num;
+    switch (num) {
+        case MODE_ZERO:
+            videoType_ = "noVideo";
+            videoParams_ = nullptr;
+            break;
+        case MODE_ONE:
+            videoType_ = "h264";
+            videoParams_ = &g_videoH264Par;
+            break;
+        case MODE_TWO:
+            videoType_ = "mpeg4";
+            videoParams_ = &g_videoMpeg4Par;
+            break;
+        default:
+            videoType_ = "noVideo";
+            videoParams_ = nullptr;
+            std::cout<<"do not support video type index: "<<", set to noVideo"<<num<<std::endl;
+            break;
+    }
+}
+
+void AVMuxerDemoBase::SelectCoverMode()
+{
+    int num;
+    std::cout<<"please select cover file:0.NoCover 1.jpg 2.png 3.bmp"<<std::endl;
+    std::cin>>num;
+    switch (num) {
+        case MODE_ZERO:
+            coverType_ = "noCover";
+            coverParams_ = nullptr;
+            break;
+        case MODE_ONE:
+            coverType_ = "jpg";
+            coverParams_ = &g_jpegCoverPar;
+            break;
+        case MODE_TWO:
+            coverType_ = "png";
+            coverParams_ = &g_pngCoverPar;
+            break;
+        case MODE_THREE:
+            coverType_ = "bmp";
+            coverParams_ = &g_bmpCoverPar;
+            break;
+        default:
+            coverType_ = "noCover";
+            coverParams_ = nullptr;
+            std::cout<<"do not support cover type index: "<<", set to noCover"<<num<<std::endl;
+            break;
+    }
+}
+
 int AVMuxerDemoBase::SelectMode()
 {
     if (hasSetMode_) {
         return 0;
     }
-    // TODO:add muxer mode select
-    int num;
+    SelectFormatMode();
+    SelectAudioVideoMode();
+    SelectCoverMode();
 
-    std::cout<<"\nplease select muxer type: 0.mp4 1.m4a"<<std::endl;
-    std::cin>>num;
-    switch (num)
-    {
-    case 0:
-        format_ = "mp4";
-        outputFormat_ = OUTPUT_FORMAT_MPEG_4;
-        break;
-    case 1:
-        format_ = "m4a";
-         outputFormat_ = OUTPUT_FORMAT_M4A;
-        break;
-    default:
-        format_ = "mp4";
-        outputFormat_ = OUTPUT_FORMAT_MPEG_4;
-        break;
-    }
-
-    std::cout<<"\nplease select audio file: 0.noAudio 1.aac 2.mpeg"<<std::endl;
-    std::cin>>num;
-    switch (num)
-    {
-    case 0:
-        audioType_ = "noAudio";
-        audioParams_ = nullptr;
-        break;
-    case 1:
-        audioType_ = "aac";
-        audioParams_ = &g_audioAacPar;
-        break;
-    case 2:
-        audioType_ = "mpeg";
-        audioParams_ = &g_audioMpegPar;
-        break;
-    default:
-        videoType_ = "noAudio";
-        audioParams_ = nullptr;
-        std::cout<<"do not support audio type index: "<<num<<", set to noAudio"<<std::endl;
-        break;
-    }
-
-    std::cout<<"please select video file:0.noVideo 1.h264 2.mpeg4"<<std::endl;
-    std::cin>>num;
-    switch (num)
-    {
-    case 0:
-        videoType_ = "noVideo";
-        videoParams_ = nullptr;
-        break;
-    case 1:
-        videoType_ = "h264";
-        videoParams_ = &g_videoH264Par;
-        break;
-    case 2:
-        videoType_ = "mpeg4";
-        videoParams_ = &g_videoMpeg4Par;
-        break;
-    default:
-        videoType_ = "noVideo";
-        videoParams_ = nullptr;
-        std::cout<<"do not support video type index: "<<", set to noVideo"<<num<<std::endl;
-        break;
-    }
-
-    std::cout<<"please select cover file:0.NoCover 1.jpg 2.png 3.bmp"<<std::endl;
-    std::cin>>num;
-    switch (num)
-    {
-    case 0:
-        coverType_ = "noCover";
-        coverParams_ = nullptr;
-        break;
-    case 1:
-        coverType_ = "jpg";
-        coverParams_ = &g_jpegCoverPar;
-        break;
-    case 2:
-        coverType_ = "png";
-        coverParams_ = &g_pngCoverPar;
-        break;
-    case 3:
-        coverType_ = "bmp";
-        coverParams_ = &g_bmpCoverPar;
-        break;
-    default:
-        coverType_ = "noCover";
-        coverParams_ = nullptr;
-        std::cout<<"do not support cover type index: "<<", set to noCover"<<num<<std::endl;
-        break;
-    }
     hasSetMode_ = true;
     return 0;
 }
@@ -252,8 +256,8 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
     uint32_t dataSize = 0;
     unsigned char *avMuxerDemoBuffer = nullptr;
     uint32_t avMuxerDemoBufferSize = 0;
-    TrackSampleInfo info {trackId, 0, 0 ,0};
-    while(1) {
+    TrackSampleInfo info {trackId, 0, 0, 0};
+    while (1) {
         file->read((char *)&info.timeUs, sizeof(info.timeUs));
         if (file->eof()) {
             break;
@@ -280,7 +284,7 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
         }
 
         file->read((char *)avMuxerDemoBuffer, dataSize);
-        if(file->eof()) {
+        if (file->eof()) {
             break;
         }
         info.size = dataSize;
@@ -302,79 +306,85 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
     }
 }
 
+int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile, unsigned char *&buffer,
+    uint32_t &curSize, TrackSampleInfo &info)
+{
+    int32_t dataSize = 0;
+    uint32_t flags = 0;
+    if (audioPts_ > videoPts_) {
+        curFile = videoFile_;
+        info.trackIndex = videoTrackId_;
+        info.timeUs = videoPts_;
+    } else {
+        curFile = audioFile_;
+        info.trackIndex = audioTrackId_;
+        info.timeUs = audioPts_;
+    }
+
+    curFile->read((char *)&flags, sizeof(flags));
+    if (curFile->eof()) {
+        return -1;
+    }
+    info.flags = 0;
+    if (flags != 0) {
+        info.flags |= AVCODEC_BUFFER_FLAG_SYNC_FRAME;
+    }
+
+    curFile->read((char *)&dataSize, sizeof(dataSize));
+    if (curFile->eof()) {
+        return -1;
+    }
+
+    if (buffer != nullptr && dataSize > curSize) {
+        delete [] buffer;
+        buffer = nullptr;
+        curSize = 0;
+    }
+    if (buffer == nullptr) {
+        buffer = new unsigned char[dataSize];
+        curSize = dataSize;
+    }
+
+    curFile->read((char *)buffer, dataSize);
+    if(curFile->eof()) {
+        return -1;
+    }
+    info.size = dataSize;
+    return 0;
+}
+
 void AVMuxerDemoBase::WriteAvTrackSample()
 {
     if (audioFile_ == nullptr || videoFile_ == nullptr) {
-        std::cout<<"AVMuxerDemoBase::WriteTrackSample audioFile_ or videoFile_ is nullptr!"<<std::endl;
         return;
     }
-    uint32_t dataSize = 0;
-    uint32_t flags = 0;
-    uint64_t audioPts = 0;
-    uint64_t videoPts = 0;
     TrackSampleInfo info {0, 0, 0 ,0};
     std::shared_ptr<std::ifstream> curFile = nullptr;
     unsigned char *avMuxerDemoBuffer = nullptr;
     uint32_t avMuxerDemoBufferSize = 0;
-    audioFile_->read((char *)&audioPts, sizeof(audioPts));
+    audioFile_->read((char *)&audioPts_, sizeof(audioPts_));
     if (audioFile_->eof()) {
         return;
     }
-    videoFile_->read((char *)&videoPts, sizeof(videoPts));
+    videoFile_->read((char *)&videoPts_, sizeof(videoPts_));
     if (videoFile_->eof()) {
         return;
     }
     while (1) {
-        if (audioPts > videoPts) {
-            curFile = videoFile_;
-            info.trackIndex = videoTrackId_;
-            info.timeUs = videoPts;
-        } else {
-            curFile = audioFile_;
-            info.trackIndex = audioTrackId_;
-            info.timeUs = audioPts;
-        }
-
-        curFile->read((char *)&flags, sizeof(flags));
-        if (curFile->eof()) {
+        if (ReadSampleDataInfo(curFile, avMuxerDemoBuffer, avMuxerDemoBufferSize, info) != 0) {
             break;
         }
-
-        curFile->read((char *)&dataSize, sizeof(dataSize));
-        if (curFile->eof()) {
-            break;
-        }
-
-        if (avMuxerDemoBuffer != nullptr && dataSize > avMuxerDemoBufferSize) {
-            delete [] avMuxerDemoBuffer;
-            avMuxerDemoBuffer = nullptr;
-            avMuxerDemoBufferSize = 0;
-        }
-        if (avMuxerDemoBuffer == nullptr) {
-            avMuxerDemoBuffer = new unsigned char[dataSize];
-            avMuxerDemoBufferSize = dataSize;
-        }
-        curFile->read((char *)avMuxerDemoBuffer, dataSize);
-        if(curFile->eof()) {
-            break;
-        }
-        info.size = dataSize;
     
-        info.flags = 0;
-        if (flags != 0) {
-            info.flags |= AVCODEC_BUFFER_FLAG_SYNC_FRAME;
-        }
-
         if (DoWriteSampleBuffer((uint8_t*)avMuxerDemoBuffer, info) != 0) {
             std::cout<<"DoWriteSampleBuffer failed!"<<std::endl;
         }
         if (curFile == audioFile_) {
-            audioFile_->read((char *)&audioPts, sizeof(audioPts));
+            audioFile_->read((char *)&audioPts_, sizeof(audioPts_));
             if (audioFile_->eof()) {
                 break;
             }
         } else {
-            videoFile_->read((char *)&videoPts, sizeof(videoPts));
+            videoFile_->read((char *)&videoPts_, sizeof(videoPts_));
             if (videoFile_->eof()) {
                 break;
             }
@@ -404,7 +414,8 @@ void AVMuxerDemoBase::WriteTrackSample()
     }
 }
 
-void AVMuxerDemoBase::MulThdWriteTrackSample(AVMuxerDemoBase *muxerBase, uint32_t trackId, std::shared_ptr<std::ifstream> file)
+void AVMuxerDemoBase::MulThdWriteTrackSample(AVMuxerDemoBase *muxerBase, uint32_t trackId,
+    std::shared_ptr<std::ifstream> file)
 {
     muxerBase->WriteSingleTrackSample(trackId, file);
 }
@@ -416,7 +427,7 @@ void AVMuxerDemoBase::WriteCoverSample()
         std::cout<<"AVMuxerDemoBase::WriteCoverSample coverFile_ is nullptr!"<<std::endl;
         return;
     }
-    TrackSampleInfo info {coverTrackId_, 0, 0 ,0};
+    TrackSampleInfo info {coverTrackId_, 0, 0, 0};
     coverFile_->seekg(0, std::ios::end);
     info.size = coverFile_->tellg();
     coverFile_->seekg(0, std::ios::beg);
@@ -447,11 +458,9 @@ int AVMuxerDemoBase::AddVideoTrack(VideoTrackParam *param)
     videoParams.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, param->height);
 
     int extSize = 0;
-    char buffer[100] {0};
-    // fread(&extSize, sizeof(extSize), 1, g_avBinStrNewFd);
+    char buffer[CONFIG_BUFFER_SZIE] {0};
     videoFile_->read((char*)&extSize, sizeof(extSize));
-    if (extSize > 0 && extSize < 100) {
-        // fread(buffer, extSize, 1, g_avBinStrNewFd);
+    if (extSize > 0 && extSize < CONFIG_BUFFER_SZIE) {
         videoFile_->read((char*)buffer, extSize);
         videoParams.PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, (uint8_t *)buffer, extSize);
     } else {
@@ -477,9 +486,9 @@ int AVMuxerDemoBase::AddAudioTrack(AudioTrackParam *param)
     audioParams.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, param->channels);
 
     int extSize = 0;
-    char buffer[100] {0};
+    char buffer[CONFIG_BUFFER_SZIE] {0};
     audioFile_->read((char*)&extSize, sizeof(extSize));
-    if (extSize > 0 && extSize < 100) {
+    if (extSize > 0 && extSize < CONFIG_BUFFER_SZIE) {
         audioFile_->read((char*)buffer, extSize);
         audioParams.PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, (uint8_t *)buffer, extSize);
     } else {

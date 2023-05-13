@@ -24,15 +24,7 @@
 
 namespace OHOS {
 namespace Media {
-
 class AudioFFMpegAdapter : public CodecBase, public NoCopyable {
-private:
-    std::atomic<CodecState> state_;
-    const std::string name_;
-    std::shared_ptr<AVCodecCallback> callback_;
-    std::shared_ptr<IAudioFFMpegBaseCodec> audioCodec;
-    std::shared_ptr<AudioCodecWorker> worker_;
-
 public:
     explicit AudioFFMpegAdapter(const std::string &name);
 
@@ -71,6 +63,13 @@ public:
     int32_t ReleaseOutputBuffer(size_t index) override;
 
 private:
+    std::atomic<CodecState> state_;
+    const std::string name_;
+    std::shared_ptr<AVCodecCallback> callback_;
+    std::shared_ptr<AudioFFMpegBaseCodec> audioCodec;
+    std::shared_ptr<AudioCodecWorker> worker_;
+
+private:
     int32_t doFlush();
     int32_t doStart();
     int32_t doStop();
@@ -80,7 +79,6 @@ private:
     int32_t doConfigure(const Format &format);
     std::string_view stateToString(CodecState state);
 };
-
 } // namespace Media
 } // namespace OHOS
 #endif

@@ -56,7 +56,6 @@ private:
     std::string uri_ {};
     SourceType type_ {};
 };
-
 } // namespace Plugin
 } // namespace Media
 } // namespace OHOS

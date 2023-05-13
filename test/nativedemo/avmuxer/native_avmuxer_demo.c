@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "native_avmuxer_demo.h"
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -29,6 +30,12 @@
 
 #define NORMAL 0
 #define THREAD 1
+#define TYPE_BUFFER_SIZE 20
+#define CONFIG_BUFFER_SIZE 100
+
+typedef struct AudioTrackParam AudioTrackParam;
+typedef struct VideoTrackParam VideoTrackParam;
+typedef struct FdListStr FdListStr;
 
 struct WriteTrackSampleParam {
     OH_AVMuxer *muxer;
@@ -38,26 +45,16 @@ struct WriteTrackSampleParam {
 
 struct MuxerParam {
     int outputFormat;
-    char outputFormatType[20];
+    char outputFormatType[TYPE_BUFFER_SIZE];
     int runMode;
-    char runModeType[20];
+    char runModeType[TYPE_BUFFER_SIZE];
     AudioTrackParam *audioParams;
-    char audioType[20];
+    char audioType[TYPE_BUFFER_SIZE];
     VideoTrackParam *videoParams;
-    char videoType[20];
+    char videoType[TYPE_BUFFER_SIZE];
     VideoTrackParam *coverParams;
-    char coverType[20];
+    char coverType[TYPE_BUFFER_SIZE];
 };
-
-extern char *RUN_NORMAL;
-extern char *RUN_MUL_THREAD;
-extern AudioTrackParam g_audioMpegPar;
-extern AudioTrackParam g_audioAacPar;
-extern VideoTrackParam g_videoH264Par;
-extern VideoTrackParam g_videoMpeg4Par;
-extern VideoTrackParam g_jpegCoverPar;
-extern VideoTrackParam g_pngCoverPar;
-extern VideoTrackParam g_bmpCoverPar;
 
 static struct MuxerParam g_muxerParam  = {
     .outputFormat = AV_OUTPUT_FORMAT_DEFAULT,
@@ -84,9 +81,9 @@ int AddTrackAudio(OH_AVMuxer *muxer, const AudioTrackParam *param, int fdInput)
         return AV_ERR_NO_MEMORY;
     }
     int extraSize = 0;
-    unsigned char buffer[100] = {0};
+    unsigned char buffer[CONFIG_BUFFER_SIZE] = {0};
     read(fdInput, (void*)&extraSize, sizeof(extraSize));
-    if (extraSize <= 100 && extraSize > 0) {
+    if (extraSize <= CONFIG_BUFFER_SIZE && extraSize > 0) {
         read(fdInput, buffer, extraSize);
         OH_AVFormat_SetBuffer(formatAudio, OH_MD_KEY_CODEC_CONFIG, buffer, extraSize);
     }
@@ -117,9 +114,9 @@ int AddTrackVideo(OH_AVMuxer *muxer, const VideoTrackParam *param, int fdInput)
         return AV_ERR_NO_MEMORY;
     }
     int extraSize = 0;
-    unsigned char buffer[100] = {0};
+    unsigned char buffer[CONFIG_BUFFER_SIZE] = {0};
     read(fdInput, (void*)&extraSize, sizeof(extraSize));
-    if (extraSize <= 100 && extraSize > 0) {
+    if (extraSize <= CONFIG_BUFFER_SIZE && extraSize > 0) {
         read(fdInput, buffer, extraSize);
         OH_AVFormat_SetBuffer(formatVideo, OH_MD_KEY_CODEC_CONFIG, buffer, extraSize);
     }
@@ -164,6 +161,55 @@ int AddTrackCover(OH_AVMuxer *muxer, const VideoTrackParam *param, int fdInput)
     return trackIndex;
 }
 
+static int UpDateWriteBufferInfo(int fd, unsigned char **buffer, int *curSize, OH_AVCodecBufferAttr *info)
+{
+    if (fd < 0 || buffer == NULL || curSize == NULL || info == NULL) {
+        return -1;
+    }
+
+    int ret;
+    int flags = 0;
+    int dataSize = 0;
+
+    ret = read(fd, (void*)&flags, sizeof(flags));
+    if (ret <= 0) {
+        return -1;
+    }
+
+    info->flags = 0;
+    if (flags != 0) {
+        info->flags |= AVCODEC_BUFFER_FLAGS_SYNC_FRAME;
+    }
+
+    ret = read(fd, (void*)&dataSize, sizeof(dataSize));
+    if (ret <= 0 || dataSize < 0) {
+        return -1;
+    }
+
+    if (*buffer != NULL && dataSize > *curSize) {
+        free(*buffer);
+        *curSize = 0;
+        *buffer = NULL;
+    }
+    if (*buffer == NULL) {
+        *buffer = malloc(dataSize);
+        *curSize = dataSize;
+        if (*buffer == NULL) {
+            printf("error malloc memory! %d\n", dataSize);
+            return -1;
+        }
+    }
+
+    ret = read(fd, (void*)*buffer, dataSize);
+    if (ret <= 0) {
+        return -1;
+    }
+    info->size = dataSize;
+
+
+    return 0;
+}
+
 void WriteSingleTrackSample(OH_AVMuxer *muxer, int trackId, int fd)
 {
     if (muxer == NULL || fd < 0 || trackId  < 0) {
@@ -171,8 +217,6 @@ void WriteSingleTrackSample(OH_AVMuxer *muxer, int trackId, int fd)
         return;
     }
     int ret = 0;
-    int dataSize = 0;
-    int flags = 0;
     unsigned char *avMuxerDemoBuffer = NULL;
     int avMuxerDemoBufferSize = 0;
     OH_AVCodecBufferAttr info;
@@ -183,39 +227,8 @@ void WriteSingleTrackSample(OH_AVMuxer *muxer, int trackId, int fd)
             break;
         }
 
-        ret = read(fd, (void*)&flags, sizeof(flags));
-        if (ret <= 0) {
+        if (UpDateWriteBufferInfo(fd, &avMuxerDemoBuffer, &avMuxerDemoBufferSize, &info) != 0) {
             break;
-        }
-
-        // read frame buffer
-        ret = read(fd, (void*)&dataSize, sizeof(dataSize));
-        if (ret <= 0 || dataSize < 0) {
-            break;
-        }
-
-        if (avMuxerDemoBuffer != NULL && dataSize > avMuxerDemoBufferSize) {
-            free(avMuxerDemoBuffer);
-            avMuxerDemoBufferSize = 0;
-            avMuxerDemoBuffer = NULL;
-        }
-        if (avMuxerDemoBuffer == NULL) {
-            avMuxerDemoBuffer = malloc(dataSize);
-            avMuxerDemoBufferSize = dataSize;
-            if (avMuxerDemoBuffer == NULL) {
-                printf("error malloc memory! %d\n", dataSize);
-                break;
-            }
-        }
-        ret = read(fd, (void*)avMuxerDemoBuffer, dataSize);
-        if (ret <= 0) {
-            break;
-        }
-        info.size = dataSize;
-
-        info.flags = 0;
-        if (flags != 0) {
-            info.flags |= AVCODEC_BUFFER_FLAGS_SYNC_FRAME;
         }
 
         if (OH_AVMuxer_WriteSampleBuffer(muxer, trackId, avMuxerDemoBuffer, info) != AV_ERR_OK) {
@@ -236,6 +249,27 @@ void *ThreadWriteTrackSample(void *param)
     return NULL;
 }
 
+static int UpdatePtsByFd(int curFd, FdListStr *fdStr, int64_t *audioPts, int64_t *videoPts)
+{
+    if (curFd < 0 || fdStr == NULL || audioPts == NULL || videoPts == NULL) {
+        return -1;
+    }
+
+    int ret;
+    if (curFd == fdStr->inVideoFd) {
+        ret = read(fdStr->inVideoFd, (void*)videoPts, sizeof(*videoPts));
+        if (ret <= 0) {
+            return -1;
+        }
+    } else {
+        ret = read(fdStr->inAudioFd, (void*)audioPts, sizeof(*audioPts));
+        if (ret <= 0) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
 void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackIndex, FdListStr *fdStr)
 {
     if (fdStr == NULL || fdStr->inAudioFd < 0 || fdStr->inVideoFd < 0) {
@@ -243,11 +277,9 @@ void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackInde
         return;
     }
     printf("WriteTrackSample\n");
-    int dataSize = 0;
     int ret = 0;
     int trackId = 0;
     int curFd = 0;
-    int flags = 0;
     int64_t audioPts = 0;
     int64_t videoPts = 0;
     OH_AVCodecBufferAttr info;
@@ -274,56 +306,17 @@ void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackInde
             curFd = fdStr->inAudioFd;
         }
 
-        // read flags
-        ret = read(curFd, (void*)&flags, sizeof(flags));
-        if (ret <= 0) {
+        if (UpDateWriteBufferInfo(curFd, &avMuxerDemoBuffer, &avMuxerDemoBufferSize, &info) != 0) {
             break;
         }
-        info.flags = 0;
-        if (flags != 0) {
-            info.flags |= AVCODEC_BUFFER_FLAGS_SYNC_FRAME;
-        }
-
-        // read frame buffer
-        ret = read(curFd, (void*)&dataSize, sizeof(dataSize));
-        if (ret <= 0 || dataSize < 0) {
-            break;
-        }
-
-        if (avMuxerDemoBuffer != NULL && dataSize > avMuxerDemoBufferSize) {
-            free(avMuxerDemoBuffer);
-            avMuxerDemoBufferSize = 0;
-            avMuxerDemoBuffer = NULL;
-        }
-        if (avMuxerDemoBuffer == NULL) {
-            avMuxerDemoBuffer = malloc(dataSize);
-            avMuxerDemoBufferSize = dataSize;
-            if (avMuxerDemoBuffer == NULL) {
-                printf("error malloc memory! %d\n", dataSize);
-                break;
-            }
-        }
-        ret = read(curFd, (void*)avMuxerDemoBuffer, dataSize);
-        if (ret <= 0) {
-            break;
-        }
-        info.size = dataSize;
 
         if (OH_AVMuxer_WriteSampleBuffer(muxer, trackId, avMuxerDemoBuffer, info) != AV_ERR_OK) {
             printf("OH_AVMuxer_WriteSampleBuffer error!\n");
             break;
         }
 
-        if (curFd == fdStr->inVideoFd) {
-            ret = read(fdStr->inVideoFd, (void*)&videoPts, sizeof(videoPts));
-            if (ret <= 0) {
-                break;
-            }
-        } else {
-            ret = read(fdStr->inAudioFd, (void*)&audioPts, sizeof(audioPts));
-            if (ret <= 0) {
-                break;
-            }
+        if (UpdatePtsByFd(curFd, fdStr, &audioPts, &videoPts) != 0) {
+            break;
         }
     }
 
@@ -368,38 +361,37 @@ int GetInputNum(int defaultNum)
         num = defaultNum;
     } else {
         ungetc(num, stdin);
-        scanf("%d", &num);
+        scanf_s("%d", &num, sizeof(num));
         fflush(stdin);
     }
     return num;
 }
 
 
-void NativeSelectMuxerType()
+void NativeSelectMuxerType(void)
 {
     int num;
 
     printf("\nplese select muxer type : 0.mp4 1.m4a\n");
     num = GetInputNum(0);
-    switch (num)
-    {
-    case 0:
-        g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_MPEG_4;
-        snprintf(g_muxerParam.outputFormatType, sizeof(g_muxerParam.outputFormatType), "%s", "mp4");
-        break;
-    case 1:
-        g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_M4A;
-        snprintf(g_muxerParam.outputFormatType, sizeof(g_muxerParam.outputFormatType), "%s", "m4a");
-        break;
-    default:
-        g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_MPEG_4;
-        snprintf(g_muxerParam.outputFormatType, sizeof(g_muxerParam.outputFormatType), "%s", "mp4");
-        break;
+    switch (num) {
+        case 0:
+            g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_MPEG_4;
+            (void)snprintf_s(g_muxerParam.outputFormatType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mp4");
+            break;
+        case 1:
+            g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_M4A;
+            (void)snprintf_s(g_muxerParam.outputFormatType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "m4a");
+            break;
+        default:
+            g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_MPEG_4;
+            (void)snprintf_s(g_muxerParam.outputFormatType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mp4");
+            break;
     }
     printf("select mode:%d\n", num);
 }
 
-void NativeSelectRunMode()
+void NativeSelectRunMode(void)
 {
     int num;
 
@@ -407,101 +399,97 @@ void NativeSelectRunMode()
     printf("0. audio video write in sample thread\n");
     printf("1. audio video write in different thread\n");
     num = GetInputNum(0);
-    switch (num)
-    {
-    case 0:
-        g_muxerParam.runMode = NORMAL;
-        snprintf(g_muxerParam.runModeType, sizeof(g_muxerParam.runModeType), "%s", RUN_NORMAL);
-        break;
-    case 1:
-        g_muxerParam.runMode = THREAD;
-        snprintf(g_muxerParam.runModeType, sizeof(g_muxerParam.runModeType), "%s", RUN_MUL_THREAD);
-        break;
-    default:
-        g_muxerParam.runMode = NORMAL;
-        snprintf(g_muxerParam.runModeType, sizeof(g_muxerParam.runModeType), "%s", RUN_NORMAL);
-        break;
+    switch (num) {
+        case 0:
+            g_muxerParam.runMode = NORMAL;
+            (void)snprintf_s(g_muxerParam.runModeType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", RUN_NORMAL);
+            break;
+        case 1:
+            g_muxerParam.runMode = THREAD;
+            (void)snprintf_s(g_muxerParam.runModeType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", RUN_MUL_THREAD);
+            break;
+        default:
+            g_muxerParam.runMode = NORMAL;
+            (void)snprintf_s(g_muxerParam.runModeType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", RUN_NORMAL);
+            break;
     }
     printf("select mode:%d\n", num);
 }
 
-void NativeSelectAudio()
+void NativeSelectAudio(void)
 {
     int num;
 
     printf("\nplese select audio mode: 0.noAudio 1.aac 2.mpeg\n");
     num = GetInputNum(1);
-    switch (num)
-    {
-    case 1:
-        g_muxerParam.audioParams = &g_audioAacPar;
-        snprintf(g_muxerParam.audioType, sizeof(g_muxerParam.audioType), "%s", "aac");
-        break;
-    case 2:
-        g_muxerParam.audioParams = &g_audioMpegPar;
-        snprintf(g_muxerParam.audioType, sizeof(g_muxerParam.audioType), "%s", "mpeg");
-        break;
-    default:
-        g_muxerParam.audioParams = NULL;
-        snprintf(g_muxerParam.audioType, sizeof(g_muxerParam.audioType), "%s", "noAudio");
-        break;
+    switch (num) {
+        case 1:
+            g_muxerParam.audioParams = &g_audioAacPar;
+            (void)snprintf_s(g_muxerParam.audioType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "aac");
+            break;
+        case 2:
+            g_muxerParam.audioParams = &g_audioMpegPar;
+            (void)snprintf_s(g_muxerParam.audioType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mpeg");
+            break;
+        default:
+            g_muxerParam.audioParams = NULL;
+            (void)snprintf_s(g_muxerParam.audioType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "noAudio");
+            break;
     }
     printf("select mode:%d\n", num);
 }
 
-void NativeSelectVideo()
+void NativeSelectVideo(void)
 {
     int num;
 
     printf("\nplese select video mode: 0.noVideo 1.h264 2.mpeg4\n");
     num = GetInputNum(1);
-    switch (num)
-    {
-    case 1:
-        g_muxerParam.videoParams = &g_videoH264Par;
-        snprintf(g_muxerParam.videoType, sizeof(g_muxerParam.videoType), "%s", "h264");
-        break;
-    case 2:
-        g_muxerParam.videoParams = &g_videoMpeg4Par;
-        snprintf(g_muxerParam.videoType, sizeof(g_muxerParam.videoType), "%s", "mpeg4");
-        break;
-    default:
-        g_muxerParam.videoParams = NULL;
-        snprintf(g_muxerParam.videoType, sizeof(g_muxerParam.videoType), "%s", "noVideo");
-        break;
+    switch (num) {
+        case 1:
+            g_muxerParam.videoParams = &g_videoH264Par;
+            (void)snprintf_s(g_muxerParam.videoType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "h264");
+            break;
+        case 2:
+            g_muxerParam.videoParams = &g_videoMpeg4Par;
+            (void)snprintf_s(g_muxerParam.videoType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mpeg4");
+            break;
+        default:
+            g_muxerParam.videoParams = NULL;
+            (void)snprintf_s(g_muxerParam.videoType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "noVideo");
+            break;
     }
     printf("select mode:%d\n", num);
 }
 
-void NativeSelectCover()
+void NativeSelectCover(void)
 {
     int num;
 
     printf("\nplese select cover mode: 0.noCover 1.jpg 2.png 3.bmp\n");
     num = GetInputNum(1);
-    switch (num)
-    {
-    case 1:
-        g_muxerParam.coverParams = &g_jpegCoverPar;
-        snprintf(g_muxerParam.coverType, sizeof(g_muxerParam.coverType), "%s", "jpg");
-        break;
-    case 2:
-        g_muxerParam.coverParams = &g_pngCoverPar;
-        snprintf(g_muxerParam.coverType, sizeof(g_muxerParam.coverType), "%s", "png");
-        break;
-    case 3:
-        g_muxerParam.coverParams = &g_bmpCoverPar;
-        snprintf(g_muxerParam.coverType, sizeof(g_muxerParam.coverType), "%s", "bmp");
-        break;
-    default:
-        g_muxerParam.coverParams = NULL;
-        snprintf(g_muxerParam.coverType, sizeof(g_muxerParam.coverType), "%s", "noCover");
-        break;
+    switch (num) {
+        case 1:
+            g_muxerParam.coverParams = &g_jpegCoverPar;
+            (void)snprintf_s(g_muxerParam.coverType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "jpg");
+            break;
+        case 2:
+            g_muxerParam.coverParams = &g_pngCoverPar;
+            (void)snprintf_s(g_muxerParam.coverType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "png");
+            break;
+        case 3:
+            g_muxerParam.coverParams = &g_bmpCoverPar;
+            (void)snprintf_s(g_muxerParam.coverType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "bmp");
+            break;
+        default:
+            g_muxerParam.coverParams = NULL;
+            (void)snprintf_s(g_muxerParam.coverType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "noCover");
+            break;
     }
     printf("select mode:%d\n", num);
 }
 
-void NativeSelectMode()
+void NativeSelectMode(void)
 {
     if (g_muxerParam.outputFormat != AV_OUTPUT_FORMAT_DEFAULT) {
         return;
@@ -560,8 +548,8 @@ int DoRunMuxer(FdListStr *fdStr, OH_AVMuxer *muxer)
         return -1;
     }
 
-    if (OH_AVMuxer_SetLocation(muxer, 10, 10) != AV_ERR_OK 
-        || OH_AVMuxer_SetRotation(muxer, 0) != AV_ERR_OK ) {
+    if (OH_AVMuxer_SetLocation(muxer, 0, 0) != AV_ERR_OK
+        || OH_AVMuxer_SetRotation(muxer, 0) != AV_ERR_OK) {
         printf("set failed!\n");
         return -1;
     }
@@ -638,8 +626,8 @@ int RunNativeMuxer(const char *out)
         return -1;
     }
 
-    char outFileName[100] = {0};
-    snprintf(outFileName, sizeof(outFileName), "%s_%s_%s_%s_%s.%s", 
+    char outFileName[CONFIG_BUFFER_SIZE] = {0};
+    (void)snprintf_s(outFileName, sizeof(outFileName), sizeof(outFileName) - 1, "%s_%s_%s_%s_%s.%s", 
         out, g_muxerParam.runModeType, g_muxerParam.audioType, g_muxerParam.videoType,
         g_muxerParam.coverType, g_muxerParam.outputFormatType);
 
