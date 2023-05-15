@@ -185,9 +185,10 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveFrameSucc(std::shared_ptr<AudioBufferIn
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }
     if (av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
-        size_t planarSize = outputSize / channels;
-        for (int32_t idx = 0; idx < channels; idx++) {
-            ioInfoMem->Write(cachedFrame_->extended_data[idx], planarSize);
+        for (int i = 0; i < samples; ++i) {
+            for (int ch = 0; ch < channels; ++ch) {
+                ioInfoMem->Write(cachedFrame_->data[ch] + bytePerSample * i, bytePerSample);
+            }
         }
     } else {
         ioInfoMem->Write(cachedFrame_->data[0], outputSize);
