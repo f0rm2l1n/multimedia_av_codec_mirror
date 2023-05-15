@@ -32,14 +32,15 @@ using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
-constexpr uint32_t BITS_RATE = 169000;
+constexpr uint32_t BITS_RATE = 112000;
 constexpr uint32_t BITS_PER_CODED_RATE = 16;
 constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr uint32_t CHANNEL_LAYOUT = 3;
-constexpr int32_t SAMPLE_FORMAT = 1;
+constexpr int32_t SAMPLE_FORMAT = 8;
+constexpr int32_t INPUT_FRAME_BYTES = 2 * 1024 * 4;
 
-constexpr string_view inputFilePath = "/data/encoderTest.pcm";
-constexpr string_view outputFilePath = "/data/encoderTest.flac";
+constexpr string_view inputFilePath = "/data/media/test_fltp.pcm";
+constexpr string_view outputFilePath = "/data/media/encode2.aac";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -131,7 +132,7 @@ AEncDemo::~AEncDemo()
 
 int32_t AEncDemo::CreateEnc()
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_DECODER_FLAC_NAME_KEY).data());
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_ENCODER_AAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();
@@ -214,9 +215,6 @@ void AEncDemo::HandleEOS(const uint32_t &index)
 void AEncDemo::InputFunc()
 {
     DEMO_CHECK_AND_RETURN_LOG(inputFile_ != nullptr && inputFile_->is_open(), "Fatal: open file fail");
-    inputFile_->seekg(0, ios::end);
-    int32_t fsize = inputFile_->tellg();
-    inputFile_->seekg(0, ios::beg);
     while (true) {
         if (!isRunning_.load()) {
             break;
@@ -230,18 +228,15 @@ void AEncDemo::InputFunc()
         auto buffer = signal_->inBufferQueue_.front();
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
 
-        uint32_t bufferSize = fsize > OH_AVMemory_GetSize(buffer) ? OH_AVMemory_GetSize(buffer) : fsize;
-        if (fsize > 0 || !inputFile_->eof()) {
-            (void)inputFile_->read((char *)OH_AVMemory_GetAddr(buffer), bufferSize);
-            fsize = fsize - bufferSize;
-            std::cout << "fsize " << fsize << std::endl;
+        if (!inputFile_->eof()) {
+            inputFile_->read((char*)OH_AVMemory_GetAddr(buffer), INPUT_FRAME_BYTES);
         } else {
             HandleEOS(index);
             break;
         }
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
         OH_AVCodecBufferAttr info;
-        info.size = bufferSize;
+        info.size = INPUT_FRAME_BYTES;
         info.offset = 0;
 
         int32_t ret = AVCS_ERR_OK;
@@ -309,6 +304,10 @@ void AEncDemo::OutputFunc()
         if (OH_AudioEncoder_FreeOutputData(audioEnc_, index) != AV_ERR_OK) {
             cout << "Fatal: FreeOutputData fail" << endl;
             break;
+        }
+        if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
+            cout << "decode eos" << endl;
+            isRunning_.store(false);
         }
     }
     outputFile.close();

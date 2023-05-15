@@ -172,6 +172,16 @@ public:
      */
     static constexpr std::string_view MD_KEY_AAC_IS_ADTS = "aac_is_adts";
 
+    /**
+     * Key for aac profile, value type is uint32_t
+     */
+    static constexpr std::string_view MD_KEY_AAC_PROFILE = "aac_profile";
+
+    /**
+     * Key for aac sbr, value type is uint32_t
+     */
+    static constexpr std::string_view MD_KEY_SBR = "sbr";
+
 private:
     MediaDescriptionKey() = delete;
     ~MediaDescriptionKey() = delete;
