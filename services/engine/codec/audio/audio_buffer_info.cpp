@@ -19,7 +19,8 @@
 #include "securec.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioBufferInfo"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioBufferInfo"};
+    constexpr uint8_t LOGD_FREQUENCY = 5;
 }
 
 namespace OHOS {
@@ -52,12 +53,12 @@ AudioBufferInfo::AudioBufferInfo(const uint32_t &bufferSize, const std::string_v
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         AVCODEC_LOGE("Create buffer avsharedmemory failed, ret = %{public}d", ret);
     }
-    AVCODEC_LOGI("AudioBufferInfo constructor %{public}s buffer.", name_.data());
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "AudioBufferInfo constructor %{public}s buffer.", name_.data());
 }
 
 AudioBufferInfo::~AudioBufferInfo()
 {
-    AVCODEC_LOGI("AudioBufferInfo destructor %{public}s buffer.", name_.data());
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "AudioBufferInfo destructor %{public}s buffer.", name_.data());
     isEos_ = false;
     status_ = BufferStatus::IDEL;
 

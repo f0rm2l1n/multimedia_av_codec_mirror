@@ -73,7 +73,7 @@ int32_t AudioFFMpegAdapter::Configure(const Format &format)
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
 
-    AVCODEC_LOGI("state from %{public}s to INITLIZING,name:%{public}s,name size:%{public}d",
+    AVCODEC_LOGI("state from %{public}s to INITLIZING, name:%{public}s, name size:%{public}zu",
                  stateToString(state_).data(), name_.data(), name_.size());
     state_ = CodecState::INITLIZING;
     auto ret = doInit();
@@ -244,7 +244,7 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetInputBuffer(size_t in
     }
     if (index < 0) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}d error", index);
+        AVCODEC_LOGE("index=%{public}zu error", index);
         return nullptr;
     }
 
@@ -275,7 +275,7 @@ int32_t AudioFFMpegAdapter::QueueInputBuffer(size_t index, const AVCodecBufferIn
 
     if (index < 0) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}d error", index);
+        AVCODEC_LOGE("index=%{public}zu error", index);
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
@@ -311,7 +311,7 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetOutputBuffer(size_t i
 
     if (index < 0) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}d error", index);
+        AVCODEC_LOGE("index=%{public}zu error", index);
         return nullptr;
     }
 
@@ -340,14 +340,14 @@ int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(size_t index)
     }
 
     if (index < 0) {
-        AVCODEC_LOGE("index=%{public}d error", index);
+        AVCODEC_LOGE("index=%{public}zu error", index);
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
     auto outBufferInfo = worker_->GetOutputBufferInfo(index);
     if (outBufferInfo == nullptr) {
-        AVCODEC_LOGE("index=%{public}d error", index);
+        AVCODEC_LOGE("index=%{public}zu error", index);
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }
@@ -355,7 +355,7 @@ int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(size_t index)
 
     auto outBuffer = worker_->GetOutputBuffer();
     if (outBuffer == nullptr) {
-        AVCODEC_LOGE("index=%{public}d error", index);
+        AVCODEC_LOGE("index=%{public}zu error", index);
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }

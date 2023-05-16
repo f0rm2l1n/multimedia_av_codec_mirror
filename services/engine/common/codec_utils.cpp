@@ -60,7 +60,7 @@ int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, ui
         size_t srcPos = 0;
         size_t dstPos = 0;
         int32_t writeSize = scaleLineSize[0];
-        for (uint32_t colNum = 0; colNum < height; colNum++) {
+        for (int32_t colNum = 0; colNum < height; colNum++) {
             frameBuffer->Write(scaleData[0] + srcPos, writeSize, dstPos);
             dstPos += stride;
         }
@@ -87,8 +87,8 @@ int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase> &frameBuffer, uin
     } else if (pixFmt == VideoPixelFormat::NV21 || pixFmt == VideoPixelFormat::NV12) {
         frameSize = ySize + uvSize;
     }
-    CHECK_AND_RETURN_RET_LOG(frameBuffer->GetSize() >= frameSize, AVCS_ERR_NO_MEMORY,
-                             "output buffer size is not enough: real[%{public}zu], need[%{public}zu]",
+    CHECK_AND_RETURN_RET_LOG(frameBuffer->GetSize() >= (int32_t)frameSize, AVCS_ERR_NO_MEMORY,
+                             "output buffer size is not enough: real[%{public}d], need[%{public}zu]",
                              frameBuffer->GetSize(), frameSize);
     if (pixFmt == VideoPixelFormat::YUV420P) {
         frameBuffer->Write(scaleData[0], ySize);
@@ -119,8 +119,8 @@ int32_t WriteRgbData(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t 
         return WriteRgbDataStride(frameBuffer, scaleData, scaleLineSize, stride, format);
     }
     size_t frameSize = static_cast<size_t>(scaleLineSize[0] * height);
-    CHECK_AND_RETURN_RET_LOG(frameBuffer->GetSize() >= frameSize, AVCS_ERR_NO_MEMORY,
-                             "output buffer size is not enough: real[%{public}zu], need[%{public}zu]",
+    CHECK_AND_RETURN_RET_LOG(frameBuffer->GetSize() >= (int32_t)frameSize, AVCS_ERR_NO_MEMORY,
+                             "output buffer size is not enough: real[%{public}d], need[%{public}zu]",
                              frameBuffer->GetSize(), frameSize);
     if (pixFmt == VideoPixelFormat::RGBA || pixFmt == VideoPixelFormat::BGRA) {
         frameBuffer->Write(scaleData[0], frameSize);

@@ -45,7 +45,7 @@ namespace {
     constexpr uint32_t DUMP_INSTANCE_INDEX = 0x01010000;
     constexpr uint32_t DUMP_PID_INDEX = 0x01010100;
     constexpr uint32_t DUMP_UID_INDEX = 0x01010200;
-    constexpr uint32_t DUMP_OFFSET_8 = 8;
+    constexpr uint32_t DUMP_OFFSET_16 = 16;
 
     const std::vector<const std::string> SA_DUMP_MENU_DUMP_TABLE = {
         "all",
@@ -544,7 +544,8 @@ void AVCodecServerManager::PrintDumpMenu(int32_t fd)
     dumpControler.AddInfo(DUMP_MENU_INDEX, "[AVCodec Dump Menu]");
     uint32_t index = 1;
     for (auto iter : SA_DUMP_MENU_DUMP_TABLE) {
-        dumpControler.AddInfo(DUMP_MENU_INDEX + (index << DUMP_OFFSET_8), iter);
+        dumpControler.AddInfo(DUMP_MENU_INDEX + (index << DUMP_OFFSET_16), iter);
+        index++;
     }
         
     std::string dumpString;

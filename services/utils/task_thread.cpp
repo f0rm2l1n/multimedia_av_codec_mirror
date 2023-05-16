@@ -17,7 +17,8 @@
 #include "avcodec_log.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-TaskThread"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "TaskThread"};
+    constexpr uint8_t LOGD_FREQUENCY = 5;
 }
 namespace OHOS {
 namespace Media {
@@ -134,7 +135,8 @@ void TaskThread::doTask()
 void TaskThread::Run()
 {
     for (;;) {
-        AVCODEC_LOGD("task %{public}s is running on state : %{public}d", name_.data(), runningState_.load());
+        AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "task %{public}s is running on state : %{public}d",
+            name_.data(), runningState_.load());
         if (runningState_.load() == RunningState::STARTED) {
             handler_();
         }
