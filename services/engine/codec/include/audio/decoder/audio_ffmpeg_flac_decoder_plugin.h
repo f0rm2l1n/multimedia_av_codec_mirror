@@ -18,7 +18,7 @@
 
 #include "audio_ffmpeg_base_codec.h"
 #include "audio_ffmpeg_decoder_plugin.h"
-#include "avcodec_audio_codec_key.h"
+#include "avcodec_codec_key.h"
 
 namespace OHOS {
 namespace Media {
@@ -38,7 +38,7 @@ public:
     Format GetFormat() const noexcept override;
     const static std::string identify()
     {
-        return std::string(AVCodecAudioCodecKey::AUDIO_DECODER_FLAC_NAME_KEY);
+        return std::string(AVCodecCodecKey::AUDIO_DECODER_FLAC_NAME_KEY);
     }
 
 private:

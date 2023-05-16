@@ -22,7 +22,7 @@
 #include "native_avformat.h"
 #include "demo_log.h"
 #include "native_avcodec_base.h"
-#include "avcodec_audio_codec_key.h"
+#include "avcodec_codec_key.h"
 #include "avcodec_audio_encoder_demo.h"
 
 using namespace OHOS;
@@ -132,7 +132,7 @@ AEncDemo::~AEncDemo()
 
 int32_t AEncDemo::CreateEnc()
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_ENCODER_AAC_NAME_KEY).data());
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecKey::AUDIO_ENCODER_AAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();
@@ -229,7 +229,7 @@ void AEncDemo::InputFunc()
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
 
         if (!inputFile_->eof()) {
-            inputFile_->read((char*)OH_AVMemory_GetAddr(buffer), INPUT_FRAME_BYTES);
+            inputFile_->read((char *)OH_AVMemory_GetAddr(buffer), INPUT_FRAME_BYTES);
         } else {
             HandleEOS(index);
             break;

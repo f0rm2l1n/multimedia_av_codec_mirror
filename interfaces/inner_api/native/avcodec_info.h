@@ -21,6 +21,7 @@
 #include <vector>
 #include "av_common.h"
 #include "nocopyable.h"
+#include "avcodec_audio_common.h"
 
 namespace OHOS {
 namespace Media {
@@ -36,15 +37,6 @@ enum AVCodecType : int32_t {
     AVCODEC_TYPE_VIDEO_DECODER,
     AVCODEC_TYPE_AUDIO_ENCODER,
     AVCODEC_TYPE_AUDIO_DECODER,
-};
-
-enum AudioSampleFormat {
-    SAMPLE_U8 = 0,
-    SAMPLE_S16LE = 1,
-    SAMPLE_S24LE = 2,
-    SAMPLE_S32LE = 3,
-    SAMPLE_F32LE = 4,
-    INVALID_WIDTH = -1
 };
 
 /**
@@ -151,8 +143,8 @@ struct LevelParams {
     int32_t maxFrameRate = 0;
     int32_t maxWidth = 0;
     int32_t maxHeight = 0;
-    LevelParams(const int32_t &blockPerFrame, const int32_t &blockPerSecond,
-                const int32_t &frameRate, const int32_t &width, const int32_t height)
+    LevelParams(const int32_t &blockPerFrame, const int32_t &blockPerSecond, const int32_t &frameRate,
+                const int32_t &width, const int32_t height)
     {
         this->maxBlockPerFrame = blockPerFrame;
         this->maxBlockPerSecond = blockPerSecond;
@@ -419,8 +411,8 @@ private:
     ImgSize MatchClosestSize(const ImgSize &imgSize);
     int32_t DivCeil(const int32_t &dividend, const int32_t &divisor);
     Range DivRange(const Range &range, const int32_t &divisor);
-    void UpdateBlockParams(const int32_t &blockWidth, const int32_t &blockHeight,
-                           Range &blockPerFrameRange, Range &blockPerSecondRange);
+    void UpdateBlockParams(const int32_t &blockWidth, const int32_t &blockHeight, Range &blockPerFrameRange,
+                           Range &blockPerSecondRange);
 };
 
 class __attribute__((visibility("default"))) AudioCaps {
@@ -629,22 +621,6 @@ enum VP8Profile : int32_t {
  * @since 3.1
  * @version 3.1
  */
-enum AACProfile : int32_t {
-    AAC_PROFILE_LC = 0,
-    AAC_PROFILE_ELD = 1,
-    AAC_PROFILE_ERLC = 2,
-    AAC_PROFILE_HE = 3,
-    AAC_PROFILE_HE_V2 = 4,
-    AAC_PROFILE_LD = 5,
-    AAC_PROFILE_MAIN = 6,
-};
-
-/**
- * @brief
- *
- * @since 3.1
- * @version 3.1
- */
 enum AVCLevel : int32_t {
     AVC_LEVEL_1 = 0,
     AVC_LEVEL_1b = 1,
@@ -725,15 +701,15 @@ enum MPEG4Level : int32_t {
 enum VideoEncodeBitrateMode : int32_t {
     /**
      * constant bit rate mode.
-    */
+     */
     CBR = 0,
     /**
      * variable bit rate mode.
-    */
+     */
     VBR = 1,
     /**
      * constant quality mode.
-    */
+     */
     CQ = 2,
 };
 } // namespace Media
