@@ -44,7 +44,7 @@ struct VideoDecoderObject : public OH_AVCodec {
     std::atomic<bool> isFlushing_ = false;
     std::atomic<bool> isStop_ = false;
     std::atomic<bool> isEOS_ = false;
-    bool isOutputSurfaceMode_ =false;
+    bool isOutputSurfaceMode_ = false;
 };
 
 class NativeVideoDecoderCallback : public AVCodecCallback {
