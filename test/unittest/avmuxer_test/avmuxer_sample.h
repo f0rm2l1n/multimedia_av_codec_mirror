@@ -30,7 +30,7 @@ public:
     int32_t Start();
     int32_t Stop();
     int32_t AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMock> &trackFormat);
-    int32_t WriteSampleBuffer(uint32_t trackIndex, uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info);
+    int32_t WriteSample(uint32_t trackIndex, uint8_t *sample, const AVCodecBufferAttrMock &info);
     int32_t SetLocation(float latitude, float longitude);
     int32_t SetRotation(int32_t rotation);
 private:

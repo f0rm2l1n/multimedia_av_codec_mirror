@@ -361,7 +361,7 @@ void AVCodecServerManager::DestroyStubObject(StubType type, sptr<IRemoteObject> 
     std::lock_guard<std::mutex> lock(mutex_);
     pid_t pid = IPCSkeleton::GetCallingPid();
     DestroyDumper(type, object);
-    
+
     auto compare_func = [object](std::pair<sptr<IRemoteObject>, pid_t> objectPair) ->
         bool { return objectPair.first == object; };
     switch (type) {

@@ -274,14 +274,14 @@ Status FFmpegMuxerPlugin::Stop()
     return Status::NO_ERROR;
 }
 
-Status FFmpegMuxerPlugin::WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info)
+Status FFmpegMuxerPlugin::WriteSample(uint8_t *sample, const TrackSampleInfo &info)
 {
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr, Status::ERROR_NULL_POINTER,
-        "av_write_frame sampleBuffer is null!");
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr, Status::ERROR_NULL_POINTER,
+        "av_write_frame sample is null!");
     CHECK_AND_RETURN_RET_LOG(info.trackIndex < formatContext_->nb_streams,
         Status::ERROR_INVALID_PARAMETER, "track index is invalid!");
     (void)memset_s(cachePacket_.get(), sizeof(AVPacket), 0, sizeof(AVPacket));
-    cachePacket_->data = sampleBuffer;
+    cachePacket_->data = sample;
     cachePacket_->size = info.size;
     cachePacket_->stream_index = static_cast<int>(info.trackIndex);
     cachePacket_->pts = ConvertTimeToFFmpeg(info.timeUs, formatContext_->streams[info.trackIndex]->time_base);

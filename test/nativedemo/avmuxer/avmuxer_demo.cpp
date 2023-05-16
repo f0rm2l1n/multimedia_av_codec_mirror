@@ -25,10 +25,10 @@
 
 namespace OHOS {
 namespace Media {
-int AVMuxerDemo::DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info)
+int AVMuxerDemo::DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info)
 {
     if (avmuxer_ != nullptr &&
-        avmuxer_->WriteSampleBuffer(sampleBuffer, info) == AVCS_ERR_OK) {
+        avmuxer_->WriteSample(sample, info) == AVCS_ERR_OK) {
             return 0;
     }
     return -1;
@@ -48,7 +48,8 @@ void AVMuxerDemo::DoRunMuxer(const std::string &runMode)
 {
     constexpr float latitude = 50.5;
     constexpr float longitude = 60.6;
-    std::string outFileName = "mux_" + runMode + "_" + audioType_ + "_" + videoType_ + "_" + coverType_ + "." + format_;
+    std::string outFileName = "inner_mux_" + runMode + "_" + audioType_ +
+        "_" + videoType_ + "_" + coverType_ + "." + format_;
     outFd_ = open(outFileName.c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
     if (outFd_ < 0) {
         std::cout << "Open file failed! filePath is: " << outFileName << std::endl;
@@ -82,7 +83,7 @@ void AVMuxerDemo::DoRunMuxer(const std::string &runMode)
     std::cout << "start muxer success" << std::endl;
 
     WriteCoverSample();
-    
+
     std::cout<<"AVMuxerDemo::DoRunMuxer runMode is : "<<runMode<<std::endl;
     if (runMode.compare(RUN_NORMAL) == 0) {
         WriteTrackSample();

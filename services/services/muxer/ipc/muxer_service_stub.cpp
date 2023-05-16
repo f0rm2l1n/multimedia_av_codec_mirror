@@ -56,7 +56,7 @@ int32_t MuxerServiceStub::Init()
     muxerFuncs_[SET_ROTATION] = &MuxerServiceStub::SetRotation;
     muxerFuncs_[ADD_TRACK] = &MuxerServiceStub::AddTrack;
     muxerFuncs_[START] = &MuxerServiceStub::Start;
-    muxerFuncs_[WRITE_SAMPLE_BUFFER] = &MuxerServiceStub::WriteSampleBuffer;
+    muxerFuncs_[WRITE_SAMPLE] = &MuxerServiceStub::WriteSample;
     muxerFuncs_[STOP] = &MuxerServiceStub::Stop;
     muxerFuncs_[RELEASE] = &MuxerServiceStub::Release;
     muxerFuncs_[DESTROY] = &MuxerServiceStub::DestroyStub;
@@ -114,11 +114,11 @@ int32_t MuxerServiceStub::Start()
     return muxerServer_->Start();
 }
 
-int32_t MuxerServiceStub::WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info)
+int32_t MuxerServiceStub::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
 {
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr, AVCS_ERR_INVALID_VAL, "sampleData is nullptr");
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_INVALID_VAL, "sampleData is nullptr");
     CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
-    return muxerServer_->WriteSampleBuffer(sampleBuffer, info);
+    return muxerServer_->WriteSample(sample, info);
 }
 
 int32_t MuxerServiceStub::Stop()
@@ -189,17 +189,18 @@ int32_t MuxerServiceStub::Start(MessageParcel &data, MessageParcel &reply)
     return AVCS_ERR_OK;
 }
 
-int32_t MuxerServiceStub::WriteSampleBuffer(MessageParcel &data, MessageParcel &reply)
+int32_t MuxerServiceStub::WriteSample(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<AVSharedMemory> sampleBuffer = ReadAVSharedMemoryFromParcel(data);
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr, AVCS_ERR_UNKNOWN, "Read sampleBuffer from parcel failed!");
+    std::shared_ptr<AVSharedMemory> sample = ReadAVSharedMemoryFromParcel(data);
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_UNKNOWN, "Read sample from parcel failed!");
     TrackSampleInfo info;
     info.trackIndex = data.ReadUint32();
     info.timeUs = data.ReadInt64();
     info.size = data.ReadUint32();
+    info.offset = data.ReadUint32();
     info.flags = data.ReadUint32();
-    int32_t ret = WriteSampleBuffer(sampleBuffer, info);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply WriteSampleBuffer failed!");
+    int32_t ret = WriteSample(sample, info);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply WriteSample failed!");
     return AVCS_ERR_OK;
 }
 

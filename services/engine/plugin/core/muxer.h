@@ -31,7 +31,7 @@ public:
     Status SetRotation(int32_t rotation);
     Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc);
     Status Start();
-    Status WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info);
+    Status WriteSample(uint8_t *sample, const TrackSampleInfo &info);
     Status Stop();
 
 private:

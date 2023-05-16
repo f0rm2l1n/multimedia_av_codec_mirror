@@ -26,6 +26,7 @@
 #include "avcodec_info.h"
 #include "avcodec_errors.h"
 #include "avcodec_dump_utils.h"
+#include "avsharedmemorybase.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "MuxerEngineImpl"};
@@ -205,7 +206,7 @@ int32_t MuxerEngineImpl::Start()
     AVCODEC_LOGI("Start");
     std::unique_lock<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
-        "The state is not INITIALIZED, the interface must be called after AddTrack() and before WriteSampleBuffer(). "
+        "The state is not INITIALIZED, the interface must be called after AddTrack() and before WriteSample(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracks_.size() > 0, AVCS_ERR_INVALID_OPERATION,
         "The track count is error, count is %{public}zu", tracks_.size());
@@ -217,19 +218,27 @@ int32_t MuxerEngineImpl::Start()
     return AVCS_ERR_OK;
 }
 
-int32_t MuxerEngineImpl::WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info)
+int32_t MuxerEngineImpl::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
 {
-    AVCodecTrace trace("MuxerEngine::WriteSampleBuffer");
+    AVCodecTrace trace("MuxerEngine::WriteSample");
     std::unique_lock<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED, the interface must be called after Start() and before Stop(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracks_.find(info.trackIndex) != tracks_.end(), AVCS_ERR_INVALID_VAL,
         "The track index does not exist");
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr && info.timeUs >= 0, AVCS_ERR_INVALID_VAL, "Invalid memory");
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.timeUs >= 0 &&
+        sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
+
+    std::shared_ptr<AVSharedMemoryBase> buffer =
+        std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sample");
+    int32_t ret = buffer->Init();
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_NO_MEMORY, "Failed to create AVSharedMemoryBase");
+    errno_t rc = memcpy_s(buffer->GetBase(), buffer->GetSize(), sample->GetBase() + info.offset, info.size);
+    CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
     std::shared_ptr<BlockBuffer> blockBuffer = std::make_shared<BlockBuffer>();
-    blockBuffer->buffer_ = sampleBuffer;
+    blockBuffer->buffer_ = buffer;
     blockBuffer->info_ = info;
     que_.Push(blockBuffer);
 
@@ -345,7 +354,7 @@ void MuxerEngineImpl::ThreadProcessor()
         }
         auto buffer = que_.Pop();
         if (buffer != nullptr) {
-            (void)muxer_->WriteSampleBuffer(buffer->buffer_->GetBase(), buffer->info_);
+            (void)muxer_->WriteSample(buffer->buffer_->GetBase(), buffer->info_);
         }
         if (que_.Empty()) {
             cond_.notify_all();

@@ -40,7 +40,7 @@ public:
     Status SetRotation(int32_t rotation) override;
     Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     Status Start() override;
-    Status WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info) override;
+    Status WriteSample(uint8_t *sample, const TrackSampleInfo &info) override;
     Status Stop() override;
 
 private:

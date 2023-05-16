@@ -30,7 +30,7 @@ public:
     int32_t SetRotation(int32_t rotation) override;
     int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     int32_t Start() override;
-    int32_t WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info) override;
+    int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info) override;
     int32_t Stop() override;
 
 private:

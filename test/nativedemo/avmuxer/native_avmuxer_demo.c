@@ -25,6 +25,7 @@
 #include "native_averrors.h"
 #include "native_avformat.h"
 #include "native_avmuxer.h"
+#include "native_avmemory.h"
 #include "avmuxer_demo_common.h"
 
 
@@ -165,7 +166,7 @@ int AddTrackCover(OH_AVMuxer *muxer, const VideoTrackParam *param, int fdInput)
     return trackIndex;
 }
 
-static int UpDateWriteBufferInfo(int fd, unsigned char **buffer, int *curSize, OH_AVCodecBufferAttr *info)
+static int UpDateWriteBufferInfo(int fd, OH_AVMemory **buffer, int *curSize, OH_AVCodecBufferAttr *info)
 {
     if (fd < 0 || buffer == NULL || curSize == NULL || info == NULL) {
         return -1;
@@ -191,20 +192,20 @@ static int UpDateWriteBufferInfo(int fd, unsigned char **buffer, int *curSize, O
     }
 
     if (*buffer != NULL && dataSize > *curSize) {
-        free(*buffer);
+        OH_AVMemory_Destroy(*buffer);
         *curSize = 0;
         *buffer = NULL;
     }
     if (*buffer == NULL) {
-        *buffer = malloc(dataSize);
+        *buffer = OH_AVMemory_Create(dataSize);
         *curSize = dataSize;
         if (*buffer == NULL) {
-            printf("error malloc memory! %d\n", dataSize);
+            printf("error create OH_AVMemory! %d\n", dataSize);
             return -1;
         }
     }
 
-    ret = read(fd, (void*)*buffer, dataSize);
+    ret = read(fd, (void*)OH_AVMemory_GetAddr(*buffer), dataSize);
     if (ret <= 0) {
         return -1;
     }
@@ -219,8 +220,8 @@ void WriteSingleTrackSample(OH_AVMuxer *muxer, int trackId, int fd)
         return;
     }
     int ret = 0;
-    unsigned char *avMuxerDemoBuffer = NULL;
-    int avMuxerDemoBufferSize = 0;
+    OH_AVMemory *avMemBuffer = NULL;
+    int avMemBufferSize = 0;
     OH_AVCodecBufferAttr info;
     memset_s(&info, sizeof(info), 0, sizeof(info));
     while (1) {
@@ -229,18 +230,18 @@ void WriteSingleTrackSample(OH_AVMuxer *muxer, int trackId, int fd)
             break;
         }
 
-        if (UpDateWriteBufferInfo(fd, &avMuxerDemoBuffer, &avMuxerDemoBufferSize, &info) != 0) {
+        if (UpDateWriteBufferInfo(fd, &avMemBuffer, &avMemBufferSize, &info) != 0) {
             break;
         }
 
-        if (OH_AVMuxer_WriteSampleBuffer(muxer, trackId, avMuxerDemoBuffer, info) != AV_ERR_OK) {
-            printf("OH_AVMuxer_WriteSampleBuffer error!\n");
+        if (OH_AVMuxer_WriteSample(muxer, trackId, avMemBuffer, info) != AV_ERR_OK) {
+            printf("OH_AVMuxer_WriteSample error!\n");
             break;
         }
     }
 
-    if (avMuxerDemoBuffer != NULL) {
-        free(avMuxerDemoBuffer);
+    if (avMemBuffer != NULL) {
+        OH_AVMemory_Destroy(avMemBuffer);
     }
 }
 
@@ -286,8 +287,8 @@ void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackInde
     int64_t videoPts = 0;
     OH_AVCodecBufferAttr info;
     memset_s(&info, sizeof(info), 0, sizeof(info));
-    unsigned char *avMuxerDemoBuffer = NULL;
-    int avMuxerDemoBufferSize = 0;
+    OH_AVMemory *avMemBuffer = NULL;
+    int avMemBufferSize = 0;
 
     ret = read(fdStr->inAudioFd, (void*)&audioPts, sizeof(audioPts));
     if (ret <= 0) {
@@ -307,13 +308,12 @@ void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackInde
             trackId = audioTrackIndex;
             curFd = fdStr->inAudioFd;
         }
-
-        if (UpDateWriteBufferInfo(curFd, &avMuxerDemoBuffer, &avMuxerDemoBufferSize, &info) != 0) {
+        if (UpDateWriteBufferInfo(curFd, &avMemBuffer, &avMemBufferSize, &info) != 0) {
             break;
         }
 
-        if (OH_AVMuxer_WriteSampleBuffer(muxer, trackId, avMuxerDemoBuffer, info) != AV_ERR_OK) {
-            printf("OH_AVMuxer_WriteSampleBuffer error!\n");
+        if (OH_AVMuxer_WriteSample(muxer, trackId, avMemBuffer, info) != AV_ERR_OK) {
+            printf("OH_AVMuxer_WriteSample error!\n");
             break;
         }
 
@@ -322,8 +322,8 @@ void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackInde
         }
     }
 
-    if (avMuxerDemoBuffer != NULL) {
-        free(avMuxerDemoBuffer);
+    if (avMemBuffer != NULL) {
+        OH_AVMemory_Destroy(avMemBuffer);
     }
 }
 
@@ -335,24 +335,24 @@ void WriteTrackCover(OH_AVMuxer *muxer, int coverTrackIndex, int fdInput)
     struct stat fileStat;
     fstat(fdInput, &fileStat);
     info.size = fileStat.st_size;
-    unsigned char *avMuxerDemoBuffer = malloc(info.size);
-    if (avMuxerDemoBuffer == NULL) {
-        printf("malloc memory error! size: %d \n", info.size);
+    OH_AVMemory *avMemBuffer = OH_AVMemory_Create(info.size);
+    if (avMemBuffer == NULL) {
+        printf("create OH_AVMemory error! size: %d \n", info.size);
         return;
     }
 
-    int ret = read(fdInput, avMuxerDemoBuffer, info.size);
+    int ret = read(fdInput, (void*)OH_AVMemory_GetAddr(avMemBuffer), info.size);
     if (ret <= 0) {
-        free(avMuxerDemoBuffer);
+        OH_AVMemory_Destroy(avMemBuffer);
         return;
     }
 
-    if (OH_AVMuxer_WriteSampleBuffer(muxer, coverTrackIndex, avMuxerDemoBuffer, info) != AV_ERR_OK) {
-        free(avMuxerDemoBuffer);
-        printf("OH_AVMuxer_WriteSampleBuffer error!\n");
+    if (OH_AVMuxer_WriteSample(muxer, coverTrackIndex, avMemBuffer, info) != AV_ERR_OK) {
+       OH_AVMemory_Destroy(avMemBuffer);
+        printf("OH_AVMuxer_WriteSample error!\n");
         return;
     }
-    free(avMuxerDemoBuffer);
+    OH_AVMemory_Destroy(avMemBuffer);
 }
 
 int GetInputNum(int defaultNum)

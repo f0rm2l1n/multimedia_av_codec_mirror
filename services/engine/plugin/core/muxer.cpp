@@ -41,9 +41,9 @@ Status Muxer::Start()
     return muxer_->Start();
 }
 
-Status Muxer::WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info)
+Status Muxer::WriteSample(uint8_t *sample, const TrackSampleInfo &info)
 {
-    return muxer_->WriteSampleBuffer(sampleBuffer, info);
+    return muxer_->WriteSample(sample, info);
 }
 
 Status Muxer::Stop()

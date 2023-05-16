@@ -21,6 +21,7 @@
 #include "native_avcodec_base.h"
 #include "native_averrors.h"
 #include "native_avformat.h"
+#include "native_avmemory.h"
 
 
 #ifdef __cplusplus
@@ -75,7 +76,7 @@ OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation);
  * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance
  * @param trackIndex The int32_t handle pointer used to get the track index for this newly added track,
- * and it should be used in the OH_AVMuxer_WriteSampleBuffer. The track index is greater than or equal to 0,
+ * and it should be used in the OH_AVMuxer_WriteSample. The track index is greater than or equal to 0,
  * others is error index.
  * @param trackFormat OH_AVFormat handle pointer contain track format
  * @return Returns AV_ERR_OK if the execution is successful,
@@ -87,7 +88,7 @@ OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFo
 
 /**
  * @brief Start the muxer.
- * Note: This interface is called after OH_AVMuxer_AddTrack and before OH_AVMuxer_WriteSampleBuffer.
+ * Note: This interface is called after OH_AVMuxer_AddTrack and before OH_AVMuxer_WriteSample.
  * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance
  * @return Returns AV_ERR_OK if the execution is successful,
@@ -105,17 +106,17 @@ OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer);
  * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance
  * @param trackIndex The track index for this sample
- * @param sampleBuffer The encoded sample buffer
+ * @param sample The encoded or demuxer sample
  * @param info The buffer information related to this sample {@link OH_AVCodecBufferAttr}
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
  */
-OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer *muxer,
-                                          uint32_t trackIndex,
-                                          uint8_t *sampleBuffer,
-                                          OH_AVCodecBufferAttr info);
+OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer *muxer,
+                                    uint32_t trackIndex,
+                                    OH_AVMemory *sample,
+                                    OH_AVCodecBufferAttr info);
 
 /**
  * @brief Stop the muxer.

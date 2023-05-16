@@ -16,6 +16,7 @@
 #include "avmuxer_sample.h"
 #include "nocopyable.h"
 using namespace std;
+
 namespace OHOS {
 namespace Media {
 AVMuxerSample::AVMuxerSample()
@@ -64,12 +65,12 @@ int32_t AVMuxerSample::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMock>
     return muxer_->AddTrack(trackIndex, trackFormat);
 }
 
-int32_t AVMuxerSample::WriteSampleBuffer(uint32_t trackIndex, uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
+int32_t AVMuxerSample::WriteSample(uint32_t trackIndex, uint8_t *sample, const AVCodecBufferAttrMock &info)
 {
     if (muxer_ == nullptr) {
         return AV_ERR_INVALID_VAL;
     }
-    return muxer_->WriteSampleBuffer(trackIndex, sampleBuffer, info);
+    return muxer_->WriteSample(trackIndex, sample, info);
 }
 
 int32_t AVMuxerSample::SetLocation(float latitude, float longitude)

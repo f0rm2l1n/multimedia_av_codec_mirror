@@ -100,20 +100,13 @@ int32_t AVMuxerImpl::Start()
     return muxerService_->Start();
 }
 
-int32_t AVMuxerImpl::WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info)
+int32_t AVMuxerImpl::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
 {
-    AVCodecTrace trace("AVMuxer::WriteSampleBuffer");
+    AVCodecTrace trace("AVMuxer::WriteSample");
     CHECK_AND_RETURN_RET_LOG(muxerService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "AVMuxer Service does not exist");
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr && info.timeUs >= 0, AVCS_ERR_INVALID_VAL, "Invalid memory");
-
-    std::shared_ptr<AVSharedMemoryBase> sharedSampleBuffer =
-        std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sampleBuffer");
-    int32_t ret = sharedSampleBuffer->Init();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_NO_MEMORY, "create AVSharedMemoryBase failed");
-    errno_t rc = memcpy_s(sharedSampleBuffer->GetBase(), sharedSampleBuffer->GetSize(), sampleBuffer, info.size);
-    CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
-
-    return muxerService_->WriteSampleBuffer(sharedSampleBuffer, info);
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.timeUs >= 0 &&
+        sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
+    return muxerService_->WriteSample(sample, info);
 }
 
 int32_t AVMuxerImpl::Stop()

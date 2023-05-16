@@ -21,28 +21,14 @@
 #include <fcntl.h>
 #include <thread>
 #include <vector>
-#include "securec.h"
 #include "avcodec_errors.h"
-#include "avsharedmemorybase.h"
 
 namespace OHOS {
 namespace Media {
-int AVMuxerEngineDemo::DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info)
+int AVMuxerEngineDemo::DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info)
 {
-    std::shared_ptr<AVSharedMemoryBase> sharedSampleBuffer =
-        std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sampleBuffer");
-    int32_t ret = sharedSampleBuffer->Init();
-    if (ret != AVCS_ERR_OK) {
-        std::cout<<"AVMuxerEngineDemo::DoWriteSampleBuffer shared memory Init failed!"<<std::endl;
-    }
-
-    errno_t rc = memcpy_s(sharedSampleBuffer->GetBase(), sharedSampleBuffer->GetSize(), sampleBuffer, info.size);
-    if (rc != EOK) {
-        std::cout<<"AVMuxerEngineDemo::DoWriteSampleBuffer memcpy_s failed!"<<std::endl;
-    }
-
     if (avmuxer_ != nullptr &&
-        avmuxer_->WriteSampleBuffer(sharedSampleBuffer, info) == AVCS_ERR_OK) {
+        avmuxer_->WriteSample(sample, info) == AVCS_ERR_OK) {
             return 0;
     }
     return -1;

@@ -254,10 +254,10 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
     }
     uint32_t flags = 0;
     uint32_t dataSize = 0;
-    unsigned char *avMuxerDemoBuffer = nullptr;
-    uint32_t avMuxerDemoBufferSize = 0;
-    TrackSampleInfo info {trackId, 0, 0, 0};
-    while (1) {
+    std::shared_ptr<AVSharedMemoryBase> avMemBuffer = nullptr;
+    uint32_t avMemBufferSize = 0;
+    TrackSampleInfo info {trackId, 0, 0, 0, 0};
+    while(1) {
         file->read((char *)&info.timeUs, sizeof(info.timeUs));
         if (file->eof()) {
             break;
@@ -273,18 +273,19 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
             break;
         }
 
-        if (avMuxerDemoBuffer != nullptr && dataSize > avMuxerDemoBufferSize) {
-            delete [] avMuxerDemoBuffer;
-            avMuxerDemoBuffer = nullptr;
-            avMuxerDemoBufferSize = 0;
+        if (avMemBuffer != nullptr && dataSize > avMemBufferSize) {
+            avMemBuffer = nullptr;
+            avMemBufferSize = 0;
         }
-        if (avMuxerDemoBuffer == nullptr) {
-            avMuxerDemoBuffer = new unsigned char[dataSize];
-            avMuxerDemoBufferSize = dataSize;
+        if (avMemBuffer == nullptr) {
+            avMemBuffer = std::make_shared<AVSharedMemoryBase>(dataSize,
+                AVSharedMemory::FLAGS_READ_ONLY, "sampleData");;
+            avMemBufferSize = dataSize;
+            avMemBuffer->Init();
         }
 
-        file->read((char *)avMuxerDemoBuffer, dataSize);
-        if (file->eof()) {
+        file->read((char *)avMemBuffer->GetBase(), dataSize);
+        if(file->eof()) {
             break;
         }
         info.size = dataSize;
@@ -294,20 +295,14 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
             info.flags |= AVCODEC_BUFFER_FLAG_SYNC_FRAME;
         }
 
-        // std::cout<<"tracker id:"<<trackId<<" pts:"<<info.pts<<std::endl;
-        if (DoWriteSampleBuffer((uint8_t*)avMuxerDemoBuffer, info) != 0) {
-            std::cout<<"DoWriteSampleBuffer failed!"<<std::endl;
+        if (DoWriteSample(avMemBuffer, info) != 0) {
+            std::cout<<"DoWriteSample failed!"<<std::endl;
         }
-    }
-
-    if (avMuxerDemoBuffer != nullptr) {
-        delete[] avMuxerDemoBuffer;
-        avMuxerDemoBuffer = nullptr;
     }
 }
 
-int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile, unsigned char *&buffer,
-    uint32_t &curSize, TrackSampleInfo &info)
+int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile,
+    std::shared_ptr<AVSharedMemoryBase> &buffer, uint32_t &curSize, TrackSampleInfo &info)
 {
     uint32_t dataSize = 0;
     uint32_t flags = 0;
@@ -336,17 +331,18 @@ int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile,
     }
 
     if (buffer != nullptr && dataSize > curSize) {
-        delete [] buffer;
         buffer = nullptr;
         curSize = 0;
     }
     if (buffer == nullptr) {
-        buffer = new unsigned char[dataSize];
+        buffer = std::make_shared<AVSharedMemoryBase>(dataSize,
+            AVSharedMemory::FLAGS_READ_ONLY, "sampleData");;
         curSize = dataSize;
+        buffer->Init();
     }
 
-    curFile->read((char *)buffer, dataSize);
-    if (curFile->eof()) {
+    curFile->read((char *)buffer->GetBase(), dataSize);
+    if(curFile->eof()) {
         return -1;
     }
     info.size = dataSize;
@@ -358,10 +354,10 @@ void AVMuxerDemoBase::WriteAvTrackSample()
     if (audioFile_ == nullptr || videoFile_ == nullptr) {
         return;
     }
-    TrackSampleInfo info {0, 0, 0, 0};
+    TrackSampleInfo info {0, 0, 0, 0, 0};
     std::shared_ptr<std::ifstream> curFile = nullptr;
-    unsigned char *avMuxerDemoBuffer = nullptr;
-    uint32_t avMuxerDemoBufferSize = 0;
+    std::shared_ptr<AVSharedMemoryBase> avMemBuffer = nullptr;
+    uint32_t avMemBufferSize = 0;
     audioFile_->read((char *)&audioPts_, sizeof(audioPts_));
     if (audioFile_->eof()) {
         return;
@@ -371,12 +367,11 @@ void AVMuxerDemoBase::WriteAvTrackSample()
         return;
     }
     while (1) {
-        if (ReadSampleDataInfo(curFile, avMuxerDemoBuffer, avMuxerDemoBufferSize, info) != 0) {
+        if (ReadSampleDataInfo(curFile, avMemBuffer, avMemBufferSize, info) != 0) {
             break;
         }
-    
-        if (DoWriteSampleBuffer((uint8_t*)avMuxerDemoBuffer, info) != 0) {
-            std::cout<<"DoWriteSampleBuffer failed!"<<std::endl;
+        if (DoWriteSample(avMemBuffer, info) != 0) {
+            std::cout<<"DoWriteSample failed!"<<std::endl;
         }
         if (curFile == audioFile_) {
             audioFile_->read((char *)&audioPts_, sizeof(audioPts_));
@@ -389,11 +384,6 @@ void AVMuxerDemoBase::WriteAvTrackSample()
                 break;
             }
         }
-    }
-
-    if (avMuxerDemoBuffer != nullptr) {
-        delete [] avMuxerDemoBuffer;
-        avMuxerDemoBuffer = nullptr;
     }
 }
 
@@ -430,7 +420,7 @@ void AVMuxerDemoBase::WriteCoverSample()
         std::cout<<"AVMuxerDemoBase::WriteCoverSample coverFile_ is nullptr!"<<std::endl;
         return;
     }
-    TrackSampleInfo info {coverTrackId_, 0, 0, 0};
+    TrackSampleInfo info {coverTrackId_, 0, 0, 0, 0};
     coverFile_->seekg(0, std::ios::end);
     info.size = coverFile_->tellg();
     coverFile_->seekg(0, std::ios::beg);
@@ -439,14 +429,13 @@ void AVMuxerDemoBase::WriteCoverSample()
         return;
     }
 
-    unsigned char *avMuxerDemoBuffer = new unsigned char[info.size];
-    coverFile_->read((char *)avMuxerDemoBuffer, info.size);
-    if (DoWriteSampleBuffer((uint8_t*)avMuxerDemoBuffer, info) != AVCS_ERR_OK) {
-        delete [] avMuxerDemoBuffer;
+    std::shared_ptr<AVSharedMemoryBase> avMemBuffer =
+        std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sampleData");
+    avMemBuffer->Init();
+    coverFile_->read((char *)avMemBuffer->GetBase(), info.size);
+    if (DoWriteSample(avMemBuffer, info) != AVCS_ERR_OK) {
         std::cout<<"WriteCoverSample error"<<std::endl;
-        return;
     }
-    delete [] avMuxerDemoBuffer;
 }
 
 int AVMuxerDemoBase::AddVideoTrack(const VideoTrackParam *param)

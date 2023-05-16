@@ -682,7 +682,7 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_001, TestSize.Level0)
     AVCodecBufferAttrMock info;
     info.pts = 0;
     info.size = sizeof(buffer_);
-    ret = avmuxer_->WriteSampleBuffer(trackId, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(trackId, (uint8_t*)buffer_, info);
     ASSERT_EQ(ret, 0);
 }
 
@@ -712,7 +712,7 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_002, TestSize.Level0)
     AVCodecBufferAttrMock info;
     info.pts = 0;
     info.size = sizeof(buffer_);
-    ret = avmuxer_->WriteSampleBuffer(trackId, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(trackId, (uint8_t*)buffer_, info);
     ASSERT_NE(ret, 0);
 }
 
@@ -743,7 +743,7 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_003, TestSize.Level0)
     AVCodecBufferAttrMock info;
     info.pts = 0;
     info.size = sizeof(buffer_);
-    ret = avmuxer_->WriteSampleBuffer(trackId, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(trackId, (uint8_t*)buffer_, info);
     ASSERT_NE(ret, 0);
 }
 
@@ -775,13 +775,13 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_004, TestSize.Level0)
     AVCodecBufferAttrMock info;
     info.pts = 0;
     info.size = sizeof(buffer_);
-    ret = avmuxer_->WriteSampleBuffer(trackId + 1, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(trackId + 1, (uint8_t*)buffer_, info);
     ASSERT_NE(ret, 0);
 
-    ret = avmuxer_->WriteSampleBuffer(-2, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(-2, (uint8_t*)buffer_, info);
     ASSERT_NE(ret, 0);
 
-    ret = avmuxer_->WriteSampleBuffer(99999, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(99999, (uint8_t*)buffer_, info);
     ASSERT_NE(ret, 0);
 }
 
@@ -814,7 +814,7 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_005, TestSize.Level0)
     AVCodecBufferAttrMock info;
     info.pts = 0;
     info.size = sizeof(buffer_);
-    ret = avmuxer_->WriteSampleBuffer(trackId, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(trackId, (uint8_t*)buffer_, info);
     ASSERT_NE(ret, 0);
 }
 
@@ -967,7 +967,7 @@ HWTEST_F(AVMuxerUnitTest, Muxer_SetLocation_SetRotation_005, TestSize.Level0)
     AVCodecBufferAttrMock info;
     info.pts = 0;
     info.size = sizeof(buffer_);
-    ret = avmuxer_->WriteSampleBuffer(trackId, (uint8_t*)buffer_, info);
+    ret = avmuxer_->WriteSample(trackId, (uint8_t*)buffer_, info);
     EXPECT_EQ(ret, 0);
 
     ret = avmuxer_->SetLocation(22.38, 114.05);
