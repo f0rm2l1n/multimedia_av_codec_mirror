@@ -23,8 +23,8 @@
 #include <tuple>
 #include <vector>
 #include "av_common.h"
-#include "avcodec_common.h" //AVCodecBufferInfo & callback
-#include "avcodec_errors.h" //Errorcode
+#include "avcodec_common.h"
+#include "avcodec_errors.h"
 #include "avcodec_info.h"
 #include "codec_utils.h"
 #include "codecbase.h"
@@ -130,7 +130,7 @@ private:
     std::list<size_t> codecAvailBuffers_;
     std::list<size_t> renderBuffers_;
     std::list<size_t> inBufQue_;
-    sptr<Surface> CodecSurface_ = nullptr;
+    sptr<Surface> surface_ = nullptr;
     std::shared_ptr<TaskThread> sendTask_ = nullptr;
     std::shared_ptr<TaskThread> receiveTask_ = nullptr;
     std::shared_ptr<TaskThread> renderTask_ = nullptr;

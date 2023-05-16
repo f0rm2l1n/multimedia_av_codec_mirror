@@ -60,7 +60,7 @@ private:
     int32_t fence_ = -1;
     uint32_t stride_ = 0;
     bool needRender_ = false;
-    static sptr<Surface> surfaceMem_;
+    static sptr<Surface> surface_;
     static BufferRequestConfig requestConfig_;
     static ScalingMode scalingMode_;
     static constexpr size_t INVALID_POSITION = -1;
