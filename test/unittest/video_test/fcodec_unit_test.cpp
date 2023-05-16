@@ -148,7 +148,7 @@ int32_t FCodecUnitTest::ProceFunc(void)
 {
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE,
                        static_cast<int32_t>(GraphicTransformType::GRAPHIC_ROTATE_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
@@ -174,7 +174,7 @@ HWTEST_F(FCodecUnitTest, fcodec_Configure_02, TestSize.Level1)
 {
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 0);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE,
                        static_cast<int32_t>(GraphicTransformType::GRAPHIC_ROTATE_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
@@ -187,7 +187,7 @@ HWTEST_F(FCodecUnitTest, fcodec_Configure_03, TestSize.Level1)
 {
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 0);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE,
                        static_cast<int32_t>(GraphicTransformType::GRAPHIC_ROTATE_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
@@ -213,7 +213,7 @@ HWTEST_F(FCodecUnitTest, fcodec_Configure_05, TestSize.Level1)
 {
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, 1);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
                        static_cast<int32_t>(ScalingMode::SCALING_MODE_SCALE_TO_WINDOW));
@@ -225,7 +225,7 @@ HWTEST_F(FCodecUnitTest, fcodec_Configure_06, TestSize.Level1)
 {
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE,
                        static_cast<int32_t>(GraphicTransformType::GRAPHIC_ROTATE_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE, 1);
@@ -249,7 +249,7 @@ HWTEST_F(FCodecUnitTest, fcodec_SetParameter_02, TestSize.Level1)
 HWTEST_F(FCodecUnitTest, fcodec_SetParameter_03, TestSize.Level2)
 {
     EXPECT_EQ(ProceFunc(), AVCS_ERR_OK);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE,
                        static_cast<int32_t>(GraphicTransformType::GRAPHIC_ROTATE_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
@@ -273,7 +273,7 @@ HWTEST_F(FCodecUnitTest, fcodec_SetParameter_04, TestSize.Level3)
 HWTEST_F(FCodecUnitTest, fcodec_SetParameter_05, TestSize.Level4)
 {
     EXPECT_EQ(ProceFunc(), AVCS_ERR_OK);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, 1);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
                        static_cast<int32_t>(ScalingMode::SCALING_MODE_SCALE_TO_WINDOW));
@@ -284,7 +284,7 @@ HWTEST_F(FCodecUnitTest, fcodec_SetParameter_05, TestSize.Level4)
 HWTEST_F(FCodecUnitTest, fcodec_SetParameter_06, TestSize.Level1)
 {
     EXPECT_EQ(ProceFunc(), AVCS_ERR_OK);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE,
                        static_cast<int32_t>(GraphicTransformType::GRAPHIC_ROTATE_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE, 1);
@@ -428,7 +428,7 @@ HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_01, TestSize.Level1)
     // case2 传参正常
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(Codec::VideoPixelFormat::BGRA));
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE,
                        static_cast<int32_t>(GraphicTransformType::GRAPHIC_ROTATE_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
