@@ -34,7 +34,8 @@ const std::string_view ASYNC_DECODE_FRAME = "AsyncDecodeFrame";
 
 AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioFFMpegBaseCodec> &codec,
                                    const std::shared_ptr<AVCodecCallback> &callback)
-    : isRunning(true),
+    : isFirFrame_(true),
+      isRunning(true),
       isProduceInput(true),
       codec_(codec),
       inputBufferSize(codec_->getInputBufferSize()),
@@ -261,7 +262,7 @@ void AudioCodecWorker::produceInputBuffer()
     if (isProduceInput) {
         isProduceInput = false;
         uint32_t index;
-        if (inputBuffer_->RequestAvialbaleIndex(&index)) {
+        if (inputBuffer_->RequestAvialbaleIndex(index)) {
             AVCODEC_LOGD("produceInputBuffer request success.");
             auto inputBuffer = GetInputBufferInfo(index);
             callback_->OnInputBufferAvailable(index);
@@ -288,12 +289,12 @@ void AudioCodecWorker::consumerOutputBuffer()
     }
     while (!inBufIndexQue_.empty() && isRunning) {
         uint32_t index;
-        if (outputBuffer_->RequestAvialbaleIndex(&index)) {
+        if (outputBuffer_->RequestAvialbaleIndex(index)) {
             uint32_t inputIndex = inBufIndexQue_.front();
             inBufIndexQue_.pop();
 
             auto inputBuffer = GetInputBufferInfo(inputIndex);
-
+            bool isEos = inputBuffer->CheckIsEos();
             int32_t ret = codec_->processSendData(inputBuffer);
             inputBuffer_->RelaseBuffer(inputIndex);
 
@@ -311,6 +312,13 @@ void AudioCodecWorker::consumerOutputBuffer()
             }
 
             auto outBuffer = GetOutputBufferInfo(index);
+            if (isEos) {
+                outBuffer->SetEos(isEos);
+            }
+            if (isFirFrame_) {
+                outBuffer->SetFirstFrame();
+                isFirFrame_ = false;
+            }
             ret = codec_->processRecieveData(outBuffer);
             if (ret == AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA) {
                 AVCODEC_LOGW("current ouput buffer is not enough,skip this frame.");

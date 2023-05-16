@@ -65,6 +65,7 @@ private:
     bool begin();
 
 private:
+    bool isFirFrame_;
     std::atomic<bool> isRunning;
     std::atomic<bool> isProduceInput;
     std::shared_ptr<AudioFFMpegBaseCodec> codec_;

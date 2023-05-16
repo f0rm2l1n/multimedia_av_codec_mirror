@@ -40,9 +40,9 @@ public:
 
     bool SetBufferBusy(const uint32_t &index);
 
-    bool RequestNewBuffer(uint32_t *index, std::shared_ptr<AudioBufferInfo> &buffer);
+    bool RequestNewBuffer(uint32_t &index, std::shared_ptr<AudioBufferInfo> &buffer);
 
-    bool RequestAvialbaleIndex(uint32_t *index);
+    bool RequestAvialbaleIndex(uint32_t &index);
 
     void ReleaseAll();
 
