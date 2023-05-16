@@ -882,7 +882,7 @@ void FCodec::RenderFrame()
 
 int32_t FCodec::ReleaseOutputBuffer(size_t index)
 {
-    AVCodecTrace trace(std::string(__FUNCTION__));
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Release output buffer failed: not in Running/Flushed/EOS");
     std::lock_guard<std::mutex> oLock (outputMutex_);
