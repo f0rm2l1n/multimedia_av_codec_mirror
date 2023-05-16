@@ -348,7 +348,7 @@ void WriteTrackCover(OH_AVMuxer *muxer, int coverTrackIndex, int fdInput)
     }
 
     if (OH_AVMuxer_WriteSample(muxer, coverTrackIndex, avMemBuffer, info) != AV_ERR_OK) {
-       OH_AVMemory_Destroy(avMemBuffer);
+        OH_AVMemory_Destroy(avMemBuffer);
         printf("OH_AVMuxer_WriteSample error!\n");
         return;
     }

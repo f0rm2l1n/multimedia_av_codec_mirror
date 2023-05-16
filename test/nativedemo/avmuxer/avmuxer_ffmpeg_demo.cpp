@@ -122,7 +122,7 @@ void AVMuxerFFmpegDemo::DoRunMultiThreadCase()
 
 int AVMuxerFFmpegDemo::DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info)
 {
-    if(ffmpegMuxer_ != nullptr && 
+    if (ffmpegMuxer_ != nullptr &&
         ffmpegMuxer_->WriteSample(sample->GetBase(), info) == Status::NO_ERROR) {
         return 0;
     }

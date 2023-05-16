@@ -257,7 +257,7 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
     std::shared_ptr<AVSharedMemoryBase> avMemBuffer = nullptr;
     uint32_t avMemBufferSize = 0;
     TrackSampleInfo info {trackId, 0, 0, 0, 0};
-    while(1) {
+    while (1) {
         file->read((char *)&info.timeUs, sizeof(info.timeUs));
         if (file->eof()) {
             break;
@@ -285,7 +285,7 @@ void AVMuxerDemoBase::WriteSingleTrackSample(uint32_t trackId, std::shared_ptr<s
         }
 
         file->read((char *)avMemBuffer->GetBase(), dataSize);
-        if(file->eof()) {
+        if (file->eof()) {
             break;
         }
         info.size = dataSize;
@@ -342,7 +342,7 @@ int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile,
     }
 
     curFile->read((char *)buffer->GetBase(), dataSize);
-    if(curFile->eof()) {
+    if (curFile->eof()) {
         return -1;
     }
     info.size = dataSize;
