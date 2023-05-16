@@ -16,12 +16,12 @@
 #ifndef CODEC_UTILS_H
 #define CODEC_UTILS_H
 
-#include "surface.h"
+#include "av_common.h"
 #include "avcodec_errors.h"
-#include "surface_memory.h"
 #include "avsharedmemorybase.h"
 #include "format.h"
-#include "av_common.h"
+#include "surface.h"
+#include "surface_memory.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/imgutils.h"
@@ -46,30 +46,31 @@ struct ScalePara {
     int32_t align = 16;
 };
 struct Scale {
-public:
-    int32_t Init(const ScalePara &scalePara, uint8_t **dstData, int32_t *dstLineSize);
-    int32_t Convert(uint8_t **srcData, const int32_t *srcLineSize, uint8_t **dstData, int32_t *dstLineSize);
+  public:
+    int32_t Init(const ScalePara& scalePara, uint8_t** dstData, int32_t* dstLineSize);
+    int32_t Convert(uint8_t** srcData, const int32_t* srcLineSize, uint8_t** dstData,
+                    int32_t* dstLineSize);
 
-private:
+  private:
     ScalePara scalePara_;
     std::shared_ptr<SwsContext> swsCtx_ = nullptr;
 };
-PixelFormat TranslateSurfaceFormat(const VideoPixelFormat &surfaceFormat);
+PixelFormat TranslateSurfaceFormat(const VideoPixelFormat& surfaceFormat);
 VideoPixelFormat ConvertPixelFormatFromFFmpeg(int32_t ffmpegPixelFormat);
 AVPixelFormat ConvertPixelFormatToFFmpeg(VideoPixelFormat pixelFormat);
 GraphicTransformType TranslateSurfaceRotation(const VideoRotation& rotation);
-int32_t ConvertVideoFrame(std::shared_ptr<Scale> *scale, std::shared_ptr<AVFrame> frame, uint8_t **dstData,
-                          int32_t *dstLineSize, AVPixelFormat dstPixFmt);
-int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData,
-                           int32_t *scaleLineSize, int32_t stride, const Format &format);
-int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase> &frameBuffer, uint8_t **scaleData,
-                     int32_t *scaleLineSize, const Format &format);
-int32_t WriteRgbData(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData, int32_t *scaleLineSize,
-                     const Format &format);
+int32_t ConvertVideoFrame(std::shared_ptr<Scale>* scale, std::shared_ptr<AVFrame> frame,
+                          uint8_t** dstData, int32_t* dstLineSize, AVPixelFormat dstPixFmt);
+int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory>& frameBuffer, uint8_t** scaleData,
+                           int32_t* scaleLineSize, int32_t stride, const Format& format);
+int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase>& frameBuffer, uint8_t** scaleData,
+                     int32_t* scaleLineSize, const Format& format);
+int32_t WriteRgbData(const std::shared_ptr<SurfaceMemory>& frameBuffer, uint8_t** scaleData,
+                     int32_t* scaleLineSize, const Format& format);
 std::string AVStrError(int errnum);
 bool IsYuvFormat(AVPixelFormat format);
 bool IsRgbFormat(AVPixelFormat format);
-} // namespace Codec
-} // namespace Media
-} // namespace OHOS
+}  // namespace Codec
+}  // namespace Media
+}  // namespace OHOS
 #endif
