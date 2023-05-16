@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+#include <memory>
 #include "avcodec_log.h"
 #include "securec.h"
-#include <memory>
 #include "native_averrors.h"
 #include "surface_memory.h"
 
@@ -31,8 +31,7 @@ ScalingMode SurfaceMemory::scalingMode_ = {ScalingMode::SCALING_MODE_SCALE_TO_WI
 std::shared_ptr<SurfaceMemory> SurfaceMemory::Create()
 {
     CHECK_AND_RETURN_RET_LOG(surfaceMem_ != nullptr, nullptr, "surface is nullptr");
-    CHECK_AND_RETURN_RET_LOG(requestConfig_.width != 0 && requestConfig_.height != 0, nullptr,
-                             "surface config invalid");
+    CHECK_AND_RETURN_RET_LOG(requestConfig_.width!=0 && requestConfig_.height!=0, nullptr, "surface config invalid");
     std::shared_ptr<SurfaceMemory> buffer = std::make_shared<SurfaceMemory>();
     buffer->AllocSurfaceBuffer();
     return buffer;
@@ -167,7 +166,6 @@ void SurfaceMemory::UpdateSurfaceBufferScaleMode()
         AVCODEC_LOGE("surfaceBuffer is nullptr");
         return;
     }
-
     auto ret = surfaceMem_->SetScalingMode(surfaceBuffer_->GetSeqNum(), scalingMode_);
     if (ret != OHOS::SurfaceError::SURFACE_ERROR_OK) {
         AVCODEC_LOGE("update surface buffer scaling mode fail, ret: %{public}" PRIu64, static_cast<uint64_t>(ret));

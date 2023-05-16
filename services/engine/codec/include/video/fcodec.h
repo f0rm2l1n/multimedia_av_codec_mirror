@@ -22,8 +22,9 @@
 #include <shared_mutex>
 #include <tuple>
 #include <vector>
-#include "avcodec_common.h" // AVCodecBufferInfo & callback
-#include "avcodec_errors.h" // Errorcode
+#include "av_common.h"
+#include "avcodec_common.h" //AVCodecBufferInfo & callback
+#include "avcodec_errors.h" //Errorcode
 #include "avcodec_info.h"
 #include "codec_utils.h"
 #include "codecbase.h"

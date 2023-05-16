@@ -71,6 +71,7 @@ enum VideoPixelFormat {
      */
     RGBA = 5,
     BGRA = 6,
+    UNKNOWN_FORMAT = 7,
 };
 
 /**

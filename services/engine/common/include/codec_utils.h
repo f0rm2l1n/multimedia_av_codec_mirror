@@ -21,6 +21,7 @@
 #include "surface_memory.h"
 #include "avsharedmemorybase.h"
 #include "format.h"
+#include "av_common.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/imgutils.h"
@@ -34,14 +35,6 @@ enum struct VideoFormat : uint8_t {
     H264 = 1,
     MPEG4 = 2,
 };
-enum struct VideoPixelFormat : uint32_t {
-    UNKNOWN,
-    YUV420P, ///< planar YUV 4:2:0, 1 Cr & Cb sample per 2x2 Y samples
-    NV12,    ///< semi-planar YUV 4:2:0, UVUV...
-    NV21,    ///< semi-planar YUV 4:2:0, VUVU...
-    RGBA,    ///< packed RGBA 8:8:8:8, 32bpp, RGBARGBA...
-    BGRA,    ///< packed BGRA 8:8:8:8, 32bpp, BGRABGRA...
-};
 
 struct ScalePara {
     int32_t srcWidth = 0;
@@ -52,7 +45,6 @@ struct ScalePara {
     AVPixelFormat dstFfFmt = AVPixelFormat::AV_PIX_FMT_RGBA;
     int32_t align = 16;
 };
-
 struct Scale {
 public:
     int32_t Init(const ScalePara &scalePara, uint8_t **dstData, int32_t *dstLineSize);
@@ -62,11 +54,11 @@ private:
     ScalePara scalePara_;
     std::shared_ptr<SwsContext> swsCtx_ = nullptr;
 };
-
 PixelFormat TranslateSurfaceFormat(const VideoPixelFormat &surfaceFormat);
 VideoPixelFormat ConvertPixelFormatFromFFmpeg(int32_t ffmpegPixelFormat);
 AVPixelFormat ConvertPixelFormatToFFmpeg(VideoPixelFormat pixelFormat);
-int32_t ConvertVideoFrame(std::shared_ptr<Scale> scale, std::shared_ptr<AVFrame> frame, uint8_t **dstData,
+GraphicTransformType TranslateSurfaceRotation(const VideoRotation& rotation);
+int32_t ConvertVideoFrame(std::shared_ptr<Scale> *scale, std::shared_ptr<AVFrame> frame, uint8_t **dstData,
                           int32_t *dstLineSize, AVPixelFormat dstPixFmt);
 int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData,
                            int32_t *scaleLineSize, int32_t stride, const Format &format);
