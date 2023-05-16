@@ -69,8 +69,8 @@ private:
     Format format_;
 
 private:
-    int32_t sendBuffer(const std::shared_ptr<AudioBufferInfo> &inputBuffer);
-    int32_t receiveBuffer(std::shared_ptr<AudioBufferInfo> &outBuffer);
+    int32_t SendBuffer(const std::shared_ptr<AudioBufferInfo> &inputBuffer);
+    int32_t ReceiveBuffer(std::shared_ptr<AudioBufferInfo> &outBuffer);
     int32_t ReceivePacketSucc(std::shared_ptr<AudioBufferInfo> &outBuffer);
     int32_t PcmFillFrame(const std::shared_ptr<AudioBufferInfo> &inputBuffer);
     HeaderFunc GetHeaderFunc_;
