@@ -49,7 +49,7 @@ const struct {
     {"video_decoder.avc", "video/avc", "h264", false},
 };
 const size_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
-}
+} // namespace
 FCodec::FCodec(const std::string &name)
 {
     AVCODEC_SYNC_TRACE;
@@ -142,6 +142,10 @@ int32_t FCodec::Configure(const Format &format)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((state_ == State::Initialized), AVCS_ERR_INVALID_STATE,
                              "Configure codec failed:  not in Initialized state");
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_VIDEO_WIDTH);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_VIDEO_HEIGHT);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT, DEFAULT_OUT_BUFFER_CNT);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT, DEFAULT_IN_BUFFER_CNT);
     for (auto &it : format.GetFormatMap()) {
         if (it.first == MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT) {
             ConfigureDefaultVal(format, it.first, DEFAULT_OUT_BUFFER_CNT, DEFAULT_MIN_BUFFER_CNT);
