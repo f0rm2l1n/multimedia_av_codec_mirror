@@ -535,7 +535,7 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Stop_01, TestSize.Leve
 HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Stop_02, TestSize.Level1)
 {
     // correct flow 2
-    format_.PutIntValue(MediaDescriptionKEY::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY, DEFAULT_BITS_PER_CODED_RATE);
