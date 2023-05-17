@@ -33,10 +33,11 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 169000;
-constexpr uint32_t BITS_PER_CODED_RATE = 4;
+constexpr uint32_t BITS_PER_CODED_RATE = 16;
 constexpr uint32_t FRAME_DURATION_US = 33000;
-constexpr string_view inputFilePath = "/data/test441_2_noid3.mp3";
-constexpr string_view outputFilePath = "/data/audioOut.pcm";
+constexpr uint32_t FRAME_BYTES = 18432;
+constexpr string_view inputFilePath = "/data/test1.flac";
+constexpr string_view outputFilePath = "/data/test1.pcm";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -135,7 +136,7 @@ ADecDemo::~ADecDemo()
 
 int32_t ADecDemo::CreateDec()
 {
-    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecAudioCodecKey::AUDIO_DECODER_MP3_NAME_KEY).data());
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecAudioCodecKey::AUDIO_DECODER_FLAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new ADecSignal();
@@ -265,6 +266,7 @@ void ADecDemo::InputFunc()
 void ADecDemo::OutputFunc()
 {
     std::ofstream pcmFile;
+    bool no_write = false;
     pcmFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
     if (!pcmFile.is_open()) {
         std::cout << "open " << outputFilePath << " failed!" << std::endl;
@@ -287,7 +289,10 @@ void ADecDemo::OutputFunc()
         uint32_t index = signal_->outQueue_.front();
         OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
         OH_AVMemory *data = signal_->outBufferQueue_.front();
-        if (data != nullptr) {
+        if (data != nullptr && !no_write) {
+            if (attr.size != FRAME_BYTES) {
+                no_write = true;
+            }
             cout << "OutputFunc write file,buffer index" << index << ", data size = :" << attr.size << endl;
             pcmFile.write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
         }
