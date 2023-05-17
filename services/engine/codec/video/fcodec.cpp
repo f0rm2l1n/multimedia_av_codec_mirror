@@ -138,9 +138,9 @@ void FCodec::ConfigureBuffer(const Format &format, const std::string_view &forma
             format_.PutIntValue(formatKey, val32);
         } else {
             AVCODEC_LOGW(
-                "Set parameter failed: size: %{public}zu  %{public}s, \
-                which minimum threshold=%{public}d, maximum threshold=%{public}d",
-                formatKey.size(), formatKey.data(), minVal, maxVal);
+                "Set parameter failed with key: %{public}s, \
+                minimum threshold: %{public}d, maximum threshold: %{public}d",
+                formatKey.data(), minVal, maxVal);
         }
     } else if (format.GetValueType(formatKey) == FORMAT_TYPE_INT64) {
         int64_t val64 = 0;
