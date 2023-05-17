@@ -23,11 +23,11 @@
 #include "demo_log.h"
 #include "native_avcodec_base.h"
 #include "avcodec_audio_codec_key.h"
-#include "avcodec_audio_encoder_demo.h"
+#include "avcodec_audio_aac_encoder_demo.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
-using namespace OHOS::Media::AudioDemo;
+using namespace OHOS::Media::AudioAacDemo;
 using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
@@ -89,7 +89,7 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
     signal_->outCond_.notify_all();
 }
 
-void AEncDemo::RunCase()
+void AEncAacDemo::RunCase()
 {
     std::cout << "RunCase enter" << std::endl;
     DEMO_CHECK_AND_RETURN_LOG(CreateEnc() == AVCS_ERR_OK, "Fatal: CreateEnc fail");
@@ -114,14 +114,14 @@ void AEncDemo::RunCase()
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }
 
-AEncDemo::AEncDemo()
+AEncAacDemo::AEncAacDemo()
 {
     frameCount_ = 0;
     isRunning_ = false;
     inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
 }
 
-AEncDemo::~AEncDemo()
+AEncAacDemo::~AEncAacDemo()
 {
     OH_AudioEncoder_Destroy(audioEnc_);
     if (signal_) {
@@ -130,7 +130,7 @@ AEncDemo::~AEncDemo()
     }
 }
 
-int32_t AEncDemo::CreateEnc()
+int32_t AEncAacDemo::CreateEnc()
 {
     audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_ENCODER_AAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
@@ -145,25 +145,25 @@ int32_t AEncDemo::CreateEnc()
     return AVCS_ERR_OK;
 }
 
-int32_t AEncDemo::Configure(OH_AVFormat *format)
+int32_t AEncAacDemo::Configure(OH_AVFormat *format)
 {
     return OH_AudioEncoder_Configure(audioEnc_, format);
 }
 
-int32_t AEncDemo::Start()
+int32_t AEncAacDemo::Start()
 {
     isRunning_.store(true);
 
-    inputLoop_ = make_unique<thread>(&AEncDemo::InputFunc, this);
+    inputLoop_ = make_unique<thread>(&AEncAacDemo::InputFunc, this);
     DEMO_CHECK_AND_RETURN_RET_LOG(inputLoop_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
 
-    outputLoop_ = make_unique<thread>(&AEncDemo::OutputFunc, this);
+    outputLoop_ = make_unique<thread>(&AEncAacDemo::OutputFunc, this);
     DEMO_CHECK_AND_RETURN_RET_LOG(outputLoop_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
 
     return OH_AudioEncoder_Start(audioEnc_);
 }
 
-int32_t AEncDemo::Stop()
+int32_t AEncAacDemo::Stop()
 {
     isRunning_.store(false);
 
@@ -184,22 +184,22 @@ int32_t AEncDemo::Stop()
     return OH_AudioEncoder_Stop(audioEnc_);
 }
 
-int32_t AEncDemo::Flush()
+int32_t AEncAacDemo::Flush()
 {
     return OH_AudioEncoder_Flush(audioEnc_);
 }
 
-int32_t AEncDemo::Reset()
+int32_t AEncAacDemo::Reset()
 {
     return OH_AudioEncoder_Reset(audioEnc_);
 }
 
-int32_t AEncDemo::Release()
+int32_t AEncAacDemo::Release()
 {
     return OH_AudioEncoder_Destroy(audioEnc_);
 }
 
-void AEncDemo::HandleEOS(const uint32_t &index)
+void AEncAacDemo::HandleEOS(const uint32_t &index)
 {
     OH_AVCodecBufferAttr info;
     info.size = 0;
@@ -212,7 +212,7 @@ void AEncDemo::HandleEOS(const uint32_t &index)
     signal_->inBufferQueue_.pop();
 }
 
-void AEncDemo::InputFunc()
+void AEncAacDemo::InputFunc()
 {
     DEMO_CHECK_AND_RETURN_LOG(inputFile_ != nullptr && inputFile_->is_open(), "Fatal: open file fail");
     while (true) {
@@ -260,7 +260,7 @@ void AEncDemo::InputFunc()
     inputFile_->close();
 }
 
-void AEncDemo::OutputFunc()
+void AEncAacDemo::OutputFunc()
 {
     std::ofstream outputFile;
     outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);

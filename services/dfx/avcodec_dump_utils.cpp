@@ -37,7 +37,7 @@ int32_t AVCodecDumpControler::AddInfo(const uint32_t dumpIdx, const std::string 
     CHECK_AND_RETURN_RET_LOG(!name.empty(), AVCS_ERR_INVALID_VAL,
                              "Add dump info failed, get a empty name.");
     if (dumpInfoMap_.find(dumpIdx) != dumpInfoMap_.end()) {
-        AVCODEC_LOGW("Dump info index already exist, index: %{public}d", dumpIdx);
+        AVCODEC_LOGW("Dump info index already exist, index: %{public}d, name: %{public}s.", dumpIdx, name.c_str());
         return AVCS_ERR_OK;
     }
 

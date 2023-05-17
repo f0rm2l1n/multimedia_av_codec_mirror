@@ -24,6 +24,7 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVSharedMemoryBase"};
+    constexpr uint8_t LOGD_FREQUENCY = 5;
 }
 
 namespace OHOS {
@@ -63,20 +64,20 @@ std::shared_ptr<AVSharedMemory> AVSharedMemoryBase::CreateFromRemote(
 AVSharedMemoryBase::AVSharedMemoryBase(int32_t size, uint32_t flags, const std::string &name)
     : base_(nullptr), capacity_(size), flags_(flags), name_(name), fd_(-1), size_(0)
 {
-    AVCODEC_LOGD("enter ctor, instance: 0x%{public}06" PRIXPTR ", name = %{public}s",
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "enter ctor, instance: 0x%{public}06" PRIXPTR ", name = %{public}s",
                FAKE_POINTER(this), name_.c_str());
 }
 
 AVSharedMemoryBase::AVSharedMemoryBase(int32_t fd, int32_t size, uint32_t flags, const std::string &name)
     : base_(nullptr), capacity_(size), flags_(flags), name_(name), fd_(dup(fd)), size_(0)
 {
-    AVCODEC_LOGD("enter ctor, instance: 0x%{public}06" PRIXPTR ", name = %{public}s",
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "enter ctor, instance: 0x%{public}06" PRIXPTR ", name = %{public}s",
                FAKE_POINTER(this), name_.c_str());
 }
 
 AVSharedMemoryBase::~AVSharedMemoryBase()
 {
-    AVCODEC_LOGD("enter dtor, instance: 0x%{public}06" PRIXPTR ", name = %{public}s",
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "enter dtor, instance: 0x%{public}06" PRIXPTR ", name = %{public}s",
                FAKE_POINTER(this), name_.c_str());
     Close();
 }

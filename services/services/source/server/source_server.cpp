@@ -167,7 +167,7 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
     }
 
     dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX, "Track_Info");
-    for (int32_t idx = 0; idx < trackCount; idx++) {
+    for (uint32_t idx = 0; idx < trackCount; idx++) {
         ret = GetTrackFormat(trackFormat, idx);
         CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
             AVCS_ERR_INVALID_OPERATION, "Get track format failed!");

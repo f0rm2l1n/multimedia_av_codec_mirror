@@ -20,63 +20,142 @@
 #include "avcodec_audio_decoder_inner_demo.h"
 #include "avcodec_audio_encoder_inner_demo.h"
 #include "avcodec_audio_decoder_demo.h"
-#include "avcodec_audio_encoder_demo.h"
+#include "avcodec_audio_aac_encoder_demo.h"
+#include "avcodec_audio_flac_encoder_demo.h"
 #include "codeclist_demo.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::Media::AudioDemo;
+using namespace OHOS::Media::AudioFlacDemo;
+using namespace OHOS::Media::AudioAacDemo;
 using namespace OHOS::Media::InnerAudioDemo;
 using namespace std;
 
 static int RunAudioDecoder()
 {
-    auto audioEnc = std::make_unique<ADecDemo>();
-    if (audioEnc == nullptr) {
-        cout << "audio decoder is null" << endl;
+    cout << "Please select number for format (default AAC Decoder): " << endl;
+    cout << "0: AAC" << endl;
+    cout << "1: FLAC" << endl;
+    cout << "2: MP3" << endl;
+    cout << "3: VORBIS" << endl;
+    string mode;
+    (void)getline(cin, mode);
+    if (mode == "" || mode == "0") {
+        auto audioDec = std::make_unique<ADecDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    } else if (mode == "1") {
+        auto audioDec = std::make_unique<ADecDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    } else if (mode == "2") {
+        auto audioDec = std::make_unique<ADecDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    } else if (mode == "3") {
+        auto audioDec = std::make_unique<ADecDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    }  else {
+        cout << "no that selection" << endl;
         return 0;
     }
-    audioEnc->RunCase();
     cout << "demo audio decoder end" << endl;
     return 0;
 }
 
 static int RunAudioEncoder()
 {
-    auto audioEnc = std::make_unique<AEncDemo>();
-    if (audioEnc == nullptr) {
-        cout << "audio encoder is null" << endl;
+    cout << "Please select number for format (default AAC Encoder): " << endl;
+    cout << "0: AAC" << endl;
+    cout << "1: FLAC" << endl;
+
+    string mode;
+    (void)getline(cin, mode);
+    if (mode == "" || mode == "0") {
+        auto audioEnc = std::make_unique<AEncAacDemo>();
+        if (audioEnc) {
+            audioEnc->RunCase();
+        }
+    } else if (mode == "1") {
+        auto audioEnc = std::make_unique<AEncFlacDemo>();
+        if (audioEnc) {
+            audioEnc->RunCase();
+        }
+    }  else {
+        cout << "no that selection" << endl;
         return 0;
     }
-    audioEnc->RunCase();
     cout << "demo audio encoder end" << endl;
     return 0;
 }
 
 static int RunAudioInnerDecoder()
 {
-    auto audioEnc = std::make_unique<ADecInnerDemo>();
-    if (audioEnc == nullptr) {
-        cout << "audio decoder is null" << endl;
+    cout << "Please select number for format (default AAC Decoder): " << endl;
+    cout << "0: AAC" << endl;
+    cout << "1: FLAC" << endl;
+    cout << "2: MP3" << endl;
+    cout << "3: VORBIS" << endl;
+    string mode;
+    (void)getline(cin, mode);
+    if (mode == "" || mode == "0") {
+        auto audioDec = std::make_unique<ADecInnerDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    } else if (mode == "1") {
+        auto audioDec = std::make_unique<ADecInnerDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    } else if (mode == "2") {
+        auto audioDec = std::make_unique<ADecInnerDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    } else if (mode == "3") {
+        auto audioDec = std::make_unique<ADecInnerDemo>();
+        if (audioDec) {
+            audioDec->RunCase();
+        }
+    }  else {
+        cout << "no that selection" << endl;
         return 0;
     }
-    audioEnc->RunCase();
     cout << "demo audio decoder end" << endl;
     return 0;
 }
 
 static int RunAudioInnerEncoder()
 {
-    auto audioEnc = std::make_unique<AEnInnerDemo>();
-    if (audioEnc == nullptr) {
-        cout << "audio encoder is null" << endl;
+    cout << "Please select number for format (default AAC Encoder): " << endl;
+    cout << "0: AAC" << endl;
+    cout << "1: FLAC" << endl;
+    string mode;
+    (void)getline(cin, mode);
+    if (mode == "" || mode == "0") {
+        auto audioEnc = std::make_unique<AEnInnerDemo>();
+        if (audioEnc) {
+            audioEnc->RunCase();
+        }
+    } else if (mode == "1") {
+        auto audioEnc = std::make_unique<AEnInnerDemo>();
+        if (audioEnc) {
+            audioEnc->RunCase();
+        }
+    }  else {
+        cout << "no that selection" << endl;
         return 0;
     }
-    audioEnc->RunCase();
     cout << "demo audio encoder end" << endl;
     return 0;
 }
-
 
 static int RunCodecList()
 {

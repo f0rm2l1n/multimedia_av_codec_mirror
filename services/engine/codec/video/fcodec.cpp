@@ -133,7 +133,8 @@ void FCodec::ConfigureSufrace(const Format &format, const std::string_view &form
             }
         }
     } else {
-        AVCODEC_LOGW("Set parameter failed: %{public}.*s, please check your value", formatKey.size(), formatKey.data());
+        AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, please check your value",
+            formatKey.size(), formatKey.data());
     }
 }
 
@@ -160,7 +161,8 @@ int32_t FCodec::Configure(const Format &format)
                    it.first == MediaDescriptionKey::MD_KEY_SCALE_TYPE) {
             ConfigureSufrace(format, it.first, it.second.type);
         } else {
-            AVCODEC_LOGW("Set parameter failed: %{public}.*s, unsupport name", it.first.size(), it.first.data());
+            AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, unsupport name",
+                it.first.size(), it.first.data());
         }
     }
     avCodecContext_ = std::shared_ptr<AVCodecContext>(avcodec_alloc_context3(avCodec_.get()), [](AVCodecContext *p) {
@@ -385,7 +387,7 @@ void FCodec::SetSurfaceParameter(const Format &format, const std::string_view &f
             SurfaceMemory::SetScaleType(scaleMode);
         }
     } else {
-        AVCODEC_LOGW("Set parameter failed: %{public}.*s", formatKey.size(), formatKey.data());
+        AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s", formatKey.size(), formatKey.data());
     }
 }
 
