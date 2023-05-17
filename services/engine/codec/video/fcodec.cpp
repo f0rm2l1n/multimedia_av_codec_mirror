@@ -475,7 +475,7 @@ int32_t FCodec::GetOutputFormat(Format &format)
 std::tuple<int32_t, int32_t> FCodec::CalculateBufferSize()
 {
     int32_t stride = AlignUp(width_, VIDEO_ALIGN_SIZE);
-    int32_t inputBufferSize = static_cast<int32_t>((stride * height_ * VIDEO_PIX_DEPTH_YUV) >> 1));
+    int32_t inputBufferSize = static_cast<int32_t>((stride * height_ * VIDEO_PIX_DEPTH_YUV) >> 1);
     int32_t outputBufferSize = inputBufferSize;
     if (surface_ != nullptr) {
         outputBufferSize = static_cast<int32_t>(stride * height_ * VIDEO_PIX_DEPTH_RGBA);
@@ -487,7 +487,7 @@ std::tuple<int32_t, int32_t> FCodec::CalculateBufferSize()
 int32_t FCodec::AllocateInputBuffer(int32_t bufferCnt, int32_t inBufferSize)
 {
     int32_t valBufferCnt = 0;
-    for (uint32_t i = 0; i < bufferCnt; i++) {
+    for (int32_t i = 0; i < bufferCnt; i++) {
         std::shared_ptr<AVBuffer> buf = std::make_shared<AVBuffer>();
         buf->memory_ = AVSharedMemoryBase::CreateFromLocal(inBufferSize, AVSharedMemory::FLAGS_READ_WRITE,
                                                            std::string("inBuffer") + std::to_string(i));
