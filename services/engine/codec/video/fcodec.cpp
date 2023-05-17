@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "fcodec.h"
+#include "avcodec_dfx.h"
+#include "avcodec_log.h"
+#include "codec_utils.h"
+#include "securec.h"
+#include "utils.h"
 #include <iostream>
 #include <set>
 #include <thread>
-#include "securec.h"
-#include "avcodec_dfx.h"
-#include "avcodec_log.h"
-#include "utils.h"
-#include "codec_utils.h"
-#include "fcodec.h"
 
 namespace OHOS {
 namespace Media {
@@ -107,50 +107,17 @@ int32_t FCodec::Init(const std::string &name)
     return AVCS_ERR_OK;
 }
 
-int32_t FCodec::ConfigureDefault()
+void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &formatKey, int32_t defaultVal,
+                             int32_t minVal, int32_t maxVal)
 {
-    AVCODEC_SYNC_TRACE;
-    CHECK_AND_RETURN_RET_LOG((state_ == State::Initialized), AVCS_ERR_INVALID_STATE,
-                             "Configure codec failed:  not in Initialized state");
-    format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_VIDEO_WIDTH);
-    format_.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_VIDEO_HEIGHT);
-    format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT, DEFAULT_OUT_BUFFER_CNT);
-    format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT, DEFAULT_IN_BUFFER_CNT);
-    avCodecContext_ = std::shared_ptr<AVCodecContext>(avcodec_alloc_context3(avCodec_.get()), [](AVCodecContext *p) {
-        if (p != nullptr) {
-            if (p->extradata) {
-                av_free(p->extradata);
-                p->extradata = nullptr;
-            }
-            avcodec_free_context(&p);
-        }
-    });
-    CHECK_AND_RETURN_RET_LOG(avCodecContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-                             "Configure codec failed: Allocate context error");
-    avCodecContext_->codec_type = AVMEDIA_TYPE_VIDEO;
-    return AVCS_ERR_OK;
-}
-
-void FCodec::ConfigureBuffer(const Format &format, const std::string_view &formatKey, int32_t minVal, int32_t maxVal)
-{
-    if (format.GetValueType(formatKey) == FORMAT_TYPE_INT32) {
-        int32_t val32 = 0;
-        if (format.GetIntValue(formatKey, val32) && val32 > minVal && val32 < maxVal) {
-            format_.PutIntValue(formatKey, val32);
-        } else {
-            AVCODEC_LOGW("Set parameter failed: %{public}.*s, which minimum threshold=%{public}d, "
-                         "maximum threshold=%{public}d",
-                         formatKey.size(), formatKey.data(), minVal, maxVal);
-        }
-    } else if (format.GetValueType(formatKey) == FORMAT_TYPE_INT64) {
-        int64_t val64 = 0;
-        if (format.GetLongValue(formatKey, val64) && val64 > minVal) {
-            format_.PutLongValue(formatKey, val64);
-        } else {
-            AVCODEC_LOGW("Set parameter failed: %{public}.*s", formatKey.size(), formatKey.data());
-        }
+    int32_t val32 = 0;
+    if (format.GetIntValue(formatKey, val32) && val32 > minVal && val32 < maxVal) {
+        format_.PutIntValue(formatKey, val32);
     } else {
-        AVCODEC_LOGW("Unsupport type for parameter: %{public}.*s", formatKey.size(), formatKey.data());
+        AVCODEC_LOGW("Set parameter failed: %{public}.*s, which minimum threshold=%{public}d, "
+                     "maximum threshold=%{public}d",
+                     formatKey.size(), formatKey.data(), minVal, maxVal);
+        format_.PutIntValue(formatKey, defaultVal);
     }
 }
 
@@ -200,16 +167,15 @@ int32_t FCodec::Configure(const Format &format)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((state_ == State::Initialized), AVCS_ERR_INVALID_STATE,
                              "Configure codec failed:  not in Initialized state");
-    CHECK_AND_RETURN_RET_LOG((ConfigureDefault() == AVCS_ERR_OK), AVCS_ERR_UNKNOWN,
-                             "Configure codec failed:  not in Initialized state");
     for (auto &it : format.GetFormatMap()) {
-        if (it.first == MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT ||
-            it.first == MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT) {
-            ConfigureBuffer(format, it.first, DEFAULT_MIN_BUFFER_CNT);
-        } else if (it.first == MediaDescriptionKey::MD_KEY_WIDTH || it.first == MediaDescriptionKey::MD_KEY_HEIGHT) {
-            ConfigureBuffer(format, it.first, 0, VIDEO_MAX_SIZE);
-        } else if (it.first == MediaDescriptionKey::MD_KEY_BITRATE) {
-            ConfigureBuffer(format, MediaDescriptionKey::MD_KEY_BITRATE);
+        if (it.first == MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT) {
+            ConfigureDefaultVal(format, it.first, DEFAULT_OUT_BUFFER_CNT, DEFAULT_MIN_BUFFER_CNT);
+        } else if (it.first == MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT) {
+            ConfigureDefaultVal(format, it.first, DEFAULT_IN_BUFFER_CNT, DEFAULT_MIN_BUFFER_CNT);
+        } else if (it.first == MediaDescriptionKey::MD_KEY_WIDTH) {
+            ConfigureDefaultVal(format, it.first, DEFAULT_VIDEO_WIDTH, 0, VIDEO_MAX_SIZE);
+        } else if (it.first == MediaDescriptionKey::MD_KEY_HEIGHT) {
+            ConfigureDefaultVal(format, it.first, DEFAULT_VIDEO_HEIGHT, 0, VIDEO_MAX_SIZE);
         } else if (it.first == MediaDescriptionKey::MD_KEY_CODEC_CONFIG ||
                    it.first == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT ||
                    it.first == MediaDescriptionKey::MD_KEY_ROTATION_ANGLE ||
@@ -219,6 +185,18 @@ int32_t FCodec::Configure(const Format &format)
             AVCODEC_LOGW("Set parameter failed: %{public}.*s, unsupport name", it.first.size(), it.first.data());
         }
     }
+    avCodecContext_ = std::shared_ptr<AVCodecContext>(avcodec_alloc_context3(avCodec_.get()), [](AVCodecContext *p) {
+        if (p != nullptr) {
+            if (p->extradata) {
+                av_free(p->extradata);
+                p->extradata = nullptr;
+            }
+            avcodec_free_context(&p);
+        }
+    });
+    CHECK_AND_RETURN_RET_LOG(avCodecContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
+                             "Configure codec failed: Allocate context error");
+    avCodecContext_->codec_type = AVMEDIA_TYPE_VIDEO;
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_WIDTH, width_);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height_);
@@ -500,9 +478,8 @@ int32_t FCodec::AllocateInputBuffer(int32_t bufferCnt, int32_t inBufferSize)
         callback_->OnInputBufferAvailable(valBufferCnt);
         valBufferCnt++;
     }
-    if (buffers_[INDEX_INPUT].size() < DEFAULT_MIN_BUFFER_CNT + 1) {
-        AVCODEC_LOGE("Allocate input buffer failed: only %{public}d buffer is allocated, no memory",
-                     buffers_[INDEX_INPUT].size());
+    if (valBufferCnt < DEFAULT_MIN_BUFFER_CNT + 1) {
+        AVCODEC_LOGE("Allocate input buffer failed: only %{public}d buffer is allocated, no memory", valBufferCnt);
         buffers_[INDEX_INPUT].clear();
         return AVCS_ERR_NO_MEMORY;
     }
@@ -545,9 +522,8 @@ int32_t FCodec::AllocateOutputBuffer(int32_t bufferCnt, int32_t outBufferSize)
         codecAvailBuffers_.emplace_back(valBufferCnt);
         valBufferCnt++;
     }
-    if (buffers_[INDEX_OUTPUT].size() < DEFAULT_MIN_BUFFER_CNT + 1) {
-        AVCODEC_LOGE("Allocate output buffer failed: only %{public}d buffer is allocated, no memory",
-                     buffers_[INDEX_OUTPUT].size());
+    if (valBufferCnt < DEFAULT_MIN_BUFFER_CNT + 1) {
+        AVCODEC_LOGE("Allocate output buffer failed: only %{public}d buffer is allocated, no memory", valBufferCnt);
         buffers_[INDEX_INPUT].clear();
         buffers_[INDEX_OUTPUT].clear();
         return AVCS_ERR_NO_MEMORY;

@@ -16,12 +16,6 @@
 #ifndef FCODEC_H
 #define FCODEC_H
 
-#include <atomic>
-#include <list>
-#include <map>
-#include <shared_mutex>
-#include <tuple>
-#include <vector>
 #include "av_common.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
@@ -31,6 +25,12 @@
 #include "media_description.h"
 #include "surface_memory.h"
 #include "task_thread.h"
+#include <atomic>
+#include <list>
+#include <map>
+#include <shared_mutex>
+#include <tuple>
+#include <vector>
 namespace OHOS {
 namespace Media {
 namespace Codec {
@@ -97,9 +97,8 @@ private:
     void ReceiveFrame();
     void RenderFrame();
     void ConfigureSufrace(const Format &format, const std::string_view &formatKey, uint32_t FORMAT_TYPE);
-    void ConfigureBuffer(const Format &format, const std::string_view &formatKey, int32_t minVal = 0,
-                         int32_t maxVal = INT_MAX);
-    int32_t ConfigureDefault();
+    void ConfigureDefaultVal(const Format &format, const std::string_view &formatKey, int32_t defaultVal,
+                         int32_t minVal = 0, int32_t maxVal = INT_MAX);
     void FramePostProcess(std::shared_ptr<AVBuffer> frameBuffer, int32_t status, int ret);
     int32_t AllocateInputBuffer(int32_t bufferCnt, int32_t inBufferSize);
     int32_t AllocateOutputBuffer(int32_t bufferCnt, int32_t outBufferSize);
