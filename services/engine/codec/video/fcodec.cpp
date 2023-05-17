@@ -138,18 +138,21 @@ void FCodec::ConfigureBuffer(const Format &format, const std::string_view &forma
             format_.PutIntValue(formatKey, val32);
         } else {
             AVCODEC_LOGW(
-                "Set parameter failed: %{public}.*s, which minimum threshold=%{public}d, maximum threshold=%{public}d",
-                formatKey.size(), formatKey.data(), minVal, maxVal);
+                "Set parameter failed with key: %{public}s, \
+                minimum threshold: %{public}d, maximum threshold: %{public}d",
+                formatKey.data(), minVal, maxVal);
         }
     } else if (format.GetValueType(formatKey) == FORMAT_TYPE_INT64) {
         int64_t val64 = 0;
         if (format.GetLongValue(formatKey, val64) && val64 > minVal) {
             format_.PutLongValue(formatKey, val64);
         } else {
-            AVCODEC_LOGW("Set parameter failed: %{public}.*s", formatKey.size(), formatKey.data());
+            AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s",
+                formatKey.size(), formatKey.data());
         }
     } else {
-        AVCODEC_LOGW("Unsupport type for parameter: %{public}.*s", formatKey.size(), formatKey.data());
+        AVCODEC_LOGW("Unsupport type for parameter: size: %{public}zu  %{public}s",
+            formatKey.size(), formatKey.data());
     }
 }
 
@@ -190,7 +193,8 @@ void FCodec::ConfigureSufrace(const Format &format, const std::string_view &form
             }
         }
     } else {
-        AVCODEC_LOGW("Set parameter failed: %{public}.*s, please check your value", formatKey.size(), formatKey.data());
+        AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, please check your value",
+            formatKey.size(), formatKey.data());
     }
 }
 
@@ -215,7 +219,8 @@ int32_t FCodec::Configure(const Format &format)
                    it.first == MediaDescriptionKey::MD_KEY_SCALE_TYPE) {
             ConfigureSufrace(format, it.first, it.second.type);
         } else {
-            AVCODEC_LOGW("Set parameter failed: %{public}.*s, unsupport name", it.first.size(), it.first.data());
+            AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, unsupport name",
+                it.first.size(), it.first.data());
         }
     }
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
@@ -435,7 +440,7 @@ void FCodec::SetSurfaceParameter(const Format &format, const std::string_view &f
             SurfaceMemory::SetScaleType(scaleMode);
         }
     } else {
-        AVCODEC_LOGW("Set parameter failed: %{public}.*s", formatKey.size(), formatKey.data());
+        AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s", formatKey.size(), formatKey.data());
     }
 }
 
@@ -500,7 +505,7 @@ int32_t FCodec::AllocateInputBuffer(int32_t bufferCnt, int32_t inBufferSize)
         valBufferCnt++;
     }
     if (buffers_[INDEX_INPUT].size() < DEFAULT_MIN_BUFFER_CNT) {
-        AVCODEC_LOGE("Allocate input buffer failed: only %{public}d buffer is allocated, no memory",
+        AVCODEC_LOGE("Allocate input buffer failed: only %{public}zu buffer is allocated, no memory",
                      buffers_[INDEX_INPUT].size());
         buffers_[INDEX_INPUT].clear();
         return AVCS_ERR_NO_MEMORY;
@@ -545,7 +550,7 @@ int32_t FCodec::AllocateOutputBuffer(int32_t bufferCnt, int32_t outBufferSize)
         valBufferCnt++;
     }
     if (buffers_[INDEX_OUTPUT].size() < DEFAULT_MIN_BUFFER_CNT) {
-        AVCODEC_LOGE("Allocate output buffer failed: only %{public}d buffer is allocated, no memory",
+        AVCODEC_LOGE("Allocate output buffer failed: only %{public}zu buffer is allocated, no memory",
                      buffers_[INDEX_OUTPUT].size());
         buffers_[INDEX_INPUT].clear();
         buffers_[INDEX_OUTPUT].clear();
