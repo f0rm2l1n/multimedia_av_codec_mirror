@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "fcodec.h"
 #include <cstring>
-#include <gtest/gtest.h>
 #include <mutex>
 #include <queue>
 #include <vector>
+#include <gtest/gtest.h>
+#include "fcodec.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

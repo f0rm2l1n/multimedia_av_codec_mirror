@@ -16,6 +16,12 @@
 #ifndef FCODEC_H
 #define FCODEC_H
 
+#include <atomic>
+#include <list>
+#include <map>
+#include <shared_mutex>
+#include <tuple>
+#include <vector>
 #include "av_common.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
@@ -25,12 +31,6 @@
 #include "media_description.h"
 #include "surface_memory.h"
 #include "task_thread.h"
-#include <atomic>
-#include <list>
-#include <map>
-#include <shared_mutex>
-#include <tuple>
-#include <vector>
 namespace OHOS {
 namespace Media {
 namespace Codec {

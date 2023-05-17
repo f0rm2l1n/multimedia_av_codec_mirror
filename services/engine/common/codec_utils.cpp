@@ -16,7 +16,6 @@
 #include "codec_utils.h"
 #include "avcodec_log.h"
 #include "media_description.h"
-
 namespace OHOS {
 namespace Media {
 namespace Codec {

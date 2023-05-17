@@ -12,15 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "fcodec.h"
-#include "avcodec_dfx.h"
-#include "avcodec_log.h"
-#include "codec_utils.h"
-#include "securec.h"
-#include "utils.h"
 #include <iostream>
 #include <set>
 #include <thread>
+#include "securec.h"
+#include "avcodec_dfx.h"
+#include "avcodec_log.h"
+#include "utils.h"
+#include "codec_utils.h"
+#include "fcodec.h"
+
 namespace OHOS {
 namespace Media {
 namespace Codec {
