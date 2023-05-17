@@ -110,16 +110,16 @@ public:
 
 protected:
     int32_t index_;
-    int64_t timeStamp_{0};
+    int64_t timeStamp_;
 
     ADecSignal *signal_;
 
-    FILE *inFile_{nullptr};
-    FILE *dumpFd_{nullptr};
-    std::string codecName_{CODEC_MP3_NAME};
+    FILE *inFile_;
+    FILE *dumpFd_;
+    std::string codecName_;
 
     OHOS::Media::Format format_;
-    std::shared_ptr<OHOS::Media::CodecBase> adec_{nullptr};
+    std::shared_ptr<OHOS::Media::CodecBase> adec_;
 };
 
 void AudioCodeDecoderUnitTest::SetUpTestCase(void)
@@ -134,6 +134,7 @@ void AudioCodeDecoderUnitTest::TearDownTestCase(void)
 
 void AudioCodeDecoderUnitTest::SetUp(void)
 {
+    codecName_ = CODEC_MP3_NAME;
     cout << "[SetUp]: SetUp!!!" << endl;
     adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(codecName_);
     ASSERT_NE(nullptr, adec_);
