@@ -13,28 +13,22 @@
  * limitations under the License.
  */
 
-#include "avcodec_log.h"
-#include "fcodec.h"
-#include "codeclist_builder.h"
-
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecList_builder"};
-}
+#ifndef CODECLIST_UTILS_H
+#define CODECLIST_UTILS_H
 namespace OHOS {
 namespace Media {
-int32_t VideoCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
-{
-    auto ret = Codec::FCodec::GetCodecCapability(caps);
-    if (ret == AVCS_ERR_OK) {
-        AVCODEC_LOGI("Get capability from fcodec successful");
-    }
-    return ret;
-}
-
-int32_t AudioCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
-{
-    (void)caps;
-    return 0;
-}
+/**
+ * @brief Codec Type
+ *
+ * @since 3.1
+ * @version 3.1
+ */
+enum class CodecType : int32_t {
+    AVCODEC_INVALID = -1,
+    AVCODEC_HCODEC = 0,
+    AVCODEC_VIDEO_CODEC,
+    AVCODEC_AUDIO_CODEC,
+};
 } // namespace Media
 } // namespace OHOS
+#endif // CODECLIST_UTILS_H

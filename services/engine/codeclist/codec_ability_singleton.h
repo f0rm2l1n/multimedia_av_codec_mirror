@@ -19,7 +19,8 @@
 #include <mutex>
 #include <unordered_map>
 #include "avcodec_info.h"
-#include "avcodec_audio_codec_key.h"
+#include "codeclist_utils.h"
+#include "avcodec_codec_name.h"
 
 namespace OHOS {
 namespace Media {
@@ -27,16 +28,16 @@ class __attribute__((visibility("default"))) CodecAbilitySingleton : public NoCo
 public:
     ~CodecAbilitySingleton();
     static CodecAbilitySingleton &GetInstance();
-    void RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray, int32_t codecType);
+    void RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray, CodecType codecType);
     std::vector<CapabilityData> GetCapabilityArray();
-    std::unordered_map<std::string, int32_t> GetNameCodecTypeMap();
+    std::unordered_map<std::string, CodecType> GetNameCodecTypeMap();
     std::unordered_map<std::string, std::vector<size_t>> GetMimeCapIdxMap();
 
 private:
     CodecAbilitySingleton();
     std::vector<CapabilityData> capabilityDataArray_;
     std::unordered_map<std::string, std::vector<size_t>> mimeCapIdxMap_;
-    std::unordered_map<std::string, int32_t> nameCodecTypeMap_;
+    std::unordered_map<std::string, CodecType> nameCodecTypeMap_;
     std::mutex mutex_;
 };
 } // namespace Media

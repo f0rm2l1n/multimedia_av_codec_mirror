@@ -24,9 +24,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecAbili
 
 namespace OHOS {
 namespace Media {
-std::map<int32_t, std::shared_ptr<CodecListBase>> GetCodecLists()
+std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> GetCodecLists()
 {
-    std::map<int32_t, std::shared_ptr<CodecListBase>> codecLists;
+    std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> codecLists;
     // For HCodec: codecLists.insert(std::make_pair(CodecType::AVCODEC_HCODEC, nullptr));
     std::shared_ptr<CodecListBase> vcodecList = std::make_shared<VideoCodecList>();
     codecLists.insert(std::make_pair(CodecType::AVCODEC_VIDEO_CODEC, vcodecList));
@@ -44,9 +44,9 @@ CodecAbilitySingleton &CodecAbilitySingleton::GetInstance()
 
 CodecAbilitySingleton::CodecAbilitySingleton()
 {
-    std::map<int32_t, std::shared_ptr<CodecListBase>> codecLists = GetCodecLists();
+    std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> codecLists = GetCodecLists();
     for (auto iter = codecLists.begin(); iter != codecLists.end(); iter++) {
-        int32_t codecType = iter->first;
+        CodecType codecType = iter->first;
         std::vector<CapabilityData> capaArray;
         int32_t ret = iter->second->GetCapabilityList(capaArray);
         if (ret == AVCS_ERR_OK) {
@@ -61,7 +61,7 @@ CodecAbilitySingleton::~CodecAbilitySingleton()
     AVCODEC_LOGI("Capability instances destroy successful");
 }
 
-void CodecAbilitySingleton::RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray, int32_t codecType)
+void CodecAbilitySingleton::RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray, CodecType codecType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t beginIdx = capabilityDataArray_.size();
@@ -85,7 +85,7 @@ std::vector<CapabilityData> CodecAbilitySingleton::GetCapabilityArray()
     return capabilityDataArray_;
 }
 
-std::unordered_map<std::string, int32_t> CodecAbilitySingleton::GetNameCodecTypeMap()
+std::unordered_map<std::string, CodecType> CodecAbilitySingleton::GetNameCodecTypeMap()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return nameCodecTypeMap_;

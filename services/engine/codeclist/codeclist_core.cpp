@@ -99,8 +99,8 @@ bool CodecListCore::CheckVideoFrameRate(const Format &format, const CapabilityDa
         case FORMAT_TYPE_DOUBLE: {
             double targetFrameRateDouble;
             (void)format.GetDoubleValue("frame_rate", targetFrameRateDouble);
-            double minValDouble{data.frameRate.minVal};
-            double maxValDouble{data.frameRate.maxVal};
+            double minValDouble {data.frameRate.minVal};
+            double maxValDouble {data.frameRate.maxVal};
             if ((minValDouble > targetFrameRateDouble && fabs(minValDouble - targetFrameRateDouble) >= EPSINON) ||
                 (maxValDouble < targetFrameRateDouble && fabs(maxValDouble - targetFrameRateDouble) >= EPSINON)) {
                 return false;
@@ -187,9 +187,6 @@ std::string CodecListCore::FindCodec(const Format &format, bool isEncoder)
     std::vector<size_t> capsIdx = mimeCapIdxMap.at(targetMimeType);
     for (auto iter = capsIdx.begin(); iter != capsIdx.end(); iter++) {
         CapabilityData capsData = capabilityDataArray[*iter];
-        AVCODEC_LOGI(
-            "FindCodec: capsData.mime=%{public}s, capsData.name=%{public}s, target mime=%{public}s, idx=%{public}d",
-            capsData.mimeType.c_str(), capsData.codecName.c_str(), targetMimeType.c_str(), *iter);
         if (capsData.codecType != codecType || capsData.mimeType != targetMimeType ||
             (isVendorKey && capsData.isVendor != isVendor)) {
             continue;
@@ -217,18 +214,18 @@ std::string CodecListCore::FindDecoder(const Format &format)
     return FindCodec(format, false);
 }
 
-int32_t CodecListCore::FindCodecType(std::string codecName)
+CodecType CodecListCore::FindCodecType(std::string codecName)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (codecName.empty()) {
-        return -1;
+        return CodecType::AVCODEC_INVALID;
     }
-    std::unordered_map<std::string, int32_t> nameCodecTypeMap =
+    std::unordered_map<std::string, CodecType> nameCodecTypeMap =
         CodecAbilitySingleton::GetInstance().GetNameCodecTypeMap();
     if (nameCodecTypeMap.find(codecName) != nameCodecTypeMap.end()) {
         return nameCodecTypeMap.at(codecName);
     }
-    return -1;
+    return CodecType::AVCODEC_INVALID;
 }
 
 CapabilityData CodecListCore::CreateCapability(std::string codecName)
