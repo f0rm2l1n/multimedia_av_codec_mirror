@@ -46,7 +46,7 @@ public:
     FFmpegDemuxerPlugin();
     ~FFmpegDemuxerPlugin();
     int32_t Create(uintptr_t sourceAddr) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t* buffer,
+    int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                             AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
     int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
     int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
@@ -57,7 +57,7 @@ private:
     AVCodecBufferFlag ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream);
     int64_t GetTotalStreamFrames(int streamIndex);
     int32_t SetBitStreamFormat();
-    int32_t ConvertAVPacketToSample(AVStream* avStream, uint8_t* buffer, AVCodecBufferInfo &bufferInfo,
+    int32_t ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> memory, AVCodecBufferInfo &bufferInfo,
                                     AVCodecBufferFlag &flag, AVPacket* pkt);
     void ConvertAvcOrHevcToAnnexb(AVPacket& pkt);
     void InitBitStreamContext(const AVStream& avStream);

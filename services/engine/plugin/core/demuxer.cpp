@@ -33,10 +33,10 @@ int32_t Demuxer::UnselectSourceTrackByID(uint32_t trackIndex)
     return demuxer_->UnselectSourceTrackByID(trackIndex);
 }
 
-int32_t Demuxer::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+int32_t Demuxer::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                                 AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
-    return demuxer_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
+    return demuxer_->CopyNextSample(trackIndex, memory, bufferInfo, flag);
 }
 
 int32_t Demuxer::SeekToTime(int64_t mSeconds, AVSeekMode mode)

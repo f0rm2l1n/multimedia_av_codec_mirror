@@ -40,7 +40,7 @@ public:
 private:
     std::shared_ptr<ISourceService> sourceClient_ = nullptr;
     std::vector<std::shared_ptr<AVSourceTrack>> tracks_ {};
-    int32_t trackCount_ = -1;
+    uint32_t trackCount_ = 0;
     bool TrackIndexIsValid(uint32_t trackIndex);
 };
 

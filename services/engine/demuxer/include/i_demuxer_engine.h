@@ -28,7 +28,7 @@ public:
     virtual ~IDemuxerEngine() = default;
     virtual int32_t SelectSourceTrackByID(uint32_t trackIndex) = 0;
     virtual int32_t UnselectSourceTrackByID(uint32_t trackIndex) = 0;
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+    virtual int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                                     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) = 0;
     virtual int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) = 0;
 };

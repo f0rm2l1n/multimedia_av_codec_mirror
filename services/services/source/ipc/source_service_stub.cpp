@@ -125,10 +125,10 @@ int32_t SourceServiceStub::GetSourceFormat(Format &format)
     return sourceServer_->GetSourceFormat(format);
 }
 
-uint64_t SourceServiceStub::GetSourceAddr()
+int32_t SourceServiceStub::GetSourceAddr(uintptr_t &addr)
 {
     CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
-    return sourceServer_->GetSourceAddr();
+    return sourceServer_->GetSourceAddr(addr);
 }
 
 int32_t SourceServiceStub::DumpInfo(int32_t fd)
@@ -154,9 +154,9 @@ int32_t SourceServiceStub::Init(MessageParcel &data, MessageParcel &reply)
 int32_t SourceServiceStub::GetTrackCount(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    uint32_t trackCount;
+    uint32_t trackCount = data.ReadUint32();
     int32_t ret = GetTrackCount(trackCount);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(trackCount), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackCount), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
     return AVCS_ERR_OK;
 }
@@ -176,15 +176,14 @@ int32_t SourceServiceStub::GetTrackFormat(MessageParcel &data, MessageParcel &re
     uint32_t trackIndex = data.ReadUint32();
     Format format;
     int32_t ret = GetTrackFormat(format, trackIndex);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetTrackFormat failed");
     AVCodecParcel::Marshalling(reply, format);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetTrackFormat failed");
     return AVCS_ERR_OK;
 }
 
 int32_t SourceServiceStub::GetSourceFormat(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-
     Format format;
     int32_t ret = GetSourceFormat(format);
     AVCodecParcel::Marshalling(reply, format);
@@ -195,8 +194,10 @@ int32_t SourceServiceStub::GetSourceFormat(MessageParcel &data, MessageParcel &r
 int32_t SourceServiceStub::GetSourceAddr(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-
-    CHECK_AND_RETURN_RET_LOG(reply.WriteUint64(GetSourceAddr()), AVCS_ERR_UNKNOWN, "Reply GetSourceAddr failed!");
+    uintptr_t addr;
+    auto ret = GetSourceAddr(addr);
+    CHECK_AND_RETURN_RET_LOG(reply.WritePointer(addr), AVCS_ERR_UNKNOWN, "Reply GetSourceAddr failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetSourceAddr failed!");
     return AVCS_ERR_OK;
 }
 }  // namespace Media

@@ -88,7 +88,7 @@ OH_AVErrCode OH_AVDemuxer_UnselectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_
  * @version 4.0
 */
 OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackIndex,
-                                         uint8_t *buffer, OH_AVCodecBufferAttr *bufferInfo);
+                                         uint8_t *buffer, uint32_t bufferSize, OH_AVCodecBufferAttr *bufferInfo);
 
 /**
  * @brief All selected tracks seek near to the requested time according to the seek mode.

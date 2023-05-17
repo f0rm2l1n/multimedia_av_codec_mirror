@@ -94,7 +94,7 @@ int32_t DemuxerServiceStub::DestroyStub()
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServiceStub::Init(uint64_t sourceAddr)
+int32_t DemuxerServiceStub::Init(uintptr_t sourceAddr)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
     return demuxerServer_->Init(sourceAddr);
@@ -112,11 +112,11 @@ int32_t DemuxerServiceStub::UnselectSourceTrackByID(uint32_t trackIndex)
     return demuxerServer_->UnselectSourceTrackByID(trackIndex);
 }
 
-int32_t DemuxerServiceStub::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+int32_t DemuxerServiceStub::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
+    return demuxerServer_->CopyNextSample(trackIndex, memory, bufferInfo, flag);
 }
 
 int32_t DemuxerServiceStub::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
@@ -139,7 +139,7 @@ int32_t DemuxerServiceStub::DumpInfo(int32_t fd)
 
 int32_t DemuxerServiceStub::Init(MessageParcel &data, MessageParcel &reply)
 {
-    uint64_t sourceAddr = data.ReadUint64();
+    uint64_t sourceAddr = data.ReadPointer();
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(sourceAddr)), AVCS_ERR_UNKNOWN, "Reply Init failed!");
     return AVCS_ERR_OK;
 }
@@ -168,11 +168,12 @@ int32_t DemuxerServiceStub::CopyNextSample(MessageParcel &data, MessageParcel &r
     uint32_t trackIndex;
     AVCodecBufferInfo info;
     AVCodecBufferFlag flag;
-    uint8_t *buffer = nullptr;
+    std::shared_ptr<AVSharedMemory> memory = ReadAVSharedMemoryFromParcel(data);
     
-    int32_t ret = CopyNextSample(trackIndex, buffer, info, flag);
+    int32_t ret = CopyNextSample(trackIndex, memory, info, flag);
 
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackIndex), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    WriteAVSharedMemoryToParcel(memory, reply);
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN,
         "Reply CopyNextSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");

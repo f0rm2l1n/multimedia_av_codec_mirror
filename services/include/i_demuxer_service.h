@@ -18,6 +18,7 @@
 #include <string>
 #include <memory>
 #include "avcodec_common.h"
+#include "avsharedmemory.h"
 
 namespace OHOS {
 namespace Media {
@@ -28,7 +29,7 @@ public:
     virtual int32_t Init(uintptr_t sourceAddr) = 0;
     virtual int32_t SelectSourceTrackByID(uint32_t index) = 0;
     virtual int32_t UnselectSourceTrackByID(uint32_t index) = 0;
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+    virtual int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                                     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) = 0;
     virtual int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) = 0;
 };
