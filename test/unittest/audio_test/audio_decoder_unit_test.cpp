@@ -20,7 +20,7 @@
 #include "native_avcodec_audiodecoder.h"
 #include "audio_ffmpeg_adapter.h"
 #include "format.h"
-#include "avcodec_audio_codec_key.h"
+#include "avcodec_codec_name.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "media_description.h"
@@ -30,9 +30,9 @@ using namespace testing::ext;
 using namespace OHOS::Media;
 
 namespace {
-const string CODEC_MP3_NAME = std::string(AVCodecAudioCodecKey::AUDIO_DECODER_MP3_NAME_KEY);
-const string CODEC_FLAC_NAME = std::string(AVCodecAudioCodecKey::AUDIO_DECODER_FLAC_NAME_KEY);
-const string CODEC_AAC_NAME = std::string(AVCodecAudioCodecKey::AUDIO_DECODER_AAC_NAME_KEY);
+const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY);
+const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY);
+const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY);
 constexpr uint32_t MAX_CHANNEL_COUNT = 2;
 constexpr uint32_t INVALID_CHANNEL_COUNT = 3;
 constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
@@ -110,16 +110,16 @@ public:
 
 protected:
     int32_t index_;
-    int64_t timeStamp_ {0};
+    int64_t timeStamp_;
 
     ADecSignal *signal_;
 
-    FILE *inFile_ {nullptr};
-    FILE *dumpFd_ {nullptr};
-    std::string codecName_ {CODEC_MP3_NAME};
+    FILE *inFile_;
+    FILE *dumpFd_;
+    std::string codecName_;
 
     OHOS::Media::Format format_;
-    std::shared_ptr<OHOS::Media::CodecBase> adec_ {nullptr};
+    std::shared_ptr<OHOS::Media::CodecBase> adec_;
 };
 
 void AudioCodeDecoderUnitTest::SetUpTestCase(void)
@@ -134,13 +134,14 @@ void AudioCodeDecoderUnitTest::TearDownTestCase(void)
 
 void AudioCodeDecoderUnitTest::SetUp(void)
 {
+    codecName_ = CODEC_MP3_NAME;
     cout << "[SetUp]: SetUp!!!" << endl;
     adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(codecName_);
     ASSERT_NE(nullptr, adec_);
 
     signal_ = new ADecSignal();
-    ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->SetCallback(
-        std::shared_ptr<AVCodecCallback>(std::make_shared<BufferCallback>(signal_))));
+    ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK,
+              adec_->SetCallback(std::shared_ptr<AVCodecCallback>(std::make_shared<BufferCallback>(signal_))));
 }
 
 void AudioCodeDecoderUnitTest::TearDown(void)
@@ -1044,5 +1045,5 @@ int main(int argc, char *argv[])
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-}  // namespace Media
-}  // namespace OHOS
+} // namespace Media
+} // namespace OHOS

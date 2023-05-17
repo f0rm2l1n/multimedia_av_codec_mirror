@@ -21,7 +21,7 @@
 #include "audio_ffmpeg_adapter.h"
 #include "format.h"
 #include "avcodec_audio_decoder.h"
-#include "avcodec_audio_codec_key.h"
+#include "avcodec_codec_name.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "media_description.h"
@@ -31,9 +31,9 @@ using namespace testing::ext;
 using namespace OHOS::Media;
 
 namespace {
-const string CODEC_MP3_NAME = std::string(AVCodecAudioCodecKey::AUDIO_DECODER_MP3_NAME_KEY);
-const string CODEC_FLAC_NAME = std::string(AVCodecAudioCodecKey::AUDIO_DECODER_FLAC_NAME_KEY);
-const string CODEC_AAC_NAME = std::string(AVCodecAudioCodecKey::AUDIO_DECODER_AAC_NAME_KEY);
+const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY);
+const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY);
+const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY);
 constexpr uint32_t MAX_CHANNEL_COUNT = 2;
 constexpr uint32_t INVALID_CHANNEL_COUNT = 3;
 constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
@@ -111,13 +111,13 @@ public:
 
 protected:
     int32_t index_;
-    int64_t timeStamp_ {0};
+    int64_t timeStamp_;
 
     ADecSignal *signal_;
 
-    FILE *inFile_ {nullptr};
-    FILE *dumpFd_ {nullptr};
-    std::string codecName_ {CODEC_MP3_NAME};
+    FILE *inFile_;
+    FILE *dumpFd_;
+    std::string codecName_;
 
     OHOS::Media::Format format_;
     std::shared_ptr<AVCodecAudioDecoder> adec_ = {nullptr};
@@ -135,13 +135,15 @@ void AudioCodeDecoderInnerUnitTest::TearDownTestCase(void)
 
 void AudioCodeDecoderInnerUnitTest::SetUp(void)
 {
+    timeStamp_ = 0;
+    codecName_ = CODEC_MP3_NAME;
     cout << "[SetUp]: SetUp!!!" << endl;
     adec_ = AudioDecoderFactory::CreateByName(codecName_);
     ASSERT_NE(nullptr, adec_);
 
     signal_ = new ADecSignal();
-    ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->SetCallback(
-        std::shared_ptr<AVCodecCallback>(std::make_shared<BufferCallback>(signal_))));
+    ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK,
+              adec_->SetCallback(std::shared_ptr<AVCodecCallback>(std::make_shared<BufferCallback>(signal_))));
 }
 
 void AudioCodeDecoderInnerUnitTest::TearDown(void)
@@ -638,7 +640,8 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_GetInputBuffer_01, Tes
 HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_QueueInputBuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;;
+    AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
+    ;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     sleep(1);
@@ -985,5 +988,5 @@ int main(int argc, char *argv[])
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-}  // namespace Media
-}  // namespace OHOS
+} // namespace Media
+} // namespace OHOS

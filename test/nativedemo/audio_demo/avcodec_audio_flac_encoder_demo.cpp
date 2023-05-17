@@ -22,7 +22,7 @@
 #include "native_avformat.h"
 #include "demo_log.h"
 #include "native_avcodec_base.h"
-#include "avcodec_audio_codec_key.h"
+#include "avcodec_codec_name.h"
 #include "avcodec_audio_flac_encoder_demo.h"
 
 using namespace OHOS;
@@ -131,7 +131,7 @@ AEncFlacDemo::~AEncFlacDemo()
 
 int32_t AEncFlacDemo::CreateEnc()
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_ENCODER_FLAC_NAME_KEY).data());
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();
@@ -252,7 +252,7 @@ void AEncFlacDemo::InputFunc()
             info.flags = AVCODEC_BUFFER_FLAGS_NONE;
             ret = OH_AudioEncoder_PushInputData(audioEnc_, index, info);
         }
-        
+
         timeStamp_ += FRAME_DURATION_US;
         signal_->inQueue_.pop();
         signal_->inBufferQueue_.pop();

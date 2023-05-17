@@ -16,7 +16,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "avcodec_audio_codec_key.h"
+#include "avcodec_codec_name.h"
 #include "avcodec_errors.h"
 #include "avcodec_common.h"
 #include "demo_log.h"
@@ -54,13 +54,13 @@ void ADecInnerDemo::RunCase()
     // extradata for vorbis
     char buffer[TMP_BUFFER_SIZE]; // 临时buffer，仅测试vorbis时需要
     int64_t extradataSize;
-    inputFile_.read((char*)&extradataSize, sizeof(int64_t));
+    inputFile_.read((char *)&extradataSize, sizeof(int64_t));
     DEMO_CHECK_AND_RETURN_LOG(inputFile_.gcount() == sizeof(int64_t), "Fatal: read extradataSize bytes error");
 
     DEMO_CHECK_AND_RETURN_LOG(extradataSize <= TMP_BUFFER_SIZE, "Fatal: buffer not large enough");
     inputFile_.read(buffer, extradataSize);
     DEMO_CHECK_AND_RETURN_LOG(inputFile_.gcount() == extradataSize, "Fatal: read extradata bytes error");
-    format.PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t*)buffer, extradataSize);
+    format.PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t *)buffer, extradataSize);
 
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
@@ -74,7 +74,7 @@ void ADecInnerDemo::RunCase()
 
 int32_t ADecInnerDemo::CreateDec()
 {
-    audioDec_ = AudioDecoderFactory::CreateByName((AVCodecAudioCodecKey::AUDIO_DECODER_VORBIS_NAME_KEY).data());
+    audioDec_ = AudioDecoderFactory::CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = make_shared<ADecSignal>();
@@ -193,7 +193,7 @@ void ADecInnerDemo::InputFunc()
             break;
         }
 
-        inputFile_.read((char*)&size, sizeof(size));
+        inputFile_.read((char *)&size, sizeof(size));
         if (inputFile_.eof() || inputFile_.gcount() == 0) {
             std::cout << "eof reached" << std::endl;
             HandleInputEOS(index);
@@ -201,9 +201,9 @@ void ADecInnerDemo::InputFunc()
         }
         DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == sizeof(size), "Fatal: read size fail");
 
-        inputFile_.read((char*)&pts, sizeof(pts));
+        inputFile_.read((char *)&pts, sizeof(pts));
         DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == sizeof(pts), "Fatal: read pts fail");
-        inputFile_.read((char*)buffer->GetBase(), size);
+        inputFile_.read((char *)buffer->GetBase(), size);
         DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == size, "Fatal: read buffer fail");
 
         auto result = HandleNormalInput(index, pts, size);
