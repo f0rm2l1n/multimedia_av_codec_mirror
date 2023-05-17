@@ -14,10 +14,10 @@
  */
 
 #include <memory>
+#include "surface_memory.h"
 #include "avcodec_log.h"
 #include "native_averrors.h"
 #include "securec.h"
-#include "surface_memory.h"
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-SurfaceMemory"};
 }

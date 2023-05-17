@@ -12,32 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "fcodec.h"
-#include "avcodec_dfx.h"
-#include "avcodec_log.h"
-#include "codec_utils.h"
-#include "securec.h"
-#include "utils.h"
+
 #include <iostream>
 #include <set>
 #include <thread>
+#include "securec.h"
+#include "avcodec_dfx.h"
+#include "avcodec_log.h"
+#include "utils.h"
+#include "codec_utils.h"
+#include "fcodec.h"
 
 namespace OHOS {
 namespace Media {
 namespace Codec {
-static const uint32_t INDEX_INPUT = 0;
-static const uint32_t INDEX_OUTPUT = 1;
-static const int32_t DEFAULT_IN_BUFFER_CNT = 8;
-static const int32_t DEFAULT_OUT_BUFFER_CNT = 8;
-static const int32_t DEFAULT_MIN_BUFFER_CNT = 1;
-static const uint32_t VIDEO_PIX_DEPTH_YUV = 3;
-static const uint32_t VIDEO_PIX_DEPTH_RGBA = 4;
-static const int32_t VIDEO_ALIGN_SIZE = 16;  // 16字节对齐
-static const int32_t VIDEO_MAX_SIZE = 15360; // 16K的宽
-static const int32_t DEFAULT_VIDEO_WIDTH = 1920;
-static const int32_t DEFAULT_VIDEO_HEIGHT = 1080;
-static const uint32_t DEFAULT_TRY_DECODE_TIME = 10;
-static const struct {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
+const uint32_t INDEX_INPUT = 0;
+const uint32_t INDEX_OUTPUT = 1;
+const int32_t DEFAULT_IN_BUFFER_CNT = 8;
+const int32_t DEFAULT_OUT_BUFFER_CNT = 8;
+const int32_t DEFAULT_MIN_BUFFER_CNT = 1;
+const uint32_t VIDEO_PIX_DEPTH_YUV = 3;
+const uint32_t VIDEO_PIX_DEPTH_RGBA = 4;
+const int32_t VIDEO_ALIGN_SIZE = 16;  // 16字节对齐
+const int32_t VIDEO_MAX_SIZE = 15360; // 16K的宽
+const int32_t DEFAULT_VIDEO_WIDTH = 1920;
+const int32_t DEFAULT_VIDEO_HEIGHT = 1080;
+const uint32_t DEFAULT_TRY_DECODE_TIME = 10;
+const struct {
     const char *codecName;
     const char *mimeType;
     const char *ffmpegCodec;
@@ -45,9 +48,7 @@ static const struct {
 } SupportCodec[] = {
     {"video_decoder.avc", "video/avc", "h264", false},
 };
-static const size_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
+const size_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
 }
 FCodec::FCodec(const std::string &name)
 {
@@ -63,22 +64,6 @@ FCodec::FCodec(const std::string &name)
     CHECK_AND_RETURN_LOG(!fcodecName.empty(), "Create codec failed: not support name: %{public}s", name.c_str());
     int32_t ret = Init(fcodecName);
     format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_NAME, name);
-    CHECK_AND_RETURN_LOG(ret == AVCS_ERR_OK, "Create codec failed: init codec error");
-}
-
-FCodec::FCodec(bool isEncoder, const std::string &mime)
-{
-    AVCODEC_SYNC_TRACE;
-    CHECK_AND_RETURN_LOG(!mime.empty(), "Create codec failed:  empty mime");
-    std::string fcodecName;
-    for (size_t i = 0; i < numSupportCodec; ++i) {
-        if (SupportCodec[i].mimeType == mime && SupportCodec[i].isEncoder == isEncoder) {
-            fcodecName = SupportCodec[i].ffmpegCodec;
-            break;
-        }
-    }
-    CHECK_AND_RETURN_LOG(!fcodecName.empty(), "Create codec failed: not support mime: %{public}s", mime.c_str());
-    int32_t ret = Init(fcodecName);
     CHECK_AND_RETURN_LOG(ret == AVCS_ERR_OK, "Create codec failed: init codec error");
 }
 
@@ -108,7 +93,7 @@ int32_t FCodec::Init(const std::string &name)
 }
 
 void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &formatKey, int32_t defaultVal,
-                             int32_t minVal, int32_t maxVal)
+                                 int32_t minVal, int32_t maxVal)
 {
     int32_t val32 = 0;
     if (format.GetIntValue(formatKey, val32) && val32 > minVal && val32 < maxVal) {
@@ -123,18 +108,8 @@ void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &f
 
 void FCodec::ConfigureSufrace(const Format &format, const std::string_view &formatKey, uint32_t FORMAT_TYPE)
 {
-    uint8_t *addr = nullptr;
-    size_t size = 0;
     int32_t val = 0;
-    if (formatKey == MediaDescriptionKey::MD_KEY_CODEC_CONFIG && FORMAT_TYPE == FORMAT_TYPE_ADDR) {
-        if (format.GetBuffer(formatKey, &addr, size) && size > 0) {
-            auto allocSize = AlignUp(size + AV_INPUT_BUFFER_PADDING_SIZE, VIDEO_ALIGN_SIZE);
-            avCodecContext_->extradata = static_cast<uint8_t *>(av_mallocz(allocSize));
-            (void)memcpy_s(avCodecContext_->extradata, allocSize, addr, size);
-            avCodecContext_->extradata_size = size;
-            format_.PutBuffer(formatKey, avCodecContext_->extradata, avCodecContext_->extradata_size);
-        }
-    } else if (formatKey == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT && FORMAT_TYPE == FORMAT_TYPE_INT32) {
+    if (formatKey == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT && FORMAT_TYPE == FORMAT_TYPE_INT32) {
         if (format.GetIntValue(formatKey, val)) {
             VideoPixelFormat vpf = static_cast<VideoPixelFormat>(val);
             if (vpf == VideoPixelFormat::RGBA || vpf == VideoPixelFormat::BGRA) {
@@ -176,8 +151,7 @@ int32_t FCodec::Configure(const Format &format)
             ConfigureDefaultVal(format, it.first, DEFAULT_VIDEO_WIDTH, 0, VIDEO_MAX_SIZE);
         } else if (it.first == MediaDescriptionKey::MD_KEY_HEIGHT) {
             ConfigureDefaultVal(format, it.first, DEFAULT_VIDEO_HEIGHT, 0, VIDEO_MAX_SIZE);
-        } else if (it.first == MediaDescriptionKey::MD_KEY_CODEC_CONFIG ||
-                   it.first == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT ||
+        } else if (it.first == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT ||
                    it.first == MediaDescriptionKey::MD_KEY_ROTATION_ANGLE ||
                    it.first == MediaDescriptionKey::MD_KEY_SCALE_TYPE) {
             ConfigureSufrace(format, it.first, it.second.type);
@@ -284,24 +258,19 @@ int32_t FCodec::Stop()
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Stop codec failed: not in running or Eos state");
     AVCODEC_LOGI("Stopping codec starts");
-    state_ = State::Stopping;
     if (sendTask_ != nullptr) {
         sendTask_->Stop();
-    }
-    if (receiveTask_ != nullptr) {
-        receiveTask_->Stop();
     }
     if (surface_ && renderTask_ != nullptr) {
         renderTask_->Stop();
     }
+    if (receiveTask_ != nullptr) {
+        receiveTask_->Stop();
+    }
     AVCODEC_LOGI("Stopp codec loops");
     std::unique_lock<std::mutex> sLock(syncMutex_);
     avcodec_close(avCodecContext_.get());
-    if (avCodecContext_->extradata) {
-        av_free(avCodecContext_->extradata);
-        avCodecContext_->extradata = nullptr;
-    }
-    avCodecContext_->extradata_size = 0;
+    ResetContext(true);
     sLock.unlock();
     AVCODEC_LOGI("Stopp ffmpeg codec");
     CHECK_AND_RETURN_RET_LOG(ReleaseBuffers() == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
@@ -316,7 +285,6 @@ int32_t FCodec::Flush()
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Flush codec failed: not in running or Eos state");
-    state_ = State::Flushing;
     sendTask_->Pause();
     receiveTask_->Pause();
     if (surface_) {
@@ -328,17 +296,17 @@ int32_t FCodec::Flush()
     sLock.unlock();
     CHECK_AND_RETURN_RET_LOG(ReleaseBuffers(true) == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
                              "Flush codec failed: cannot release buffer");
+    std::unique_lock<std::shared_mutex> iLock(inputMutex_);
+    for (uint32_t i = 0; i < buffers_[INDEX_INPUT].size(); i++) {
+        buffers_[INDEX_INPUT][i]->owner_ = AVBuffer::OWNED_BY_USER;
+    }
+    iLock.unlock();
     std::unique_lock<std::mutex> oLock(outputMutex_);
     for (uint32_t i = 0; i < buffers_[INDEX_OUTPUT].size(); i++) {
         buffers_[INDEX_OUTPUT][i]->owner_ = AVBuffer::OWNED_BY_CODEC;
         codecAvailBuffers_.emplace_back(i);
     }
     oLock.unlock();
-    std::unique_lock<std::shared_mutex> iLock(inputMutex_);
-    for (uint32_t i = 0; i < buffers_[INDEX_INPUT].size(); i++) {
-        buffers_[INDEX_INPUT][i]->owner_ = AVBuffer::OWNED_BY_USER;
-    }
-    iLock.unlock();
     state_ = State::Flushed;
     AVCODEC_LOGI("Flush codec successful, state: Flushed");
     return AVCS_ERR_OK;
@@ -360,15 +328,14 @@ int32_t FCodec::Release()
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(state_ != State::Uninitialized, AVCS_ERR_OK, "Release codec successful");
-    state_ = State::Releasing;
     if (sendTask_ != nullptr) {
         sendTask_->Stop();
     }
-    if (receiveTask_ != nullptr) {
-        receiveTask_->Stop();
-    }
     if (surface_ && renderTask_ != nullptr) {
         renderTask_->Stop();
+    }
+    if (receiveTask_ != nullptr) {
+        receiveTask_->Stop();
     }
     std::unique_lock<std::mutex> sLock(syncMutex_);
     avcodec_close(avCodecContext_.get());
@@ -561,6 +528,7 @@ int32_t FCodec::ReleaseBuffers(bool isFlush)
     iLock.unlock();
     std::unique_lock<std::mutex> oLock(outputMutex_);
     codecAvailBuffers_.clear();
+    renderBuffers_.clear();
     if (!isFlush) {
         buffers_[INDEX_OUTPUT].clear();
     }

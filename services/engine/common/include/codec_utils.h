@@ -30,11 +30,6 @@ extern "C" {
 namespace OHOS {
 namespace Media {
 namespace Codec {
-enum struct VideoFormat : uint8_t {
-    UNKNOWN = 0,
-    H264 = 1,
-    MPEG4 = 2,
-};
 
 struct ScalePara {
     int32_t srcWidth = 0;
