@@ -111,13 +111,13 @@ public:
 
 protected:
     int32_t index_;
-    int64_t timeStamp_{0};
+    int64_t timeStamp_;
 
     ADecSignal *signal_;
 
-    FILE *inFile_{nullptr};
-    FILE *dumpFd_{nullptr};
-    std::string codecName_{CODEC_MP3_NAME};
+    FILE *inFile_;
+    FILE *dumpFd_;
+    std::string codecName_;
 
     OHOS::Media::Format format_;
     std::shared_ptr<AVCodecAudioDecoder> adec_ = {nullptr};
@@ -135,6 +135,8 @@ void AudioCodeDecoderInnerUnitTest::TearDownTestCase(void)
 
 void AudioCodeDecoderInnerUnitTest::SetUp(void)
 {
+    timeStamp_ = 0;
+    codecName_ = CODEC_MP3_NAME;
     cout << "[SetUp]: SetUp!!!" << endl;
     adec_ = AudioDecoderFactory::CreateByName(codecName_);
     ASSERT_NE(nullptr, adec_);
