@@ -181,6 +181,11 @@ public:
      * Key for aac sbr, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_SBR = "sbr";
+    
+    /**
+     * Key for compliance level, value type is int32_t
+     */
+    static constexpr std::string_view MD_KEY_COMPLIANCE_LEVEL = "compliance_level";
 
 private:
     MediaDescriptionKey() = delete;

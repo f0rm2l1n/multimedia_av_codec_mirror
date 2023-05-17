@@ -43,7 +43,7 @@ int32_t AudioFfmpegEncoderPlugin::ProcessSendData(const std::shared_ptr<AudioBuf
             AVCODEC_LOGE("avCodecContext_ is nullptr");
             return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
         }
-        ret = sendBuffer(inputBuffer);
+        ret = SendBuffer(inputBuffer);
     }
     return ret;
 }
@@ -83,7 +83,7 @@ int32_t AudioFfmpegEncoderPlugin::PcmFillFrame(const std::shared_ptr<AudioBuffer
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioFfmpegEncoderPlugin::sendBuffer(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFfmpegEncoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     if (!inputBuffer) {
         AVCODEC_LOGE("inputBuffer is nullptr");
@@ -130,12 +130,12 @@ int32_t AudioFfmpegEncoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBuffer
             AVCODEC_LOGE("avCodecContext_ is nullptr");
             return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
         }
-        status = receiveBuffer(outBuffer);
+        status = ReceiveBuffer(outBuffer);
     }
     return status;
 }
 
-int32_t AudioFfmpegEncoderPlugin::receiveBuffer(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFfmpegEncoderPlugin::ReceiveBuffer(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     auto ret = avcodec_receive_packet(avCodecContext_.get(), avPacket_.get());
     int32_t status;

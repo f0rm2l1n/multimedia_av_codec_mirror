@@ -33,7 +33,6 @@ ohos_executable("av_codec_demo") {
     "./codeclist_demo",
     "./include",
     "//third_party/ffmpeg",
-
   ]
 
   cflags = [
@@ -62,17 +61,18 @@ ohos_executable("av_codec_demo") {
   cflags_cc += [ "-std=c++17" ]
 
   sources = [
+    "./audio_demo/avcodec_audio_aac_encoder_demo.cpp",
     "./audio_demo/avcodec_audio_decoder_demo.cpp",
-    "./audio_demo/avcodec_audio_encoder_demo.cpp",
     "./audio_demo/avcodec_audio_decoder_inner_demo.cpp",
     "./audio_demo/avcodec_audio_encoder_inner_demo.cpp",
+    "./audio_demo/avcodec_audio_flac_encoder_demo.cpp",
     "./av_codec_demo.cpp",
     "./avmuxer/avmuxer_demo.cpp",
     "./avmuxer/avmuxer_demo_base.cpp",
     "./avmuxer/avmuxer_demo_common.c",
+    "./avmuxer/avmuxer_demo_runner.cpp",
     "./avmuxer/avmuxer_engine_demo.cpp",
     "./avmuxer/avmuxer_ffmpeg_demo.cpp",
-    "./avmuxer/avmuxer_demo_runner.cpp",
     "./avmuxer/native_avmuxer_demo.c",
     "./codeclist_demo/codeclist_demo.cpp",
   ]
