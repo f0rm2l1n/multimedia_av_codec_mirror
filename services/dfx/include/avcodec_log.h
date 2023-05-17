@@ -23,12 +23,12 @@ namespace Media {
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002BAC
 
-#define AVCODEC_LOG_FREQ_LIMIT(frequency) \
-    if (1) {                                             \
-        static uint64_t currentTimes = 0;                \
-        if (currentTimes++ % (uint64_t)frequency != 0) { \
-            break;                                       \
-        }                                                \
+#define AVCODEC_LOG_FREQ_LIMIT(frequency)                    \
+    if (1) {                                                 \
+        static uint64_t currentTimes = 0;                    \
+        if ((currentTimes++ % ((uint64_t)frequency)) != 0) { \
+            break;                                           \
+        }                                                    \
     }
 
 #define AVCODEC_LOG(func, fmt, args...)                  \

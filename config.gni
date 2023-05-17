@@ -20,6 +20,7 @@ declare_args() {
   multimedia_av_codec_support_muxer = true
   multimedia_av_codec_support_ffmpeg_demuxer = true
   multimedia_av_codec_support_test = true
+  multimedia_av_codec_support_xcollie = true
 }
 
 av_codec_root_dir = "//foundation/multimedia/av_codec"
@@ -63,4 +64,8 @@ if (multimedia_av_codec_support_source) {
 
 if (multimedia_av_codec_support_ffmpeg_demuxer) {
   av_codec_defines += [ "FFMPEG_DEMUXER_ENABLE" ]
+}
+
+if (multimedia_av_codec_support_xcollie) {
+  av_codec_defines += [ "HICOLLIE_ENABLE" ]
 }
