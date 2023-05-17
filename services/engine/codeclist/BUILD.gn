@@ -46,9 +46,12 @@ config("av_codec_engine_codeclist_config") {
     "$av_codec_root_dir/interfaces/kits/c",
     "$av_codec_root_dir/services/dfx/include",
     "$av_codec_root_dir/services/utils/include/",
-    "//third_party/libxml2/include",
-
-    # "$av_codec_root_dir/services/engine/base/include/",
+    "$av_codec_root_dir/services/engine/base/include/",
+    "$av_codec_root_dir/services/engine/codec/include/audio/",
+    "$av_codec_root_dir/services/engine/codec/include/video/",
+    "$av_codec_root_dir/services/engine/common/include/",
+    "//foundation/graphic/graphic_2d/interfaces/inner_api",
+    "//third_party/ffmpeg",
   ]
 }
 
@@ -58,13 +61,14 @@ ohos_static_library("av_codec_engine_codeclist") {
   sources = [
     "codec_ability_singleton.cpp",
     "codeclist_core.cpp",
-    "codeclist_xml_parser.cpp",
+    "codeclist_builder.cpp",
   ]
 
   deps = [
     "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
     "$av_codec_root_dir/services/utils:av_codec_service_utils",
-    "//third_party/libxml2:xml2",
+    "$av_codec_root_dir/services/engine/codec/audio:av_codec_audio_ffmpeg_codec",
+    "$av_codec_root_dir/services/engine/codec/video:av_codec_video_ffmpeg_codec",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

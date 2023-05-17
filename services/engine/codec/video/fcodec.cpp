@@ -20,7 +20,7 @@
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
 #include "utils.h"
-#include "codec_utils.h"
+#include "avcodec_audio_codec_key.h"
 #include "fcodec.h"
 
 namespace OHOS {
@@ -28,28 +28,28 @@ namespace Media {
 namespace Codec {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
-const uint32_t INDEX_INPUT = 0;
-const uint32_t INDEX_OUTPUT = 1;
-const int32_t DEFAULT_IN_BUFFER_CNT = 8;
-const int32_t DEFAULT_OUT_BUFFER_CNT = 8;
-const int32_t DEFAULT_MIN_BUFFER_CNT = 1;
-const uint32_t VIDEO_PIX_DEPTH_YUV = 3;
-const uint32_t VIDEO_PIX_DEPTH_RGBA = 4;
-const int32_t VIDEO_ALIGN_SIZE = 16;  // 16字节对齐
-const int32_t VIDEO_MAX_SIZE = 15360; // 16K的宽
-const int32_t DEFAULT_VIDEO_WIDTH = 1920;
-const int32_t DEFAULT_VIDEO_HEIGHT = 1080;
-const uint32_t DEFAULT_TRY_DECODE_TIME = 10;
-const struct {
-    const char *codecName;
-    const char *mimeType;
+static const uint32_t INDEX_INPUT = 0;
+static const uint32_t INDEX_OUTPUT = 1;
+static const int32_t DEFAULT_IN_BUFFER_CNT = 8;
+static const int32_t DEFAULT_OUT_BUFFER_CNT = 8;
+static const int32_t DEFAULT_MIN_BUFFER_CNT = 1;
+static const uint32_t VIDEO_PIX_DEPTH_YUV = 3;
+static const uint32_t VIDEO_PIX_DEPTH_RGBA = 4;
+static const int32_t VIDEO_ALIGN_SIZE = 16;  // 16字节对齐
+static const int32_t VIDEO_MAX_SIZE = 3840; // 16K的宽
+static const int32_t DEFAULT_VIDEO_WIDTH = 1920;
+static const int32_t DEFAULT_VIDEO_HEIGHT = 1080;
+static const uint32_t DEFAULT_TRY_DECODE_TIME = 10;
+static const struct {
+    const std::string_view codecName;
+    const std::string_view mimeType;
     const char *ffmpegCodec;
     const bool isEncoder;
 } SupportCodec[] = {
-    {"video_decoder.avc", "video/avc", "h264", false},
+    {AVCodecAudioCodecKey::VIDEO_DECODER_AVC_NAME_KEY, CodecMimeType::VIDEO_AVC, "h264", false},
 };
 const size_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
-} // namespace
+}
 FCodec::FCodec(const std::string &name)
 {
     AVCODEC_SYNC_TRACE;
@@ -940,6 +940,49 @@ int32_t FCodec::Pause()
 
 int32_t FCodec::Resume()
 {
+    return AVCS_ERR_OK;
+}
+
+int32_t FCodec::getCodecCapability(std::vector<CapabilityData> &capaArray)
+{
+    for (size_t i = 0; i < numSupportCodec; ++i) {
+        CapabilityData capsData;
+        capsData.codecName = static_cast<std::string>(SupportCodec[i].codecName);
+        capsData.mimeType = static_cast<std::string>(SupportCodec[i].mimeType);
+        capsData.codecType = SupportCodec[i].isEncoder ? AVCODEC_TYPE_VIDEO_ENCODER : AVCODEC_TYPE_VIDEO_DECODER;
+        capsData.isVendor = false;
+        capsData.maxInstance = 16;
+        capsData.alignment.width = 0;
+        capsData.alignment.height = 0;
+        capsData.width.minVal = 2;
+        capsData.width.maxVal = VIDEO_MAX_SIZE;
+        capsData.height.minVal = 2;
+        capsData.height.maxVal = VIDEO_MAX_SIZE;
+        capsData.frameRate.minVal = 1;
+        capsData.frameRate.maxVal = 30;
+        if (SupportCodec[i].isEncoder) {
+            capsData.bitrate.minVal = 1;
+            capsData.bitrate.maxVal = 3000000;
+            capsData.complexity.minVal = 0;
+            capsData.complexity.maxVal = 0;
+            capsData.encodeQuality.minVal = 0;
+            capsData.encodeQuality.maxVal = 0;
+            capsData.blockPerFrame.minVal = 1;
+            capsData.blockPerFrame.maxVal = 32768;
+            capsData.blockPerSecond.minVal = 1;
+            capsData.blockPerSecond.maxVal = 244800;
+            capsData.blockSize.width = 16;
+            capsData.blockSize.height = 16;
+        }
+        for (int32_t i = 0; i < static_cast<int32_t>(VideoPixelFormat::BGRA); ++i) {
+            capsData.pixFormat.emplace_back(i);
+        }
+        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_BASELINE));
+        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_MAIN));
+        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_HIGH));
+        capaArray.emplace_back(capsData);
+    }
+    AVCODEC_LOGI("Get %{public}d capability successful", capaArray.size());
     return AVCS_ERR_OK;
 }
 } // namespace Codec

@@ -99,8 +99,8 @@ bool CodecListCore::CheckVideoFrameRate(const Format &format, const CapabilityDa
         case FORMAT_TYPE_DOUBLE: {
             double targetFrameRateDouble;
             (void)format.GetDoubleValue("frame_rate", targetFrameRateDouble);
-            double minValDouble {data.frameRate.minVal};
-            double maxValDouble {data.frameRate.maxVal};
+            double minValDouble{data.frameRate.minVal};
+            double maxValDouble{data.frameRate.maxVal};
             if ((minValDouble > targetFrameRateDouble && fabs(minValDouble - targetFrameRateDouble) >= EPSINON) ||
                 (maxValDouble < targetFrameRateDouble && fabs(maxValDouble - targetFrameRateDouble) >= EPSINON)) {
                 return false;
@@ -179,23 +179,30 @@ std::string CodecListCore::FindCodec(const Format &format, bool isEncoder)
         (void)format.GetIntValue("codec_vendor_flag", isVendor);
     }
     std::vector<CapabilityData> capabilityDataArray = CodecAbilitySingleton::GetInstance().GetCapabilityArray();
-    auto iter = capabilityDataArray.begin();
-    while (iter != capabilityDataArray.end()) {
-        if ((*iter).codecType != codecType || (*iter).mimeType != targetMimeType ||
-            (isVendorKey && (*iter).isVendor != isVendor)) {
-            ++iter;
+    std::unordered_map<std::string, std::vector<size_t>> mimeCapIdxMap =
+        CodecAbilitySingleton::GetInstance().GetMimeCapIdxMap();
+    if (mimeCapIdxMap.find(targetMimeType) == mimeCapIdxMap.end()) {
+        return "";
+    }
+    std::vector<size_t> capsIdx = mimeCapIdxMap.at(targetMimeType);
+    for (auto iter = capsIdx.begin(); iter != capsIdx.end(); iter++) {
+        CapabilityData capsData = capabilityDataArray[*iter];
+        AVCODEC_LOGI(
+            "FindCodec: capsData.mime=%{public}s, capsData.name=%{public}s, target mime=%{public}s, idx=%{public}d",
+            capsData.mimeType.c_str(), capsData.codecName.c_str(), targetMimeType.c_str(), *iter);
+        if (capsData.codecType != codecType || capsData.mimeType != targetMimeType ||
+            (isVendorKey && capsData.isVendor != isVendor)) {
             continue;
         }
         if (isVideo) {
-            if (IsVideoCapSupport(format, *iter)) {
-                return (*iter).codecName;
+            if (IsVideoCapSupport(format, capsData)) {
+                return capsData.codecName;
             }
         } else {
-            if (IsAudioCapSupport(format, *iter)) {
-                return (*iter).codecName;
+            if (IsAudioCapSupport(format, capsData)) {
+                return capsData.codecName;
             }
         }
-        ++iter;
     }
     return "";
 }
@@ -208,6 +215,20 @@ std::string CodecListCore::FindEncoder(const Format &format)
 std::string CodecListCore::FindDecoder(const Format &format)
 {
     return FindCodec(format, false);
+}
+
+int32_t CodecListCore::FindCodecType(std::string codecName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (codecName.empty()) {
+        return -1;
+    }
+    std::unordered_map<std::string, int32_t> nameCodecTypeMap =
+        CodecAbilitySingleton::GetInstance().GetNameCodecTypeMap();
+    if (nameCodecTypeMap.find(codecName) != nameCodecTypeMap.end()) {
+        return nameCodecTypeMap.at(codecName);
+    }
+    return -1;
 }
 
 CapabilityData CodecListCore::CreateCapability(std::string codecName)

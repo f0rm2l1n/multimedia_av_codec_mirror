@@ -29,6 +29,7 @@ public:
     ~CodecListCore();
     std::string FindEncoder(const Format &format);
     std::string FindDecoder(const Format &format);
+    int32_t FindCodecType(std::string codecName);
     CapabilityData CreateCapability(std::string codecName);
 
 private:

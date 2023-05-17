@@ -39,6 +39,21 @@ enum AVCodecType : int32_t {
     AVCODEC_TYPE_AUDIO_DECODER,
 };
 
+enum CodecType : int32_t {
+    AVCODEC_HCODEC = 0,
+    AVCODEC_VIDEO_CODEC,
+    AVCODEC_AUDIO_CODEC,
+};
+
+enum AudioSampleFormat {
+    SAMPLE_U8 = 0,
+    SAMPLE_S16LE = 1,
+    SAMPLE_S24LE = 2,
+    SAMPLE_S32LE = 3,
+    SAMPLE_F32LE = 4,
+    INVALID_WIDTH = -1
+};
+
 /**
  * @brief Range contain min and max value
  *
