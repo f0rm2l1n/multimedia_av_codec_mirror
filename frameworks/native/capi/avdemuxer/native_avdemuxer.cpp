@@ -93,7 +93,7 @@ OH_AVErrCode OH_AVDemuxer_UnselectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_
 }
 
 OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackIndex, uint8_t *buffer,
-                                        uint32_t bufferSize, OH_AVCodecBufferAttr *bufferInfo)
+    uint32_t bufferSize, OH_AVCodecBufferAttr *bufferInfo)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
         "Copy sample failed because input demuxer is nullptr!");

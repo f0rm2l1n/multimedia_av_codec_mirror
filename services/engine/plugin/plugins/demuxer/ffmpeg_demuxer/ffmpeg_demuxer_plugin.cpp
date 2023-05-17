@@ -319,8 +319,8 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
   
     bufferInfo.size = frameSize;
     bufferInfo.offset = 0;
-    memset_s(memory->GetBase(), memory->GetSize(), 0, frameSize);
-    memcpy_s(memory->GetBase(), memory->GetSize(), pkt->data, frameSize);
+    (void)memset_s(memory->GetBase(), memory->GetSize(), 0, frameSize);
+    (void)memcpy_s(memory->GetBase(), memory->GetSize(), pkt->data, frameSize);
     return AVCS_ERR_OK;
 }
 

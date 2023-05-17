@@ -55,9 +55,10 @@ int32_t AVDemuxerImpl::Init(AVSource &source)
     demuxerClient_ = AVCodecServiceFactory::GetInstance().CreateDemuxerService();
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr,
         AVCS_ERR_CREATE_DEMUXER_SUB_SERVICE_FAILED, "Create demuxer service failed when init demuxerImpl");
-
-    uintptr_t sourceAddr = source.GetSourceAddr();
-
+    uintptr_t sourceAddr;
+    int32_t ret = source.GetSourceAddr(sourceAddr);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
+        AVCS_ERR_CREATE_DEMUXER_SUB_SERVICE_FAILED, "Get source address failed when create demuxer service");
     sourceUri_ = source.sourceUri;
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "demuxer service died when load add sourceTrack!");

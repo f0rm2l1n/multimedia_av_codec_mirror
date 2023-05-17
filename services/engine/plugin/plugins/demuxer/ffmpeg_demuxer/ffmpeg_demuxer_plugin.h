@@ -57,8 +57,8 @@ private:
     AVCodecBufferFlag ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream);
     int64_t GetTotalStreamFrames(int streamIndex);
     int32_t SetBitStreamFormat();
-    int32_t ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> memory, AVCodecBufferInfo &bufferInfo,
-                                    AVCodecBufferFlag &flag, AVPacket* pkt);
+    int32_t ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> memory,
+        AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, AVPacket* pkt);
     void ConvertAvcOrHevcToAnnexb(AVPacket& pkt);
     void InitBitStreamContext(const AVStream& avStream);
     int64_t CalculateTimeByFrameIndex(AVStream* avStream, int keyFrameIdx);

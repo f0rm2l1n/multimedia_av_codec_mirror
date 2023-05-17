@@ -112,14 +112,12 @@ AVSourceImpl::~AVSourceImpl()
     AVCODEC_LOGD("AVSourceImpl:0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
-// TODO
-uintptr_t AVSourceImpl::GetSourceAddr()
+int32_t AVSourceImpl::GetSourceAddr(uintptr_t &addr)
 {
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "source service died when get source addr!");
-    uintptr_t addr;
-    sourceClient_->GetSourceAddr(addr);
-    return addr;
+    
+    return sourceClient_->GetSourceAddr(addr);
 }
 
 int32_t AVSourceImpl::GetTrackCount(uint32_t &trackCount)
