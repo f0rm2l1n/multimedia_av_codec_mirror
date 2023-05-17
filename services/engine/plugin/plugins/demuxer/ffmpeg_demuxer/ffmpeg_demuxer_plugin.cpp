@@ -17,7 +17,6 @@
 #include <string>
 #include <sstream>
 #include <type_traits>
-#include <iostream>
 #include "securec.h"
 #include "avcodec_errors.h"
 #include "native_avcodec_base.h"
@@ -290,8 +289,9 @@ void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
     (void)av_bsf_receive_packet(avbsfContext_.get(), &pkt);
 }
 
-int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, uint8_t* buffer, AVCodecBufferInfo &bufferInfo,
-                                                     AVCodecBufferFlag &flag, AVPacket* pkt)
+int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> memory,
+                                                     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag,
+                                                     AVPacket* pkt)
 {
     int frameSize = 0;
     bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(pkt->pts, avStream->time_base));
@@ -316,28 +316,27 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, uint8_t
         AVCODEC_LOGE("unsupport stream type");
         return AVCS_ERR_UNSUPPORT_VID_PARAMS;
     }
-    if (buffer==nullptr) {
-        AVCODEC_LOGW("the buffer is NULL, allocate buffer\n");
-        buffer = (uint8_t*)malloc(frameSize);
-    }
-    
+  
     bufferInfo.size = frameSize;
     bufferInfo.offset = 0;
-    memset_s(buffer, frameSize, 0, frameSize);
-    memcpy_s(buffer, frameSize, pkt->data, frameSize);
+    (void)memset_s(memory->GetBase(), frameSize, 0, frameSize);
+    (void)memcpy_s(memory->GetBase(), frameSize, pkt->data, frameSize);
     return AVCS_ERR_OK;
 }
 
-int32_t FFmpegDemuxerPlugin::CopyNextSample(uint32_t &trackIndex, uint8_t* buffer,
+int32_t FFmpegDemuxerPlugin::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                                             AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     AVCODEC_LOGD("FFmpegDemuxerPlugin::CopyNextSample is on call");
     int ret = -1;
     AVPacket* pkt = av_packet_alloc();
+    if (selectedTrackIds_.empty()) {
+        AVCODEC_LOGE("not selected any track ,please selected , ffmpeg error: %{public}d", ret);
+        return AVCS_ERR_DEMUXER_FAILED;
+    }
     do {
         ret = av_read_frame(formatContext_.get(), pkt);
-    } while (ret >= 0 && !selectedTrackIds_.empty() && !IsInSelectedTrack(pkt->stream_index));
-    
+    } while (ret >= 0 && !IsInSelectedTrack(pkt->stream_index));
     if (ret >= 0) {
         trackIndex = pkt->stream_index;
         AVStream* avStream = formatContext_->streams[pkt->stream_index];
@@ -346,7 +345,7 @@ int32_t FFmpegDemuxerPlugin::CopyNextSample(uint32_t &trackIndex, uint8_t* buffe
         } else {
             sampleIndex_[pkt->stream_index]++;
         }
-        ret = ConvertAVPacketToSample(avStream, buffer, bufferInfo, flag, pkt);
+        ret = ConvertAVPacketToSample(avStream, memory, bufferInfo, flag, pkt);
     } else {
         AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ret);
         ret = AVCS_ERR_DEMUXER_FAILED;
@@ -377,15 +376,10 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
     int flags = seekModeToFFmpegSeekFlags.at(mode);
     std::vector<uint32_t> trackVec;
     if (selectedTrackIds_.empty()) {
-        for (uint32_t trackIndex = 0; trackIndex < formatContext_.get()->nb_streams; trackIndex++) {
-            trackVec.push_back(trackIndex);
-        }
-    } else {
-        trackVec = selectedTrackIds_;
+        AVCODEC_LOGW("no track has been selected");
     }
-    
-    for (size_t i = 0; i < trackVec.size(); i++) {
-        int trackIndex = trackVec[i];
+    for (size_t i = 0; i < selectedTrackIds_.size(); i++) {
+        int trackIndex = selectedTrackIds_[i];
         auto avStream = formatContext_->streams[trackIndex];
         int64_t ffTime = ConvertTimeToFFmpeg(mSeconds*1000*1000, avStream->time_base);
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {

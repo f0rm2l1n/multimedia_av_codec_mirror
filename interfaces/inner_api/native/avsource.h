@@ -62,7 +62,7 @@ public:
      * @since 4.0
      * @version 4.0
      */
-    virtual uintptr_t GetSourceAddr() = 0;
+    virtual int32_t GetSourceAddr(uintptr_t &addr) = 0;
 
     std::string sourceUri;
 

@@ -89,7 +89,7 @@ config("av_codec_service_config") {
   defines += [
     "AV_CODEC_PLUGIN_PATH=${av_codec_plugin_path}",
     "AV_CODEC_PLUGIN_FILE_TAIL=\".z.so\"",
-    "OH_FILE_PLUGIN_PATH=\".\"",
+    "OH_FILE_PLUGIN_PATH=\"/system/lib/media/histreamer_plugins\"",
   ]
 
   if (target_cpu == "arm") {

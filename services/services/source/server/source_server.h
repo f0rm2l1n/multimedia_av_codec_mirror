@@ -33,7 +33,7 @@ public:
     int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     int32_t GetSourceFormat(Format &format) override;
-    uint64_t GetSourceAddr() override;
+    int32_t GetSourceAddr(uintptr_t &addr) override;
     int32_t DumpInfo(int32_t fd);
 
 private:

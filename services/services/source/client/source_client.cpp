@@ -97,13 +97,13 @@ int32_t SourceClient::GetSourceFormat(Format &format)
     return sourceProxy_->GetSourceFormat(format);
 }
 
-uint64_t SourceClient::GetSourceAddr()
+int32_t SourceClient::GetSourceAddr(uintptr_t &addr)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
     AVCODEC_LOGD("source client call GetSourceAddr");
-    return sourceProxy_->GetSourceAddr();
+    return sourceProxy_->GetSourceAddr(addr);
 }
 }  // namespace Media
 }  // namespace OHOS

@@ -85,9 +85,7 @@ int32_t AVSourceImpl::Init(const std::string &uri)
     
     int32_t ret = sourceClient_->Init(uri);
     if (ret == AVCS_ERR_OK) {
-        uint32_t trackCount = 0;
-        ret = sourceClient_->GetTrackCount(trackCount);
-        trackCount_ = trackCount;
+        ret = sourceClient_->GetTrackCount(trackCount_);
     }
     return ret;
 }
@@ -114,12 +112,12 @@ AVSourceImpl::~AVSourceImpl()
     AVCODEC_LOGD("AVSourceImpl:0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
-uintptr_t AVSourceImpl::GetSourceAddr()
+int32_t AVSourceImpl::GetSourceAddr(uintptr_t &addr)
 {
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "source service died when get source addr!");
     
-    return sourceClient_->GetSourceAddr();
+    return sourceClient_->GetSourceAddr(addr);
 }
 
 int32_t AVSourceImpl::GetTrackCount(uint32_t &trackCount)
@@ -131,14 +129,8 @@ int32_t AVSourceImpl::GetTrackCount(uint32_t &trackCount)
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "source service died when get source track!");
 
-    if (trackCount_ < 0) {
-        int32_t ret = sourceClient_->GetTrackCount(trackCount);
-        trackCount_ = trackCount;
-        return ret;
-    } else {
-        trackCount = trackCount_;
-        return AVCS_ERR_OK;
-    }
+    trackCount = trackCount_;
+    return AVCS_ERR_OK;
 }
 
 std::shared_ptr<AVSourceTrack> AVSourceImpl::GetSourceTrackByID(uint32_t trackIndex)
@@ -149,8 +141,8 @@ std::shared_ptr<AVSourceTrack> AVSourceImpl::GetSourceTrackByID(uint32_t trackIn
 
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, nullptr, "source service died when load track!");
 
-    auto trackIndexIsValid = TrackIndexIsValid(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(trackIndexIsValid, nullptr, "track index is invalid!");
+    bool isValid = TrackIndexIsValid(trackIndex);
+    CHECK_AND_RETURN_RET_LOG(isValid, nullptr, "track index is invalid!");
 
     std::shared_ptr<AVSourceTrack> track = std::make_shared<AVSourceTrackImpl>(this, trackIndex);
     tracks_.emplace_back(track);
@@ -179,8 +171,8 @@ int32_t AVSourceImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                             "source service died when get track format!");
 
-    auto trackIndexIsValid = TrackIndexIsValid(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(trackIndexIsValid, AVCS_ERR_INVALID_VAL, "track index is invalid!");
+    bool isValid = TrackIndexIsValid(trackIndex);
+    CHECK_AND_RETURN_RET_LOG(isValid, AVCS_ERR_INVALID_VAL, "track index is invalid!");
 
     return sourceClient_->GetTrackFormat(format, trackIndex);
 }
@@ -195,8 +187,8 @@ int32_t AVSourceImpl::SetTrackFormat(const Format &format, uint32_t trackIndex)
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "source service died when set format!");
 
-    auto trackIndexIsValid = TrackIndexIsValid(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(trackIndexIsValid, AVCS_ERR_INVALID_VAL, "track index is invalid!");
+    bool isValid = TrackIndexIsValid(trackIndex);
+    CHECK_AND_RETURN_RET_LOG(isValid, AVCS_ERR_INVALID_VAL, "track index is invalid!");
 
     auto &formatMap = format.GetFormatMap();
     bool allKeySupported = true;
@@ -218,15 +210,7 @@ int32_t AVSourceImpl::SetTrackFormat(const Format &format, uint32_t trackIndex)
 
 bool AVSourceImpl::TrackIndexIsValid(uint32_t trackIndex)
 {
-    if (trackCount_ < 0) {
-        uint32_t trackCount = 0;
-        int32_t ret = sourceClient_->GetTrackCount(trackCount);
-        if (ret != AVCS_ERR_OK) {
-            return false;
-        }
-        trackCount_ = trackCount;
-    }
-    return (trackIndex>=0 && (uint32_t)trackCount_>=0 && trackIndex<=(uint32_t)trackCount_);
+    return (trackIndex >= 0 && trackIndex < trackCount_);
 }
 
 AVSourceTrackImpl::AVSourceTrackImpl(AVSourceImpl *source, uint32_t trackIndex)
