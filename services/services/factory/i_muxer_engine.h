@@ -26,7 +26,6 @@ namespace Media {
 class IMuxerEngine {
 public:
     virtual ~IMuxerEngine() = default;
-    virtual int32_t SetLocation(float latitude, float longitude) = 0;
     virtual int32_t SetRotation(int32_t rotation) = 0;
     virtual int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) = 0;
     virtual int32_t Start() = 0;

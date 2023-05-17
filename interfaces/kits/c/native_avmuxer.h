@@ -42,22 +42,6 @@ typedef struct OH_AVMuxer OH_AVMuxer;
 OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format);
 
 /**
- * @brief Set and store the location to the output file.
- * Note: This interface can only be called before OH_AVMuxer_Start.
- * The location is stored in the output file if the output format is {@link OH_AVOutputFormat}
- * AV_OUTPUT_FORMAT_MPEG_4, and is ignored for other output formats.
- * @syscap SystemCapability.Multimedia.Media.Muxer
- * @param muxer Pointer to an OH_AVMuxer instance.
- * @param latitude Must be in the range [-90, 90].
- * @param longitude Must be in the range [-180, 180].
- * @return Returns AV_ERR_OK if the execution is successful,
- * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
- * @since 10
- * @version 1.0
- */
-OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer *muxer, float latitude, float longitude);
-
-/**
  * @brief Set the rotation for output video playback.
  * Note: This interface can only be called before OH_AVMuxer_Start.
  * @syscap SystemCapability.Multimedia.Media.Muxer

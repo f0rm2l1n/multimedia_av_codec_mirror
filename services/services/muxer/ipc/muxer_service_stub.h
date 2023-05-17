@@ -30,7 +30,6 @@ public:
     using MuxerStubFunc = int32_t(MuxerServiceStub::*)(MessageParcel &data, MessageParcel &reply);
 
     int32_t InitParameter(int32_t fd, OutputFormat format) override;
-    int32_t SetLocation(float latitude, float longitude) override;
     int32_t SetRotation(int32_t rotation) override;
     int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     int32_t Start() override;
@@ -44,7 +43,6 @@ private:
     MuxerServiceStub();
     int32_t Init();
     int32_t InitParameter(MessageParcel &data, MessageParcel &reply);
-    int32_t SetLocation(MessageParcel &data, MessageParcel &reply);
     int32_t SetRotation(MessageParcel &data, MessageParcel &reply);
     int32_t AddTrack(MessageParcel &data, MessageParcel &reply);
     int32_t Start(MessageParcel &data, MessageParcel &reply);

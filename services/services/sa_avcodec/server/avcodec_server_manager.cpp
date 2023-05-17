@@ -546,7 +546,7 @@ void AVCodecServerManager::PrintDumpMenu(int32_t fd)
     for (auto iter : SA_DUMP_MENU_DUMP_TABLE) {
         dumpControler.AddInfo(DUMP_MENU_INDEX + (index << DUMP_OFFSET_8), iter);
     }
-        
+
     std::string dumpString;
     dumpControler.GetDumpString(dumpString);
     dumpString += "\n";

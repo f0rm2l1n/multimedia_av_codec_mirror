@@ -52,7 +52,7 @@ int32_t AVMuxerInnerMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMo
     }
     return AV_ERR_UNKNOWN;
 }
-                         
+
 int32_t AVMuxerInnerMock::WriteSample(uint32_t trackIndex,
     uint8_t *sample, const AVCodecBufferAttrMock &info)
 {
@@ -67,14 +67,6 @@ int32_t AVMuxerInnerMock::WriteSample(uint32_t trackIndex,
         sampleInfo.size = info.size;
         sampleInfo.flags = info.flags;
         return muxer_->WriteSample(avSample, sampleInfo);
-    }
-    return AV_ERR_UNKNOWN;
-}
-
-int32_t AVMuxerInnerMock::SetLocation(float latitude, float longitude)
-{
-    if (muxer_ != nullptr) {
-        return muxer_->SetLocation(latitude, longitude);
     }
     return AV_ERR_UNKNOWN;
 }

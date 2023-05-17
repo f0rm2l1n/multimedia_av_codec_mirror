@@ -57,7 +57,7 @@ int32_t Sniff(const std::string& pluginName, uint32_t outputFormat)
     if (it != g_supportedMuxer.end() && it->second == outputFormat) {
         confidence = ffmpegConfidence;
     }
-    
+
     return confidence;
 }
 
@@ -155,15 +155,6 @@ FFmpegMuxerPlugin::~FFmpegMuxerPlugin()
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
-Status FFmpegMuxerPlugin::SetLocation(float latitude, float longitude)
-{
-    std::string location = std::to_string(longitude) + " ";
-    location += std::to_string(latitude) + " ";
-    location += std::to_string(0.0f);
-    av_dict_set(&formatContext_.get()->metadata, "location", location.c_str(), 0);
-    return Status::NO_ERROR;
-}
-
 Status FFmpegMuxerPlugin::SetRotation(int32_t rotation)
 {
     rotation_ = rotation;
@@ -205,7 +196,7 @@ Status FFmpegMuxerPlugin::SetCodecParameterOfTrack(AVStream *stream, const Media
     } else {
         AVCODEC_LOGD("mimeType %{public}s is unsupported", mimeType.c_str());
     }
-    
+
     if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_BITRATE)) {
         trackDesc.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, par->bit_rate); // bit rate
     }

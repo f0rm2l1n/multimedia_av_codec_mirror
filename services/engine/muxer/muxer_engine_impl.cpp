@@ -30,10 +30,6 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "MuxerEngineImpl"};
-    constexpr int32_t MAX_LATITUDE = 90;
-    constexpr int32_t MIN_LATITUDE = -90;
-    constexpr int32_t MAX_LONGITUDE = 180;
-    constexpr int32_t MIN_LONGITUDE = -180;
     constexpr int32_t ERR_TRACK_INDEX = -1;
     constexpr uint32_t DUMP_MUXER_INFO_INDEX = 0x01010000;
     constexpr uint32_t DUMP_STATUS_INDEX = 0x01010100;
@@ -133,25 +129,6 @@ MuxerEngineImpl::~MuxerEngineImpl()
     muxer_ = nullptr;
     tracks_.clear();
     AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
-}
-
-int32_t MuxerEngineImpl::SetLocation(float latitude, float longitude)
-{
-    AVCodecTrace trace("MuxerEngine::SetLocation");
-    AVCODEC_LOGI("SetLocation");
-    std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
-        "The state is not INITIALIZED, the interface must be called after constructor and before Start(). "
-        "The current state is %{public}s", ConvertStateToString(state_).c_str());
-    if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE ||
-        longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
-        AVCODEC_LOGW("Invalid GeoLocation, latitude must be greater than %{public}d and less than %{public}d,"
-            "longitude must be greater than %{public}d and less than %{public}d",
-            MIN_LATITUDE, MAX_LATITUDE, MIN_LONGITUDE, MAX_LONGITUDE);
-        return AVCS_ERR_INVALID_VAL;
-    }
-
-    return TranslatePluginStatus(muxer_->SetLocation(latitude, longitude));
 }
 
 int32_t MuxerEngineImpl::SetRotation(int32_t rotation)
@@ -266,7 +243,6 @@ int32_t MuxerEngineImpl::Stop()
 int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
 {
     AVCodecDumpControler dumpControler;
-    
     dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX, "Muxer_Info");
     dumpControler.AddInfo(DUMP_STATUS_INDEX, "Status", ConvertStateToString(state_));
     dumpControler.AddInfo(DUMP_OUTPUT_FORMAT_INDEX,
@@ -282,7 +258,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
         CHECK_AND_CONTINUE_LOG(ret == true, "Get codec mime from format failed.");
         TrackMimeType mimeType = GetTrackMimeType(codecMime);
         auto &dumpTable = MUXER_DUMP_TABLE.at(mimeType);
-        
+
         dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << DUMP_OFFSET_8),
             std::string("Track_") + std::to_string(mediaDescIdx) + "_Info");
         for (auto iter : dumpTable) {

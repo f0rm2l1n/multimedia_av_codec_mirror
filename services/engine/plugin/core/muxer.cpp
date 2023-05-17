@@ -21,11 +21,6 @@ namespace Plugin {
 Muxer::Muxer (uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<MuxerPlugin> plugin)
     : pkgVersion_(pkgVer), apiVersion_(apiVer), muxer_(std::move(plugin)) {}
 
-Status Muxer::SetLocation(float latitude, float longitude)
-{
-    return muxer_->SetLocation(latitude, longitude);
-}
-
 Status Muxer::SetRotation(int32_t rotation)
 {
     return muxer_->SetRotation(rotation);

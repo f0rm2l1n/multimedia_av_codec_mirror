@@ -25,7 +25,6 @@ class IStandardMuxerService : public IRemoteBroker {
 public:
     virtual ~IStandardMuxerService() = default;
     virtual int32_t InitParameter(int32_t fd, OutputFormat format) = 0;
-    virtual int32_t SetLocation(float latitude, float longitude) = 0;
     virtual int32_t SetRotation(int32_t rotation) = 0;
     virtual int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) = 0;
     virtual int32_t Start() = 0;
@@ -36,7 +35,6 @@ public:
 
     enum MuxerServiceMsg {
         INIT_PARAMETER = 0,
-        SET_LOCATION,
         SET_ROTATION,
         ADD_TRACK,
         START,
@@ -45,7 +43,7 @@ public:
         RELEASE,
 		DESTROY,
     };
-    
+
     DECLARE_INTERFACE_DESCRIPTOR(u"IStandardMuxerServiceq1a");
 };
 }  // namespace Media

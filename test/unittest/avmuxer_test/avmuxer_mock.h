@@ -35,7 +35,6 @@ public:
     virtual int32_t AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMock> &trackFormat) = 0;
     virtual int32_t WriteSample(uint32_t trackIndex, uint8_t *sample,
         const AVCodecBufferAttrMock &info)  = 0;
-    virtual int32_t SetLocation(float latitude, float longitude) = 0;
     virtual int32_t SetRotation(int32_t rotation) = 0;
 };
 

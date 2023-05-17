@@ -73,14 +73,6 @@ int32_t AVMuxerSample::WriteSample(uint32_t trackIndex, uint8_t *sample, const A
     return muxer_->WriteSample(trackIndex, sample, info);
 }
 
-int32_t AVMuxerSample::SetLocation(float latitude, float longitude)
-{
-    if (muxer_ == nullptr) {
-        return AV_ERR_INVALID_VAL;
-    }
-    return muxer_->SetLocation(latitude, longitude);
-}
-
 int32_t AVMuxerSample::SetRotation(int32_t rotation)
 {
     if (muxer_ == nullptr) {

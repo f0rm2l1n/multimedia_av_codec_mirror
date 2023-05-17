@@ -52,7 +52,6 @@ int32_t MuxerServiceStub::Init()
     CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Create muxer server failed");
 
     muxerFuncs_[INIT_PARAMETER] = &MuxerServiceStub::InitParameter;
-    muxerFuncs_[SET_LOCATION] = &MuxerServiceStub::SetLocation;
     muxerFuncs_[SET_ROTATION] = &MuxerServiceStub::SetRotation;
     muxerFuncs_[ADD_TRACK] = &MuxerServiceStub::AddTrack;
     muxerFuncs_[START] = &MuxerServiceStub::Start;
@@ -88,12 +87,6 @@ int32_t MuxerServiceStub::InitParameter(int32_t fd, OutputFormat format)
 {
     CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
     return muxerServer_->InitParameter(fd, format);
-}
-
-int32_t MuxerServiceStub::SetLocation(float latitude, float longitude)
-{
-    CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
-    return muxerServer_->SetLocation(latitude, longitude);
 }
 
 int32_t MuxerServiceStub::SetRotation(int32_t rotation)
@@ -152,15 +145,6 @@ int32_t MuxerServiceStub::InitParameter(MessageParcel &data, MessageParcel &repl
     OutputFormat format = static_cast<OutputFormat>(data.ReadInt32());
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitParameter(fd, format)), AVCS_ERR_UNKNOWN,
         "Reply InitParameter failed!");
-    return AVCS_ERR_OK;
-}
-
-int32_t MuxerServiceStub::SetLocation(MessageParcel &data, MessageParcel &reply)
-{
-    float latitude = data.ReadFloat();
-    float longitude = data.ReadFloat();
-    int32_t ret = SetLocation(latitude, longitude);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply SetLocation failed!");
     return AVCS_ERR_OK;
 }
 

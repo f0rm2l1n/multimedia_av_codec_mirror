@@ -32,7 +32,6 @@ public:
     int32_t Stop() override;
     int32_t AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMock> &trackFormat) override;
     int32_t WriteSample(uint32_t trackIndex, uint8_t *sample, const AVCodecBufferAttrMock &info) override;
-    int32_t SetLocation(float latitude, float longitude) override;
     int32_t SetRotation(int32_t rotation) override;
 private:
     std::shared_ptr<AVMuxer> muxer_ = nullptr;

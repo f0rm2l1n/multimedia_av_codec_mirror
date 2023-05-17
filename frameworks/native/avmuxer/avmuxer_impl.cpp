@@ -68,14 +68,6 @@ int32_t AVMuxerImpl::Init()
     return muxerService_->InitParameter(fd_, format_);
 }
 
-int32_t AVMuxerImpl::SetLocation(float latitude, float longitude)
-{
-    AVCodecTrace trace("AVMuxer::SetLocation");
-    AVCODEC_LOGI("SetLocation");
-    CHECK_AND_RETURN_RET_LOG(muxerService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "AVMuxer Service does not exist");
-    return muxerService_->SetLocation(latitude, longitude);
-}
-
 int32_t AVMuxerImpl::SetRotation(int32_t rotation)
 {
     AVCodecTrace trace("AVMuxer::SetRotation");

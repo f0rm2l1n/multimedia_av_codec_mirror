@@ -80,7 +80,8 @@ int AddTrackAudio(OH_AVMuxer *muxer, const AudioTrackParam *param, int fdInput)
         printf("unselect audio, fd is %d\n", fdInput);
         return -1;
     }
-    OH_AVFormat *formatAudio = OH_AVFormat_Create();
+    OH_AVFormat *formatAudio = OH_AVFormat_CreateAudioFormat(param->mimeType,
+        param->sampleRate, param->channels);
     if (formatAudio == NULL) {
         printf("audio format failed!\n");
         return AV_ERR_NO_MEMORY;
@@ -93,9 +94,6 @@ int AddTrackAudio(OH_AVMuxer *muxer, const AudioTrackParam *param, int fdInput)
         OH_AVFormat_SetBuffer(formatAudio, OH_MD_KEY_CODEC_CONFIG, buffer, extraSize);
     }
     printf("AddTrackAudio audio metadata size: %d\n", extraSize);
-    OH_AVFormat_SetStringValue(formatAudio, OH_MD_KEY_CODEC_MIME, param->mimeType);
-    OH_AVFormat_SetIntValue(formatAudio, OH_MD_KEY_AUD_SAMPLE_RATE, param->sampleRate);
-    OH_AVFormat_SetIntValue(formatAudio, OH_MD_KEY_AUD_CHANNEL_COUNT, param->channels);
     int trackIndex = -1;
     int ret = OH_AVMuxer_AddTrack(muxer, &trackIndex, formatAudio);
     OH_AVFormat_Destroy(formatAudio);
@@ -113,7 +111,8 @@ int AddTrackVideo(OH_AVMuxer *muxer, const VideoTrackParam *param, int fdInput)
         printf("unselect video, fd is %d\n", fdInput);
         return -1;
     }
-    OH_AVFormat *formatVideo = OH_AVFormat_Create();
+    OH_AVFormat *formatVideo = OH_AVFormat_CreateVideoFormat(param->mimeType,
+        param->width, param->height);
     if (formatVideo == NULL) {
         printf("video format failed!\n");
         return AV_ERR_NO_MEMORY;
@@ -126,9 +125,6 @@ int AddTrackVideo(OH_AVMuxer *muxer, const VideoTrackParam *param, int fdInput)
         OH_AVFormat_SetBuffer(formatVideo, OH_MD_KEY_CODEC_CONFIG, buffer, extraSize);
     }
     printf("AddTrackVideo video metadata size: %d\n", extraSize);
-    OH_AVFormat_SetStringValue(formatVideo, OH_MD_KEY_CODEC_MIME, param->mimeType);
-    OH_AVFormat_SetIntValue(formatVideo, OH_MD_KEY_WIDTH, param->width);
-    OH_AVFormat_SetIntValue(formatVideo, OH_MD_KEY_HEIGHT, param->height);
     int trackIndex = -1;
     int ret = OH_AVMuxer_AddTrack(muxer, &trackIndex, formatVideo);
     OH_AVFormat_Destroy(formatVideo);
@@ -501,7 +497,7 @@ void NativeSelectMode(void)
     if (g_muxerParam.outputFormat != AV_OUTPUT_FORMAT_DEFAULT) {
         return;
     }
-    
+
     NativeSelectMuxerType();
     NativeSelectRunMode();
     NativeSelectAudio();
@@ -555,15 +551,14 @@ int DoRunMuxer(FdListStr *fdStr, OH_AVMuxer *muxer)
         return -1;
     }
 
-    if (OH_AVMuxer_SetLocation(muxer, 0, 0) != AV_ERR_OK
-        || OH_AVMuxer_SetRotation(muxer, 0) != AV_ERR_OK) {
+    if (OH_AVMuxer_SetRotation(muxer, 0) != AV_ERR_OK) {
         printf("set failed!\n");
         return -1;
     }
     int audioTrackIndex = AddTrackAudio(muxer, g_muxerParam.audioParams, fdStr->inAudioFd);
     int videoTrackIndex = AddTrackVideo(muxer, g_muxerParam.videoParams, fdStr->inVideoFd);
     int coverTrackIndex =  AddTrackCover(muxer, g_muxerParam.coverParams, fdStr->inCoverFd);
-    
+
     if (OH_AVMuxer_Start(muxer) != AV_ERR_OK) {
         printf("start muxer failed!\n");
         return -1;
@@ -659,6 +654,6 @@ int RunNativeMuxer(const char *out)
     }
 
     CloseAllFd(&fdStr);
-    
+
     return 0;
 }

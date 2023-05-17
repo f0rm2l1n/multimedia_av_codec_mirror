@@ -50,7 +50,7 @@ std::shared_ptr<std::ifstream> OpenFile(const std::string &filePath)
     if (file->is_open()) {
         return file;
     }
-    
+
     return nullptr;
 }
 
@@ -190,7 +190,7 @@ int AVMuxerDemoBase::SelectModeAndOpenFile()
         }
         std::cout<<"video file success! file name:"<<videoParams_->fileName<<std::endl;
     }
-    
+
     if (coverParams_ != nullptr) {
         coverFile_ = OpenFile(coverParams_->fileName);
         if (coverFile_ == nullptr) {

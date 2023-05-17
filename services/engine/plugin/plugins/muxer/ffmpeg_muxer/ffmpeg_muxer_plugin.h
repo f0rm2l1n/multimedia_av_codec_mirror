@@ -36,7 +36,6 @@ public:
     explicit FFmpegMuxerPlugin(std::string name, int32_t fd);
     ~FFmpegMuxerPlugin() override;
 
-    Status SetLocation(float latitude, float longitude) override;
     Status SetRotation(int32_t rotation) override;
     Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     Status Start() override;

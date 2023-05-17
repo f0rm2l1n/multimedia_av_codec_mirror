@@ -58,13 +58,6 @@ int32_t MuxerClient::InitParameter(int32_t fd, OutputFormat format)
     return muxerProxy_->InitParameter(fd, format);
 }
 
-int32_t MuxerClient::SetLocation(float latitude, float longitude)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(muxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
-    return muxerProxy_->SetLocation(latitude, longitude);
-}
-
 int32_t MuxerClient::SetRotation(int32_t rotation)
 {
     std::lock_guard<std::mutex> lock(mutex_);

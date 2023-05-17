@@ -27,7 +27,6 @@ public:
     Muxer operator=(const Muxer &) = delete;
     ~Muxer() = default;
 
-    Status SetLocation(float latitude, float longitude);
     Status SetRotation(int32_t rotation);
     Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc);
     Status Start();

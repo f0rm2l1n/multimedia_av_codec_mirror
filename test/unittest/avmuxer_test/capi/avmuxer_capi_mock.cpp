@@ -59,11 +59,6 @@ int32_t AVMuxerCapiMock::WriteSample(uint32_t trackIndex,
     return OH_AVMuxer_WriteSample(muxer_, trackIndex, avSample, bufferAttr);
 }
 
-int32_t AVMuxerCapiMock::SetLocation(float latitude, float longitude)
-{
-    return OH_AVMuxer_SetLocation(muxer_, latitude, longitude);
-}
-
 int32_t AVMuxerCapiMock::SetRotation(int32_t rotation)
 {
     return OH_AVMuxer_SetRotation(muxer_, rotation);

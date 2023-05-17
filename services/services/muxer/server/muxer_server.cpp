@@ -52,14 +52,6 @@ int32_t MuxerServer::InitParameter(int32_t fd, OutputFormat format)
     return AVCS_ERR_OK;
 }
 
-int32_t MuxerServer::SetLocation(float latitude, float longitude)
-{
-    CHECK_AND_RETURN_RET_LOG(muxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "muxer engine does not exist");
-    int32_t ret = muxerEngine_->SetLocation(latitude, longitude);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetLocation");
-    return AVCS_ERR_OK;
-}
-
 int32_t MuxerServer::SetRotation(int32_t rotation)
 {
     CHECK_AND_RETURN_RET_LOG(muxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "muxer engine does not exist");
