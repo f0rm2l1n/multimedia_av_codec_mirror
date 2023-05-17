@@ -274,7 +274,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
     std::string dumpString;
     dumpControler.GetDumpString(dumpString);
     CHECK_AND_RETURN_RET_LOG(fd != -1, AVCS_ERR_INVALID_VAL, "Get a invalid fd.");
-            write(fd, dumpString.c_str(), dumpString.size());
+    write(fd, dumpString.c_str(), dumpString.size());
 
     return AVCS_ERR_OK;
 }
