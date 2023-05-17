@@ -117,7 +117,7 @@ OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer);
 /**
  * @brief Clear the internal resources of the muxer and destroy the muxer instance
  * @syscap SystemCapability.Multimedia.Media.Muxer
- * @param codec Pointer to an OH_AVMuxer instance
+ * @param muxer Pointer to an OH_AVMuxer instance
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10

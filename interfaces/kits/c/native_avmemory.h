@@ -56,10 +56,11 @@ uint8_t *OH_AVMemory_GetAddr(struct OH_AVMemory *mem);
 int32_t OH_AVMemory_GetSize(struct OH_AVMemory *mem);
 
 /**
- * @brief Get the memory's size
+ * @brief Clear the internal resources of the memory and destroy the memory instance
  * @syscap SystemCapability.Multimedia.Media.Core
  * @param mem Encapsulate OH_AVMemory structure instance pointer
- * @return the memory's size if the memory is valid, otherwise -1.
+ * @return Returns AV_ERR_OK if the execution is successful,
+ * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
  * @version 1.0
  */
