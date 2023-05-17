@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#include <list>
-#include <mutex>
+#include "avcodec_errors.h"
+#include "avcodec_log.h"
+#include "avcodec_video_decoder.h"
+#include "avsharedmemory.h"
 #include "native_avcodec_base.h"
 #include "native_avcodec_videodecoder.h"
 #include "native_avmagic.h"
 #include "native_window.h"
-#include "avcodec_video_decoder.h"
-#include "avsharedmemory.h"
-#include "avcodec_log.h"
-#include "avcodec_errors.h"
+#include <list>
+#include <mutex>
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeVideoDecoder"};
@@ -116,7 +116,7 @@ public:
         bufferAttr.offset = info.offset;
         bufferAttr.flags = flag;
         OH_AVMemory *data = nullptr;
-        if(videoDecObj->isOutputSurfaceMode_ == false) {
+        if (!videoDecObj->isOutputSurfaceMode_) {
             data = GetOutputData(codec_, index);
             CHECK_AND_RETURN_LOG(data != nullptr, "Data is nullptr, get output data failed");
         }
@@ -352,7 +352,7 @@ OH_AVErrCode OH_VideoDecoder_SetSurface(OH_AVCodec *codec, OHNativeWindow *windo
     CHECK_AND_RETURN_RET_LOG(codec->magic_ == AVMagic::AVCODEC_MAGIC_VIDEO_DECODER, AV_ERR_INVALID_VAL,
                              "Codec magic error!");
     CHECK_AND_RETURN_RET_LOG(window != nullptr, AV_ERR_INVALID_VAL, "Window is nullptr!");
-    CHECK_AND_RETURN_RET_LOG(window->surface != nullptr, AV_ERR_INVALID_VAL, "Surface is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(window->surface != nullptr, AV_ERR_INVALID_VAL, "Input surface is nullptr!");
 
     struct VideoDecoderObject *videoDecObj = reinterpret_cast<VideoDecoderObject *>(codec);
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
