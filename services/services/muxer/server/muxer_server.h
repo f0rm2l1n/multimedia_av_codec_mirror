@@ -30,11 +30,10 @@ public:
     ~MuxerServer();
 
     int32_t InitParameter(int32_t fd, OutputFormat format) override;
-    int32_t SetLocation(float latitude, float longitude) override;
     int32_t SetRotation(int32_t rotation) override;
     int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     int32_t Start() override;
-    int32_t WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info) override;
+    int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info) override;
     int32_t Stop() override;
     void Release() override;
     int32_t DumpInfo(int32_t fd);

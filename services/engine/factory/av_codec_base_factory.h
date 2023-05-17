@@ -17,6 +17,7 @@
 #define AV_CODEC_ENGIN_BASE_FACTORY_H
 
 #include <functional>
+#include <unordered_map>
 
 namespace OHOS {
 namespace Media {

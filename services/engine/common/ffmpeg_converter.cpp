@@ -16,7 +16,6 @@
 #include <vector>
 namespace OHOS {
 namespace Media {
-
 // ffmpeg channel layout to histreamer channel layout
 const std::vector<std::pair<AudioChannelLayout, uint64_t>> g_toFFMPEGChannelLayout = {
     {AudioChannelLayout::MONO, AV_CH_LAYOUT_MONO},

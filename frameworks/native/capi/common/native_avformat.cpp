@@ -54,6 +54,32 @@ struct OH_AVFormat *OH_AVFormat_Create(void)
     return new(std::nothrow) OH_AVFormat();
 }
 
+struct OH_AVFormat *OH_AVFormat_CreateAudioFormat(const char *mimeType,
+                                                  int32_t sampleRate,
+                                                  int32_t channelCount)
+{
+    CHECK_AND_RETURN_RET_LOG(mimeType != nullptr, nullptr, "mimeType is nullptr!");
+    OH_AVFormat *audioFormat = new(std::nothrow) OH_AVFormat();
+    CHECK_AND_RETURN_RET_LOG(audioFormat != nullptr, nullptr, "new format is nullptr!");
+    audioFormat->format_.PutStringValue("codec_mime", mimeType);
+    audioFormat->format_.PutIntValue("sample_rate", sampleRate);
+    audioFormat->format_.PutIntValue("channel_count", channelCount);
+    return audioFormat;
+}
+
+struct OH_AVFormat *OH_AVFormat_CreateVideoFormat(const char *mimeType,
+                                                  int32_t width,
+                                                  int32_t height)
+{
+    CHECK_AND_RETURN_RET_LOG(mimeType != nullptr, nullptr, "mimeType is nullptr!");
+    OH_AVFormat *videoFormat = new(std::nothrow) OH_AVFormat();
+    CHECK_AND_RETURN_RET_LOG(videoFormat != nullptr, nullptr, "new format is nullptr!");
+    videoFormat->format_.PutStringValue("codec_mime", mimeType);
+    videoFormat->format_.PutIntValue("width", width);
+    videoFormat->format_.PutIntValue("height", height);
+    return videoFormat;
+}
+
 void OH_AVFormat_Destroy(struct OH_AVFormat *format)
 {
     delete format;

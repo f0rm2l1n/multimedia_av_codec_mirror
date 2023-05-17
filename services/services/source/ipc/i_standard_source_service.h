@@ -30,7 +30,7 @@ public:
     virtual int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) = 0;
     virtual int32_t GetTrackFormat(Format &format, uint32_t trackIndex) = 0;
     virtual int32_t GetSourceFormat(Format &format) = 0;
-    virtual uint64_t GetSourceAddr() = 0;
+    virtual int32_t GetSourceAddr(uintptr_t &addr) = 0;
 
     virtual int32_t DestroyStub() = 0;
     enum SourceServiceMsg {

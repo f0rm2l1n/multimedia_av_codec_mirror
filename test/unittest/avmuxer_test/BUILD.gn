@@ -96,6 +96,8 @@ ohos_unittest("avmuxer_inner_unit_test") {
       "./inner/avmuxer_inner_mock_factory.cpp",
     ]
   }
+
+  deps = [ "$av_codec_root_dir/services/utils:av_codec_service_utils" ]
   external_deps = [ "av_codec:av_codec_client" ]
 
   resource_config_file =

@@ -27,7 +27,7 @@ public:
     ~AVMuxerDemo() = default;
 private:
     void DoRunMuxer() override;
-    int DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info) override;
+    int DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info) override;
     int DoAddTrack(int32_t &trackIndex, MediaDescription &trackDesc) override;
     void DoRunMultiThreadCase() override;
     void DoRunMuxer(const std::string &runMode);

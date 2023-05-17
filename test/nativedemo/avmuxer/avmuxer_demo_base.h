@@ -17,6 +17,7 @@
 
 #include <string>
 #include "av_common.h"
+#include "avsharedmemorybase.h"
 #include "media_description.h"
 #include "avmuxer_demo_common.h"
 namespace OHOS {
@@ -31,7 +32,7 @@ public:
 protected:
     virtual void DoRunMuxer() = 0;
     virtual void DoRunMultiThreadCase()= 0;
-    virtual int DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info) = 0;
+    virtual int DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info) = 0;
     virtual int DoAddTrack(int32_t &trackIndex, MediaDescription &trackDesc) = 0;
     int AddVideoTrack(const VideoTrackParam *param);
     int AddAudioTrack(const AudioTrackParam *param);
@@ -45,8 +46,8 @@ protected:
     void SelectCoverMode();
     int SelectMode();
     int SelectModeAndOpenFile();
-    int ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile, unsigned char *&buffer,
-        uint32_t &curSize, TrackSampleInfo &info);
+    int ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile,
+        std::shared_ptr<AVSharedMemoryBase> &buffer, uint32_t &curSize, TrackSampleInfo &info);
     void Reset();
     static void MulThdWriteTrackSample(AVMuxerDemoBase *muxerBase, uint32_t trackId,
         std::shared_ptr<std::ifstream> file);

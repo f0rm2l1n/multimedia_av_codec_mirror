@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Media {
-class AVCodecCodecKey {
+class AVCodecCodecName {
 public:
     static constexpr std::string_view AUDIO_DECODER_MP3_NAME_KEY = "avdec_mp3";
     static constexpr std::string_view AUDIO_DECODER_AAC_NAME_KEY = "avdec_aac";
@@ -30,8 +30,8 @@ public:
     static constexpr std::string_view AUDIO_ENCODER_AAC_NAME_KEY = "avenc_aac";
 
 private:
-    AVCodecCodecKey() = delete;
-    ~AVCodecCodecKey() = delete;
+    AVCodecCodecName() = delete;
+    ~AVCodecCodecName() = delete;
 };
 } // namespace Media
 } // namespace OHOS

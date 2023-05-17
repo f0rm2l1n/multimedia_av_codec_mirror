@@ -16,20 +16,13 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "avcodec_codec_name.h"
 #include "avcodec_errors.h"
 #include "avcodec_common.h"
 #include "demo_log.h"
 #include "media_description.h"
 #include "securec.h"
 #include "avcodec_audio_decoder_inner_demo.h"
-
-extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#include "libavutil/imgutils.h"
-#include "libavutil/samplefmt.h"
-#include "libavutil/timestamp.h"
-}
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -38,14 +31,18 @@ using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
-constexpr uint32_t BITS_RATE = 169000; // for mp3
+constexpr uint32_t BITS_RATE = 112000;
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
-constexpr string_view inputFilePath = "/data/audioIn.mp3";
-constexpr string_view outputFilePath = "/data/audioOut.pcm";
+constexpr string_view inputFilePath = "/data/media/vorbis_2c_44100hz_112k.dat";
+constexpr string_view outputFilePath = "/data/media/decode_ogg.pcm";
+constexpr uint32_t TMP_BUFFER_SIZE = 4096;
 } // namespace
 
 void ADecInnerDemo::RunCase()
 {
+    inputFile_.open(inputFilePath, std::ios::binary);
+    DEMO_CHECK_AND_RETURN_LOG(inputFile_.is_open(), "Fatal: open file failed");
+
     DEMO_CHECK_AND_RETURN_LOG(CreateDec() == AVCS_ERR_OK, "Fatal: CreateDec fail");
 
     Format format;
@@ -53,6 +50,18 @@ void ADecInnerDemo::RunCase()
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, SAMPLE_RATE);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, BITS_RATE);
     format.PutIntValue("bits_per_coded_sample", BITS_PER_CODED_RATE);
+
+    // extradata for vorbis
+    char buffer[TMP_BUFFER_SIZE]; // 临时buffer，仅测试vorbis时需要
+    int64_t extradataSize;
+    inputFile_.read((char *)&extradataSize, sizeof(int64_t));
+    DEMO_CHECK_AND_RETURN_LOG(inputFile_.gcount() == sizeof(int64_t), "Fatal: read extradataSize bytes error");
+
+    DEMO_CHECK_AND_RETURN_LOG(extradataSize <= TMP_BUFFER_SIZE, "Fatal: buffer not large enough");
+    inputFile_.read(buffer, extradataSize);
+    DEMO_CHECK_AND_RETURN_LOG(inputFile_.gcount() == extradataSize, "Fatal: read extradata bytes error");
+    format.PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t *)buffer, extradataSize);
+
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
@@ -65,7 +74,7 @@ void ADecInnerDemo::RunCase()
 
 int32_t ADecInnerDemo::CreateDec()
 {
-    audioDec_ = AudioDecoderFactory::CreateByName("OH.Media.Codec.MP3.FFMPEGMp3");
+    audioDec_ = AudioDecoderFactory::CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = make_shared<ADecSignal>();
@@ -165,19 +174,8 @@ int32_t ADecInnerDemo::HandleNormalInput(const uint32_t &index, const int64_t &p
 
 void ADecInnerDemo::InputFunc()
 {
-    AVFormatContext *fmpt_ctx;
-    AVPacket pkt;
-    if (avformat_open_input(&fmpt_ctx, inputFilePath.data(), NULL, NULL) < 0) {
-        std::cout << "open file failed\n";
-        return;
-    }
-    if (avformat_find_stream_info(fmpt_ctx, NULL) < 0) {
-        std::cout << "get file stream failed\n";
-        return;
-    }
-    av_init_packet(&pkt);
-    pkt.data = NULL;
-    pkt.size = 0;
+    int64_t size;
+    int64_t pts;
     while (true) {
         if (!isRunning_.load()) {
             break;
@@ -194,18 +192,21 @@ void ADecInnerDemo::InputFunc()
             std::cout << "buffer is null:" << index << "\n";
             break;
         }
-        int ret = av_read_frame(fmpt_ctx, &pkt);
-        if (ret < 0) {
+
+        inputFile_.read((char *)&size, sizeof(size));
+        if (inputFile_.eof() || inputFile_.gcount() == 0) {
+            std::cout << "eof reached" << std::endl;
             HandleInputEOS(index);
-            av_packet_unref(&pkt);
             break;
         }
-        if (memcpy_s(buffer->GetBase(), buffer->GetSize(), pkt.data, pkt.size) != EOK) {
-            cout << "Fatal: memcpy fail" << endl;
-            break;
-        }
-        auto result = HandleNormalInput(index, pkt.pts, pkt.size);
-        av_packet_unref(&pkt);
+        DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == sizeof(size), "Fatal: read size fail");
+
+        inputFile_.read((char *)&pts, sizeof(pts));
+        DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == sizeof(pts), "Fatal: read pts fail");
+        inputFile_.read((char *)buffer->GetBase(), size);
+        DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == size, "Fatal: read buffer fail");
+
+        auto result = HandleNormalInput(index, pts, size);
         if (result != AVCS_ERR_OK) {
             std::cout << "QueueInputBuffer error:\n";
             isRunning_ = false;

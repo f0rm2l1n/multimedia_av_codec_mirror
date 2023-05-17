@@ -21,28 +21,14 @@
 #include <fcntl.h>
 #include <thread>
 #include <vector>
-#include "securec.h"
 #include "avcodec_errors.h"
-#include "avsharedmemorybase.h"
 
 namespace OHOS {
 namespace Media {
-int AVMuxerEngineDemo::DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info)
+int AVMuxerEngineDemo::DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info)
 {
-    std::shared_ptr<AVSharedMemoryBase> sharedSampleBuffer =
-        std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sampleBuffer");
-    int32_t ret = sharedSampleBuffer->Init();
-    if (ret != AVCS_ERR_OK) {
-        std::cout<<"AVMuxerEngineDemo::DoWriteSampleBuffer shared memory Init failed!"<<std::endl;
-    }
-
-    errno_t rc = memcpy_s(sharedSampleBuffer->GetBase(), sharedSampleBuffer->GetSize(), sampleBuffer, info.size);
-    if (rc != EOK) {
-        std::cout<<"AVMuxerEngineDemo::DoWriteSampleBuffer memcpy_s failed!"<<std::endl;
-    }
-
     if (avmuxer_ != nullptr &&
-        avmuxer_->WriteSampleBuffer(sharedSampleBuffer, info) == AVCS_ERR_OK) {
+        avmuxer_->WriteSample(sample, info) == AVCS_ERR_OK) {
             return 0;
     }
     return -1;
@@ -60,8 +46,6 @@ int AVMuxerEngineDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &trackDe
 
 void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
 {
-    constexpr float latitude = 50.5;
-    constexpr float longitude = 60.6;
     std::string outFileName = "engine_mux_" + runMode + "_" + audioType_ + "_"
         + videoType_ + "_" + coverType_ + "." + format_;
     outFd_ = open(outFileName.c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
@@ -78,8 +62,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
     }
     std::cout << "create muxer success " << avmuxer_ << std::endl;
 
-    if (avmuxer_->SetLocation(latitude, longitude) != AVCS_ERR_OK
-        || avmuxer_->SetRotation(0) != AVCS_ERR_OK) {
+    if (avmuxer_->SetRotation(0) != AVCS_ERR_OK) {
         std::cout<<"set failed!"<<std::endl;
         return;
     }
@@ -89,7 +72,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
     AddCoverTrack(coverParams_);
 
     std::cout << "add track success" << std::endl;
-    
+
     if (avmuxer_->Start() != AVCS_ERR_OK) {
         return;
     }
@@ -97,7 +80,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
     std::cout << "start muxer success" << std::endl;
 
     WriteCoverSample();
-    
+
     std::cout<<"AVMuxerDemo::DoRunMuxer runMode is : "<<runMode<<std::endl;
     if (runMode.compare(RUN_NORMAL) == 0) {
         WriteTrackSample();
@@ -111,7 +94,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
     }
 
     std::cout << "write muxer success" << std::endl;
-    
+
     if (avmuxer_->Stop() != AVCS_ERR_OK) {
         return;
     }

@@ -18,7 +18,7 @@
 
 #include "audio_ffmpeg_base_codec.h"
 #include "audio_ffmpeg_decoder_plugin.h"
-#include "avcodec_codec_key.h"
+#include "avcodec_codec_name.h"
 
 namespace OHOS {
 namespace Media {
@@ -39,7 +39,7 @@ public:
 
     const static std::string identify()
     {
-        return std::string(AVCodecCodecKey::AUDIO_DECODER_VORBIS_NAME_KEY);
+        return std::string(AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY);
     }
 
 private:

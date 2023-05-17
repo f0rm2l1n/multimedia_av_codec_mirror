@@ -19,6 +19,7 @@
 #include "avcodec_common.h"
 #include "plugin_base.h"
 #include "plugin_definition.h"
+#include "avsharedmemory.h"
 
 namespace OHOS {
 namespace Media {
@@ -26,7 +27,7 @@ namespace Plugin {
 struct DemuxerPlugin : public PluginBase {
     explicit DemuxerPlugin() : PluginBase("Demuxer") {}
     virtual int32_t Create(uintptr_t sourceAddr) = 0;
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t* buffer,
+    virtual int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                                     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) = 0;
     virtual int32_t SelectSourceTrackByID(uint32_t index) = 0;
     virtual int32_t UnselectSourceTrackByID(uint32_t index) = 0;

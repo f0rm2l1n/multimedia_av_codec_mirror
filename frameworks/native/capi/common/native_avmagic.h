@@ -58,6 +58,7 @@ struct OH_AVMemory : public AVObjectMagic {
     ~OH_AVMemory() override;
     bool IsEqualMemory(const std::shared_ptr<OHOS::Media::AVSharedMemory> &mem);
     const std::shared_ptr<OHOS::Media::AVSharedMemory> memory_;
+    bool isUserCreated = false;
 };
 
 struct OH_AVCodec : public AVObjectMagic {

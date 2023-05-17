@@ -36,7 +36,7 @@ extern "C" {
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-struct FfmpegRegister : PackageRegister {
+struct SourceRegister : PackageRegister {
 public:
     std::string name = "custom register";
     Status AddPlugin(const PluginDefBase& def) override;
@@ -77,10 +77,11 @@ private:
     std::map<uint32_t, AVDictionary*> trackParam_;
     std::shared_ptr<AVInputFormat> inputFormat_;
     std::shared_ptr<SourcePlugin> sourcePlugin_;
-    std::shared_ptr<FfmpegRegister> register_;
+    std::shared_ptr<SourceRegister> register_;
     CustomIOContext customIOContext_;
     AVIOContext* avioContext_ = nullptr;
-    int32_t LoadDemuxerList();
+    void* handler_ = nullptr;
+    int32_t LoadInputFormatList();
     int32_t LoadDynamicPlugin(const std::string& path);
     int32_t GuessInputFormat(const std::string& uri,  std::shared_ptr<AVInputFormat>& bestInputFormat);
     int32_t SniffInputFormat(const std::string& uri);

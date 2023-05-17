@@ -32,7 +32,7 @@ public:
     ~DemuxerEngineImpl() override;
     int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
     int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+    int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                             AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) override;
 private:

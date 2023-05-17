@@ -21,7 +21,8 @@
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioCodecWorker"};
-}
+constexpr uint8_t LOGD_FREQUENCY = 5;
+} // namespace
 
 namespace OHOS {
 namespace Media {
@@ -254,7 +255,7 @@ std::shared_ptr<AudioBufferInfo> AudioCodecWorker::GetInputBufferInfo(const uint
 void AudioCodecWorker::produceInputBuffer()
 {
     AVCODEC_SYNC_TRACE;
-    AVCODEC_LOGD("Worker produceInputBuffer enter");
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Worker produceInputBuffer enter");
     if (!isRunning) {
         SleepFor(DEFAULT_TRY_DECODE_TIME);
         return;
@@ -263,7 +264,7 @@ void AudioCodecWorker::produceInputBuffer()
         isProduceInput = false;
         uint32_t index;
         if (inputBuffer_->RequestAvialbaleIndex(index)) {
-            AVCODEC_LOGD("produceInputBuffer request success.");
+            AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "produceInputBuffer request success.");
             auto inputBuffer = GetInputBufferInfo(index);
             callback_->OnInputBufferAvailable(index);
         } else {
@@ -276,13 +277,13 @@ void AudioCodecWorker::produceInputBuffer()
     std::unique_lock lock(inputMuxt_);
     inputCondition_.wait_for(lock, std::chrono::milliseconds(timeoutMs),
                              [this] { return (isProduceInput.load() || !isRunning); });
-    AVCODEC_LOGD("Worker produceInputBuffer exit");
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Worker produceInputBuffer exit");
 }
 
 void AudioCodecWorker::consumerOutputBuffer()
 {
     AVCODEC_SYNC_TRACE;
-    AVCODEC_LOGD("Worker consumerOutputBuffer enter");
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Worker consumerOutputBuffer enter");
     if (!isRunning) {
         SleepFor(DEFAULT_TRY_DECODE_TIME);
         return;
@@ -340,7 +341,7 @@ void AudioCodecWorker::consumerOutputBuffer()
     std::unique_lock lock(outputMuxt_);
     outputCondition_.wait_for(lock, std::chrono::milliseconds(timeoutMs),
                               [this] { return (inBufIndexQue_.size() > 0 || !isRunning); });
-    AVCODEC_LOGD("Work consumerOutputBuffer exit");
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Work consumerOutputBuffer exit");
 }
 
 void AudioCodecWorker::dispose()

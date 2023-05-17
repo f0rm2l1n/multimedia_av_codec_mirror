@@ -73,6 +73,7 @@ namespace {
             ret = AVCS_ERR_OK;
         } else {
             protocol.append("file");
+            ret = AVCS_ERR_OK;
         }
         
         if (protocol.empty()) {
@@ -82,13 +83,11 @@ namespace {
         return ret;
     }
 
-    RegisterFunc OpenFilePlugin(const std::string& path, const std::string& name)
+    RegisterFunc OpenFilePlugin(const std::string& path, const std::string& name, void* handler)
     {
         AVCODEC_LOGD("OpenFilePlugin, input: path=%{public}s, name=%{public}s", path.c_str(), name.c_str());
-        void *handler = nullptr;
-        auto pathStr = path.c_str();
-        if (FileIsExists(pathStr)) {
-            handler = ::dlopen(pathStr, RTLD_NOW);
+        if (FileIsExists(path.c_str())) {
+            handler = ::dlopen(path.c_str(), RTLD_NOW);
             if (handler == nullptr) {
                 AVCODEC_LOGE("dlopen failed due to %{public}s", ::dlerror());
             }
@@ -103,7 +102,7 @@ namespace {
                 AVCODEC_LOGE("register is not found in %{public}s", registerFuncName.c_str());
             }
         } else {
-            AVCODEC_LOGE("dlopen failed: %{public}s", pathStr);
+            AVCODEC_LOGE("dlopen failed: %{public}s", path.c_str());
         }
         return {};
     }
@@ -137,14 +136,14 @@ namespace {
     };
 }
 
-Status FfmpegRegister::AddPlugin(const PluginDefBase& def)
+Status SourceRegister::AddPlugin(const PluginDefBase& def)
 {
     auto& tmpDef = (SourcePluginDef&) def;
-    sourcePlugin = (tmpDef.creator)(def.name);
+    sourcePlugin = (tmpDef.creator)(tmpDef.name);
     return Status::OK;
 }
 
-Status FfmpegRegister::AddPackage(const PackageDef& def)
+Status SourceRegister::AddPackage(const PackageDef& def)
 {
     packageDef = std::make_shared<PackageDef>(def);
     return Status::OK;
@@ -155,7 +154,6 @@ Source::Source()
     :formatContext_(nullptr), inputFormat_(nullptr)
 {
     AVCODEC_LOGI("Source::Source is on call");
-    register_ = std::make_shared<FfmpegRegister>();
 }
 
 Source::~Source()
@@ -165,6 +163,7 @@ Source::~Source()
     sourcePlugin_ = nullptr;
     register_ = nullptr;
     avioContext_ = nullptr;
+    ::dlclose(handler_);
     AVCODEC_LOGI("Source::~Source is on call");
 }
 
@@ -211,14 +210,13 @@ int32_t Source::SetTrackFormat(const Format &format, uint32_t trackIndex)
 
 void Source::GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format)
 {
-    int32_t ret;
     AVDictionaryEntry *valPtr = nullptr;
     valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_IGNORE_SUFFIX);
     if (valPtr == nullptr) {
         AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
     } else {
-        ret = format.PutStringValue(formatName, valPtr->value);
-        if (ret != AVCS_ERR_OK) {
+        bool ret = format.PutStringValue(formatName, valPtr->value);
+        if (ret == false) {
             AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
         }
     }
@@ -243,8 +241,8 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("media_type", AVSourceFormat::SOURCE_TYPE, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
 
-    auto ret = format.PutLongValue(AVSourceFormat::SOURCE_DURATION, formatContext_->duration);
-    if (ret != AVCS_ERR_OK) {
+    bool ret = format.PutLongValue(AVSourceFormat::SOURCE_DURATION, formatContext_->duration);
+    if (ret == false) {
         AVCODEC_LOGW("Put track info failed: miss album_artist info in file");
     }
     return AVCS_ERR_OK;
@@ -254,7 +252,6 @@ int32_t Source::GetSourceFormat(Format &format)
 int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
     AVCODEC_LOGI("Source::GetTrackFormat is on call");
-    int ret = -1;
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                              "GetTrackFormat failed, formatContext_ is nullptr!");
     if (trackIndex < 0 || trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {
@@ -262,35 +259,35 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
         return AVCS_ERR_INVALID_VAL;
     }
     auto stream = formatContext_->streams[trackIndex];
-    ret = format.PutIntValue(AVSourceTrackFormat::TRACK_INDEX, trackIndex);
-    if (ret != AVCS_ERR_OK) {
+    bool ret = format.PutIntValue(AVSourceTrackFormat::TRACK_INDEX, trackIndex);
+    if (ret == false) {
         AVCODEC_LOGW("Get track info failed:  miss index info in track %{public}d", trackIndex);
     }
     ret = format.PutLongValue(AVSourceTrackFormat::TRACK_SAMPLE_COUNT, stream->nb_frames);
-    if (ret != AVCS_ERR_OK) {
+    if (ret == false) {
         AVCODEC_LOGW("Get track info failed:  miss sample cout info in track %{public}d", trackIndex);
     }
     ret = format.PutStringValue(AVSourceTrackFormat::TRACK_TYPE,
                                 av_get_media_type_string(stream->codecpar->codec_type));
-    if (ret != AVCS_ERR_OK) {
+    if (ret == false) {
         AVCODEC_LOGW("Get track info failed:  miss type info in track %{public}d", trackIndex);
     }
     ret = format.PutLongValue(AVSourceTrackFormat::TRACK_DURATION, stream->duration);
-    if (ret != AVCS_ERR_OK) {
+    if (ret == false) {
         AVCODEC_LOGW("Get track info failed:  miss duration info in track %{public}d", trackIndex);
     }
     ret = format.PutIntValue(AVSourceTrackFormat::VIDEO_TRACK_WIDTH, stream->codecpar->width);
-    if (ret != AVCS_ERR_OK) {
+    if (ret == false) {
         AVCODEC_LOGW("Get track info failed:  miss width info in track %{public}d", trackIndex);
     }
     ret = format.PutIntValue(AVSourceTrackFormat::VIDEO_TRACK_HEIGHT, stream->codecpar->height);
-    if (ret != AVCS_ERR_OK) {
+    if (ret == false) {
         AVCODEC_LOGW("Get track info failed:  miss height info in track %{public}d", trackIndex);
     }
     AVDictionaryEntry *pair = av_dict_get(stream->metadata, "rotate", nullptr, 0);
     if (pair!=nullptr) {
         ret = format.PutIntValue(AVSourceTrackFormat::VIDEO_TRACK_ROTATION, std::atoi(pair->value));
-        if (ret != AVCS_ERR_OK) {
+        if (ret == false) {
             AVCODEC_LOGW("Get track info failed:  miss rotate info in track %{public}d", trackIndex);
         }
     } else {
@@ -312,7 +309,7 @@ int32_t Source::Create(std::string& uri)
 {
     AVCODEC_LOGI("Source::Create is called");
     int32_t ret = LoadDynamicPlugin(uri);
-    CHECK_AND_RETURN_RET_LOG(ret != AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when load source plugin!");
     std::shared_ptr<MediaSource> mediaSource = std::make_shared<MediaSource>(uri);
     AVCODEC_LOGD("mediaSource Init: %{public}s", mediaSource->GetSourceUri().c_str());
@@ -321,9 +318,12 @@ int32_t Source::Create(std::string& uri)
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
+    size_t size;
+    sourcePlugin_->GetSize(size);
+    AVCODEC_LOGD("mp4 fileSize: %{public}d", size);
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when set data source for plugin!");
-    ret = LoadDemuxerList();
+    ret = LoadInputFormatList();
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when load demuxerlist!");
     ret = SniffInputFormat(uri);
@@ -331,7 +331,6 @@ int32_t Source::Create(std::string& uri)
                              "create source failed when find input format!");
     CHECK_AND_RETURN_RET_LOG(inputFormat_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when find input format, cannnot match any input format!");
-
     ret = InitAVFormatContext();
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when parse source info!");
@@ -341,7 +340,7 @@ int32_t Source::Create(std::string& uri)
 }
 
 
-int32_t Source::LoadDemuxerList()
+int32_t Source::LoadInputFormatList()
 {
     const AVInputFormat* plugin = nullptr;
     constexpr size_t strMax = 4;
@@ -372,7 +371,7 @@ int32_t Source::LoadDynamicPlugin(const std::string& path)
 {
     AVCODEC_LOGI("LoadDynamicPlugin: %{public}s", path.c_str());
     std::string protocol;
-    if (!ParseProtocol(path, protocol)) {
+    if (ParseProtocol(path, protocol) != AVCS_ERR_OK) {
         AVCODEC_LOGE("Couldn't find valid protocol for %{public}s", path.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
@@ -384,10 +383,9 @@ int32_t Source::LoadDynamicPlugin(const std::string& path)
     std::string filePluginPath = OH_FILE_PLUGIN_PATH + g_fileSeparator + libFileName;
     std::string pluginName =
         libFileName.substr(g_libFileHead.size(), libFileName.size() - g_libFileHead.size() - g_libFileTail.size());
-    std::string registerFuncName = "register_" + pluginName;
-    RegisterFunc registerFunc = OpenFilePlugin(filePluginPath, pluginName);
+    RegisterFunc registerFunc = OpenFilePlugin(filePluginPath, pluginName, handler_);
     if (registerFunc) {
-        register_ = std::make_shared<FfmpegRegister>();
+        register_ = std::make_shared<SourceRegister>();
         registerFunc(register_);
         sourcePlugin_ = register_->sourcePlugin;
         AVCODEC_LOGD("regist source plugin successful");

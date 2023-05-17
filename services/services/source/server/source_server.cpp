@@ -90,6 +90,7 @@ int32_t SourceServer::Init(const std::string &uri)
 {
     sourceEngine_ = ISourceEngineFactory::CreateSourceEngine(appUid_, appPid_, uri);
     uri_ = uri;
+    sourceEngine_->Create();
     return AVCS_ERR_OK;
 }
 
@@ -125,11 +126,11 @@ int32_t SourceServer::GetSourceFormat(Format &format)
     return AVCS_ERR_OK;
 }
 
-uint64_t SourceServer::GetSourceAddr()
+int32_t SourceServer::GetSourceAddr(uintptr_t &addr)
 {
     CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
-    int32_t ret = sourceEngine_->GetSourceAddr();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
+    addr = sourceEngine_->GetSourceAddr();
+    CHECK_AND_RETURN_RET_LOG(addr != 0, AVCS_ERR_INVALID_VAL, "Failed to call SetRotation");
     return AVCS_ERR_OK;
 }
 
@@ -167,7 +168,7 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
     }
 
     dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX, "Track_Info");
-    for (int32_t idx = 0; idx < trackCount; idx++) {
+    for (uint32_t idx = 0; idx < trackCount; idx++) {
         ret = GetTrackFormat(trackFormat, idx);
         CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
             AVCS_ERR_INVALID_OPERATION, "Get track format failed!");

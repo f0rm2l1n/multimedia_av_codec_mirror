@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 #include "plugin_types.h"
 
 namespace OHOS {
@@ -115,7 +116,7 @@ struct PackageDef {
 
 /// Plugin create function. All plugins must implement this function.
 template <typename T>
-using PluginCreatorFunc = std::shared_ptr<T>(*)(const std::string& name);
+using PluginCreatorFunc = std::function<std::shared_ptr<T>(const std::string& name)>;
 
 /**
  * @brief Describes the basic information about the plugin.

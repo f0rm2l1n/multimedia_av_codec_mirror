@@ -16,7 +16,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "avcodec_codec_key.h"
+#include "avcodec_codec_name.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "demo_log.h"
@@ -67,7 +67,7 @@ void AEnInnerDemo::RunCase()
 
 int32_t AEnInnerDemo::CreateDec()
 {
-    audioEn_ = AudioEncoderFactory::CreateByName((AVCodecCodecKey::AUDIO_ENCODER_AAC_NAME_KEY).data());
+    audioEn_ = AudioEncoderFactory::CreateByName((AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEn_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = make_shared<AEnSignal>();
@@ -174,7 +174,7 @@ void AEnInnerDemo::InputFunc()
             (void)audioEn_->QueueInputBuffer(index, attr, flag);
             signal_->inQueue_.pop();
             std::cout << "end buffer\n";
-            continue;
+            break;
         }
         auto result = audioEn_->QueueInputBuffer(index, attr, flag);
         signal_->inQueue_.pop();

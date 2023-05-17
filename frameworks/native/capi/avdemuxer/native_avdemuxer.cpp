@@ -92,8 +92,8 @@ OH_AVErrCode OH_AVDemuxer_UnselectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackIndex,
-                                         uint8_t *buffer, OH_AVCodecBufferAttr *bufferInfo)
+OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackIndex, uint8_t *buffer,
+    uint32_t bufferSize, OH_AVCodecBufferAttr *bufferInfo)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
         "Copy sample failed because input demuxer is nullptr!");
@@ -111,13 +111,12 @@ OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackI
         "New DemuxerObject failed when copy sample!");
 
     struct AVCodecBufferInfo bufferInfoInner;
-    enum AVCodecBufferFlag *flag = nullptr;
-    *flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
-    int32_t ret = demuxerObj->demuxer_->CopyNextSample(*trackIndex, buffer, bufferInfoInner, *flag);
+    AVCodecBufferFlag bufferFlag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
+    int32_t ret = demuxerObj->demuxer_->CopyNextSample(*trackIndex, buffer, bufferSize, bufferInfoInner, bufferFlag);
     bufferInfo->pts = bufferInfoInner.presentationTimeUs;
     bufferInfo->size = bufferInfoInner.size;
     bufferInfo->offset = bufferInfoInner.offset;
-    bufferInfo->flags =static_cast<uint32_t>(*flag);
+    bufferInfo->flags =static_cast<uint32_t>(bufferFlag);
     CHECK_AND_RETURN_RET_LOG(ret == AV_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ CopyNextSample failed!");
 
     return AV_ERR_OK;

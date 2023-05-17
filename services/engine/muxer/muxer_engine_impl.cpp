@@ -26,13 +26,10 @@
 #include "avcodec_info.h"
 #include "avcodec_errors.h"
 #include "avcodec_dump_utils.h"
+#include "avsharedmemorybase.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "MuxerEngineImpl"};
-    constexpr int32_t MAX_LATITUDE = 90;
-    constexpr int32_t MIN_LATITUDE = -90;
-    constexpr int32_t MAX_LONGITUDE = 180;
-    constexpr int32_t MIN_LONGITUDE = -180;
     constexpr int32_t ERR_TRACK_INDEX = -1;
     constexpr uint32_t DUMP_MUXER_INFO_INDEX = 0x01010000;
     constexpr uint32_t DUMP_STATUS_INDEX = 0x01010100;
@@ -134,25 +131,6 @@ MuxerEngineImpl::~MuxerEngineImpl()
     AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
-int32_t MuxerEngineImpl::SetLocation(float latitude, float longitude)
-{
-    AVCodecTrace trace("MuxerEngine::SetLocation");
-    AVCODEC_LOGI("SetLocation");
-    std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
-        "The state is not INITIALIZED, the interface must be called after constructor and before Start(). "
-        "The current state is %{public}s", ConvertStateToString(state_).c_str());
-    if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE ||
-        longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
-        AVCODEC_LOGW("Invalid GeoLocation, latitude must be greater than %{public}d and less than %{public}d,"
-            "longitude must be greater than %{public}d and less than %{public}d",
-            MIN_LATITUDE, MAX_LATITUDE, MIN_LONGITUDE, MAX_LONGITUDE);
-        return AVCS_ERR_INVALID_VAL;
-    }
-
-    return TranslatePluginStatus(muxer_->SetLocation(latitude, longitude));
-}
-
 int32_t MuxerEngineImpl::SetRotation(int32_t rotation)
 {
     AVCodecTrace trace("MuxerEngine::SetRotation");
@@ -205,7 +183,7 @@ int32_t MuxerEngineImpl::Start()
     AVCODEC_LOGI("Start");
     std::unique_lock<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
-        "The state is not INITIALIZED, the interface must be called after AddTrack() and before WriteSampleBuffer(). "
+        "The state is not INITIALIZED, the interface must be called after AddTrack() and before WriteSample(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracks_.size() > 0, AVCS_ERR_INVALID_OPERATION,
         "The track count is error, count is %{public}zu", tracks_.size());
@@ -217,19 +195,27 @@ int32_t MuxerEngineImpl::Start()
     return AVCS_ERR_OK;
 }
 
-int32_t MuxerEngineImpl::WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info)
+int32_t MuxerEngineImpl::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
 {
-    AVCodecTrace trace("MuxerEngine::WriteSampleBuffer");
+    AVCodecTrace trace("MuxerEngine::WriteSample");
     std::unique_lock<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED, the interface must be called after Start() and before Stop(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracks_.find(info.trackIndex) != tracks_.end(), AVCS_ERR_INVALID_VAL,
         "The track index does not exist");
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr && info.timeUs >= 0, AVCS_ERR_INVALID_VAL, "Invalid memory");
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.timeUs >= 0 &&
+        sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
+
+    std::shared_ptr<AVSharedMemoryBase> buffer =
+        std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sample");
+    int32_t ret = buffer->Init();
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_NO_MEMORY, "Failed to create AVSharedMemoryBase");
+    errno_t rc = memcpy_s(buffer->GetBase(), buffer->GetSize(), sample->GetBase() + info.offset, info.size);
+    CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
     std::shared_ptr<BlockBuffer> blockBuffer = std::make_shared<BlockBuffer>();
-    blockBuffer->buffer_ = sampleBuffer;
+    blockBuffer->buffer_ = buffer;
     blockBuffer->info_ = info;
     que_.Push(blockBuffer);
 
@@ -257,7 +243,6 @@ int32_t MuxerEngineImpl::Stop()
 int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
 {
     AVCodecDumpControler dumpControler;
-    
     dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX, "Muxer_Info");
     dumpControler.AddInfo(DUMP_STATUS_INDEX, "Status", ConvertStateToString(state_));
     dumpControler.AddInfo(DUMP_OUTPUT_FORMAT_INDEX,
@@ -273,7 +258,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
         CHECK_AND_CONTINUE_LOG(ret == true, "Get codec mime from format failed.");
         TrackMimeType mimeType = GetTrackMimeType(codecMime);
         auto &dumpTable = MUXER_DUMP_TABLE.at(mimeType);
-        
+
         dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << DUMP_OFFSET_8),
             std::string("Track_") + std::to_string(mediaDescIdx) + "_Info");
         for (auto iter : dumpTable) {
@@ -289,7 +274,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
     std::string dumpString;
     dumpControler.GetDumpString(dumpString);
     CHECK_AND_RETURN_RET_LOG(fd != -1, AVCS_ERR_INVALID_VAL, "Get a invalid fd.");
-            write(fd, dumpString.c_str(), dumpString.size());
+    write(fd, dumpString.c_str(), dumpString.size());
 
     return AVCS_ERR_OK;
 }
@@ -345,7 +330,7 @@ void MuxerEngineImpl::ThreadProcessor()
         }
         auto buffer = que_.Pop();
         if (buffer != nullptr) {
-            (void)muxer_->WriteSampleBuffer(buffer->buffer_->GetBase(), buffer->info_);
+            (void)muxer_->WriteSample(buffer->buffer_->GetBase(), buffer->info_);
         }
         if (que_.Empty()) {
             cond_.notify_all();

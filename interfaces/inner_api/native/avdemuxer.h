@@ -56,7 +56,7 @@ public:
      * @since 4.0
      * @version 4.0
      */
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, uint32_t bufferSize,
                                    AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) = 0;
 
     /**

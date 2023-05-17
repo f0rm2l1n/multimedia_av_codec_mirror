@@ -77,6 +77,7 @@ int32_t SourceServiceProxy::GetTrackCount(uint32_t &trackCount)
     data.WriteUint32(trackCount);
     int error = Remote()->SendRequest(GET_TRACK_COUNT, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call GetTrackCount, error: %{public}d", error);
+    trackCount = reply.ReadUint32();
     return reply.ReadInt32();
 }
 
@@ -129,7 +130,7 @@ int32_t SourceServiceProxy::GetSourceFormat(Format &format)
     return reply.ReadInt32();
 }
 
-uint64_t SourceServiceProxy::GetSourceAddr()
+int32_t SourceServiceProxy::GetSourceAddr(uintptr_t &addr)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -140,6 +141,7 @@ uint64_t SourceServiceProxy::GetSourceAddr()
 
     int error = Remote()->SendRequest(GET_SOURCE_ADDR, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call GetSourceAddr, error: %{public}d", error);
+    addr = reply.ReadPointer();
     return reply.ReadUint64();
 }
 }  // namespace Media

@@ -84,7 +84,6 @@ enum AudioChannelSet : uint64_t {
     AMBISONICS_ACN13 = 1ULL << 54U, /** third-order ambisonics channel number 13. */
     AMBISONICS_ACN14 = 1ULL << 55U, /** third-order ambisonics channel number 14. */
     AMBISONICS_ACN15 = 1ULL << 56U, /** third-order ambisonics channel number 15. */
-
 };
 
 /**

@@ -29,7 +29,7 @@ public:
 
     int32_t GetTrackCount(uint32_t &trackCount) override;
     std::shared_ptr<AVSourceTrack> GetSourceTrackByID(uint32_t trackIndex) override;
-    uintptr_t GetSourceAddr() override;
+    int32_t GetSourceAddr(uintptr_t &addr) override;
     int32_t GetSourceFormat(Format &format) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex);
     int32_t SetTrackFormat(const Format &format, uint32_t trackIndex);
@@ -40,7 +40,7 @@ public:
 private:
     std::shared_ptr<ISourceService> sourceClient_ = nullptr;
     std::vector<std::shared_ptr<AVSourceTrack>> tracks_ {};
-    int32_t trackCount_ = -1;
+    uint32_t trackCount_ = 0;
     bool TrackIndexIsValid(uint32_t trackIndex);
 };
 

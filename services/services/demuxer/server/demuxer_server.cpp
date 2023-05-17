@@ -68,11 +68,11 @@ int32_t DemuxerServer::UnselectSourceTrackByID(uint32_t trackIndex)
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServer::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
+int32_t DemuxerServer::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
                                       AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
-    int32_t ret = demuxerEngine_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
+    int32_t ret = demuxerEngine_->CopyNextSample(trackIndex, memory, bufferInfo, flag);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
     return AVCS_ERR_OK;
 }
