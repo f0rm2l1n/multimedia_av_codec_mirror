@@ -22,8 +22,10 @@ namespace Codec {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
 std::map<VideoPixelFormat, AVPixelFormat> g_pixelFormatMap = {
-    {VideoPixelFormat::YUV420P, AV_PIX_FMT_YUV420P}, {VideoPixelFormat::NV12, AV_PIX_FMT_NV12},
-    {VideoPixelFormat::NV21, AV_PIX_FMT_NV21},       {VideoPixelFormat::RGBA, AV_PIX_FMT_RGBA},
+    {VideoPixelFormat::YUV420P, AV_PIX_FMT_YUV420P},
+    {VideoPixelFormat::NV12, AV_PIX_FMT_NV12},
+    {VideoPixelFormat::NV21, AV_PIX_FMT_NV21},
+    {VideoPixelFormat::RGBA, AV_PIX_FMT_RGBA},
     {VideoPixelFormat::BGRA, AV_PIX_FMT_BGRA},
 };
 } // namespace
@@ -33,9 +35,12 @@ int32_t ConvertVideoFrame(std::shared_ptr<Scale> *scale, std::shared_ptr<AVFrame
 {
     if (*scale == nullptr) {
         *scale = std::make_shared<Scale>();
-        ScalePara scalePara{static_cast<int32_t>(frame->width),        static_cast<int32_t>(frame->height),
-                            static_cast<AVPixelFormat>(frame->format), static_cast<int32_t>(frame->width),
-                            static_cast<int32_t>(frame->height),       dstPixFmt};
+        ScalePara scalePara {static_cast<int32_t>(frame->width),
+                             static_cast<int32_t>(frame->height),
+                             static_cast<AVPixelFormat>(frame->format),
+                             static_cast<int32_t>(frame->width),
+                             static_cast<int32_t>(frame->height),
+                             dstPixFmt};
         CHECK_AND_RETURN_RET_LOG((*scale)->Init(scalePara, dstData, dstLineSize) == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
                                  "Scale init error");
     }
