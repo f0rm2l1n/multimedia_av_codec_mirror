@@ -65,6 +65,34 @@ typedef enum OH_AVPixelFormat {
 struct OH_AVFormat *OH_AVFormat_Create(void);
 
 /**
+ * @briefCreate an audio OH_AVFormat handle pointer to read and write data
+ * @syscap SystemCapability.Multimedia.Media.Core
+ * @param mimeType mime type
+ * @param sampleRate sample rate
+ * @param channelCount channel count
+ * @return Returns a pointer to an OH_AVFormat instance
+ * @since 10
+ * @version 1.0
+ */
+struct OH_AVFormat *OH_AVFormat_CreateAudioFormat(const char *mimeType,
+                                                  int32_t sampleRate,
+                                                  int32_t channelCount);
+
+/**
+ * @briefCreate an video OH_AVFormat handle pointer to read and write data
+ * @syscap SystemCapability.Multimedia.Media.Core
+ * @param mimeType mime type
+ * @param width width
+ * @param height height
+ * @return Returns a pointer to an OH_AVFormat instance
+ * @since 10
+ * @version 1.0
+ */
+struct OH_AVFormat *OH_AVFormat_CreateVideoFormat(const char *mimeType,
+                                                  int32_t width,
+                                                  int32_t height);
+
+/**
  * @brief Destroy the specified OH_AVFormat handle resource
  * @syscap SystemCapability.Multimedia.Media.Core
  * @param format pointer to an OH_AVFormat instance

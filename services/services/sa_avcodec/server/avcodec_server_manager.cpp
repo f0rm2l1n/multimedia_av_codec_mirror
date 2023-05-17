@@ -361,7 +361,7 @@ void AVCodecServerManager::DestroyStubObject(StubType type, sptr<IRemoteObject> 
     std::lock_guard<std::mutex> lock(mutex_);
     pid_t pid = IPCSkeleton::GetCallingPid();
     DestroyDumper(type, object);
-    
+
     auto compare_func = [object](std::pair<sptr<IRemoteObject>, pid_t> objectPair) ->
         bool { return objectPair.first == object; };
     switch (type) {
@@ -547,7 +547,7 @@ void AVCodecServerManager::PrintDumpMenu(int32_t fd)
         dumpControler.AddInfo(DUMP_MENU_INDEX + (index << DUMP_OFFSET_16), iter);
         index++;
     }
-        
+
     std::string dumpString;
     dumpControler.GetDumpString(dumpString);
     dumpString += "\n";

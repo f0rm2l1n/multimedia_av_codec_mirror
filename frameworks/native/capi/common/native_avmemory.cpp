@@ -15,6 +15,7 @@
 
 #include "native_avmemory.h"
 #include "native_avmagic.h"
+#include "avsharedmemorybase.h"
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
 
@@ -38,6 +39,21 @@ bool OH_AVMemory::IsEqualMemory(const std::shared_ptr<OHOS::Media::AVSharedMemor
     return (mem == memory_) ? true : false;
 }
 
+struct OH_AVMemory *OH_AVMemory_Create(int32_t size)
+{
+    CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "size %{public}d is error!", size);
+    std::shared_ptr<AVSharedMemoryBase> sharedMemory =
+        std::make_shared<AVSharedMemoryBase>(size, AVSharedMemory::FLAGS_READ_WRITE, "userBuffer");
+    CHECK_AND_RETURN_RET_LOG(sharedMemory->Init() == AVCS_ERR_OK, nullptr,
+        "create OH_AVMemory failed");
+
+    struct OH_AVMemory *mem = new(std::nothrow) OH_AVMemory(sharedMemory);
+    CHECK_AND_RETURN_RET_LOG(mem != nullptr, nullptr, "failed to new OH_AVMemory");
+    mem->isUserCreated = true;
+
+    return mem;
+}
+
 uint8_t *OH_AVMemory_GetAddr(struct OH_AVMemory *mem)
 {
     CHECK_AND_RETURN_RET_LOG(mem != nullptr, nullptr, "input mem is nullptr!");
@@ -52,4 +68,13 @@ int32_t OH_AVMemory_GetSize(struct OH_AVMemory *mem)
     CHECK_AND_RETURN_RET_LOG(mem->magic_ == AVMagic::AVCODEC_MAGIC_SHARED_MEMORY, -1, "magic error!");
     CHECK_AND_RETURN_RET_LOG(mem->memory_ != nullptr, -1, "memory is nullptr!");
     return mem->memory_->GetSize();
+}
+
+OH_AVErrCode OH_AVMemory_Destroy(struct OH_AVMemory *mem)
+{
+    CHECK_AND_RETURN_RET_LOG(mem != nullptr, AV_ERR_INVALID_VAL, "input mem is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(mem->magic_ == AVMagic::AVCODEC_MAGIC_SHARED_MEMORY, AV_ERR_INVALID_VAL, "magic error!");
+    CHECK_AND_RETURN_RET_LOG(mem->isUserCreated, AV_ERR_INVALID_VAL, "input mem is not user created!");
+    delete mem;
+    return AV_ERR_OK;
 }

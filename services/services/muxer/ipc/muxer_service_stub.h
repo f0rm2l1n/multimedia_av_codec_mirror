@@ -30,11 +30,10 @@ public:
     using MuxerStubFunc = int32_t(MuxerServiceStub::*)(MessageParcel &data, MessageParcel &reply);
 
     int32_t InitParameter(int32_t fd, OutputFormat format) override;
-    int32_t SetLocation(float latitude, float longitude) override;
     int32_t SetRotation(int32_t rotation) override;
     int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     int32_t Start() override;
-    int32_t WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info) override;
+    int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info) override;
     int32_t Stop() override;
     void Release() override;
     int32_t DestroyStub() override;
@@ -44,11 +43,10 @@ private:
     MuxerServiceStub();
     int32_t Init();
     int32_t InitParameter(MessageParcel &data, MessageParcel &reply);
-    int32_t SetLocation(MessageParcel &data, MessageParcel &reply);
     int32_t SetRotation(MessageParcel &data, MessageParcel &reply);
     int32_t AddTrack(MessageParcel &data, MessageParcel &reply);
     int32_t Start(MessageParcel &data, MessageParcel &reply);
-    int32_t WriteSampleBuffer(MessageParcel &data, MessageParcel &reply);
+    int32_t WriteSample(MessageParcel &data, MessageParcel &reply);
     int32_t Stop(MessageParcel &data, MessageParcel &reply);
     int32_t Release(MessageParcel &data, MessageParcel &reply);
     int32_t DestroyStub(MessageParcel &data, MessageParcel &reply);

@@ -140,7 +140,7 @@ int32_t AVCodecServiceStub::GetSystemAbility(MessageParcel &data, MessageParcel 
 {
     AVCodecSystemAbility id = static_cast<AVCodecSystemAbility>(data.ReadInt32());
     sptr<IRemoteObject> listenerObj = data.ReadRemoteObject();
-    
+
     COLLIE_LISTEN((void)reply.WriteRemoteObject(GetSubSystemAbility(id, listenerObj)),
         "AVCodecServiceStub::GetSystemAbility");
     return AVCS_ERR_OK;

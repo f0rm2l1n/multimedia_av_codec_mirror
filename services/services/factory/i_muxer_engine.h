@@ -26,11 +26,10 @@ namespace Media {
 class IMuxerEngine {
 public:
     virtual ~IMuxerEngine() = default;
-    virtual int32_t SetLocation(float latitude, float longitude) = 0;
     virtual int32_t SetRotation(int32_t rotation) = 0;
     virtual int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) = 0;
     virtual int32_t Start() = 0;
-    virtual int32_t WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info) = 0;
+    virtual int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info) = 0;
     virtual int32_t Stop() = 0;
     virtual int32_t DumpInfo(int32_t fd) = 0;
 };

@@ -25,27 +25,25 @@ class IStandardMuxerService : public IRemoteBroker {
 public:
     virtual ~IStandardMuxerService() = default;
     virtual int32_t InitParameter(int32_t fd, OutputFormat format) = 0;
-    virtual int32_t SetLocation(float latitude, float longitude) = 0;
     virtual int32_t SetRotation(int32_t rotation) = 0;
     virtual int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) = 0;
     virtual int32_t Start() = 0;
-    virtual int32_t WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info) = 0;
+    virtual int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info) = 0;
     virtual int32_t Stop() = 0;
     virtual void Release() = 0;
     virtual int32_t DestroyStub() = 0;
 
     enum MuxerServiceMsg {
         INIT_PARAMETER = 0,
-        SET_LOCATION,
         SET_ROTATION,
         ADD_TRACK,
         START,
-        WRITE_SAMPLE_BUFFER,
+        WRITE_SAMPLE,
         STOP,
         RELEASE,
 		DESTROY,
     };
-    
+
     DECLARE_INTERFACE_DESCRIPTOR(u"IStandardMuxerServiceq1a");
 };
 }  // namespace Media

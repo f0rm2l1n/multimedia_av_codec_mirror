@@ -26,11 +26,10 @@ namespace Media {
 namespace Plugin {
 struct MuxerPlugin : public PluginBase {
     explicit MuxerPlugin(std::string &&name) : PluginBase(std::move(name)) {}
-    virtual Status SetLocation(float latitude, float longitude) = 0;
     virtual Status SetRotation(int32_t rotation) = 0;
     virtual Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) = 0;
     virtual Status Start() = 0;
-    virtual Status WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info) = 0;
+    virtual Status WriteSample(uint8_t *sample, const TrackSampleInfo &info) = 0;
     virtual Status Stop() = 0;
     Status SetCallback(Callback* cb)
     {
