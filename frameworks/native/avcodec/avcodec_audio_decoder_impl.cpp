@@ -150,5 +150,5 @@ int32_t AVCodecAudioDecoderImpl::SetCallback(const std::shared_ptr<AVCodecCallba
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "callback is nullptr");
     return codecService_->SetCallback(callback);
 }
-} // nmamespace Media
+} // namespace Media
 } // namespace OHOS

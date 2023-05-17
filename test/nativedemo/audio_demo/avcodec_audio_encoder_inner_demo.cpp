@@ -174,7 +174,7 @@ void AEnInnerDemo::InputFunc()
             (void)audioEn_->QueueInputBuffer(index, attr, flag);
             signal_->inQueue_.pop();
             std::cout << "end buffer\n";
-            continue;
+            break;
         }
         auto result = audioEn_->QueueInputBuffer(index, attr, flag);
         signal_->inQueue_.pop();
