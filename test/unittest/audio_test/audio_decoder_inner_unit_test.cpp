@@ -20,6 +20,7 @@
 #include "native_avcodec_audiodecoder.h"
 #include "audio_ffmpeg_adapter.h"
 #include "format.h"
+#include "avcodec_audio_decoder.h"
 #include "avcodec_audio_codec_key.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
@@ -98,7 +99,7 @@ void BufferCallback::OnOutputBufferAvailable(size_t index, AVCodecBufferInfo inf
     (void)flag;
 }
 
-class AudioCodeDecoderUnitTest : public testing::Test {
+class AudioCodeDecoderInnerUnitTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -119,23 +120,23 @@ protected:
     std::string codecName_ {CODEC_MP3_NAME};
 
     OHOS::Media::Format format_;
-    std::shared_ptr<OHOS::Media::CodecBase> adec_ {nullptr};
+    std::shared_ptr<AVCodecAudioDecoder> adec_ = {nullptr};
 };
 
-void AudioCodeDecoderUnitTest::SetUpTestCase(void)
+void AudioCodeDecoderInnerUnitTest::SetUpTestCase(void)
 {
     cout << "[SetUpTestCase]: " << endl;
 }
 
-void AudioCodeDecoderUnitTest::TearDownTestCase(void)
+void AudioCodeDecoderInnerUnitTest::TearDownTestCase(void)
 {
     cout << "[TearDownTestCase]: " << endl;
 }
 
-void AudioCodeDecoderUnitTest::SetUp(void)
+void AudioCodeDecoderInnerUnitTest::SetUp(void)
 {
     cout << "[SetUp]: SetUp!!!" << endl;
-    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(codecName_);
+    adec_ = AudioDecoderFactory::CreateByName(codecName_);
     ASSERT_NE(nullptr, adec_);
 
     signal_ = new ADecSignal();
@@ -143,13 +144,13 @@ void AudioCodeDecoderUnitTest::SetUp(void)
         std::shared_ptr<AVCodecCallback>(std::make_shared<BufferCallback>(signal_))));
 }
 
-void AudioCodeDecoderUnitTest::TearDown(void)
+void AudioCodeDecoderInnerUnitTest::TearDown(void)
 {
     adec_->Release();
     cout << "[TearDown]: over!!!" << endl;
 }
 
-int32_t AudioCodeDecoderUnitTest::ProceMp3Func(void)
+int32_t AudioCodeDecoderInnerUnitTest::ProceMp3Func(void)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -163,7 +164,7 @@ int32_t AudioCodeDecoderUnitTest::ProceMp3Func(void)
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioCodeDecoderUnitTest::ProceFlacFunc(void)
+int32_t AudioCodeDecoderInnerUnitTest::ProceFlacFunc(void)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -178,7 +179,7 @@ int32_t AudioCodeDecoderUnitTest::ProceFlacFunc(void)
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioCodeDecoderUnitTest::ProceAacFunc(void)
+int32_t AudioCodeDecoderInnerUnitTest::ProceAacFunc(void)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -193,14 +194,14 @@ int32_t AudioCodeDecoderUnitTest::ProceAacFunc(void)
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Configure_01, TestSize.Level1)
 {
     // lack of correct key
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Configure_02, TestSize.Level1)
 {
     // correct key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -210,7 +211,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_02, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Configure_03, TestSize.Level1)
 {
     // correct key input with redundancy key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -220,7 +221,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_03, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_04, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Configure_04, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -229,7 +230,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_04, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_05, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Configure_05, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, INVALID_CHANNEL_COUNT);
@@ -238,19 +239,19 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_05, TestSize.Level
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_06, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Configure_06, TestSize.Level1)
 {
     // empty format input
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Start_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Start_01, TestSize.Level1)
 {
     // correct flow 1
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Start_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Start_02, TestSize.Level1)
 {
     // correct flow 2
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
@@ -258,13 +259,13 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Start_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Start_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Start_03, TestSize.Level1)
 {
     // wrong flow 1
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Start_04, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Start_04, TestSize.Level1)
 {
     // wrong flow 2
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
@@ -272,27 +273,14 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Start_04, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Pause_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Resume_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Resume());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Stop_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Stop_01, TestSize.Level1)
 {
     // correct flow 1
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Stop_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Stop_02, TestSize.Level1)
 {
     // correct flow 2
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -300,16 +288,16 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Stop_02, TestSize.Level1)
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
+    EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Flush_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Flush_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Flush());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Flush_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Flush_02, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
@@ -317,14 +305,14 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Flush_02, TestSize.Level1)
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Flush());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Reset_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Reset_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Reset_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Reset_02, TestSize.Level1)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -334,20 +322,20 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Reset_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Reset_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Reset_03, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Release_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Release_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Release_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Release_02, TestSize.Level1)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -357,36 +345,29 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Release_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Release_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_Release_03, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_NotifyEos_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->NotifyEos());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_SetParameter_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_SetParameter_01, TestSize.Level1)
 {
     // 尚未实现
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE, adec_->SetParameter(format_));
+    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE, adec_->SetParameter(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_GetOutputFormat_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_GetOutputFormat_01, TestSize.Level1)
 {
     // 尚未实现
     EXPECT_EQ(AVCS_ERR_OK, ProceMp3Func());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->GetOutputFormat(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_GetInputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_GetInputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     sleep(1);
@@ -404,10 +385,10 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_GetInputBuffer_01, TestSize.
     EXPECT_NE(nullptr, buffer);
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_QueueInputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_QueueInputBuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     sleep(1);
@@ -427,7 +408,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_QueueInputBuffer_01, TestSiz
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->QueueInputBuffer(index_, info, flag));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_GetOutputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_GetOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceMp3Func());
     std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
@@ -441,7 +422,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_GetOutputBuffer_01, TestSize
     EXPECT_EQ(nullptr, buffer);
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_ReleaseOutputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_ReleaseOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceMp3Func());
 
@@ -455,19 +436,19 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_ReleaseOutputBuffer_01, Test
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->ReleaseOutputBuffer(index_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_SetCodecName_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_SetCodecName_01, TestSize.Level1)
 {
     codecName_ = CODEC_FLAC_NAME;
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Configure_01, TestSize.Level1)
 {
     // lack of correct key
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Configure_02, TestSize.Level1)
 {
     // correct key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -477,7 +458,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_02, TestSize.Leve
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Configure_03, TestSize.Level1)
 {
     // correct key input with redundancy key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -488,7 +469,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_03, TestSize.Leve
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_04, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Configure_04, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -498,7 +479,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_04, TestSize.Leve
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_05, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Configure_05, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, INVALID_CHANNEL_COUNT);
@@ -508,19 +489,19 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_05, TestSize.Leve
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Configure_06, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Configure_06, TestSize.Level1)
 {
     // empty format input
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Start_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Start_01, TestSize.Level1)
 {
     // correct flow 1
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Start_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Start_02, TestSize.Level1)
 {
     // correct flow 2
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
@@ -528,13 +509,13 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Start_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Start_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Start_03, TestSize.Level1)
 {
     // wrong flow 1
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Start_04, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Start_04, TestSize.Level1)
 {
     // wrong flow 2
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
@@ -542,27 +523,14 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Start_04, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Pause_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Resume_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Resume());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Stop_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Stop_01, TestSize.Level1)
 {
     // correct flow 1
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Stop_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Stop_02, TestSize.Level1)
 {
     // correct flow 2
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -570,16 +538,16 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Stop_02, TestSize.Level1)
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
     format_.PutIntValue(MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY, DEFAULT_BITS_PER_CODED_RATE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
+    EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Flush_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Flush_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Flush());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Flush_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Flush_02, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
@@ -587,14 +555,14 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Flush_02, TestSize.Level1)
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Flush());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Reset_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Reset_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Reset_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Reset_02, TestSize.Level1)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -604,20 +572,20 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Reset_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Reset_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Reset_03, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Release_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Release_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Release_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Release_02, TestSize.Level1)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -627,36 +595,29 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Release_02, TestSize.Level1
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Release_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_Release_03, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_NotifyEos_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->NotifyEos());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_SetParameter_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_SetParameter_01, TestSize.Level1)
 {
     // 尚未实现
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE, adec_->SetParameter(format_));
+    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE, adec_->SetParameter(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_GetOutputFormat_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_GetOutputFormat_01, TestSize.Level1)
 {
     // 尚未实现
     EXPECT_EQ(AVCS_ERR_OK, ProceFlacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->GetOutputFormat(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_GetInputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_GetInputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     sleep(1);
@@ -674,10 +635,10 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_GetInputBuffer_01, TestSize
     EXPECT_NE(nullptr, buffer);
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_QueueInputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_QueueInputBuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     sleep(1);
@@ -697,7 +658,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_QueueInputBuffer_01, TestSi
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->QueueInputBuffer(index_, info, flag));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_GetOutputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_GetOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceFlacFunc());
     std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
@@ -711,7 +672,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_GetOutputBuffer_01, TestSiz
     EXPECT_EQ(nullptr, buffer);
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_ReleaseOutputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_ReleaseOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceFlacFunc());
 
@@ -725,19 +686,19 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_ReleaseOutputBuffer_01, Tes
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->ReleaseOutputBuffer(index_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_SetCodecName_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_SetCodecName_02, TestSize.Level1)
 {
     codecName_ = CODEC_AAC_NAME;
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_01, TestSize.Level1)
 {
     // lack of correct key
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_02, TestSize.Level1)
 {
     // correct key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -747,7 +708,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_02, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_03, TestSize.Level1)
 {
     // correct key input with redundancy key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -758,7 +719,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_03, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_04, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_04, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -768,7 +729,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_04, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_05, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_05, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, INVALID_CHANNEL_COUNT);
@@ -778,7 +739,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_05, TestSize.Level
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_06, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_06, TestSize.Level1)
 {
     // correct key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -788,7 +749,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_06, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_07, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_07, TestSize.Level1)
 {
     // correct key input with redundancy key input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -799,7 +760,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_07, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_08, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_08, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -809,7 +770,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_08, TestSize.Level
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_09, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_09, TestSize.Level1)
 {
     // correct key input with wrong value type input
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, INVALID_CHANNEL_COUNT);
@@ -819,19 +780,19 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_09, TestSize.Level
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Configure_10, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Configure_10, TestSize.Level1)
 {
     // empty format input
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Start_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Start_01, TestSize.Level1)
 {
     // correct flow 1
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Start_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Start_02, TestSize.Level1)
 {
     // correct flow 2
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
@@ -839,13 +800,13 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Start_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Start_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Start_03, TestSize.Level1)
 {
     // wrong flow 1
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Start_04, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Start_04, TestSize.Level1)
 {
     // wrong flow 2
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
@@ -853,27 +814,14 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Start_04, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Pause_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Resume_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Resume());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Stop_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Stop_01, TestSize.Level1)
 {
     // correct flow 1
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Stop_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Stop_02, TestSize.Level1)
 {
     // correct flow 2
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
@@ -882,16 +830,16 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Stop_02, TestSize.Level1)
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, DEFAULT_AAC_TYPE);
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
+    EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Flush_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Flush_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Flush());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Flush_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Flush_02, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
@@ -899,14 +847,14 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Flush_02, TestSize.Level1)
     EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Flush());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Reset_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Reset_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Reset_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Reset_02, TestSize.Level1)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -917,20 +865,20 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Reset_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Reset_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Reset_03, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Reset());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Release_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Release_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Release_02, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Release_02, TestSize.Level1)
 {
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
@@ -941,36 +889,29 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Release_02, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Release_03, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_Release_03, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Release());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_NotifyEos_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Stop());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->NotifyEos());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_SetParameter_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_SetParameter_01, TestSize.Level1)
 {
     // 尚未实现
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE, adec_->SetParameter(format_));
+    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE, adec_->SetParameter(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_GetOutputFormat_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_GetOutputFormat_01, TestSize.Level1)
 {
     // 尚未实现
     EXPECT_EQ(AVCS_ERR_OK, ProceAacFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->GetOutputFormat(format_));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_GetInputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_GetInputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     sleep(1);
@@ -988,10 +929,10 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_GetInputBuffer_01, TestSize.
     EXPECT_NE(nullptr, buffer);
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_QueueInputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_QueueInputBuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     sleep(1);
@@ -1011,7 +952,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_QueueInputBuffer_01, TestSiz
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->QueueInputBuffer(index_, info, flag));
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_GetOutputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_GetOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceAacFunc());
     std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
@@ -1025,7 +966,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_GetOutputBuffer_01, TestSize
     EXPECT_EQ(nullptr, buffer);
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_ReleaseOutputBuffer_01, TestSize.Level1)
+HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_ReleaseOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceAacFunc());
 
