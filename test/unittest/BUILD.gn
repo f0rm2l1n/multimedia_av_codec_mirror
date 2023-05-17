@@ -127,9 +127,6 @@ ohos_unittest("av_audio_inner_unit_test") {
   include_dirs += [
     "./",
     "//third_party/ffmpeg",
-    "//commonlibrary/c_utils/base/include",
-    "//base/startup/init/interfaces/innerkits/include/syspara",
-    "//foundation/graphic/graphic_2d/frameworks/surface/include",
     "$av_codec_root_dir/interfaces/kits/c",
     "$av_codec_root_dir/services/engine/common/include",
     "$av_codec_root_dir/services/engine/base/include",
