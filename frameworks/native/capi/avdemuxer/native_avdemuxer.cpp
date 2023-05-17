@@ -111,7 +111,7 @@ OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackI
         "New DemuxerObject failed when copy sample!");
 
     struct AVCodecBufferInfo bufferInfoInner;
-    enum AVCodecBufferFlag bufferFlag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
+    AVCodecBufferFlag bufferFlag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     int32_t ret = demuxerObj->demuxer_->CopyNextSample(*trackIndex, buffer, bufferSize, bufferInfoInner, bufferFlag);
     bufferInfo->pts = bufferInfoInner.presentationTimeUs;
     bufferInfo->size = bufferInfoInner.size;
