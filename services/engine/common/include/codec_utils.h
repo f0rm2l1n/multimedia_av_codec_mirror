@@ -30,7 +30,6 @@ extern "C" {
 namespace OHOS {
 namespace Media {
 namespace Codec {
-
 struct ScalePara {
     int32_t srcWidth = 0;
     int32_t srcHeight = 0;
