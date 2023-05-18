@@ -158,8 +158,8 @@ ohos_shared_library("av_codec_service") {
   if (multimedia_av_codec_support_demuxer) {
     sources += [
       "$av_codec_root_dir/services/engine/demuxer/demuxer_engine_impl.cpp",
-      "$av_codec_root_dir/services/engine/plugin/core/demuxer_factory.cpp",
       "$av_codec_root_dir/services/engine/plugin/core/demuxer.cpp",
+      "$av_codec_root_dir/services/engine/plugin/core/demuxer_factory.cpp",
       "demuxer/ipc/demuxer_service_stub.cpp",
       "demuxer/server/demuxer_server.cpp",
     ]
