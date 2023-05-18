@@ -63,6 +63,7 @@ private:
     void consumerOutputBuffer();
     void dispose();
     bool begin();
+    bool handInputBuffer(int32_t &ret);
 
 private:
     bool isFirFrame_;
