@@ -116,7 +116,7 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
     info->offset = bufferInfoInner.offset;
     info->flags =static_cast<uint32_t>(bufferFlag);
 
-    CHECK_AND_RETURN_RET_LOG(ret != AVCS_ERR_NO_MEMORY, AV_ERR_NO_MEMORY, 
+    CHECK_AND_RETURN_RET_LOG(ret != AVCS_ERR_NO_MEMORY, AV_ERR_NO_MEMORY,
         "demuxer_ ReadSample failed! sample size is too small to copy full frame data");
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ ReadSample failed!");
 

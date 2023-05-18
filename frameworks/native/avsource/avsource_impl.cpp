@@ -55,7 +55,8 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
         "Create source with uri failed because input fd is illegal, fd must be greater than 2!");
     CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with uri failed because input size is negative");
 
-    CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDONLY) == O_RDONLY, nullptr, "No permission to read and write fd");
+    CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDONLY) == O_RDONLY, nullptr,
+        "No permission to read and write fd");
     CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "The fd is not seekable");
 
     std::shared_ptr<AVSourceImpl> sourceImpl = std::make_shared<AVSourceImpl>();

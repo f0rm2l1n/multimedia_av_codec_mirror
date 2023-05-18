@@ -85,6 +85,10 @@ private:
     void InitAVIOContext(int flags);
     int32_t InitAVFormatContext();
     void GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format);
+
+    void GetPublicTrackFormat(Format &format, AVStream *avStream);
+    void GetVideoTrackFormat(Format &format, AVStream *avStream);
+    void GetAudioTrackFormat(Format &format, AVStream *avStream);
 };
 } // namespace Plugin
 } // namespace Media

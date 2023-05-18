@@ -72,7 +72,6 @@ Status RegisterDemuxerPlugins(const std::shared_ptr<Register>& reg)
 }
 
 PLUGIN_DEFINITION(FFmpegDemuxer, LicenseType::GPL, RegisterDemuxerPlugins, [] {})
-
 }
 
 inline int64_t AvTime2Ms(int64_t hTime)
@@ -285,8 +284,7 @@ void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
 }
 
 int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> sample,
-                                                    AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag,
-                                                    std::shared_ptr<SamplePacket> samplePacket)
+    AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, std::shared_ptr<SamplePacket> samplePacket)
 {
     int frameSize = 0;
     bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt_->pts, avStream->time_base));
@@ -321,7 +319,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     if (copySize != copyFrameSize) {
         samplePacket->offset_ += copySize;
         return AVCS_ERR_NO_MEMORY;
-    } 
+    }
     av_packet_free(&(samplePacket->pkt_));
     return AVCS_ERR_OK;
 }
@@ -395,7 +393,6 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
         return AVCS_ERR_SEEK_FAILED;
     }
     int flags = g_seekModeToFFmpegSeekFlags.at(mode);
-    std::vector<uint32_t> trackVec;
     if (selectedTrackIds_.empty()) {
         AVCODEC_LOGW("no track has been selected");
     }
@@ -427,14 +424,12 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
             }
         }
         int64_t realSeekTime = ConvertTimeFromFFmpeg(ffTime, avStream->time_base);
-        AVCODEC_LOGD("realSeekTime: %{public}" PRId64, realSeekTime);
         AVCODEC_LOGD("seek param: trackIndex=%{public}d, ffTime=%{public}" PRId64 ", \
                      realSeekTime=%{public}" PRId64 ", flags=%{public}d",
                      trackIndex, ffTime, realSeekTime, flags);
-
         auto rtv = av_seek_frame(formatContext_.get(), trackIndex, ffTime, flags);
         if (rtv < 0) {
-            AVCODEC_LOGE("seek failed, return value: %{public}d", rtv);
+            AVCODEC_LOGE("seek failed, return value: ffmpeg error:%{public}d", rtv);
             return AVCS_ERR_SEEK_FAILED;
         }
     }

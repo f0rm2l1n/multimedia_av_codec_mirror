@@ -248,6 +248,66 @@ int32_t Source::GetSourceFormat(Format &format)
     return AVCS_ERR_OK;
 }
 
+void Source::GetPublicTrackFormat(Format &format, AVStream *avStream)
+{
+    int32_t media_type = -1;
+    if (g_convertFfmpegType.count(avStream->codecpar->codec_type) > 0) {
+        media_type = static_cast<int32_t>(g_convertFfmpegType[avStream->codecpar->codec_type]);
+    }
+    bool ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_TRACK_TYPE, media_type);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss track type info in track %{public}d", avStream->index);
+    }
+    if (g_codecIdToMime.count(avStream->codecpar->codec_id) != 0) {
+        ret = format.PutStringValue(
+            MediaDescriptionKey::MD_KEY_CODEC_MIME, g_codecIdToMime[avStream->codecpar->codec_id]);
+    } else {
+        ret = false;
+    }
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss mime type info in track %{public}d", avStream->index);
+    }
+}
+
+void Source::GetVideoTrackFormat(Format &format, AVStream *avStream)
+{
+    bool ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, avStream->codecpar->width);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss width info in track %{public}d", avStream->index);
+    }
+    ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, avStream->codecpar->height);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss height info in track %{public}d", avStream->index);
+    }
+}
+
+void Source::GetAudioTrackFormat(Format &format, AVStream *avStream)
+{
+    bool ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avStream->codecpar->sample_rate);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss sample rate info in track %{public}d", avStream->index);
+    }
+    ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avStream->codecpar->channels);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss channel count info in track %{public}d", avStream->index);
+    }
+    ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avStream->codecpar->bit_rate);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
+    }
+    if (avStream->codecpar->codec_id == AV_CODEC_ID_AAC) {
+        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, 1);
+        if (!ret) {
+            AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
+        }
+    }
+    if (avStream->codecpar->codec_id == AV_CODEC_ID_AAC_LATM) {
+        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, 0);
+        if (!ret) {
+            AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
+        }
+    }
+}
 
 int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
@@ -259,60 +319,11 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
         return AVCS_ERR_INVALID_VAL;
     }
     auto avStream = formatContext_->streams[trackIndex];
-
-    int32_t media_type = -1;
-    if (g_convertFfmpegType.count(avStream->codecpar->codec_type) > 0) {
-        media_type = static_cast<int32_t>(g_convertFfmpegType[avStream->codecpar->codec_type]);
-    }
-    bool ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_TRACK_TYPE, media_type);
-    if (!ret) {
-        AVCODEC_LOGW("Get track info failed:  miss track type info in track %{public}d", trackIndex);
-    }
-
-    if (g_codecIdToMime.count(avStream->codecpar->codec_id) != 0) {
-        ret = format.PutStringValue(
-            MediaDescriptionKey::MD_KEY_CODEC_MIME, g_codecIdToMime[avStream->codecpar->codec_id]);
-    } else {
-        ret = false;
-    }
-    if (!ret) {
-        AVCODEC_LOGW("Get track info failed:  miss mime type info in track %{public}d", trackIndex);
-    }
-
+    GetPublicTrackFormat(format, avStream);
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, avStream->codecpar->width);
-        if (!ret) {
-            AVCODEC_LOGW("Get track info failed:  miss width info in track %{public}d", trackIndex);
-        }
-        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, avStream->codecpar->height);
-        if (!ret) {
-            AVCODEC_LOGW("Get track info failed:  miss height info in track %{public}d", trackIndex);
-        }
+        GetVideoTrackFormat(format, avStream);
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avStream->codecpar->sample_rate);
-        if (!ret) {
-            AVCODEC_LOGW("Get track info failed:  miss sample rate info in track %{public}d", trackIndex);
-        }
-        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avStream->codecpar->channels);
-        if (!ret) {
-            AVCODEC_LOGW("Get track info failed:  miss channel count info in track %{public}d", trackIndex);
-        }
-        ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avStream->codecpar->bit_rate);
-        if (!ret) {
-            AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", trackIndex);
-        }
-        if (avStream->codecpar->codec_id == AV_CODEC_ID_AAC) {
-            ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, 1);
-            if (!ret) {
-                AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", trackIndex);
-            }
-        }
-        if (avStream->codecpar->codec_id == AV_CODEC_ID_AAC_LATM) {
-            ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, 0);
-            if (!ret) {
-                AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", trackIndex);
-            }
-        }
+        GetAudioTrackFormat(format, avStream);
     }
     return AVCS_ERR_OK;
 }
