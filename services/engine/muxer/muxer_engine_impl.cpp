@@ -204,7 +204,7 @@ int32_t MuxerEngineImpl::WriteSample(std::shared_ptr<AVSharedMemory> sample, con
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracks_.find(info.trackIndex) != tracks_.end(), AVCS_ERR_INVALID_VAL,
         "The track index does not exist");
-    CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.timeUs >= 0 &&
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.offset >= 0 && info.size >= 0 &&
         sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
 
     std::shared_ptr<AVSharedMemoryBase> buffer =
