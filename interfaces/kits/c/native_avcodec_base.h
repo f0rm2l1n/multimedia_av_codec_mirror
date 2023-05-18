@@ -200,11 +200,11 @@ extern const char *OH_MD_KEY_PIXEL_FORMAT;
 /* Key for video YUV value range flag, value type is bool */
 extern const char *OH_MD_KEY_RANGE_FLAG;
 /* Key for video color primaries, value type is int32_t */
-extern const char *OD_MD_KEY_COLOR_PRIMARIES;
+extern const char *OH_MD_KEY_COLOR_PRIMARIES;
 /* Key for video transfer characteristics, value type is int32_t  */
-extern const char *OD_MD_KEY_TRANSFER_CHARACTERISTICS;
+extern const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS;
 /* Key for video maxtrix coefficients, value type is int32_t */
-extern const char *OD_MD_KEY_MAXTRIX_COEFFICIENTS;
+extern const char *OH_MD_KEY_MAXTRIX_COEFFICIENTS;
 /* key for audio raw format, value type is uint32_t , see @AudioSampleFormat */
 extern const char *OH_MD_KEY_AUDIO_SAMPLE_FORMAT;
 /* Key for video frame rate, value type is double. */
