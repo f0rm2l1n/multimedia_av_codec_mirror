@@ -556,7 +556,7 @@ int32_t FCodec::ReleaseBuffers(bool isFlush)
     return AVCS_ERR_OK;
 }
 
-std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(size_t index)
+std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), nullptr, "Get input buffer failed: not in Running or Flushed state");
@@ -569,7 +569,7 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(size_t index)
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
 }
 
-std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(size_t index)
+std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), nullptr,
@@ -585,7 +585,7 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(size_t index)
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
 }
 
-int32_t FCodec::QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
+int32_t FCodec::QueueInputBuffer(uint32_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag flag)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), AVCS_ERR_INVALID_STATE,
@@ -830,7 +830,7 @@ void FCodec::RenderFrame()
     }
 }
 
-int32_t FCodec::ReleaseOutputBuffer(size_t index)
+int32_t FCodec::ReleaseOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
@@ -876,7 +876,7 @@ int32_t FCodec::UpdateSurfaceMemory(std::shared_ptr<SurfaceMemory> &surfaceMemor
     return AVCS_ERR_OK;
 }
 
-int32_t FCodec::RenderOutputBuffer(size_t index)
+int32_t FCodec::RenderOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() && state_ != State::EOS || surface_ != nullptr), AVCS_ERR_INVALID_STATE,
@@ -930,16 +930,6 @@ int32_t FCodec::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
                              "Set callback failed: not in Running/Flushed state");
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "Set callback failed: callback is NULL");
     callback_ = callback;
-    return AVCS_ERR_OK;
-}
-
-int32_t FCodec::Pause()
-{
-    return AVCS_ERR_OK;
-}
-
-int32_t FCodec::Resume()
-{
     return AVCS_ERR_OK;
 }
 } // namespace Codec

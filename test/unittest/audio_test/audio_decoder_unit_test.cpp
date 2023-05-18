@@ -273,19 +273,6 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Start_04, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Pause_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Resume_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Resume());
-}
-
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Stop_01, TestSize.Level1)
 {
     // correct flow 1
@@ -408,7 +395,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_GetInputBuffer_01, TestSize.
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_QueueInputBuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCODEC_BUFFER_FLAG_NONE;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     sleep(1);
@@ -543,19 +530,6 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Start_04, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Pause_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Resume_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Resume());
-}
-
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_Stop_01, TestSize.Level1)
 {
     // correct flow 1
@@ -678,7 +652,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_GetInputBuffer_01, TestSize
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_QueueInputBuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCODEC_BUFFER_FLAG_NONE;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     sleep(1);
@@ -854,19 +828,6 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Start_04, TestSize.Level1)
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Start());
 }
 
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Pause_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-}
-
-HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Resume_01, TestSize.Level1)
-{
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Pause());
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Resume());
-}
-
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_Stop_01, TestSize.Level1)
 {
     // correct flow 1
@@ -992,7 +953,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_GetInputBuffer_01, TestSize.
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_QueueInputBuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCODEC_BUFFER_FLAG_NONE;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     sleep(1);

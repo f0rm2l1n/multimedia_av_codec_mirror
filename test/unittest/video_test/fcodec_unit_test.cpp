@@ -312,7 +312,7 @@ HWTEST_F(FCodecUnitTest, fcodec_GetInputbuffer_01, TestSize.Level1)
 HWTEST_F(FCodecUnitTest, fcodec_QueueInputbuffer_01, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCODEC_BUFFER_FLAG_NONE;
 
     EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
     // case0 传参异常
@@ -334,7 +334,7 @@ HWTEST_F(FCodecUnitTest, fcodec_QueueInputbuffer_01, TestSize.Level1)
 HWTEST_F(FCodecUnitTest, fcodec_QueueInputbuffer_02, TestSize.Level1)
 {
     AVCodecBufferInfo info;
-    AVCodecBufferFlag flag;
+    AVCodecBufferFlag flag = AVCODEC_BUFFER_FLAG_NONE;
 
     EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
     // case0 传参异常

@@ -123,6 +123,36 @@ public:
     static constexpr std::string_view MD_KEY_REQUEST_I_FRAME = "req_i_frame";
 
     /**
+     * Key for video YUV value range flag, value type is bool
+     */
+    static constexpr std::string_view MD_KEY_RANGE_FLAG = "range_flag";
+
+    /**
+     * Key for video color primaries, value type is int32_t, see {link @ColorPrimary}
+     */
+    static constexpr std::string_view MD_KEY_COLOR_PRIMARIES = "color_primaries";
+
+    /**
+     * Key for video transfer characteristics, value type is int32_t, see {link @TransferCharacteristic}
+     */
+    static constexpr std::string_view MD_KEY_TRANSFER_CHARACTERISTICS = "transfer_characteristics";
+
+    /**
+     * Key for video maxtrix coefficients, value type is int32_t, see {link @MaxtrixCoefficient}
+     */
+    static constexpr std::string_view MD_KEY_MAXTRIX_COEFFICIENTS = "matrix_coefficients";
+
+    /**
+     * video encode bitrate mode, the value type is int32_t, see {link @VideoEncodeBitrateMode}
+     */
+    static constexpr std::string_view MD_KEY_VIDEO_ENCODE_BITRATE_MODE = "video_encode_bitrate_mode";
+
+    /**
+     * encode profile, the value type is int32_t
+     */
+    static constexpr std::string_view MD_KEY_PROFILE = "codec_profile";
+
+    /**
      * Key for audio channel count, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_CHANNEL_COUNT = "channel_count";
