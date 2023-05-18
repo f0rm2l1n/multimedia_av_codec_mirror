@@ -313,12 +313,8 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
         copySize = static_cast<uint64_t>(sample->GetSize());
     }
     (void)memset_s(sample->GetBase(), copySize, 0, copySize);
-    int ret =
-        memcpy_s(sample->GetBase(), copySize, samplePacket->pkt_->data+samplePacket->offset_, copySize);
-    if (ret != 0) {
-        AVCODEC_LOGE("Memory copy failed when ReadFrame, error: %{public}d", ret);
-        return AVCS_ERR_UNKNOWN;
-    }
+    errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt_->data+samplePacket->offset_, copySize);
+    CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
     AVCODEC_LOGD("Copy from %{public}llu, copy size %{public}llu", samplePacket->offset_, copySize);
     if (copySize != copyFrameSize) {
