@@ -29,16 +29,15 @@
 
 **表1** avmuxer开放能力接口
 
-| 接口名                                                       | 描述                 |
-| ------------------------------------------------------------ | -------------------- |
-| OH_AVMuxer \*OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format); | 创建OH_AVMuxer       |
-| OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer \*muxer, float latitude, float longitude); | 设置输出文件的经纬度 |
-| OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer \*muxer, int32_t rotation); | 设置视频旋转角度     |
-| OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer \*muxer, int32_t \*trackIndex, OH_AVFormat \*trackFormat); | 添加媒体轨           |
-| OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer \*muxer);           | 开始封装             |
-| OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer \*muxer, uint32_t trackIndex, uint8_t \*sampleBuffer, OH_AVCodecBufferAttr info); | 将数据写入封装器     |
-| OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer \*muxer);            | 停止封装             |
-| OH_AVErrCode OH_AVMuxer_Destroy(OH_AVMuxer \*muxer);         | 销毁OH_AVMuxer       |
+| 接口名                                                       | 描述             |
+| ------------------------------------------------------------ | ---------------- |
+| OH_AVMuxer \*OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format); | 创建OH_AVMuxer   |
+| OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer \*muxer, int32_t rotation); | 设置视频旋转角度 |
+| OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer \*muxer, int32_t \*trackIndex, OH_AVFormat \*trackFormat); | 添加媒体轨       |
+| OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer \*muxer);           | 开始封装         |
+| OH_AVErrCode OH_AVMuxer_WriteSample( OH_AVMuxer *muxer, uint32_t trackIndex, OH_AVMemory *sample, OH_AVCodecBufferAttr info); | 将数据写入封装器 |
+| OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer \*muxer);            | 停止封装         |
+| OH_AVErrCode OH_AVMuxer_Destroy(OH_AVMuxer \*muxer);         | 销毁OH_AVMuxer   |
 
 ## 开发步骤
 
@@ -56,15 +55,13 @@
 
 
 
-2. 设置经纬度、旋转角度（非必须）
+2. 设置旋转角度（非必须）
 
    ``` c++
-   // 经纬度
-   OH_AVMuxer_SetLocation(muxer, 10, 10);
    // 旋转角度
    OH_AVMuxer_SetRotation(muxer, 0);
    ```
-
+   
    
 
 3. 添加音频轨
@@ -119,15 +116,19 @@
 
    ``` c++
    // start后，才能开始写入数据
-   char *sampleBuffer = ...; // 写入的媒体数据
+   int size = ...;
+   OH_AVMemory *sampleBuffer = OH_AVMemory_Create(size); // 创建AVMemory
+   // 往sampleBuffer里写入数据参考OH_AVMemory的使用方法
+   
+   // 创建buffer info
    OH_AVCodecBufferAttr info;
    info.pts = ...; // 当前数据的开始播放的时间，单位微秒
-   info.size = ...; // 当前数据的长度
+   info.size = size; // 当前数据的长度	
    info.offset = 0; // 偏移，一般为0
    info.flags |= AVCODEC_BUFFER_FLAGS_SYNC_FRAME; // 当前数据的标志。具体参考OH_AVCodecBufferFlags
    int trackId = audioTrackId; // 选择写的媒体轨
    
-   int ret = OH_AVMuxer_WriteSampleBuffer(muxer, trackId, sampleBuffer, info);
+   int ret = OH_AVMuxer_WriteSample(muxer, trackId, sampleBuffer, info);
    if (ret != AV_ERR_OK) {
        // 异常处理
    }

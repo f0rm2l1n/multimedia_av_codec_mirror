@@ -14,8 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <fcntl.h>
@@ -40,31 +38,10 @@ void AVMuxerUnitTest::TearDownTestCase() {}
 void AVMuxerUnitTest::SetUp()
 {
     avmuxer_ = std::make_shared<AVMuxerSample>();
-    avDataFile_ = std::make_shared<std::ifstream>();
-    avDataFile_->open("avDataMpegMpeg4.bin", std::ios::in | std::ios::binary);
-    if (avDataFile_ == nullptr) {
-        std::cout<<"open avDataMpegMpeg4.bin failed!"<<std::endl;
-    }
-
-    vDataFile_ = std::make_shared<std::ifstream>();
-    vDataFile_->open("mpeg4_720_480.bin", std::ios::in | std::ios::binary);
-    if (vDataFile_ == nullptr) {
-        std::cout<<"open mpeg4_720_480.bin failed!"<<std::endl;
-    }
 }
 
 void AVMuxerUnitTest::TearDown()
 {
-    if (avDataFile_ != nullptr) {
-        avDataFile_->close();
-        avDataFile_ = nullptr;
-    }
-
-    if (vDataFile_ != nullptr) {
-        vDataFile_->close();
-        vDataFile_ = nullptr;
-    }
-
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
