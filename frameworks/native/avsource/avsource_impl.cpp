@@ -28,10 +28,6 @@ namespace {
 
 namespace OHOS {
 namespace Media {
-std::vector<std::string_view> setTrackFormatSupportedList = {
-    AVSourceTrackFormat::VIDEO_BIT_STREAM_FORMAT,
-};
-
 std::shared_ptr<AVSource> AVSourceFactory::CreateWithURI(const std::string &uri)
 {
     AVCodecTrace trace("AVSourceFactory::CreateWithURI");
@@ -41,7 +37,7 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithURI(const std::string &uri)
     std::shared_ptr<AVSourceImpl> sourceImpl = std::make_shared<AVSourceImpl>();
     CHECK_AND_RETURN_RET_LOG(sourceImpl != nullptr, nullptr, "New AVSourceImpl failed when create source with uri");
 
-    int32_t ret = sourceImpl->Init(uri);
+    int32_t ret = sourceImpl->InitWithURI(uri);
 
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "Init AVSourceImpl failed when create source with uri");
 
@@ -59,35 +55,55 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
         "Create source with uri failed because input fd is illegal, fd must be greater than 2!");
     CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with uri failed because input size is negative");
 
-    CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDWR) == O_RDWR, nullptr, "No permission to read and write fd");
+    CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDONLY) == O_RDONLY, nullptr, "No permission to read and write fd");
     CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "The fd is not seekable");
 
-    std::string uri = "fd://" + std::to_string(fd) + "?offset=" + \
-        std::to_string(offset) + "&size=" + std::to_string(size);
-
     std::shared_ptr<AVSourceImpl> sourceImpl = std::make_shared<AVSourceImpl>();
-    CHECK_AND_RETURN_RET_LOG(sourceImpl != nullptr, nullptr, "New AVSourceImpl failed when create source with uri");
+    CHECK_AND_RETURN_RET_LOG(sourceImpl != nullptr, nullptr, "New AVSourceImpl failed when create source with fd");
 
-    int32_t ret = sourceImpl->Init(uri);
+    int32_t ret = sourceImpl->InitWithFD(fd, offset, size);
 
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "Init AVSourceImpl failed when create source with uri");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "Init AVSourceImpl failed when create source with fd");
 
     return sourceImpl;
 }
 
-int32_t AVSourceImpl::Init(const std::string &uri)
+int32_t AVSourceImpl::InitWithURI(const std::string &uri)
 {
-    AVCodecTrace trace("AVSource::Init");
+    AVCodecTrace trace("AVSource::InitWithURI");
     
     sourceClient_ = AVCodecServiceFactory::GetInstance().CreateSourceService();
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Create source service failed when init sourceImpl");
     
-    int32_t ret = sourceClient_->Init(uri);
-    if (ret == AVCS_ERR_OK) {
-        ret = sourceClient_->GetTrackCount(trackCount_);
-    }
-    return ret;
+    int32_t ret = sourceClient_->InitWithURI(uri);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
+        "Call source service init failed when init sourceImpl");
+        
+    ret = sourceClient_->GetTrackCount(trackCount_);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
+        "Init track count failed when init sourceImpl");
+
+    return AVCS_ERR_OK;
+}
+
+int32_t AVSourceImpl::InitWithFD(int32_t fd, int64_t offset, int64_t size)
+{
+    AVCodecTrace trace("AVSource::InitWithFD");
+    
+    sourceClient_ = AVCodecServiceFactory::GetInstance().CreateSourceService();
+    CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
+        "Create source service failed when init sourceImpl");
+    
+    int32_t ret = sourceClient_->InitWithFD(fd, offset, size);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
+        "Call source service init failed when init sourceImpl");
+        
+    ret = sourceClient_->GetTrackCount(trackCount_);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
+        "Init track count failed when init sourceImpl");
+
+    return AVCS_ERR_OK;
 }
 
 AVSourceImpl::AVSourceImpl()
@@ -104,11 +120,6 @@ AVSourceImpl::~AVSourceImpl()
         sourceClient_ = nullptr;
     }
 
-    for (auto track : tracks_) {
-        track = nullptr;
-    }
-    tracks_.clear();
-    
     AVCODEC_LOGD("AVSourceImpl:0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
@@ -118,35 +129,6 @@ int32_t AVSourceImpl::GetSourceAddr(uintptr_t &addr)
         "source service died when get source addr!");
     
     return sourceClient_->GetSourceAddr(addr);
-}
-
-int32_t AVSourceImpl::GetTrackCount(uint32_t &trackCount)
-{
-    AVCodecTrace trace("AVSource::GetTrackCount");
-
-    AVCODEC_LOGI("get track count by source");
-
-    CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-        "source service died when get source track!");
-
-    trackCount = trackCount_;
-    return AVCS_ERR_OK;
-}
-
-std::shared_ptr<AVSourceTrack> AVSourceImpl::GetSourceTrackByID(uint32_t trackIndex)
-{
-    AVCodecTrace trace("AVSource::GetSourceTrackByID");
-
-    AVCODEC_LOGI("get source track from source: trackIndex=%{public}d", trackIndex);
-
-    CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, nullptr, "source service died when load track!");
-
-    bool isValid = TrackIndexIsValid(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(isValid, nullptr, "track index is invalid!");
-
-    std::shared_ptr<AVSourceTrack> track = std::make_shared<AVSourceTrackImpl>(this, trackIndex);
-    tracks_.emplace_back(track);
-    return track;
 }
 
 int32_t AVSourceImpl::GetSourceFormat(Format &format)
@@ -171,79 +153,10 @@ int32_t AVSourceImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                             "source service died when get track format!");
 
-    bool isValid = TrackIndexIsValid(trackIndex);
+    bool isValid = (trackIndex >= 0 && trackIndex < trackCount_);
     CHECK_AND_RETURN_RET_LOG(isValid, AVCS_ERR_INVALID_VAL, "track index is invalid!");
 
     return sourceClient_->GetTrackFormat(format, trackIndex);
-}
-
-int32_t AVSourceImpl::SetTrackFormat(const Format &format, uint32_t trackIndex)
-{
-    AVCodecTrace trace("AVSource::SetTrackFormat");
-
-    AVCODEC_LOGI("set source track format: trackIndex=%{public}d, format=%{public}s",
-        trackIndex, format.Stringify().c_str());
-
-    CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-        "source service died when set format!");
-
-    bool isValid = TrackIndexIsValid(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(isValid, AVCS_ERR_INVALID_VAL, "track index is invalid!");
-
-    auto &formatMap = format.GetFormatMap();
-    bool allKeySupported = true;
-    for (auto pair : formatMap) {
-        auto index = std::find_if(setTrackFormatSupportedList.begin(), setTrackFormatSupportedList.end(),
-                                  [pair](std::string_view support) { return pair.first == support; });
-        if (index == setTrackFormatSupportedList.end()) {
-            AVCODEC_LOGE("key %{punlic}s is not supported to set!", pair.first.c_str());
-            allKeySupported = false;
-            break;
-        }
-    }
-
-    CHECK_AND_RETURN_RET_LOG(allKeySupported, AVCS_ERR_INVALID_VAL,
-        "Set track format failed because input format is invalid!");
-
-    return sourceClient_->SetTrackFormat(format, trackIndex);
-}
-
-bool AVSourceImpl::TrackIndexIsValid(uint32_t trackIndex)
-{
-    return (trackIndex >= 0 && trackIndex < trackCount_);
-}
-
-AVSourceTrackImpl::AVSourceTrackImpl(AVSourceImpl *source, uint32_t trackIndex)
-{
-    AVCODEC_LOGI("init source track: trackIndex=%{public}d", trackIndex);
-    
-    trackIndex_ = trackIndex;
-    sourceImpl_ = source;
-    
-    AVCODEC_LOGD("AVSourceTrackImpl:0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
-}
-
-AVSourceTrackImpl::~AVSourceTrackImpl()
-{
-    AVCODEC_LOGI("uninit sourceTrackImpl");
-    if (sourceImpl_ != nullptr) {
-        sourceImpl_ = nullptr;
-    }
-    AVCODEC_LOGD("AVSourceTrackImpl:0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
-}
-
-int32_t AVSourceTrackImpl::SetTrackFormat(const Format &format)
-{
-    AVCodecTrace trace("AVSourceTrack::SetTrackFormat");
-
-    return sourceImpl_->SetTrackFormat(format, trackIndex_);
-}
-
-int32_t AVSourceTrackImpl::GetTrackFormat(Format &format)
-{
-    AVCodecTrace trace("AVSourceTrack::GetTrackFormat");
-
-    return sourceImpl_->GetTrackFormat(format, trackIndex_);
 }
 } // namespace Media
 } // namespace OHOS

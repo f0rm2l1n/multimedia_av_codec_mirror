@@ -34,7 +34,6 @@ public:
     ~SourceEngineImpl() override;
     int32_t Create() override;
     int32_t GetTrackCount(uint32_t &trackCount) override;
-    int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) override;
     int32_t GetSourceFormat(Format &format) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     uintptr_t GetSourceAddr() override;

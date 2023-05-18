@@ -52,13 +52,22 @@ void SourceClient::AVCodecServerDied()
     sourceProxy_ = nullptr;
 }
 
-int32_t SourceClient::Init(const std::string &uri)
+int32_t SourceClient::InitWithURI(const std::string &uri)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
 
-    AVCODEC_LOGD("source client call Init");
-    return sourceProxy_->Init(uri);
+    AVCODEC_LOGD("source client call InitWithURI");
+    return sourceProxy_->InitWithURI(uri);
+}
+
+int32_t SourceClient::InitWithFD(int32_t fd, int64_t offset, int64_t size)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
+
+    AVCODEC_LOGD("source client call InitWithFD");
+    return sourceProxy_->InitWithFD(fd, offset, size);
 }
 
 int32_t SourceClient::GetTrackCount(uint32_t &trackCount)
@@ -68,15 +77,6 @@ int32_t SourceClient::GetTrackCount(uint32_t &trackCount)
 
     AVCODEC_LOGD("source client call GetTrackCount");
     return sourceProxy_->GetTrackCount(trackCount);
-}
-
-int32_t SourceClient::SetTrackFormat(const Format &format, uint32_t trackIndex)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(sourceProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
-
-    AVCODEC_LOGD("source client call SetTrackFormat");
-    return sourceProxy_->SetTrackFormat(format, trackIndex);
 }
 
 int32_t SourceClient::GetTrackFormat(Format &format, uint32_t trackIndex)

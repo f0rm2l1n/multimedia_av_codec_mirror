@@ -60,30 +60,30 @@ void DemuxerClient::DemuxerClient::AVCodecServerDied()
     demuxerProxy_ = nullptr;
 }
 
-
-int32_t DemuxerClient::SelectSourceTrackByID(uint32_t index)
+int32_t DemuxerClient::SelectTrackByID(uint32_t index)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
 
-    AVCODEC_LOGD("demuxer client call SelectSourceTrackByID");
-    return demuxerProxy_->SelectSourceTrackByID(index);
+    AVCODEC_LOGD("demuxer client call SelectTrackByID");
+    return demuxerProxy_->SelectTrackByID(index);
 }
-int32_t DemuxerClient::UnselectSourceTrackByID(uint32_t index)
+
+int32_t DemuxerClient::UnselectTrackByID(uint32_t index)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
     
-    AVCODEC_LOGD("demuxer client call UnselectSourceTrackByID");
-    return demuxerProxy_->UnselectSourceTrackByID(index);
+    AVCODEC_LOGD("demuxer client call UnselectTrackByID");
+    return demuxerProxy_->UnselectTrackByID(index);
 }
-int32_t DemuxerClient::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
-                                      AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t DemuxerClient::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
-    AVCODEC_LOGD("demuxer client call CopyNextSample");
-    return demuxerProxy_->CopyNextSample(trackIndex, memory, bufferInfo, flag);
+    AVCODEC_LOGD("demuxer client call ReadSample");
+    return demuxerProxy_->ReadSample(trackIndex, sample, info, flag);
 }
 int32_t DemuxerClient::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
 {

@@ -24,37 +24,28 @@
 
 namespace OHOS {
 namespace Media {
-class AVSourceTrack;
-
 class AVSource {
 public:
     virtual ~AVSource() = default;
 
     /**
-     * @brief Count number of the track in source.
-     * @return Returns the tracks's count.
-     * @since 4.0
-     * @version 4.0
-     */
-    virtual int32_t GetTrackCount(uint32_t &trackCount) = 0;
-
-    /**
-     * @brief Return a {@link AVSourceTrack} object.
-     * @param trackIndex The index of the track.
-     * @return Returns {@link AVSourceTrack} if success; returns nullptr otherwise.
-     * @since 4.0
-     * @version 4.0
-     */
-    virtual std::shared_ptr<AVSourceTrack> GetSourceTrackByID(uint32_t trackIndex) = 0;
-
-    /**
-     * @brief Gets the parameters of the source.
-     * @param format The empty parameters for storing data.
+     * @brief Get the format info of source.
+     * @param format The Format handle pointer to get format info.
      * @return Returns {@link Format} if success; returns nullptr otherwise.
      * @since 4.0
      * @version 4.0
      */
     virtual int32_t GetSourceFormat(Format &format) = 0;
+
+    /**
+     * @brief Gets the parameters of the source.
+     * @param format The Format handle pointer to get format info.
+     * @param trackIndex The track index to get format.
+     * @return Returns {@link Format} if success; returns nullptr otherwise.
+     * @since 4.0
+     * @version 4.0
+     */
+    virtual int32_t GetTrackFormat(Format &format, uint32_t trackIndex) = 0;
 
     /**
      * @brief Gets the address of the source.
@@ -65,9 +56,6 @@ public:
     virtual int32_t GetSourceAddr(uintptr_t &addr) = 0;
 
     std::string sourceUri;
-
-private:
-    std::vector<AVSourceTrack*> tracks_ {};
 };
 
 class __attribute__((visibility("default"))) AVSourceFactory {
@@ -98,8 +86,8 @@ public:
     /**
      * @brief Instantiate the preferred source of the fd.
      * @param fd The fileDescriptor data source.
-     * @param offset The offset into the file where the data be read starts.
-     * @param size the length in bytes of the data to be read.
+     * @param offset The offset into the file to start reading.
+     * @param size the length in bytes to read.
      * @return Returns the preferred source.
      * @since 4.0
      * @version 4.0
@@ -110,29 +98,6 @@ public:
 private:
     AVSourceFactory() = default;
     ~AVSourceFactory() = default;
-};
-
-class AVSourceTrack {
-public:
-    virtual ~AVSourceTrack() = default;
-
-    /**
-     * @brief Sets the parameters to the track.
-     * @param format The parameters to set.
-     * @return Returns {@link MSEER_OK} if success; returns nullptr otherwise.
-     * @since 4.0
-     * @version 4.0
-     */
-    virtual int32_t SetTrackFormat(const Format &format) = 0;
-
-    /**
-     * @brief Gets the parameters of the track.
-     * @param format The empty parameters for storing data.
-     * @return Returns {@link Format} if success; returns nullptr otherwise.
-     * @since 4.0
-     * @version 4.0
-     */
-    virtual int32_t GetTrackFormat(Format &format) = 0;
 };
 } // namespace Media
 } // namespace OHOS

@@ -86,8 +86,4 @@ struct OH_AVSource : public AVObjectMagic {
     virtual ~OH_AVSource() = default;
 };
 
-struct OH_AVSourceTrack : public AVObjectMagic {
-    explicit OH_AVSourceTrack(enum AVMagic m) : AVObjectMagic(m) {}
-    virtual ~OH_AVSourceTrack() = default;
-};
 #endif // NATIVE_AVMAGIC_H

@@ -53,9 +53,9 @@ int32_t SourceServiceStub::InitStub()
     sourceServer_ = SourceServer::Create();
     CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Failed to create source server");
 
-    sourceFuncs_[INIT] = &SourceServiceStub::Init;
+    sourceFuncs_[INIT_WITH_URI] = &SourceServiceStub::InitWithURI;
+    sourceFuncs_[INIT_WITH_FD] = &SourceServiceStub::InitWithFD;
     sourceFuncs_[GET_TRACK_COUNT] = &SourceServiceStub::GetTrackCount;
-    sourceFuncs_[SET_TRACK_FORMAT] = &SourceServiceStub::SetTrackFormat;
     sourceFuncs_[GET_TRACK_FORMAT] = &SourceServiceStub::GetTrackFormat;
     sourceFuncs_[GET_SOURCE_FORMAT] = &SourceServiceStub::GetSourceFormat;
     sourceFuncs_[GET_SOURCE_ADDR] = &SourceServiceStub::GetSourceAddr;
@@ -95,22 +95,22 @@ int32_t SourceServiceStub::DestroyStub()
     return AVCS_ERR_OK;
 }
 
-int32_t SourceServiceStub::Init(const std::string &uri)
+int32_t SourceServiceStub::InitWithURI(const std::string &uri)
 {
     CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
-    return sourceServer_->Init(uri);
+    return sourceServer_->InitWithURI(uri);
+}
+
+int32_t SourceServiceStub::InitWithFD(int32_t fd, int64_t offset, int64_t size)
+{
+    CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
+    return sourceServer_->InitWithFD(fd, offset, size);
 }
 
 int32_t SourceServiceStub::GetTrackCount(uint32_t &trackCount)
 {
     CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
     return sourceServer_->GetTrackCount(trackCount);
-}
-
-int32_t SourceServiceStub::SetTrackFormat(const Format &format, uint32_t trackIndex)
-{
-    CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
-    return sourceServer_->SetTrackFormat(format, trackIndex);
 }
 
 int32_t SourceServiceStub::GetTrackFormat(Format &format, uint32_t trackIndex)
@@ -144,30 +144,29 @@ int32_t SourceServiceStub::DestroyStub(MessageParcel &data, MessageParcel &reply
     return AVCS_ERR_OK;
 }
 
-int32_t SourceServiceStub::Init(MessageParcel &data, MessageParcel &reply)
+int32_t SourceServiceStub::InitWithURI(MessageParcel &data, MessageParcel &reply)
 {
     std::string uri = data.ReadString();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(uri)), AVCS_ERR_UNKNOWN, "Reply Init failed");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitWithURI(uri)), AVCS_ERR_UNKNOWN, "Reply Init failed");
+    return AVCS_ERR_OK;
+}
+
+int32_t SourceServiceStub::InitWithFD(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t fd = data.ReadFileDescriptor();
+    int64_t offset = data.ReadInt64();
+    int64_t size = data.ReadInt64();
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitWithFD(fd, offset, size)), AVCS_ERR_UNKNOWN, "Reply Init failed");
     return AVCS_ERR_OK;
 }
 
 int32_t SourceServiceStub::GetTrackCount(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    uint32_t trackCount = data.ReadUint32();
+    uint32_t trackCount = 0;
     int32_t ret = GetTrackCount(trackCount);
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackCount), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
-    return AVCS_ERR_OK;
-}
-
-int32_t SourceServiceStub::SetTrackFormat(MessageParcel &data, MessageParcel &reply)
-{
-    Format param;
-    (void)AVCodecParcel::Unmarshalling(data, param);
-    uint32_t trackIndex = data.ReadUint32();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SetTrackFormat(param, trackIndex)), AVCS_ERR_UNKNOWN,
-                             "Reply SetTrackFormat failed");
     return AVCS_ERR_OK;
 }
 

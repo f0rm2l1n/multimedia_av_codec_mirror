@@ -100,6 +100,28 @@ public:
         return element;
     }
 
+    T Front()
+    {
+        AVCODEC_LOGD("block queue %{public}s Front enter.", name_.c_str());
+        std::unique_lock<std::mutex> lock(mutex_);
+        if (que_.empty() && !isActive_) {
+            AVCODEC_LOGD("block queue %{public}s is inactive for Front.", name_.c_str());
+            return {};
+        } else if (que_.empty() && isActive_) {
+            AVCODEC_LOGD("block queue %{public}s is empty, please waiting for Push.", name_.c_str());
+            condEmpty_.wait(lock, [this] { return !isActive_ || !que_.empty(); });
+        }
+        if (que_.empty()) {
+            AVCODEC_LOGD("block queue %{public}s: inactive: %{public}d, size: %{public}zu.",
+                name_.c_str(), isActive_.load(), que_.size());
+            return {};
+        }
+        T element = que_.front();
+        condFull_.notify_one();
+        AVCODEC_LOGD("block queue %{public}s Front ok.", name_.c_str());
+        return element;
+    }
+
     void Clear()
     {
         std::unique_lock<std::mutex> lock(mutex_);

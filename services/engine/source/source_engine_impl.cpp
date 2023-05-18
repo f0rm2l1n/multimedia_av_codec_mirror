@@ -75,13 +75,6 @@ int32_t SourceEngineImpl::GetTrackCount(uint32_t &trackCount)
     return source_->GetTrackCount(trackCount);
 }
 
-int32_t SourceEngineImpl::SetTrackFormat(const Format &format, uint32_t trackIndex)
-{
-    AVCodecTrace trace("SourceEngineImpl::SetTrackFormat");
-    AVCODEC_LOGI("SetTrackFormat");
-    return source_->SetTrackFormat(format, trackIndex);
-}
-
 int32_t SourceEngineImpl::GetSourceFormat(Format &format)
 {
     AVCodecTrace trace("SourceEngineImpl::GetSourceFormat");

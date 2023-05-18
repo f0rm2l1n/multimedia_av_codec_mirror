@@ -30,10 +30,10 @@ class DemuxerEngineImpl : public IDemuxerEngine {
 public:
     DemuxerEngineImpl(int32_t appUid, int32_t appPid, uintptr_t sourceAddr);
     ~DemuxerEngineImpl() override;
-    int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
-    int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
-                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
+    int32_t SelectTrackByID(uint32_t trackIndex) override;
+    int32_t UnselectTrackByID(uint32_t trackIndex) override;
+    int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) override;
 private:
     int32_t appUid_ = -1;

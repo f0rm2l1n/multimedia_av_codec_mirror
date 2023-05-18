@@ -27,10 +27,10 @@ public:
     virtual ~IDemuxerService() = default;
 
     virtual int32_t Init(uintptr_t sourceAddr) = 0;
-    virtual int32_t SelectSourceTrackByID(uint32_t index) = 0;
-    virtual int32_t UnselectSourceTrackByID(uint32_t index) = 0;
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
-                                    AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) = 0;
+    virtual int32_t SelectTrackByID(uint32_t index) = 0;
+    virtual int32_t UnselectTrackByID(uint32_t index) = 0;
+    virtual int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo &info, AVCodecBufferFlag &flag) = 0;
     virtual int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) = 0;
 };
 } // namespace Media
