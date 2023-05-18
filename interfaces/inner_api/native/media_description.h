@@ -143,14 +143,20 @@ public:
     static constexpr std::string_view MD_KEY_MAXTRIX_COEFFICIENTS = "matrix_coefficients";
 
     /**
-     * video encode bitrate mode, the value type is int32_t, see {link @VideoEncodeBitrateMode}
+     * Key for video encode bitrate mode, the value type is int32_t, see {link @VideoEncodeBitrateMode}
      */
     static constexpr std::string_view MD_KEY_VIDEO_ENCODE_BITRATE_MODE = "video_encode_bitrate_mode";
 
     /**
-     * encode profile, the value type is int32_t
+     * Key for encode profile, the value type is int32_t
      */
     static constexpr std::string_view MD_KEY_PROFILE = "codec_profile";
+
+    /**
+     * key for the desired encoding quality, the value type is uint32_t, this key is only supported for encoders that
+     * are configured in constant quality mode
+     */
+    static constexpr std::string_view MD_KEY_QUALITY = "quality";
 
     /**
      * Key for audio channel count, value type is uint32_t
@@ -179,7 +185,7 @@ public:
 
     /**
      * Key for codec specific data buffer, vlaue type is uint8_t*
-    */
+     */
     static constexpr std::string_view MD_KEY_CODEC_CONFIG = "codec_config";
 
     /**
@@ -211,7 +217,7 @@ public:
      * Key for aac sbr, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_SBR = "sbr";
-    
+
     /**
      * Key for compliance level, value type is int32_t
      */

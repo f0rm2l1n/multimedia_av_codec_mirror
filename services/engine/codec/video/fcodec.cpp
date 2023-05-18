@@ -618,7 +618,7 @@ void FCodec::SendFrame()
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
-    size_t index = inBufQue_.front();
+    uint32_t index = inBufQue_.front();
     std::shared_ptr<AVBuffer> &inputBuffer = buffers_[INDEX_INPUT][index];
     iLock.unlock();
     if (inputBuffer->bufferFlag_ != AVCODEC_BUFFER_FLAG_EOS && inputBuffer->bufferInfo_.size != 0) {
@@ -717,7 +717,7 @@ int32_t FCodec::FillFrameBuffer(const std::shared_ptr<AVBuffer> &frameBuffer)
 
 void FCodec::FramePostProcess(std::shared_ptr<AVBuffer> frameBuffer, int32_t status, int ret)
 {
-    size_t index = codecAvailBuffers_.front();
+    uint32_t index = codecAvailBuffers_.front();
     if (status == AVCS_ERR_OK) {
         std::unique_lock<std::mutex> oLock(outputMutex_);
         codecAvailBuffers_.pop_front();
@@ -760,7 +760,7 @@ void FCodec::ReceiveFrame()
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
-    size_t index = codecAvailBuffers_.front();
+    uint32_t index = codecAvailBuffers_.front();
     std::shared_ptr<AVBuffer> frameBuffer = buffers_[INDEX_OUTPUT][index];
     oLock.unlock();
     int ret;
@@ -809,7 +809,7 @@ void FCodec::RenderFrame()
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
-    size_t index = renderBuffers_.front();
+    uint32_t index = renderBuffers_.front();
     std::shared_ptr<AVBuffer> outputBuffer = buffers_[INDEX_OUTPUT][index];
     oLock.unlock();
     std::shared_ptr<SurfaceMemory> surfaceMemory = std::static_pointer_cast<SurfaceMemory>(outputBuffer->memory_);

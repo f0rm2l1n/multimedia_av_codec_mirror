@@ -225,6 +225,9 @@ extern const char *OH_MD_KEY_ROTATION;
 extern const char *OH_MD_KEY_CODEC_CONFIG;
 /* Key for the request a I-Frame immediately. value type is boolean */
 extern const char *OH_MD_KEY_REQUEST_I_FRAME;
+/* Key for the desired encoding quality. value type is uint32_t, this key is only supported for encoders that
+ * are configured in constant quality mode */
+extern const char *OH_MD_KEY_QUALITY;
 
 /* Key for track index, value type is uint32_t */
 extern const char *OH_MD_KEY_TRACK_INDEX;

@@ -50,6 +50,7 @@ const char *OH_MD_KEY_RANGE_FLAG = "range_flag";
 const char *OH_MD_KEY_COLOR_PRIMARIES = "color_primaries";
 const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS = "transfer_characteristics";
 const char *OH_MD_KEY_MAXTRIX_COEFFICIENTS = "matrix_coefficients";
+const char *OH_MD_KEY_QUALITY = "quality";
 
 const char *OH_MD_KEY_TRACK_INDEX = "track_index";
 const char *OH_MD_KEY_TRACK_SAMPLE_COUNT = "track_sample_count";

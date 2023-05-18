@@ -124,9 +124,9 @@ private:
     bool isConverted_ = false;
     // Running
     std::vector<std::shared_ptr<AVBuffer>> buffers_[2];
-    std::list<size_t> codecAvailBuffers_;
-    std::list<size_t> renderBuffers_;
-    std::list<size_t> inBufQue_;
+    std::list<uint32_t> codecAvailBuffers_;
+    std::list<uint32_t> renderBuffers_;
+    std::list<uint32_t> inBufQue_;
     sptr<Surface> surface_ = nullptr;
     std::shared_ptr<TaskThread> sendTask_ = nullptr;
     std::shared_ptr<TaskThread> receiveTask_ = nullptr;
