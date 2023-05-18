@@ -309,7 +309,7 @@ typedef enum OH_AVCProfile {
  * @since 10
  * @version 4.0
  */
-typedef enum OH_HEVCProfile{
+typedef enum OH_HEVCProfile {
     HEVC_PROFILE_MAIN = 0,
     HEVC_PROFILE_MAIN_10 = 1,
     HEVC_PROFILE_MAIN_STILL = 2,
