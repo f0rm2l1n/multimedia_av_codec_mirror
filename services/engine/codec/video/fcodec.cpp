@@ -20,7 +20,7 @@
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
 #include "utils.h"
-#include "codec_utils.h"
+#include "avcodec_codec_name.h"
 #include "fcodec.h"
 
 namespace OHOS {
@@ -28,28 +28,34 @@ namespace Media {
 namespace Codec {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
-const uint32_t INDEX_INPUT = 0;
-const uint32_t INDEX_OUTPUT = 1;
-const int32_t DEFAULT_IN_BUFFER_CNT = 8;
-const int32_t DEFAULT_OUT_BUFFER_CNT = 8;
-const int32_t DEFAULT_MIN_BUFFER_CNT = 1;
-const uint32_t VIDEO_PIX_DEPTH_YUV = 3;
-const uint32_t VIDEO_PIX_DEPTH_RGBA = 4;
-const int32_t VIDEO_ALIGN_SIZE = 16;  // 16字节对齐
-const int32_t VIDEO_MAX_SIZE = 15360; // 16K的宽
-const int32_t DEFAULT_VIDEO_WIDTH = 1920;
-const int32_t DEFAULT_VIDEO_HEIGHT = 1080;
-const uint32_t DEFAULT_TRY_DECODE_TIME = 10;
-const struct {
-    const char *codecName;
-    const char *mimeType;
+constexpr uint32_t INDEX_INPUT = 0;
+constexpr uint32_t INDEX_OUTPUT = 1;
+constexpr int32_t DEFAULT_IN_BUFFER_CNT = 8;
+constexpr int32_t DEFAULT_OUT_BUFFER_CNT = 8;
+constexpr int32_t DEFAULT_MIN_BUFFER_CNT = 1;
+constexpr uint32_t VIDEO_PIX_DEPTH_YUV = 3;
+constexpr uint32_t VIDEO_PIX_DEPTH_RGBA = 4;
+constexpr int32_t VIDEO_ALIGN_SIZE = 16;
+constexpr int32_t VIDEO_MIN_SIZE = 2;
+constexpr int32_t VIDEO_MAX_SIZE = 3840;
+constexpr int32_t DEFAULT_VIDEO_WIDTH = 1920;
+constexpr int32_t DEFAULT_VIDEO_HEIGHT = 1080;
+constexpr uint32_t DEFAULT_TRY_DECODE_TIME = 10;
+constexpr int32_t VIDEO_INSTANCE_SIZE = 16;
+constexpr int32_t VIDEO_BITRATE_MAX_SIZE = 3000000;
+constexpr int32_t VIDEO_FRAMERATE_MAX_SIZE = 30;
+constexpr int32_t VIDEO_BLOCKPERFRAME_SIZE = 32768;
+constexpr int32_t VIDEO_BLOCKPERSEC_SIZE = 244800;
+constexpr struct {
+    const std::string_view codecName;
+    const std::string_view mimeType;
     const char *ffmpegCodec;
     const bool isEncoder;
 } SupportCodec[] = {
-    {"video_decoder.avc", "video/avc", "h264", false},
+    {AVCodecCodecName::VIDEO_DECODER_AVC_NAME_KEY, CodecMimeType::VIDEO_AVC, "h264", false},
 };
-const size_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
-} // namespace
+constexpr size_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
+}
 FCodec::FCodec(const std::string &name)
 {
     AVCODEC_SYNC_TRACE;
@@ -940,6 +946,49 @@ int32_t FCodec::Pause()
 
 int32_t FCodec::Resume()
 {
+    return AVCS_ERR_OK;
+}
+
+int32_t FCodec::GetCodecCapability(std::vector<CapabilityData> &capaArray)
+{
+    for (size_t i = 0; i < numSupportCodec; ++i) {
+        CapabilityData capsData;
+        capsData.codecName = static_cast<std::string>(SupportCodec[i].codecName);
+        capsData.mimeType = static_cast<std::string>(SupportCodec[i].mimeType);
+        capsData.codecType = SupportCodec[i].isEncoder ? AVCODEC_TYPE_VIDEO_ENCODER : AVCODEC_TYPE_VIDEO_DECODER;
+        capsData.isVendor = false;
+        capsData.maxInstance = VIDEO_INSTANCE_SIZE;
+        capsData.alignment.width = 0;
+        capsData.alignment.height = 0;
+        capsData.width.minVal = VIDEO_MIN_SIZE;
+        capsData.width.maxVal = VIDEO_MAX_SIZE;
+        capsData.height.minVal = VIDEO_MIN_SIZE;
+        capsData.height.maxVal = VIDEO_MAX_SIZE;
+        capsData.frameRate.minVal = 1;
+        capsData.frameRate.maxVal = VIDEO_FRAMERATE_MAX_SIZE;
+        if (SupportCodec[i].isEncoder) {
+            capsData.bitrate.minVal = 1;
+            capsData.bitrate.maxVal = VIDEO_BITRATE_MAX_SIZE;
+            capsData.complexity.minVal = 0;
+            capsData.complexity.maxVal = 0;
+            capsData.encodeQuality.minVal = 0;
+            capsData.encodeQuality.maxVal = 0;
+            capsData.blockPerFrame.minVal = 1;
+            capsData.blockPerFrame.maxVal = VIDEO_BLOCKPERFRAME_SIZE;
+            capsData.blockPerSecond.minVal = 1;
+            capsData.blockPerSecond.maxVal = VIDEO_BLOCKPERSEC_SIZE;
+            capsData.blockSize.width = VIDEO_ALIGN_SIZE;
+            capsData.blockSize.height = VIDEO_ALIGN_SIZE;
+        }
+        for (int32_t i = 0; i < static_cast<int32_t>(VideoPixelFormat::BGRA); ++i) {
+            capsData.pixFormat.emplace_back(i);
+        }
+        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_BASELINE));
+        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_MAIN));
+        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_HIGH));
+        capaArray.emplace_back(capsData);
+    }
+    AVCODEC_LOGI("Get %{public}d capability successful", capaArray.size());
     return AVCS_ERR_OK;
 }
 } // namespace Codec

@@ -22,6 +22,7 @@
 #include "audio_ffmpeg_adapter.h"
 #include "fcodec.h"
 #include "codeclist_core.h"
+#include "codeclist_utils.h"
 #include "format.h"
 
 namespace {
@@ -54,20 +55,31 @@ std::shared_ptr<CodecBase> CodecFactory::CreateCodecByMime(bool isEncoder, const
     } else {
         codecname = codecListCore->FindDecoder(format);
     }
+    CHECK_AND_RETURN_RET_LOG(!codecname.empty(), nullptr, "Create codec by mime failed: error mime type");
     std::shared_ptr<CodecBase> codec = CreateCodecByName(codecname);
-    AVCODEC_LOGD("CreateCodecByMime is successful");
+    AVCODEC_LOGI("Create codec by mime is successful");
     return codec;
 }
 
 std::shared_ptr<CodecBase> CodecFactory::CreateCodecByName(const std::string &name)
 {
+    std::shared_ptr<CodecListCore> codecListCore = std::make_shared<CodecListCore>();
+    CodecType codecType = codecListCore->FindCodecType(name);
     std::shared_ptr<CodecBase> codec = nullptr;
-    if (name == VIDEOCODECNAME) {
-        codec = std::make_shared<Codec::FCodec>(name);
-    } else {
-        codec = std::make_shared<AudioFFMpegAdapter>(name);
+    switch (codecType) {
+        case CodecType::AVCODEC_HCODEC:
+            break;
+        case CodecType::AVCODEC_VIDEO_CODEC:
+            codec = std::make_shared<Codec::FCodec>(name);
+            break;
+        case CodecType::AVCODEC_AUDIO_CODEC:
+            codec = std::make_shared<AudioFFMpegAdapter>(name);
+            break;
+        default:
+            AVCODEC_LOGE("Create codec %{public}s failed", name.c_str());
+            return codec;
     }
-    AVCODEC_LOGD("Create %{public}s", name.c_str());
+    AVCODEC_LOGI("Create codec %{public}s successful", name.c_str());
     return codec;
 }
 } // namespace Media

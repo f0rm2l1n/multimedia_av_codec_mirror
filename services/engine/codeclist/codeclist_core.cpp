@@ -179,23 +179,27 @@ std::string CodecListCore::FindCodec(const Format &format, bool isEncoder)
         (void)format.GetIntValue("codec_vendor_flag", isVendor);
     }
     std::vector<CapabilityData> capabilityDataArray = CodecAbilitySingleton::GetInstance().GetCapabilityArray();
-    auto iter = capabilityDataArray.begin();
-    while (iter != capabilityDataArray.end()) {
-        if ((*iter).codecType != codecType || (*iter).mimeType != targetMimeType ||
-            (isVendorKey && (*iter).isVendor != isVendor)) {
-            ++iter;
+    std::unordered_map<std::string, std::vector<size_t>> mimeCapIdxMap =
+        CodecAbilitySingleton::GetInstance().GetMimeCapIdxMap();
+    if (mimeCapIdxMap.find(targetMimeType) == mimeCapIdxMap.end()) {
+        return "";
+    }
+    std::vector<size_t> capsIdx = mimeCapIdxMap.at(targetMimeType);
+    for (auto iter = capsIdx.begin(); iter != capsIdx.end(); iter++) {
+        CapabilityData capsData = capabilityDataArray[*iter];
+        if (capsData.codecType != codecType || capsData.mimeType != targetMimeType ||
+            (isVendorKey && capsData.isVendor != isVendor)) {
             continue;
         }
         if (isVideo) {
-            if (IsVideoCapSupport(format, *iter)) {
-                return (*iter).codecName;
+            if (IsVideoCapSupport(format, capsData)) {
+                return capsData.codecName;
             }
         } else {
-            if (IsAudioCapSupport(format, *iter)) {
-                return (*iter).codecName;
+            if (IsAudioCapSupport(format, capsData)) {
+                return capsData.codecName;
             }
         }
-        ++iter;
     }
     return "";
 }
@@ -208,6 +212,20 @@ std::string CodecListCore::FindEncoder(const Format &format)
 std::string CodecListCore::FindDecoder(const Format &format)
 {
     return FindCodec(format, false);
+}
+
+CodecType CodecListCore::FindCodecType(std::string codecName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (codecName.empty()) {
+        return CodecType::AVCODEC_INVALID;
+    }
+    std::unordered_map<std::string, CodecType> nameCodecTypeMap =
+        CodecAbilitySingleton::GetInstance().GetNameCodecTypeMap();
+    if (nameCodecTypeMap.find(codecName) != nameCodecTypeMap.end()) {
+        return nameCodecTypeMap.at(codecName);
+    }
+    return CodecType::AVCODEC_INVALID;
 }
 
 CapabilityData CodecListCore::CreateCapability(std::string codecName)
