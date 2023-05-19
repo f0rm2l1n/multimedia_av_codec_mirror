@@ -13,27 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef I_SOURCE_SERVICE_H
-#define I_SOURCE_SERVICE_H
-
-#include <string>
-#include <memory>
-#include "format.h"
-
+#ifndef CODECLIST_UTILS_H
+#define CODECLIST_UTILS_H
 namespace OHOS {
 namespace Media {
-class ISourceService {
-public:
-    virtual ~ISourceService() = default;
-
-    // 业务
-    virtual int32_t InitWithURI(const std::string &uri) = 0;
-    virtual int32_t InitWithFD(int32_t fd, int64_t offset, int64_t size) = 0;
-    virtual int32_t GetTrackCount(uint32_t &trackCount) = 0;
-    virtual int32_t GetTrackFormat(Format &format, uint32_t trackIndex) = 0;
-    virtual int32_t GetSourceFormat(Format &format) = 0;
-    virtual int32_t GetSourceAddr(uintptr_t &addr) = 0;
+/**
+ * @brief Codec Type
+ *
+ * @since 3.1
+ * @version 3.1
+ */
+enum class CodecType : int32_t {
+    AVCODEC_INVALID = -1,
+    AVCODEC_HCODEC = 0,
+    AVCODEC_VIDEO_CODEC,
+    AVCODEC_AUDIO_CODEC,
 };
 } // namespace Media
 } // namespace OHOS
-#endif // I_SOURCE_SERVICE_H
+#endif // CODECLIST_UTILS_H

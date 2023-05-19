@@ -82,40 +82,40 @@ AVDemuxerImpl::~AVDemuxerImpl()
     AVCODEC_LOGD("AVDemuxerImpl:0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
-int32_t AVDemuxerImpl::SelectSourceTrackByID(uint32_t trackIndex)
+int32_t AVDemuxerImpl::SelectTrackByID(uint32_t trackIndex)
 {
-    AVCodecTrace trace("AVDemuxer::SelectSourceTrackByID");
+    AVCodecTrace trace("AVDemuxer::SelectTrackByID");
 
-    AVCODEC_LOGI("select source track: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("select track: trackIndex=%{public}d", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-        "demuxer service died when load add sourceTrack!");
-    return demuxerClient_->SelectSourceTrackByID(trackIndex);
+        "demuxer service died when select track by index!");
+    return demuxerClient_->SelectTrackByID(trackIndex);
 }
 
-int32_t AVDemuxerImpl::UnselectSourceTrackByID(uint32_t trackIndex)
+int32_t AVDemuxerImpl::UnselectTrackByID(uint32_t trackIndex)
 {
-    AVCodecTrace trace("AVDemuxer::UnselectSourceTrackByID");
+    AVCodecTrace trace("AVDemuxer::UnselectTrackByID");
 
-    AVCODEC_LOGI("unselect source track: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("unselect track: trackIndex=%{public}d", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-        "demuxer service died when remove sourceTrack!");
-    return demuxerClient_->UnselectSourceTrackByID(trackIndex);
+        "demuxer service died when unselect track by index!");
+    return demuxerClient_->UnselectTrackByID(trackIndex);
 }
 
-int32_t AVDemuxerImpl::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, uint32_t bufferSize,
-                                      AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t AVDemuxerImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCodecTrace trace("AVDemuxer::CopyNextSample");
+    AVCodecTrace trace("AVDemuxer::ReadSample");
 
-    AVCODEC_LOGI("CopyNextSample");
+    AVCODEC_LOGI("ReadSample");
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-        "demuxer service died when copy sample!");
+        "demuxer service died when read sample!");
     
-    CHECK_AND_RETURN_RET_LOG(buffer != nullptr, AVCS_ERR_INVALID_VAL,
-        "Copy sample failed because input buffer is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_INVALID_VAL,
+        "Copy sample failed because sample buffer is nullptr!");
 
     if (trackLogCount < LOOP_LOG_MAX_COUNT) {
         if (trackLogCount==0) {
@@ -124,16 +124,8 @@ int32_t AVDemuxerImpl::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer, uin
         trackLogCount++;
     }
 
-    std::shared_ptr<AVSharedMemoryBase> memory =
-        std::make_shared<AVSharedMemoryBase>(bufferSize, AVSharedMemory::FLAGS_READ_WRITE, "sampleBuffer");
-    int32_t ret = memory->Init();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_NO_MEMORY, "Copy sample failed by demuxerService!");
-
-    ret = demuxerClient_->CopyNextSample(trackIndex, memory, bufferInfo, flag);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "Copy sample failed by demuxerService!");
-    
-    errno_t rc = memcpy_s(buffer, bufferSize, memory->GetBase(), memory->GetSize());
-    CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
+    int32_t ret = demuxerClient_->ReadSample(trackIndex, sample, info, flag);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "Read sample failed by demuxerService!");
 
     if (trackLogCount == LOOP_LOG_MAX_COUNT) {
         AVCodecTrace::TraceEnd(std::string(__FUNCTION__), FAKE_POINTER(this));

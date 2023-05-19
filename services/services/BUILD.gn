@@ -49,7 +49,6 @@ config("av_codec_service_config") {
     "$av_codec_root_dir/services/engine/codec/include/video",
     "$av_codec_root_dir/services/engine/codeclist",
     "$av_codec_root_dir/services/engine/common/include",
-    "$av_codec_root_dir/services/engine/demuxer/include",
     "$av_codec_root_dir/services/engine/factory",
     "$av_codec_root_dir/services/engine/muxer",
     "$av_codec_root_dir/services/engine/plugin/common",
@@ -57,7 +56,6 @@ config("av_codec_service_config") {
     "$av_codec_root_dir/services/engine/plugin/interface",
     "$av_codec_root_dir/services/engine/source",
     "$av_codec_root_dir/services/engine/source/hst_releated",
-    "$av_codec_root_dir/services/engine/source/include",
     "$av_codec_root_dir/services/include",
     "$av_codec_root_dir/services/services/codec/ipc",
     "$av_codec_root_dir/services/services/codec/server",
@@ -160,12 +158,10 @@ ohos_shared_library("av_codec_service") {
   if (multimedia_av_codec_support_demuxer) {
     sources += [
       "$av_codec_root_dir/services/engine/demuxer/demuxer_engine_impl.cpp",
-      "$av_codec_root_dir/services/engine/factory/demuxer_factory.cpp",
       "$av_codec_root_dir/services/engine/plugin/core/demuxer.cpp",
+      "$av_codec_root_dir/services/engine/plugin/core/demuxer_factory.cpp",
       "demuxer/ipc/demuxer_service_stub.cpp",
       "demuxer/server/demuxer_server.cpp",
-
-      # "$av_codec_root_dir/services/engine/plugin/core/plugin_loader.cpp",
     ]
   }
   if (multimedia_av_codec_support_source) {

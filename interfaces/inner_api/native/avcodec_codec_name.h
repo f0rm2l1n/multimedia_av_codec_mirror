@@ -28,6 +28,7 @@ public:
 
     static constexpr std::string_view AUDIO_ENCODER_FLAC_NAME_KEY = "avenc_flac";
     static constexpr std::string_view AUDIO_ENCODER_AAC_NAME_KEY = "avenc_aac";
+    static constexpr std::string_view VIDEO_DECODER_AVC_NAME_KEY = "video_decoder.avc";
 
 private:
     AVCodecCodecName() = delete;

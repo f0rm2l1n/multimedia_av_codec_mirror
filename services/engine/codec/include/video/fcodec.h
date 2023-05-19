@@ -54,6 +54,7 @@ public:
     int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) override;
     int32_t SetOutputSurface(sptr<Surface> surface) override;
     int32_t RenderOutputBuffer(uint32_t index) override;
+    static int32_t GetCodecCapability(std::vector<CapabilityData> &capaArray);
     struct AVBuffer {
     public:
         AVBuffer() = default;

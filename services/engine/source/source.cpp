@@ -20,8 +20,11 @@
 #include <unistd.h>
 #include "avcodec_errors.h"
 #include "avcodec_dfx.h"
+#include "media_description.h"
 #include "avcodec_log.h"
+#include "avcodec_info.h"
 #include "avcodec_common.h"
+#include "media_description.h"
 #include "media_source.h"
 #include "format.h"
 
@@ -41,11 +44,38 @@ namespace {
         return (stat(name, &buffer) == 0);
     }
 
-    static std::map<std::string, std::string> pluginMap = {
+    static std::map<std::string, std::string> g_pluginMap = {
         {"http", "libhistreamer_plugin_HttpSource.z.so"},
         {"https", "libhistreamer_plugin_HttpSource.z.so"},
-        {"fd", "libhistreamer_plugin_FileFdSource.z.so"},
-        {"file", "libhistreamer_plugin_FileSource.z.so"}
+        {"fd", "libhistreamer_plugin_FileFdSource.z.so"}
+    };
+
+    static std::map<AVCodecID, std::string_view> g_codecIdToMime = {
+        {AV_CODEC_ID_MP3, CodecMimeType::AUDIO_MPEG},
+        {AV_CODEC_ID_FLAC, CodecMimeType::AUDIO_FLAC},
+        {AV_CODEC_ID_PCM_S16LE, CodecMimeType::AUDIO_RAW},
+        {AV_CODEC_ID_AAC, CodecMimeType::AUDIO_AAC},
+        {AV_CODEC_ID_VORBIS, CodecMimeType::AUDIO_VORBIS},
+        {AV_CODEC_ID_OPUS, CodecMimeType::AUDIO_OPUS},
+        {AV_CODEC_ID_AMR_NB, CodecMimeType::AUDIO_AMR_NB},
+        {AV_CODEC_ID_AMR_WB, CodecMimeType::AUDIO_AMR_WB},
+        {AV_CODEC_ID_H264, CodecMimeType::VIDEO_AVC},
+        {AV_CODEC_ID_MPEG4, CodecMimeType::VIDEO_MPEG4},
+        {AV_CODEC_ID_MJPEG, CodecMimeType::IMAGE_JPG},
+        {AV_CODEC_ID_PNG, CodecMimeType::IMAGE_PNG},
+        {AV_CODEC_ID_BMP, CodecMimeType::IMAGE_BMP},
+        {AV_CODEC_ID_H263, CodecMimeType::VIDEO_H263},
+        {AV_CODEC_ID_MPEG2TS, CodecMimeType::VIDEO_MPEG2},
+        {AV_CODEC_ID_MPEG2VIDEO, CodecMimeType::VIDEO_MPEG2},
+        {AV_CODEC_ID_HEVC, CodecMimeType::VIDEO_HEVC},
+        {AV_CODEC_ID_VP8, CodecMimeType::VIDEO_VP8},
+        {AV_CODEC_ID_VP9, CodecMimeType::VIDEO_VP9},
+    };
+
+    static std::map<AVMediaType, int32_t> g_convertFfmpegType = {
+        {AVMEDIA_TYPE_VIDEO, MEDIA_TYPE_VID},
+        {AVMEDIA_TYPE_AUDIO, MEDIA_TYPE_AUD},
+        {AVMEDIA_TYPE_SUBTITLE, MEDIA_TYPE_SUBTITLE},
     };
 
     std::map<std::string, std::shared_ptr<AVInputFormat>> g_pluginInputFormat;
@@ -70,9 +100,6 @@ namespace {
         if (pos != std::string::npos) {
             auto prefix = uri.substr(0, pos);
             protocol.append(prefix);
-            ret = AVCS_ERR_OK;
-        } else {
-            protocol.append("file");
             ret = AVCS_ERR_OK;
         }
         
@@ -175,39 +202,6 @@ int32_t Source::GetTrackCount(uint32_t &trackCount)
     return AVCS_ERR_OK;
 }
 
-int32_t Source::SetTrackFormat(const Format &format, uint32_t trackIndex)
-{
-    AVCODEC_LOGI("Source::SetTrackFormat is on call");
-    AVCODEC_LOGI("set track: %{public}d, format: %{public}s", trackIndex, format.Stringify().c_str());
-    if (trackIndex < 0 || trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {
-        AVCODEC_LOGE("trackIndex is invalid!");
-        return AVCS_ERR_INVALID_VAL;
-    }
-    AVStream *stream = formatContext_->streams[trackIndex];
-    CHECK_AND_RETURN_RET_LOG(stream != nullptr, AVCS_ERR_INVALID_OPERATION,
-                             "streams %{public}d is nullptr!", trackIndex);
-    Format::FormatDataMap formatMap = format.GetFormatMap();
-    AVDictionary *streamMetadata = stream->metadata;
-    for (auto iter = formatMap.rbegin(); iter != formatMap.rend(); iter++) {
-        if (iter->first == AVSourceTrackFormat::VIDEO_BIT_STREAM_FORMAT) {
-            if (stream->codecpar->codec_type != AVMEDIA_TYPE_VIDEO) {
-                AVCODEC_LOGE("track is not video, set VIDEO_BIT_STREAM_FORMAT failed!");
-                return AVCS_ERR_INVALID_OPERATION;
-            }
-            int32_t streamFormat = iter->second.val.int32Val;
-            AVCODEC_LOGD("SetTrackFormat format: streamFormat: %{public}d, codec_id: %{public}d",
-                         streamFormat, stream->codecpar->codec_id);
-            if ((streamFormat == VideoBitStreamFormat::AVCC && stream->codecpar->codec_id != AV_CODEC_ID_H264) ||
-                 (streamFormat == VideoBitStreamFormat::HVCC && stream->codecpar->codec_id != AV_CODEC_ID_HEVC)) {
-                return AVCS_ERR_INVALID_OPERATION;
-            };
-            av_dict_set(&streamMetadata, iter->first.c_str(), (std::to_string(streamFormat)).c_str(), 0);
-        }
-    }
-    av_dict_copy(&stream->metadata, streamMetadata, 0);
-    return AVCS_ERR_OK;
-}
-
 void Source::GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format)
 {
     AVDictionaryEntry *valPtr = nullptr;
@@ -216,7 +210,7 @@ void Source::GetStringFormatFromMetadata(std::string key, std::string_view forma
         AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
     } else {
         bool ret = format.PutStringValue(formatName, valPtr->value);
-        if (ret == false) {
+        if (!ret) {
             AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
         }
     }
@@ -241,13 +235,79 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("media_type", AVSourceFormat::SOURCE_TYPE, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
 
-    bool ret = format.PutLongValue(AVSourceFormat::SOURCE_DURATION, formatContext_->duration);
-    if (ret == false) {
+    bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, formatContext_->duration);
+    if (!ret) {
         AVCODEC_LOGW("Put track info failed: miss album_artist info in file");
+    }
+
+    ret = format.PutIntValue(
+        MediaDescriptionKey::MD_KEY_TRACK_COUNT, static_cast<uint32_t>(formatContext_->nb_streams));
+    if (!ret) {
+        AVCODEC_LOGW("Put track info failed: miss track count info in file");
     }
     return AVCS_ERR_OK;
 }
 
+void Source::GetPublicTrackFormat(Format &format, AVStream *avStream)
+{
+    int32_t media_type = -1;
+    if (g_convertFfmpegType.count(avStream->codecpar->codec_type) > 0) {
+        media_type = static_cast<int32_t>(g_convertFfmpegType[avStream->codecpar->codec_type]);
+    }
+    bool ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_TRACK_TYPE, media_type);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss track type info in track %{public}d", avStream->index);
+    }
+    if (g_codecIdToMime.count(avStream->codecpar->codec_id) != 0) {
+        ret = format.PutStringValue(
+            MediaDescriptionKey::MD_KEY_CODEC_MIME, g_codecIdToMime[avStream->codecpar->codec_id]);
+    } else {
+        ret = false;
+    }
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss mime type info in track %{public}d", avStream->index);
+    }
+}
+
+void Source::GetVideoTrackFormat(Format &format, AVStream *avStream)
+{
+    bool ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, avStream->codecpar->width);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss width info in track %{public}d", avStream->index);
+    }
+    ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, avStream->codecpar->height);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss height info in track %{public}d", avStream->index);
+    }
+}
+
+void Source::GetAudioTrackFormat(Format &format, AVStream *avStream)
+{
+    bool ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avStream->codecpar->sample_rate);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss sample rate info in track %{public}d", avStream->index);
+    }
+    ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avStream->codecpar->channels);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss channel count info in track %{public}d", avStream->index);
+    }
+    ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avStream->codecpar->bit_rate);
+    if (!ret) {
+        AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
+    }
+    if (avStream->codecpar->codec_id == AV_CODEC_ID_AAC) {
+        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, 1);
+        if (!ret) {
+            AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
+        }
+    }
+    if (avStream->codecpar->codec_id == AV_CODEC_ID_AAC_LATM) {
+        ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, 0);
+        if (!ret) {
+            AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
+        }
+    }
+}
 
 int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
@@ -258,52 +318,15 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
         AVCODEC_LOGE("trackIndex is invalid!");
         return AVCS_ERR_INVALID_VAL;
     }
-    auto stream = formatContext_->streams[trackIndex];
-    bool ret = format.PutIntValue(AVSourceTrackFormat::TRACK_INDEX, trackIndex);
-    if (ret == false) {
-        AVCODEC_LOGW("Get track info failed:  miss index info in track %{public}d", trackIndex);
-    }
-    ret = format.PutLongValue(AVSourceTrackFormat::TRACK_SAMPLE_COUNT, stream->nb_frames);
-    if (ret == false) {
-        AVCODEC_LOGW("Get track info failed:  miss sample cout info in track %{public}d", trackIndex);
-    }
-    ret = format.PutStringValue(AVSourceTrackFormat::TRACK_TYPE,
-                                av_get_media_type_string(stream->codecpar->codec_type));
-    if (ret == false) {
-        AVCODEC_LOGW("Get track info failed:  miss type info in track %{public}d", trackIndex);
-    }
-    ret = format.PutLongValue(AVSourceTrackFormat::TRACK_DURATION, stream->duration);
-    if (ret == false) {
-        AVCODEC_LOGW("Get track info failed:  miss duration info in track %{public}d", trackIndex);
-    }
-    ret = format.PutIntValue(AVSourceTrackFormat::VIDEO_TRACK_WIDTH, stream->codecpar->width);
-    if (ret == false) {
-        AVCODEC_LOGW("Get track info failed:  miss width info in track %{public}d", trackIndex);
-    }
-    ret = format.PutIntValue(AVSourceTrackFormat::VIDEO_TRACK_HEIGHT, stream->codecpar->height);
-    if (ret == false) {
-        AVCODEC_LOGW("Get track info failed:  miss height info in track %{public}d", trackIndex);
-    }
-    AVDictionaryEntry *pair = av_dict_get(stream->metadata, "rotate", nullptr, 0);
-    if (pair!=nullptr) {
-        ret = format.PutIntValue(AVSourceTrackFormat::VIDEO_TRACK_ROTATION, std::atoi(pair->value));
-        if (ret == false) {
-            AVCODEC_LOGW("Get track info failed:  miss rotate info in track %{public}d", trackIndex);
-        }
-    } else {
-        AVCODEC_LOGW("Get track info failed:  miss rotate info in track %{public}d", trackIndex);
+    auto avStream = formatContext_->streams[trackIndex];
+    GetPublicTrackFormat(format, avStream);
+    if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+        GetVideoTrackFormat(format, avStream);
+    } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+        GetAudioTrackFormat(format, avStream);
     }
     return AVCS_ERR_OK;
 }
-
-
-uintptr_t Source::GetSourceAddr()
-{
-    CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-                             "GetSourceAddr failed, formatContext_ is nullptr!");
-    return (uintptr_t)(formatContext_.get());
-}
-
 
 int32_t Source::Create(std::string& uri)
 {
@@ -375,11 +398,11 @@ int32_t Source::LoadDynamicPlugin(const std::string& path)
         AVCODEC_LOGE("Couldn't find valid protocol for %{public}s", path.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
-    if (pluginMap.count(protocol) == 0) {
+    if (g_pluginMap.count(protocol) == 0) {
         AVCODEC_LOGE("Unsupport protocol: %{public}s", protocol.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
-    std::string libFileName = pluginMap[protocol];
+    std::string libFileName = g_pluginMap[protocol];
     std::string filePluginPath = OH_FILE_PLUGIN_PATH + g_fileSeparator + libFileName;
     std::string pluginName =
         libFileName.substr(g_libFileHead.size(), libFileName.size() - g_libFileHead.size() - g_libFileTail.size());
@@ -605,6 +628,13 @@ int32_t Source::InitAVFormatContext()
         return AVCS_ERR_INVALID_OPERATION;
     }
     return AVCS_ERR_OK;
+}
+
+uintptr_t Source::GetSourceAddr()
+{
+    CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
+                             "GetSourceAddr failed, formatContext_ is nullptr!");
+    return (uintptr_t)(formatContext_.get());
 }
 } // namespace Plugin
 } // namespace Media

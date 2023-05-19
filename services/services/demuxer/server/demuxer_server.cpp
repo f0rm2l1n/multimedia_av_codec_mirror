@@ -51,29 +51,28 @@ int32_t DemuxerServer::Init(uintptr_t sourceAddr)
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServer::SelectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerServer::SelectTrackByID(uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
-    int32_t ret = demuxerEngine_->SelectSourceTrackByID(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
+    int32_t ret = demuxerEngine_->SelectTrackByID(trackIndex);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SelectTrackByID");
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServer::UnselectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerServer::UnselectTrackByID(uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
-    int32_t ret = demuxerEngine_->UnselectSourceTrackByID(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
-    // return index; // only for test
+    int32_t ret = demuxerEngine_->UnselectTrackByID(trackIndex);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call UnselectTrackByID");
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServer::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
-                                      AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t DemuxerServer::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
-    int32_t ret = demuxerEngine_->CopyNextSample(trackIndex, memory, bufferInfo, flag);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
+    int32_t ret = demuxerEngine_->ReadSample(trackIndex, sample, info, flag);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call ReadSample");
     return AVCS_ERR_OK;
 }
 
@@ -81,7 +80,7 @@ int32_t DemuxerServer::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
     int32_t ret = demuxerEngine_->SeekToTime(mSeconds, mode);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SeekToTime");
     return AVCS_ERR_OK;
 }
 }  // namespace Media

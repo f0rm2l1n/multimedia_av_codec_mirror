@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <algorithm>
 #include <string>
 #include <sstream>
@@ -47,7 +46,7 @@ namespace Media {
 namespace Plugin {
 namespace FFmpeg {
 namespace {
-static const std::map<AVSeekMode, int32_t>  seekModeToFFmpegSeekFlags = {
+static const std::map<AVSeekMode, int32_t>  g_seekModeToFFmpegSeekFlags = {
     { AVSeekMode::SEEK_MODE_PREVIOUS_SYNC, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_BACKWARD },
     { AVSeekMode::SEEK_MODE_NEXT_SYNC, AVSEEK_FLAG_FRAME },
     { AVSeekMode::SEEK_MODE_CLOSEST_SYNC, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_ANY }
@@ -73,12 +72,6 @@ Status RegisterDemuxerPlugins(const std::shared_ptr<Register>& reg)
 }
 
 PLUGIN_DEFINITION(FFmpegDemuxer, LicenseType::GPL, RegisterDemuxerPlugins, [] {})
-
-static const std::map<std::string, VideoBitStreamFormat> videoBitStreamFormatStringMap = {
-                                                            {"AVCC", VideoBitStreamFormat::AVCC},
-                                                            {"HVCC", VideoBitStreamFormat::HVCC},
-                                                            {"ANNEXB", VideoBitStreamFormat::ANNEXB},
-};
 }
 
 inline int64_t AvTime2Ms(int64_t hTime)
@@ -157,8 +150,12 @@ FFmpegDemuxerPlugin::FFmpegDemuxerPlugin()
 FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin is on call");
-    formatContext_ = nullptr;
     selectedTrackIds_.clear();
+    for (auto it:sampleCache_) {
+        it.second->Clear();
+        sampleCache_.erase(it.first);
+    }
+    formatContext_ = nullptr;
 }
 
 int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
@@ -166,32 +163,16 @@ int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
     AVCODEC_LOGI("FFmpegDemuxerPlugin::SetBitStreamFormat is on call");
     uint32_t trackCount = formatContext_->nb_streams;
     for (uint32_t i = 0; i < trackCount; i++) {
-        if (formatContext_->streams[i]->codecpar->codec_type== AVMEDIA_TYPE_VIDEO) {
-            AVDictionary *trackMetadata = formatContext_->streams[i]->metadata;
-            std::string key = std::string(AVSourceTrackFormat::VIDEO_BIT_STREAM_FORMAT);
-            auto tag = av_dict_get(trackMetadata, key.c_str(), nullptr, AV_DICT_IGNORE_SUFFIX);
-            if (tag == nullptr) {
-                AVCODEC_LOGW("SetBitStreamFormat failed, Output stream format will not change!");
-            } else if (auto value = videoBitStreamFormatStringMap.at(tag->value)) {
-                videoBitStreamFormat_[i] = value;
-                AVCODEC_LOGD("SetBitStreamFormat successful, track %{public}d, %{public}s", i, tag->value);
-            } else {
-                AVCODEC_LOGW("SetBitStreamFormat failed, %{public}s is not supported, \
-                             Output stream format will not change!", tag->value);
-            }
+        if (formatContext_->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            InitBitStreamContext(*(formatContext_->streams[i]));
         }
     }
-    std::string videoBitStreamFormatString = "";
-    for (auto const& pair: videoBitStreamFormat_) {
-        videoBitStreamFormatString += std::to_string(pair.first) + "=" + std::to_string(pair.second) + " | ";
-    }
-    AVCODEC_LOGD("videoBitStreamFormat: %{public}s", videoBitStreamFormatString.c_str());
     return AVCS_ERR_OK;
 }
 
-int32_t FFmpegDemuxerPlugin::SelectSourceTrackByID(uint32_t trackIndex)
+int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectSourceTrackByID is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID is on call");
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
@@ -208,14 +189,22 @@ int32_t FFmpegDemuxerPlugin::SelectSourceTrackByID(uint32_t trackIndex)
                               [trackIndex](uint32_t selectedId) {return trackIndex == selectedId;});
     if (index == selectedTrackIds_.end()) {
         selectedTrackIds_.push_back(trackIndex);
+
+        if (sampleCache_.count(trackIndex) == 0) {
+            sampleCache_.insert(
+                std::make_pair(
+                    trackIndex, std::make_shared<BlockQueue<std::shared_ptr<SamplePacket>>>(
+                        "track_sample_cache_" + std::to_string(trackIndex))));
+        }
     } else {
         AVCODEC_LOGW("track %{public}d is already in selected list!", trackIndex);
     }
     return AVCS_ERR_OK;
 }
 
-int32_t FFmpegDemuxerPlugin::UnselectSourceTrackByID(uint32_t trackIndex)
+int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
 {
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID is on call");
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
@@ -227,6 +216,11 @@ int32_t FFmpegDemuxerPlugin::UnselectSourceTrackByID(uint32_t trackIndex)
                               [trackIndex](uint32_t selectedId) {return trackIndex == selectedId; });
     if (index != selectedTrackIds_.end()) {
         selectedTrackIds_.erase(index);
+        
+        if (sampleCache_.count(trackIndex) != 0) {
+            sampleCache_[trackIndex]->Clear();
+            sampleCache_.erase(trackIndex);
+        }
     } else {
         AVCODEC_LOGW("Unselect track failed, track %{public}d is not in selected list!", trackIndex);
         return AVCS_ERR_INVALID_VAL;
@@ -289,29 +283,23 @@ void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
     (void)av_bsf_receive_packet(avbsfContext_.get(), &pkt);
 }
 
-int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> memory,
-                                                     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag,
-                                                     AVPacket* pkt)
+int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, std::shared_ptr<SamplePacket> samplePacket)
 {
     int frameSize = 0;
-    bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(pkt->pts, avStream->time_base));
-    flag = ConvertFlagsFromFFmpeg(pkt, avStream);
+    bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt_->pts, avStream->time_base));
+    flag = ConvertFlagsFromFFmpeg(samplePacket->pkt_, avStream);
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-        frameSize = pkt->size;
+        frameSize = samplePacket->pkt_->size;
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
         if (avStream->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
             AVCODEC_LOGE("unsupport raw video");
             return AVCS_ERR_UNSUPPORT_STREAM;
         }
-        if (videoBitStreamFormat_[pkt->stream_index] == VideoBitStreamFormat::ANNEXB) {
-            if (!avbsfContext_) {
-                InitBitStreamContext(*avStream);
-            }
-            if (avbsfContext_) {
-                ConvertAvcOrHevcToAnnexb(*pkt);
-            }
+        if (avbsfContext_) {
+            ConvertAvcOrHevcToAnnexb(*(samplePacket->pkt_));
         }
-        frameSize = pkt->size;
+        frameSize = samplePacket->pkt_->size;
     } else {
         AVCODEC_LOGE("unsupport stream type");
         return AVCS_ERR_UNSUPPORT_VID_PARAMS;
@@ -319,38 +307,70 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
   
     bufferInfo.size = frameSize;
     bufferInfo.offset = 0;
-    (void)memset_s(memory->GetBase(), frameSize, 0, frameSize);
-    (void)memcpy_s(memory->GetBase(), frameSize, pkt->data, frameSize);
+    auto copyFrameSize = frameSize-samplePacket->offset_;
+    auto copySize = copyFrameSize;
+    if (copySize > static_cast<uint64_t>(sample->GetSize())) {
+        copySize = static_cast<uint64_t>(sample->GetSize());
+    }
+    (void)memset_s(sample->GetBase(), copySize, 0, copySize);
+    errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt_->data+samplePacket->offset_, copySize);
+    CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
+
+    AVCODEC_LOGD("Copy from %{public}llu, copy size %{public}llu", samplePacket->offset_, copySize);
+    if (copySize != copyFrameSize) {
+        samplePacket->offset_ += copySize;
+        return AVCS_ERR_NO_MEMORY;
+    }
+    av_packet_free(&(samplePacket->pkt_));
     return AVCS_ERR_OK;
 }
 
-int32_t FFmpegDemuxerPlugin::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
-                                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+                                        AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::CopyNextSample is on call");
-    int ret = -1;
-    AVPacket* pkt = av_packet_alloc();
-    if (selectedTrackIds_.empty()) {
-        AVCODEC_LOGE("not selected any track ,please selected , ffmpeg error: %{public}d", ret);
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample is on call");
+    if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
+        AVCODEC_LOGE("read frame failed, track %{public}d has not been selected", trackIndex);
         return AVCS_ERR_DEMUXER_FAILED;
     }
-    do {
-        ret = av_read_frame(formatContext_.get(), pkt);
-    } while (ret >= 0 && !IsInSelectedTrack(pkt->stream_index));
-    if (ret >= 0) {
-        trackIndex = pkt->stream_index;
-        AVStream* avStream = formatContext_->streams[pkt->stream_index];
-        if (!sampleIndex_.count(pkt->stream_index)) {
-            sampleIndex_[pkt->stream_index]=1;
-        } else {
-            sampleIndex_[pkt->stream_index]++;
+    AVStream* avStream = formatContext_->streams[trackIndex];
+    if (!sampleCache_[trackIndex]->Empty()) {
+        int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, sampleCache_[trackIndex]->Front());
+        if (ret == AVCS_ERR_OK) {
+            sampleCache_[trackIndex]->Pop();
         }
-        ret = ConvertAVPacketToSample(avStream, memory, bufferInfo, flag, pkt);
-    } else {
-        AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ret);
-        ret = AVCS_ERR_DEMUXER_FAILED;
+        return ret;
     }
-    av_packet_free(&pkt);
+    int32_t ffmpegRet;
+    std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
+    do {
+        AVPacket* pkt = av_packet_alloc();
+        ffmpegRet = av_read_frame(formatContext_.get(), pkt);
+        uint32_t stream_index = pkt->stream_index;
+        if (ffmpegRet >= 0 && IsInSelectedTrack(stream_index)) {
+            std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
+            cacheSamplePacket->offset_ = 0;
+            cacheSamplePacket->pkt_ = pkt;
+            if (stream_index == trackIndex) {
+                samplePacket = cacheSamplePacket;
+                break;
+            }
+            if (sampleCache_[trackIndex]->Size() == sampleCache_[trackIndex]->Capacity()) {
+                AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", trackIndex);
+                sampleCache_[trackIndex]->Pop();
+            }
+            sampleCache_[trackIndex]->Push(cacheSamplePacket);
+        }
+    } while (ffmpegRet >= 0);
+    if (ffmpegRet<0) {
+        AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ffmpegRet);
+        av_packet_free(&(samplePacket->pkt_));
+        return AVCS_ERR_DEMUXER_FAILED;
+    }
+    int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, samplePacket);
+    if (ret==AVCS_ERR_NO_MEMORY) {
+        sampleCache_[trackIndex]->Push(samplePacket);
+    }
     return ret;
 }
 
@@ -369,12 +389,11 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
 
 int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
 {
-    if (!seekModeToFFmpegSeekFlags.count(mode)) {
+    if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
         return AVCS_ERR_SEEK_FAILED;
     }
-    int flags = seekModeToFFmpegSeekFlags.at(mode);
-    std::vector<uint32_t> trackVec;
+    int flags = g_seekModeToFFmpegSeekFlags.at(mode);
     if (selectedTrackIds_.empty()) {
         AVCODEC_LOGW("no track has been selected");
     }
@@ -390,7 +409,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
             }
             if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - mSeconds) <= 100
                 && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
-                flags = seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
+                flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
             }
             if (ffTime < 0) {
                 AVCODEC_LOGW("invalid ffmpeg time: %{public}" PRId64 " ms, will be set to 0", ffTime);
@@ -398,7 +417,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
             }
             int keyFrameIdx = av_index_search_timestamp(avStream, ffTime, flags);
             if (keyFrameIdx < 0) {
-                flags = seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
+                flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
                 keyFrameIdx = av_index_search_timestamp(avStream, ffTime, flags);
             }
             if (keyFrameIdx >= 0) {
@@ -406,16 +425,17 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
             }
         }
         int64_t realSeekTime = ConvertTimeFromFFmpeg(ffTime, avStream->time_base);
-        AVCODEC_LOGD("realSeekTime: %{public}" PRId64, realSeekTime);
         AVCODEC_LOGD("seek param: trackIndex=%{public}d, ffTime=%{public}" PRId64 ", \
                      realSeekTime=%{public}" PRId64 ", flags=%{public}d",
                      trackIndex, ffTime, realSeekTime, flags);
-
         auto rtv = av_seek_frame(formatContext_.get(), trackIndex, ffTime, flags);
         if (rtv < 0) {
-            AVCODEC_LOGE("seek failed, return value: %{public}d", rtv);
+            AVCODEC_LOGE("seek failed, return value: ffmpeg error:%{public}d", rtv);
             return AVCS_ERR_SEEK_FAILED;
         }
+    }
+    for (auto it:sampleCache_) {
+        it.second->Clear();
     }
     return AVCS_ERR_OK;
 }

@@ -22,6 +22,7 @@
 #include "avcodec_dfx.h"
 #include "ipc_skeleton.h"
 #include "avcodec_common.h"
+#include "media_description.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "SourceServer"};
@@ -42,25 +43,15 @@ namespace {
         { OHOS::Media::AVSourceFormat::SOURCE_LANGUAGE, "Language" },
         { OHOS::Media::AVSourceFormat::SOURCE_DESCRIPTION, "Description" },
         { OHOS::Media::AVSourceFormat::SOURCE_LYRICS, "Lyrics" },
-        { OHOS::Media::AVSourceFormat::SOURCE_DURATION, "Duration" },
         { OHOS::Media::AVSourceFormat::SOURCE_TYPE, "Type" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_TRACK_DUMP_TABLE = {
-        { OHOS::Media::AVSourceTrackFormat::TRACK_SAMPLE_COUNT, "Sample_Count" },
-        { OHOS::Media::AVSourceTrackFormat::TRACK_DURATION, "Duration" },
-        { OHOS::Media::AVSourceTrackFormat::TRACK_BITRATE, "Bit_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_TRACK_TYPE, "Track_Type" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> VIDEO_TRACK_DUMP_TABLE = {
-        { OHOS::Media::AVSourceTrackFormat::TRACK_SAMPLE_COUNT, "Sample_Count" },
-        { OHOS::Media::AVSourceTrackFormat::TRACK_DURATION, "Duration" },
-        { OHOS::Media::AVSourceTrackFormat::TRACK_BITRATE, "Bit_Rate" },
-        { OHOS::Media::AVSourceTrackFormat::VIDEO_TRACK_ROTATION, "Rotation" },
-        { OHOS::Media::AVSourceTrackFormat::VIDEO_TRACK_WIDTH, "Width" },
-        { OHOS::Media::AVSourceTrackFormat::VIDEO_TRACK_HEIGHT, "Height" },
-        { OHOS::Media::AVSourceTrackFormat::VIDEO_PIXEL_FORMAT, "Pixle_Format" },
-        { OHOS::Media::AVSourceTrackFormat::VIDEO_BIT_STREAM_FORMAT, "Bit_Stream_Format" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_TRACK_TYPE, "Track_Type" },
     };
 }
 
@@ -86,8 +77,19 @@ SourceServer::~SourceServer()
     sourceEngine_ = nullptr;
 }
 
-int32_t SourceServer::Init(const std::string &uri)
+int32_t SourceServer::InitWithURI(const std::string &uri)
 {
+    sourceEngine_ = ISourceEngineFactory::CreateSourceEngine(appUid_, appPid_, uri);
+    uri_ = uri;
+    sourceEngine_->Create();
+    return AVCS_ERR_OK;
+}
+
+int32_t SourceServer::InitWithFD(int32_t fd, int64_t offset, int64_t size)
+{
+    std::string uri = "fd://" + std::to_string(fd) + "?offset=" + \
+        std::to_string(offset) + "&size=" + std::to_string(size);
+
     sourceEngine_ = ISourceEngineFactory::CreateSourceEngine(appUid_, appPid_, uri);
     uri_ = uri;
     sourceEngine_->Create();
@@ -98,15 +100,7 @@ int32_t SourceServer::GetTrackCount(uint32_t &trackCount)
 {
     CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
     int32_t ret = sourceEngine_->GetTrackCount(trackCount);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
-    return AVCS_ERR_OK;
-}
-
-int32_t SourceServer::SetTrackFormat(const Format &format, uint32_t trackIndex)
-{
-    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
-    int32_t ret = sourceEngine_->SetTrackFormat(format, trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call GetTrackCount");
     return AVCS_ERR_OK;
 }
 
@@ -114,7 +108,7 @@ int32_t SourceServer::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
     int32_t ret = sourceEngine_->GetTrackFormat(format, trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call GetTrackFormat");
     return AVCS_ERR_OK;
 }
 
@@ -122,7 +116,7 @@ int32_t SourceServer::GetSourceFormat(Format &format)
 {
     CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
     int32_t ret = sourceEngine_->GetSourceFormat(format);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SetRotation");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call GetSourceFormat");
     return AVCS_ERR_OK;
 }
 
@@ -130,7 +124,7 @@ int32_t SourceServer::GetSourceAddr(uintptr_t &addr)
 {
     CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
     addr = sourceEngine_->GetSourceAddr();
-    CHECK_AND_RETURN_RET_LOG(addr != 0, AVCS_ERR_INVALID_VAL, "Failed to call SetRotation");
+    CHECK_AND_RETURN_RET_LOG(addr != 0, AVCS_ERR_INVALID_VAL, "Failed to call GetSourceAddr");
     return AVCS_ERR_OK;
 }
 
