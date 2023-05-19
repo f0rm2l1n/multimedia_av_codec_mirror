@@ -34,7 +34,6 @@ typedef struct OH_AVDemuxer OH_AVDemuxer;
  * @param source Pointer to an OH_AVSource instance.
  * @return Returns a pointer to an OH_AVDemuxer instance
  * @since 10
- * @version 1.0
 */
 OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source);
 
@@ -45,7 +44,6 @@ OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
 */
 OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
 
@@ -59,7 +57,6 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
 */
 OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);
 
@@ -72,7 +69,6 @@ OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackI
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
 */
 OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);
 
@@ -86,7 +82,6 @@ OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trac
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
 */
 OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
     OH_AVMemory *sample, OH_AVCodecBufferAttr *info);
@@ -101,7 +96,6 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
 */
 OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t mSeconds, OH_AVSeekMode mode);
 

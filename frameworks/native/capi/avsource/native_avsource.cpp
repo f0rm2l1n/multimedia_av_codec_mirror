@@ -87,7 +87,7 @@ OH_AVFormat *OH_AVSource_GetSourceFormat(OH_AVSource *source)
 OH_AVFormat *OH_AVSource_GetTrackFormat(OH_AVSource *source, uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "Set format failed because input source is nullptr!");
-    CHECK_AND_RETURN_RET_LOG(source->magic_ == AVMagic::AVCODEC_MAGIC_AVSOURCETRACK, nullptr, "magic error!");
+    CHECK_AND_RETURN_RET_LOG(source->magic_ == AVMagic::AVCODEC_MAGIC_AVSOURCE, nullptr, "magic error!");
 
     struct AVSourceObject *sourceObj = reinterpret_cast<AVSourceObject *>(source);
     CHECK_AND_RETURN_RET_LOG(sourceObj->source_ != nullptr, nullptr,

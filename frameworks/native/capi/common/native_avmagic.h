@@ -33,7 +33,6 @@ enum class AVMagic {
     AVCODEC_MAGIC_AVMUXER = AV_MAGIC('M', 'U', 'X', 'R'),
     AVCODEC_MAGIC_AVDEMUXER = AV_MAGIC('D', 'M', 'U', 'X'),
     AVCODEC_MAGIC_AVSOURCE = AV_MAGIC('S', 'O', 'U', 'C'),
-    AVCODEC_MAGIC_AVSOURCETRACK = AV_MAGIC('T', 'R', 'A', 'C'),
     AVCODEC_MAGIC_FORMAT = AV_MAGIC('F', 'R', 'M', 'T'),
     AVCODEC_MAGIC_SHARED_MEMORY = AV_MAGIC('S', 'M', 'E', 'M'),
 };
