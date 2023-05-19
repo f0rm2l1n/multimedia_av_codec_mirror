@@ -17,6 +17,7 @@
 #include "i_avcodec_service.h"
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
+#include "avcodec_dfx.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecAudioDecoderImpl"};
@@ -26,6 +27,7 @@ namespace OHOS {
 namespace Media {
 std::shared_ptr<AVCodecAudioDecoder> AudioDecoderFactory::CreateByMime(const std::string &mime)
 {
+    AVCODEC_SYNC_TRACE;
     std::shared_ptr<AVCodecAudioDecoderImpl> impl = std::make_shared<AVCodecAudioDecoderImpl>();
 
     int32_t ret = impl->Init(AVCODEC_TYPE_AUDIO_DECODER, true, mime);
@@ -36,6 +38,7 @@ std::shared_ptr<AVCodecAudioDecoder> AudioDecoderFactory::CreateByMime(const std
 
 std::shared_ptr<AVCodecAudioDecoder> AudioDecoderFactory::CreateByName(const std::string &name)
 {
+    AVCODEC_SYNC_TRACE;
     std::shared_ptr<AVCodecAudioDecoderImpl> impl = std::make_shared<AVCodecAudioDecoderImpl>();
 
     int32_t ret = impl->Init(AVCODEC_TYPE_AUDIO_DECODER, false, name);
@@ -46,6 +49,7 @@ std::shared_ptr<AVCodecAudioDecoder> AudioDecoderFactory::CreateByName(const std
 
 int32_t AVCodecAudioDecoderImpl::Init(AVCodecType type, bool isMimeType, const std::string &name)
 {
+    AVCODEC_SYNC_TRACE;
     codecService_ = AVCodecServiceFactory::GetInstance().CreateCodecService();
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_UNKNOWN, "failed to create codec service");
 
@@ -68,84 +72,98 @@ AVCodecAudioDecoderImpl::~AVCodecAudioDecoderImpl()
 
 int32_t AVCodecAudioDecoderImpl::Configure(const Format &format)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->Configure(format);
 }
 
 int32_t AVCodecAudioDecoderImpl::Prepare()
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return AVCS_ERR_OK;
 }
 
 int32_t AVCodecAudioDecoderImpl::Start()
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->Start();
 }
 
 int32_t AVCodecAudioDecoderImpl::Stop()
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->Stop();
 }
 
 int32_t AVCodecAudioDecoderImpl::Flush()
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->Flush();
 }
 
 int32_t AVCodecAudioDecoderImpl::Reset()
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->Reset();
 }
 
 int32_t AVCodecAudioDecoderImpl::Release()
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->Release();
 }
 
 std::shared_ptr<AVSharedMemory> AVCodecAudioDecoderImpl::GetInputBuffer(uint32_t index)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, nullptr, "service died");
     return codecService_->GetInputBuffer(index);
 }
 
 int32_t AVCodecAudioDecoderImpl::QueueInputBuffer(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->QueueInputBuffer(index, info, flag);
 }
 
 std::shared_ptr<AVSharedMemory> AVCodecAudioDecoderImpl::GetOutputBuffer(uint32_t index)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, nullptr, "service died");
     return codecService_->GetOutputBuffer(index);
 }
 
 int32_t AVCodecAudioDecoderImpl::GetOutputFormat(Format &format)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->GetOutputFormat(format);
 }
 
 int32_t AVCodecAudioDecoderImpl::ReleaseOutputBuffer(uint32_t index)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->ReleaseOutputBuffer(index);
 }
 
 int32_t AVCodecAudioDecoderImpl::SetParameter(const Format &format)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     return codecService_->SetParameter(format);
 }
 
 int32_t AVCodecAudioDecoderImpl::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
 {
+    AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "service died");
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "callback is nullptr");
     return codecService_->SetCallback(callback);
