@@ -342,9 +342,6 @@ int AVMuxerDemoBase::ReadSampleDataInfo(std::shared_ptr<std::ifstream> &curFile,
     }
 
     curFile->read((char *)buffer->GetBase(), dataSize);
-    if (curFile->eof()) {
-        return -1;
-    }
     info.size = dataSize;
     return 0;
 }

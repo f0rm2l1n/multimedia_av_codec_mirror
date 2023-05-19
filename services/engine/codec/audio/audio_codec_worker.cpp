@@ -20,9 +20,9 @@
 #include "utils.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioCodecWorker"};
-    constexpr uint8_t LOGD_FREQUENCY = 5;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioCodecWorker"};
+constexpr uint8_t LOGD_FREQUENCY = 5;
+} // namespace
 
 namespace OHOS {
 namespace Media {
@@ -35,7 +35,8 @@ const std::string_view ASYNC_DECODE_FRAME = "AsyncDecodeFrame";
 
 AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioFFMpegBaseCodec> &codec,
                                    const std::shared_ptr<AVCodecCallback> &callback)
-    : isRunning(true),
+    : isFirFrame_(true),
+      isRunning(true),
       isProduceInput(true),
       codec_(codec),
       inputBufferSize(codec_->getInputBufferSize()),
@@ -262,7 +263,7 @@ void AudioCodecWorker::produceInputBuffer()
     if (isProduceInput) {
         isProduceInput = false;
         uint32_t index;
-        if (inputBuffer_->RequestAvialbaleIndex(&index)) {
+        if (inputBuffer_->RequestAvialbaleIndex(index)) {
             AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "produceInputBuffer request success.");
             auto inputBuffer = GetInputBufferInfo(index);
             callback_->OnInputBufferAvailable(index);
@@ -279,6 +280,17 @@ void AudioCodecWorker::produceInputBuffer()
     AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Worker produceInputBuffer exit");
 }
 
+bool AudioCodecWorker::handInputBuffer(int32_t &ret)
+{
+    uint32_t inputIndex = inBufIndexQue_.front();
+    inBufIndexQue_.pop();
+    auto inputBuffer = GetInputBufferInfo(inputIndex);
+    bool isEos = inputBuffer->CheckIsEos();
+    ret = codec_->processSendData(inputBuffer);
+    inputBuffer_->RelaseBuffer(inputIndex);
+    return isEos;
+}
+
 void AudioCodecWorker::consumerOutputBuffer()
 {
     AVCODEC_SYNC_TRACE;
@@ -289,36 +301,34 @@ void AudioCodecWorker::consumerOutputBuffer()
     }
     while (!inBufIndexQue_.empty() && isRunning) {
         uint32_t index;
-        if (outputBuffer_->RequestAvialbaleIndex(&index)) {
-            uint32_t inputIndex = inBufIndexQue_.front();
-            inBufIndexQue_.pop();
-
-            auto inputBuffer = GetInputBufferInfo(inputIndex);
-
-            int32_t ret = codec_->processSendData(inputBuffer);
-            inputBuffer_->RelaseBuffer(inputIndex);
-
+        if (outputBuffer_->RequestAvialbaleIndex(index)) {
+            int32_t ret;
+            bool isEos = handInputBuffer(ret);
             if (ret == AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA) {
                 AVCODEC_LOGW("current input buffer is not enough,skip this frame.");
                 outputBuffer_->RelaseBuffer(index);
                 continue;
             }
-
             if (ret != AVCodecServiceErrCode::AVCS_ERR_OK && ret != AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM) {
                 AVCODEC_LOGE("process input buffer error!");
                 outputBuffer_->RelaseBuffer(index);
                 callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, ret);
                 return;
             }
-
             auto outBuffer = GetOutputBufferInfo(index);
+            if (isEos) {
+                outBuffer->SetEos(isEos);
+            }
+            if (isFirFrame_) {
+                outBuffer->SetFirstFrame();
+                isFirFrame_ = false;
+            }
             ret = codec_->processRecieveData(outBuffer);
             if (ret == AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA) {
                 AVCODEC_LOGW("current ouput buffer is not enough,skip this frame.");
                 outputBuffer_->RelaseBuffer(index);
                 continue;
             }
-
             if (ret != AVCodecServiceErrCode::AVCS_ERR_OK && ret != AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM) {
                 AVCODEC_LOGE("process output buffer error!");
                 outputBuffer_->RelaseBuffer(index);
@@ -329,7 +339,6 @@ void AudioCodecWorker::consumerOutputBuffer()
             callback_->OnOutputBufferAvailable(index, outBuffer->GetBufferAttr(), outBuffer->GetFlag());
         }
     }
-
     std::unique_lock lock(outputMuxt_);
     outputCondition_.wait_for(lock, std::chrono::milliseconds(timeoutMs),
                               [this] { return (inBufIndexQue_.size() > 0 || !isRunning); });
