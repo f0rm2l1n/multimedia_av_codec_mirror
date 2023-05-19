@@ -95,8 +95,7 @@ OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer *muxer,
     CHECK_AND_RETURN_RET_LOG(muxer != nullptr, AV_ERR_INVALID_VAL, "input muxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(muxer->magic_ == AVMagic::AVCODEC_MAGIC_AVMUXER, AV_ERR_INVALID_VAL, "magic error!");
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, AV_ERR_INVALID_VAL, "Invalid memory");
-    CHECK_AND_RETURN_RET_LOG(info.offset >= 0 && info.pts >= 0 && info.size >= 0,
-        AV_ERR_INVALID_VAL, "Invalid memory");
+    CHECK_AND_RETURN_RET_LOG(info.offset >= 0 && info.size >= 0, AV_ERR_INVALID_VAL, "Invalid memory");
 
     struct AVMuxerObject *object = reinterpret_cast<AVMuxerObject *>(muxer);
     CHECK_AND_RETURN_RET_LOG(object->muxer_ != nullptr, AV_ERR_INVALID_VAL, "muxer_ is nullptr!");

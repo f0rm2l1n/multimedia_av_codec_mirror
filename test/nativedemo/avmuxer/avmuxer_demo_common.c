@@ -16,28 +16,28 @@
 #include "avmuxer_demo_common.h"
 
 const struct AudioTrackParam g_audioMpegPar = {
-    .fileName = "mpeg_44100_2.bin",
+    .fileName = "mpeg_44100_2.dat",
     .mimeType = "audio/mpeg",
     .sampleRate = 44100,
     .channels = 2,
 };
 
 const struct AudioTrackParam g_audioAacPar = {
-    .fileName = "aac_44100_2.bin",
+    .fileName = "aac_44100_2.dat",
     .mimeType = "audio/mp4a-latm",
     .sampleRate = 44100,
     .channels = 2,
 };
 
 const struct VideoTrackParam g_videoH264Par = {
-    .fileName = "h264_640_360.bin",
+    .fileName = "h264_720_480.dat",
     .mimeType = "video/avc",
-    .width = 640,
-    .height = 360,
+    .width = 720,
+    .height = 480,
 };
 
 const struct VideoTrackParam g_videoMpeg4Par = {
-    .fileName = "mpeg4_720_480.bin",
+    .fileName = "mpeg4_720_480.dat",
     .mimeType = "video/mp4v-es",
     .width = 720,
     .height = 480,

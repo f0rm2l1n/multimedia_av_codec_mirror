@@ -69,8 +69,8 @@ protected:
     std::shared_ptr<std::ifstream> videoFile_ {nullptr};
     std::shared_ptr<std::ifstream> coverFile_ {nullptr};
     int32_t outFd_ {-1};
-    uint64_t audioPts_ {0};
-    uint64_t videoPts_ {0};
+    int64_t audioPts_ {0};
+    int64_t videoPts_ {0};
 };
 } // Media
 } // OHOS

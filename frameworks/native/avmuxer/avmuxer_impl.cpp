@@ -96,7 +96,7 @@ int32_t AVMuxerImpl::WriteSample(std::shared_ptr<AVSharedMemory> sample, const T
 {
     AVCodecTrace trace("AVMuxer::WriteSample");
     CHECK_AND_RETURN_RET_LOG(muxerService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "AVMuxer Service does not exist");
-    CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.timeUs >= 0 &&
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.offset >= 0 && info.size >= 0 &&
         sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
     return muxerService_->WriteSample(sample, info);
 }

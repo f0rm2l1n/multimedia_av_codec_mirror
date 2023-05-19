@@ -180,8 +180,8 @@ int32_t MuxerServiceStub::WriteSample(MessageParcel &data, MessageParcel &reply)
     TrackSampleInfo info;
     info.trackIndex = data.ReadUint32();
     info.timeUs = data.ReadInt64();
-    info.size = data.ReadUint32();
-    info.offset = data.ReadUint32();
+    info.size = data.ReadInt32();
+    info.offset = data.ReadInt32();
     info.flags = data.ReadUint32();
     int32_t ret = WriteSample(sample, info);
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply WriteSample failed!");
