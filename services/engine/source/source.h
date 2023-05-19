@@ -53,14 +53,9 @@ public:
 
     int32_t Create(std::string& uri) override;
     int32_t GetTrackCount(uint32_t &trackCount) override;
-    int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) override;
     int32_t GetSourceFormat(Format &format) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     uintptr_t GetSourceAddr() override;
-    std::shared_ptr<SourcePlugin> GetSourcePlugin()
-    {
-        return sourcePlugin_;
-    }
 
 private:
     struct CustomIOContext {
@@ -90,6 +85,10 @@ private:
     void InitAVIOContext(int flags);
     int32_t InitAVFormatContext();
     void GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format);
+
+    void GetPublicTrackFormat(Format &format, AVStream *avStream);
+    void GetVideoTrackFormat(Format &format, AVStream *avStream);
+    void GetAudioTrackFormat(Format &format, AVStream *avStream);
 };
 } // namespace Plugin
 } // namespace Media

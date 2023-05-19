@@ -23,20 +23,20 @@ namespace Plugin {
 Demuxer::Demuxer (uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<DemuxerPlugin> plugin)
     : pkgVersion_(pkgVer), apiVersion_(apiVer), demuxer_(std::move(plugin)) {}
 
-int32_t Demuxer::SelectSourceTrackByID(uint32_t trackIndex)
+int32_t Demuxer::SelectTrackByID(uint32_t trackIndex)
 {
-    return demuxer_->SelectSourceTrackByID(trackIndex);
+    return demuxer_->SelectTrackByID(trackIndex);
 }
 
-int32_t Demuxer::UnselectSourceTrackByID(uint32_t trackIndex)
+int32_t Demuxer::UnselectTrackByID(uint32_t trackIndex)
 {
-    return demuxer_->UnselectSourceTrackByID(trackIndex);
+    return demuxer_->UnselectTrackByID(trackIndex);
 }
 
-int32_t Demuxer::CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
-                                AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t Demuxer::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    return demuxer_->CopyNextSample(trackIndex, memory, bufferInfo, flag);
+    return demuxer_->ReadSample(trackIndex, sample, info, flag);
 }
 
 int32_t Demuxer::SeekToTime(int64_t mSeconds, AVSeekMode mode)

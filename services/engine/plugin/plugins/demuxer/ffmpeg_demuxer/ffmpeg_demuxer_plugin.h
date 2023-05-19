@@ -36,6 +36,7 @@ extern "C" {
 #include "demuxer_plugin.h"
 #include "avcodec_common.h"
 #include "avsharedmemory.h"
+#include "block_queue.h"
 
 namespace OHOS {
 namespace Media {
@@ -46,27 +47,32 @@ public:
     FFmpegDemuxerPlugin();
     ~FFmpegDemuxerPlugin();
     int32_t Create(uintptr_t sourceAddr) override;
-    int32_t CopyNextSample(uint32_t &trackIndex, std::shared_ptr<AVSharedMemory> memory,
-                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) override;
-    int32_t SelectSourceTrackByID(uint32_t trackIndex) override;
-    int32_t UnselectSourceTrackByID(uint32_t trackIndex) override;
+    int32_t SelectTrackByID(uint32_t trackIndex) override;
+    int32_t UnselectTrackByID(uint32_t trackIndex) override;
+    int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) override;
     std::vector<uint32_t> GetSelectedTrackIds();
 private:
+    struct SamplePacket {
+        uint64_t offset_;
+        AVPacket* pkt_;
+    };
+
     bool IsInSelectedTrack(uint32_t trackIndex);
     AVCodecBufferFlag ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream);
     int64_t GetTotalStreamFrames(int streamIndex);
     int32_t SetBitStreamFormat();
-    int32_t ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> memory,
-        AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, AVPacket* pkt);
+    int32_t ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, std::shared_ptr<SamplePacket> samplePacket);
     void ConvertAvcOrHevcToAnnexb(AVPacket& pkt);
     void InitBitStreamContext(const AVStream& avStream);
     int64_t CalculateTimeByFrameIndex(AVStream* avStream, int keyFrameIdx);
     std::vector<uint32_t> selectedTrackIds_;
     std::shared_ptr<AVFormatContext> formatContext_;
     std::shared_ptr<AVBSFContext> avbsfContext_ {nullptr};
-    std::map<uint32_t, VideoBitStreamFormat> videoBitStreamFormat_;
     std::map<uint32_t, uint64_t> sampleIndex_;
+    std::map<uint32_t, std::shared_ptr<BlockQueue<std::shared_ptr<SamplePacket>>>> sampleCache_;
 };
 } // namespace FFmpeg
 } // namespace Plugin
