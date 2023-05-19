@@ -63,8 +63,10 @@ private:
     void consumerOutputBuffer();
     void dispose();
     bool begin();
+    bool handInputBuffer(int32_t &ret);
 
 private:
+    bool isFirFrame_;
     std::atomic<bool> isRunning;
     std::atomic<bool> isProduceInput;
     std::shared_ptr<AudioFFMpegBaseCodec> codec_;
