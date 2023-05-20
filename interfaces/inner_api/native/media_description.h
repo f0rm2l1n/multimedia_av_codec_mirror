@@ -123,6 +123,42 @@ public:
     static constexpr std::string_view MD_KEY_REQUEST_I_FRAME = "req_i_frame";
 
     /**
+     * Key for video YUV value range flag, value type is bool
+     */
+    static constexpr std::string_view MD_KEY_RANGE_FLAG = "range_flag";
+
+    /**
+     * Key for video color primaries, value type is int32_t, see {link @ColorPrimary}
+     */
+    static constexpr std::string_view MD_KEY_COLOR_PRIMARIES = "color_primaries";
+
+    /**
+     * Key for video transfer characteristics, value type is int32_t, see {link @TransferCharacteristic}
+     */
+    static constexpr std::string_view MD_KEY_TRANSFER_CHARACTERISTICS = "transfer_characteristics";
+
+    /**
+     * Key for video maxtrix coefficients, value type is int32_t, see {link @MaxtrixCoefficient}
+     */
+    static constexpr std::string_view MD_KEY_MAXTRIX_COEFFICIENTS = "matrix_coefficients";
+
+    /**
+     * Key for video encode bitrate mode, the value type is int32_t, see {link @VideoEncodeBitrateMode}
+     */
+    static constexpr std::string_view MD_KEY_VIDEO_ENCODE_BITRATE_MODE = "video_encode_bitrate_mode";
+
+    /**
+     * Key for encode profile, the value type is int32_t
+     */
+    static constexpr std::string_view MD_KEY_PROFILE = "codec_profile";
+
+    /**
+     * key for the desired encoding quality, the value type is uint32_t, this key is only supported for encoders that
+     * are configured in constant quality mode
+     */
+    static constexpr std::string_view MD_KEY_QUALITY = "quality";
+
+    /**
      * Key for audio channel count, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_CHANNEL_COUNT = "channel_count";
@@ -149,7 +185,7 @@ public:
 
     /**
      * Key for codec specific data buffer, vlaue type is uint8_t*
-    */
+     */
     static constexpr std::string_view MD_KEY_CODEC_CONFIG = "codec_config";
 
     /**
@@ -181,7 +217,7 @@ public:
      * Key for aac sbr, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_SBR = "sbr";
-    
+
     /**
      * Key for compliance level, value type is int32_t
      */
@@ -190,6 +226,75 @@ public:
 private:
     MediaDescriptionKey() = delete;
     ~MediaDescriptionKey() = delete;
+};
+
+/**
+ * @brief
+ *
+ * @since 4.0
+ * @version 4.0
+ */
+enum ColorPrimary : int32_t {
+    COLOR_PRIMARY_BT709 = 1,
+    COLOR_PRIMARY_UNSPECIFIED = 2,
+    COLOR_PRIMARY_BT470_M = 4,
+    COLOR_PRIMARY_BT601_625 = 5,
+    COLOR_PRIMARY_BT601_525 = 6,
+    COLOR_PRIMARY_SMPTE_ST240 = 7,
+    COLOR_PRIMARY_GENERIC_FILM = 8,
+    COLOR_PRIMARY_BT2020 = 9,
+    COLOR_PRIMARY_SMPTE_ST428 = 10,
+    COLOR_PRIMARY_P3DCI = 11,
+    COLOR_PRIMARY_P3D65 = 12,
+};
+
+/**
+ * @brief
+ *
+ * @since 4.0
+ * @version 4.0
+ */
+enum TransferCharacteristic : int32_t {
+    TRANSFER_CHARACTERISTIC_BT709 = 1,
+    TRANSFER_CHARACTERISTIC_UNSPECIFIED = 2,
+    TRANSFER_CHARACTERISTIC_GAMMA_2_2 = 4,
+    TRANSFER_CHARACTERISTIC_GAMMA_2_8 = 5,
+    TRANSFER_CHARACTERISTIC_BT601 = 6,
+    TRANSFER_CHARACTERISTIC_SMPTE_ST240 = 7,
+    TRANSFER_CHARACTERISTIC_LINEAR = 8,
+    TRANSFER_CHARACTERISTIC_LOG = 9,
+    TRANSFER_CHARACTERISTIC_LOG_SQRT = 10,
+    TRANSFER_CHARACTERISTIC_IEC_61966_2_4 = 11,
+    TRANSFER_CHARACTERISTIC_BT1361 = 12,
+    TRANSFER_CHARACTERISTIC_IEC_61966_2_1 = 13,
+    TRANSFER_CHARACTERISTIC_BT2020_10BIT = 14,
+    TRANSFER_CHARACTERISTIC_BT2020_12BIT = 15,
+    TRANSFER_CHARACTERISTIC_PQ = 16,
+    TRANSFER_CHARACTERISTIC_SMPTE_ST428 = 17,
+    TRANSFER_CHARACTERISTIC_HLG = 18,
+};
+
+/**
+ * @brief
+ *
+ * @since 4.0
+ * @version 4.0
+ */
+enum MaxtrixCoefficient : int32_t {
+    MATRIX_COFFICIENT_IDENTITY = 0,
+    MATRIX_COFFICIENT_BT709 = 1,
+    MATRIX_COFFICIENT_UNSPECIFIED = 2,
+    MATRIX_COFFICIENT_FCC = 4,
+    MATRIX_COFFICIENT_BT601_625 = 5,
+    MATRIX_COFFICIENT_BT601_525 = 6,
+    MATRIX_COFFICIENT_SMPTE_ST240 = 7,
+    MATRIX_COFFICIENT_YCGCO = 8,
+    MATRIX_COFFICIENT_BT2020_NCL = 9,
+    MATRIX_COFFICIENT_BT2020_CL = 10,
+    MATRIX_COFFICIENT_SMPTE_ST2085 = 11,
+    MATRIX_COFFICIENT_CHROMATICITY_NCL = 12,
+    MATRIX_COFFICIENT_CHROMATICITY_CL = 13,
+    MATRIX_COFFICIENT_ICTCP = 14,
 };
 } // namespace Media
 } // namespace OHOS

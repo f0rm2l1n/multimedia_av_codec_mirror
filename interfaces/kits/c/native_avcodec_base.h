@@ -197,6 +197,14 @@ extern const char *OH_MD_KEY_WIDTH;
 extern const char *OH_MD_KEY_HEIGHT;
 /* Key for video pixel format, value type is int32_t, see @OH_AVPixelFormat */
 extern const char *OH_MD_KEY_PIXEL_FORMAT;
+/* Key for video YUV value range flag, value type is bool */
+extern const char *OH_MD_KEY_RANGE_FLAG;
+/* Key for video color primaries, value type is int32_t */
+extern const char *OH_MD_KEY_COLOR_PRIMARIES;
+/* Key for video transfer characteristics, value type is int32_t  */
+extern const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS;
+/* Key for video maxtrix coefficients, value type is int32_t */
+extern const char *OH_MD_KEY_MAXTRIX_COEFFICIENTS;
 /* key for audio raw format, value type is uint32_t , see @AudioSampleFormat */
 extern const char *OH_MD_KEY_AUDIO_SAMPLE_FORMAT;
 /* Key for video frame rate, value type is double. */
@@ -215,6 +223,11 @@ extern const char *OH_MD_KEY_I_FRAME_INTERVAL;
 extern const char *OH_MD_KEY_ROTATION;
 /* Key of the codec specific data. value type is uint8_t*. */
 extern const char *OH_MD_KEY_CODEC_CONFIG;
+/* Key for the request a I-Frame immediately. value type is boolean */
+extern const char *OH_MD_KEY_REQUEST_I_FRAME;
+/* Key for the desired encoding quality. value type is uint32_t, this key is only supported for encoders that
+ * are configured in constant quality mode */
+extern const char *OH_MD_KEY_QUALITY;
 
 /* source format Key for title, value type is string */
 extern const char *OH_MD_KEY_TITLE;
@@ -269,6 +282,20 @@ typedef enum OH_AVCProfile {
 } OH_AVCProfile;
 
 /**
+ * @brief HEVC Profile
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ * @version 4.0
+ */
+typedef enum OH_HEVCProfile {
+    HEVC_PROFILE_MAIN = 0,
+    HEVC_PROFILE_MAIN_10 = 1,
+    HEVC_PROFILE_MAIN_STILL = 2,
+    HEVC_PROFILE_MAIN_10_HDR10 = 3,
+    HEVC_PROFILE_MAIN_10_HDR10_PLUS = 4,
+} OH_HEVCProfile;
+
+/**
  * @brief AAC Profile
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 9
@@ -293,6 +320,74 @@ typedef enum OH_AVSeekMode {
     SEEK_MODE_CLOSEST_SYNC,
 } OH_AVSeekMode;
 
+/**
+ * @brief Color Primary
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ * @version 4.0
+ */
+typedef enum OH_ColorPrimary {
+    COLOR_PRIMARY_BT709 = 1,
+    COLOR_PRIMARY_UNSPECIFIED = 2,
+    COLOR_PRIMARY_BT470_M = 4,
+    COLOR_PRIMARY_BT601_625 = 5,
+    COLOR_PRIMARY_BT601_525 = 6,
+    COLOR_PRIMARY_SMPTE_ST240 = 7,
+    COLOR_PRIMARY_GENERIC_FILM = 8,
+    COLOR_PRIMARY_BT2020 = 9,
+    COLOR_PRIMARY_SMPTE_ST428 = 10,
+    COLOR_PRIMARY_P3DCI = 11,
+    COLOR_PRIMARY_P3D65 = 12,
+} OH_ColorPrimary;
+
+/**
+ * @brief Transfer Characteristic
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ * @version 4.0
+ */
+typedef enum OH_TransferCharacteristic {
+    TRANSFER_CHARACTERISTIC_BT709 = 1,
+    TRANSFER_CHARACTERISTIC_UNSPECIFIED = 2,
+    TRANSFER_CHARACTERISTIC_GAMMA_2_2 = 4,
+    TRANSFER_CHARACTERISTIC_GAMMA_2_8 = 5,
+    TRANSFER_CHARACTERISTIC_BT601 = 6,
+    TRANSFER_CHARACTERISTIC_SMPTE_ST240 = 7,
+    TRANSFER_CHARACTERISTIC_LINEAR = 8,
+    TRANSFER_CHARACTERISTIC_LOG = 9,
+    TRANSFER_CHARACTERISTIC_LOG_SQRT = 10,
+    TRANSFER_CHARACTERISTIC_IEC_61966_2_4 = 11,
+    TRANSFER_CHARACTERISTIC_BT1361 = 12,
+    TRANSFER_CHARACTERISTIC_IEC_61966_2_1 = 13,
+    TRANSFER_CHARACTERISTIC_BT2020_10BIT = 14,
+    TRANSFER_CHARACTERISTIC_BT2020_12BIT = 15,
+    TRANSFER_CHARACTERISTIC_PQ = 16,
+    TRANSFER_CHARACTERISTIC_SMPTE_ST428 = 17,
+    TRANSFER_CHARACTERISTIC_HLG = 18,
+} OH_TransferCharacteristic;
+
+/**
+ * @brief Maxtrix Coefficient
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ * @version 4.0
+ */
+typedef enum OH_MaxtrixCoefficient {
+    MATRIX_COFFICIENT_IDENTITY = 0,
+    MATRIX_COFFICIENT_BT709 = 1,
+    MATRIX_COFFICIENT_UNSPECIFIED = 2,
+    MATRIX_COFFICIENT_FCC = 4,
+    MATRIX_COFFICIENT_BT601_625 = 5,
+    MATRIX_COFFICIENT_BT601_525 = 6,
+    MATRIX_COFFICIENT_SMPTE_ST240 = 7,
+    MATRIX_COFFICIENT_YCGCO = 8,
+    MATRIX_COFFICIENT_BT2020_NCL = 9,
+    MATRIX_COFFICIENT_BT2020_CL = 10,
+    MATRIX_COFFICIENT_SMPTE_ST2085 = 11,
+    MATRIX_COFFICIENT_CHROMATICITY_NCL = 12,
+    MATRIX_COFFICIENT_CHROMATICITY_CL = 13,
+    MATRIX_COFFICIENT_ICTCP = 14,
+} OH_MaxtrixCoefficient;
 #ifdef __cplusplus
 }
 #endif

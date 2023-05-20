@@ -562,7 +562,7 @@ int32_t FCodec::ReleaseBuffers(bool isFlush)
     return AVCS_ERR_OK;
 }
 
-std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(size_t index)
+std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), nullptr, "Get input buffer failed: not in Running or Flushed state");
@@ -575,7 +575,7 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(size_t index)
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
 }
 
-std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(size_t index)
+std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), nullptr,
@@ -591,7 +591,7 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(size_t index)
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
 }
 
-int32_t FCodec::QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
+int32_t FCodec::QueueInputBuffer(uint32_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag flag)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), AVCS_ERR_INVALID_STATE,
@@ -624,7 +624,7 @@ void FCodec::SendFrame()
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
-    size_t index = inBufQue_.front();
+    uint32_t index = inBufQue_.front();
     std::shared_ptr<AVBuffer> &inputBuffer = buffers_[INDEX_INPUT][index];
     iLock.unlock();
     if (inputBuffer->bufferFlag_ != AVCODEC_BUFFER_FLAG_EOS && inputBuffer->bufferInfo_.size != 0) {
@@ -723,7 +723,7 @@ int32_t FCodec::FillFrameBuffer(const std::shared_ptr<AVBuffer> &frameBuffer)
 
 void FCodec::FramePostProcess(std::shared_ptr<AVBuffer> frameBuffer, int32_t status, int ret)
 {
-    size_t index = codecAvailBuffers_.front();
+    uint32_t index = codecAvailBuffers_.front();
     if (status == AVCS_ERR_OK) {
         std::unique_lock<std::mutex> oLock(outputMutex_);
         codecAvailBuffers_.pop_front();
@@ -766,7 +766,7 @@ void FCodec::ReceiveFrame()
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
-    size_t index = codecAvailBuffers_.front();
+    uint32_t index = codecAvailBuffers_.front();
     std::shared_ptr<AVBuffer> frameBuffer = buffers_[INDEX_OUTPUT][index];
     oLock.unlock();
     int ret;
@@ -815,7 +815,7 @@ void FCodec::RenderFrame()
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
-    size_t index = renderBuffers_.front();
+    uint32_t index = renderBuffers_.front();
     std::shared_ptr<AVBuffer> outputBuffer = buffers_[INDEX_OUTPUT][index];
     oLock.unlock();
     std::shared_ptr<SurfaceMemory> surfaceMemory = std::static_pointer_cast<SurfaceMemory>(outputBuffer->memory_);
@@ -836,7 +836,7 @@ void FCodec::RenderFrame()
     }
 }
 
-int32_t FCodec::ReleaseOutputBuffer(size_t index)
+int32_t FCodec::ReleaseOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
@@ -882,7 +882,7 @@ int32_t FCodec::UpdateSurfaceMemory(std::shared_ptr<SurfaceMemory> &surfaceMemor
     return AVCS_ERR_OK;
 }
 
-int32_t FCodec::RenderOutputBuffer(size_t index)
+int32_t FCodec::RenderOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() && state_ != State::EOS || surface_ != nullptr), AVCS_ERR_INVALID_STATE,
@@ -936,16 +936,6 @@ int32_t FCodec::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
                              "Set callback failed: not in Running/Flushed state");
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "Set callback failed: callback is NULL");
     callback_ = callback;
-    return AVCS_ERR_OK;
-}
-
-int32_t FCodec::Pause()
-{
-    return AVCS_ERR_OK;
-}
-
-int32_t FCodec::Resume()
-{
     return AVCS_ERR_OK;
 }
 
