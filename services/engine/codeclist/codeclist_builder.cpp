@@ -15,8 +15,8 @@
 
 #include "avcodec_log.h"
 #include "fcodec.h"
-#include "codeclist_builder.h"
 #include "audio_codeclist_info.h"
+#include "codeclist_builder.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecList_builder"};
