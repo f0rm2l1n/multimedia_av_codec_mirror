@@ -47,16 +47,14 @@ public:
     int32_t Release() override;
     int32_t SetParameter(const Format &format) override;
     int32_t GetOutputFormat(Format &format) override;
-    std::shared_ptr<AVSharedMemoryBase> GetInputBuffer(size_t index) override;
-    int32_t QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
-    std::shared_ptr<AVSharedMemoryBase> GetOutputBuffer(size_t index) override;
-    int32_t ReleaseOutputBuffer(size_t index) override;
+    std::shared_ptr<AVSharedMemoryBase> GetInputBuffer(uint32_t index) override;
+    int32_t QueueInputBuffer(uint32_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag flag) override;
+    std::shared_ptr<AVSharedMemoryBase> GetOutputBuffer(uint32_t index) override;
+    int32_t ReleaseOutputBuffer(uint32_t index) override;
     int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) override;
     int32_t SetOutputSurface(sptr<Surface> surface) override;
-    int32_t RenderOutputBuffer(size_t index) override;
+    int32_t RenderOutputBuffer(uint32_t index) override;
     static int32_t GetCodecCapability(std::vector<CapabilityData> &capaArray);
-    int32_t Pause() override;
-    int32_t Resume() override;
     struct AVBuffer {
     public:
         AVBuffer() = default;
@@ -127,9 +125,9 @@ private:
     bool isConverted_ = false;
     // Running
     std::vector<std::shared_ptr<AVBuffer>> buffers_[2];
-    std::list<size_t> codecAvailBuffers_;
-    std::list<size_t> renderBuffers_;
-    std::list<size_t> inBufQue_;
+    std::list<uint32_t> codecAvailBuffers_;
+    std::list<uint32_t> renderBuffers_;
+    std::list<uint32_t> inBufQue_;
     sptr<Surface> surface_ = nullptr;
     std::shared_ptr<TaskThread> sendTask_ = nullptr;
     std::shared_ptr<TaskThread> receiveTask_ = nullptr;

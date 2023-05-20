@@ -45,6 +45,12 @@ const char *OH_MD_KEY_AUD_SAMPLE_RATE = "sample_rate";
 const char *OH_MD_KEY_I_FRAME_INTERVAL = "i_frame_interval";
 const char *OH_MD_KEY_ROTATION = "rotation_angle";
 const char *OH_MD_KEY_CODEC_CONFIG = "codec_config";
+const char *OH_MD_KEY_REQUEST_I_FRAME = "req_i_frame";
+const char *OH_MD_KEY_RANGE_FLAG = "range_flag";
+const char *OH_MD_KEY_COLOR_PRIMARIES = "color_primaries";
+const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS = "transfer_characteristics";
+const char *OH_MD_KEY_MAXTRIX_COEFFICIENTS = "matrix_coefficients";
+const char *OH_MD_KEY_QUALITY = "quality";
 
 
 const char *OH_MD_KEY_TITLE = "title";
