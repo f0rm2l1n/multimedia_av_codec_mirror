@@ -16,6 +16,7 @@
 #include "avcodec_log.h"
 #include "fcodec.h"
 #include "codeclist_builder.h"
+#include "audio_codeclist_info.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecList_builder"};
@@ -33,8 +34,11 @@ int32_t VideoCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
 
 int32_t AudioCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
 {
-    (void)caps;
-    return 0;
+    auto audioCapacities = AudioCodeclistInfo::GetInstance().GetAudioCapacities();
+    for (const auto &v : audioCapacities) {
+        caps.emplace_back(v);
+    }
+    return AVCS_ERR_OK;
 }
 } // namespace Media
 } // namespace OHOS
