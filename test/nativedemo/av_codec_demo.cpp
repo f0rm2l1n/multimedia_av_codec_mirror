@@ -40,30 +40,23 @@ static int RunAudioDecoder()
     cout << "2: MP3" << endl;
     cout << "3: VORBIS" << endl;
     string mode;
+    AudioFormatType audioFormatType = TYPE_AAC;
     (void)getline(cin, mode);
     if (mode == "" || mode == "0") {
-        auto audioDec = std::make_unique<ADecDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioFormatType = TYPE_AAC;
     } else if (mode == "1") {
-        auto audioDec = std::make_unique<ADecDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioFormatType = TYPE_FLAC;
     } else if (mode == "2") {
-        auto audioDec = std::make_unique<ADecDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioFormatType = TYPE_MP3;
     } else if (mode == "3") {
-        auto audioDec = std::make_unique<ADecDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioFormatType = TYPE_VORBIS;
     }  else {
         cout << "no that selection" << endl;
         return 0;
+    }
+    auto audioDec = std::make_unique<ADecDemo>();
+    if (audioDec) {
+        audioDec->RunCase(audioFormatType);
     }
     cout << "demo audio decoder end" << endl;
     return 0;
