@@ -14,7 +14,6 @@
  */
 
 #include <vector>
-#include <queue>
 #include <mutex>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -26,11 +25,9 @@
 #include <thread>
 #include "avcodec_codec_name.h"
 #include "avcodec_common.h"
-#include "avcodec_errors.h"
 #include "media_description.h"
 #include "native_avcodec_base.h"
 #include "native_avformat.h"
-#include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "native_avcodec_audioencoder.h"
 #include "securec.h"
@@ -102,7 +99,6 @@ static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemor
 {
     (void)codec;
     AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
-    cout << "OnInputBufferAvailable received, index:" << index << endl;
     unique_lock<mutex> lock(signal_->inMutex_);
     signal_->inQueue_.push(index);
     signal_->inBufferQueue_.push(data);
@@ -114,13 +110,10 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
 {
     (void)codec;
     AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
-    cout << "OnOutputBufferAvailable received, index:" << index << endl;
     unique_lock<mutex> lock(signal_->outMutex_);
     signal_->outQueue_.push(index);
     signal_->outBufferQueue_.push(data);
     if (attr) {
-        cout << "OnOutputBufferAvailable received, index:" << index << ", attr->size:" << attr->size
-             << ", attr->flags:" << attr->flags << endl;
         signal_->attrQueue_.push(*attr);
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
@@ -237,9 +230,7 @@ void AudioCodeCapiEncoderUnitTest::OutputFunc()
         }
 
         unique_lock<mutex> lock(signal_->outMutex_);
-        cout << "lock, before" << endl;
         signal_->outCond_.wait(lock, [this]() { return (signal_->outQueue_.size() > 0 || !isRunning_.load()); });
-        cout << "lock, after" << endl;
 
         if (!isRunning_.load()) {
             cout << "wait to stop, exit" << endl;
@@ -251,10 +242,8 @@ void AudioCodeCapiEncoderUnitTest::OutputFunc()
         OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
         OH_AVMemory *data = signal_->outBufferQueue_.front();
         if (data != nullptr) {
-            cout << "OutputFunc write file,buffer index" << index << ", data size = :" << attr.size << endl;
             outputFile.write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
         }
-        cout << "attr.flags: " << attr.flags << endl;
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS || attr.size == 0) {
             cout << "encode eos" << endl;
             isRunning_.store(false);
@@ -314,7 +303,7 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_SetParameter_01, TestSize.Le
     EXPECT_NE(nullptr, outputLoop_);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Start(audioEnc_));
-        while (isRunning_.load()) {
+    while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
 
