@@ -26,7 +26,7 @@ public:
     std::vector<CapabilityData> GetAudioCapacities() const noexcept;
 
 private:
-    std::vector<CapabilityData> audioCapcities_;
+    std::vector<CapabilityData> audioCapbilities_;
     AudioCodeclistInfo();
 };
 } // namespace Media
