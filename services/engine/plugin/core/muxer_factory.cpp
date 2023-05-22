@@ -134,7 +134,7 @@ Status MuxerFactory::RegisterImpl::AddPlugin(const PluginDefBase& def)
     regInfo->packageDef = packageDef;
     regInfo->pluginDef = std::make_shared<MuxerPluginDef>(pluginDef);
     regInfo->loader = std::move(pluginLoader);
-    
+
     registerData->registerTable[pluginDef.name] = regInfo;
     registerData->registerNames.push_back(pluginDef.name);
     return Status::NO_ERROR;

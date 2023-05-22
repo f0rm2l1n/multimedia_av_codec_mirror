@@ -71,6 +71,7 @@ enum VideoPixelFormat {
      */
     RGBA = 5,
     BGRA = 6,
+    UNKNOWN_FORMAT = 7,
 };
 
 /**
@@ -179,7 +180,11 @@ struct TrackSampleInfo {
     /**
      * @brief the size in bytes.
      */
-    uint32_t size;
+    int32_t size;
+    /**
+     * @brief the starting offset of valid data in bytes
+     */
+    int32_t offset;
     /**
      * @brief the flags associated with the sample, this
      * maybe be a combination of multiple {@link AVCodecBufferFlag}.

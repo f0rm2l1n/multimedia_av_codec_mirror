@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
+#include "codec_utils.h"
 #include "avcodec_log.h"
 #include "media_description.h"
-#include "codec_utils.h"
-
 namespace OHOS {
 namespace Media {
 namespace Codec {
@@ -31,21 +30,21 @@ std::map<VideoPixelFormat, AVPixelFormat> g_pixelFormatMap = {
 };
 } // namespace
 
-int32_t ConvertVideoFrame(std::shared_ptr<Scale> scale, std::shared_ptr<AVFrame> frame, uint8_t **dstData,
+int32_t ConvertVideoFrame(std::shared_ptr<Scale> *scale, std::shared_ptr<AVFrame> frame, uint8_t **dstData,
                           int32_t *dstLineSize, AVPixelFormat dstPixFmt)
 {
-    if (scale == nullptr) {
-        scale = std::make_shared<Scale>();
+    if (*scale == nullptr) {
+        *scale = std::make_shared<Scale>();
         ScalePara scalePara {static_cast<int32_t>(frame->width),
                              static_cast<int32_t>(frame->height),
                              static_cast<AVPixelFormat>(frame->format),
                              static_cast<int32_t>(frame->width),
                              static_cast<int32_t>(frame->height),
                              dstPixFmt};
-        CHECK_AND_RETURN_RET_LOG(scale->Init(scalePara, dstData, dstLineSize) == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
+        CHECK_AND_RETURN_RET_LOG((*scale)->Init(scalePara, dstData, dstLineSize) == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
                                  "Scale init error");
     }
-    return scale->Convert(frame->data, frame->linesize, dstData, dstLineSize);
+    return (*scale)->Convert(frame->data, frame->linesize, dstData, dstLineSize);
 }
 
 int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData,
@@ -138,6 +137,23 @@ std::string AVStrError(int errnum)
     return std::string(errbuf);
 }
 
+GraphicTransformType TranslateSurfaceRotation(const VideoRotation &rotation)
+{
+    switch (rotation) {
+        case VideoRotation::VIDEO_ROTATION_90: {
+            return GRAPHIC_ROTATE_270;
+        }
+        case VideoRotation::VIDEO_ROTATION_180: {
+            return GRAPHIC_ROTATE_180;
+        }
+        case VideoRotation::VIDEO_ROTATION_270: {
+            return GRAPHIC_ROTATE_90;
+        }
+        default:
+            return GRAPHIC_ROTATE_NONE;
+    }
+}
+
 PixelFormat TranslateSurfaceFormat(const VideoPixelFormat &surfaceFormat)
 {
     switch (surfaceFormat) {
@@ -166,7 +182,7 @@ VideoPixelFormat ConvertPixelFormatFromFFmpeg(int32_t ffmpegPixelFormat)
     auto iter = std::find_if(
         g_pixelFormatMap.begin(), g_pixelFormatMap.end(),
         [&](const std::pair<VideoPixelFormat, AVPixelFormat> &tmp) -> bool { return tmp.second == ffmpegPixelFormat; });
-    return iter == g_pixelFormatMap.end() ? VideoPixelFormat::UNKNOWN : iter->first;
+    return iter == g_pixelFormatMap.end() ? VideoPixelFormat::UNKNOWN_FORMAT : iter->first;
 }
 
 AVPixelFormat ConvertPixelFormatToFFmpeg(VideoPixelFormat pixelFormat)

@@ -60,26 +60,26 @@ DemuxerEngineImpl::~DemuxerEngineImpl()
     AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
-int32_t DemuxerEngineImpl::SelectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerEngineImpl::SelectTrackByID(uint32_t trackIndex)
 {
-    AVCodecTrace trace("DemuxerEngineImpl::SelectSourceTrackByID");
-    AVCODEC_LOGI("SelectSourceTrackByID");
-    return demuxer_->SelectSourceTrackByID(trackIndex);
+    AVCodecTrace trace("DemuxerEngineImpl::SelectTrackByID");
+    AVCODEC_LOGI("SelectTrackByID");
+    return demuxer_->SelectTrackByID(trackIndex);
 }
 
-int32_t DemuxerEngineImpl::UnselectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerEngineImpl::UnselectTrackByID(uint32_t trackIndex)
 {
-    AVCodecTrace trace("DemuxerEngineImpl::UnselectSourceTrackByID");
-    AVCODEC_LOGI("UnselectSourceTrackByID");
-    return demuxer_->UnselectSourceTrackByID(trackIndex);
+    AVCodecTrace trace("DemuxerEngineImpl::UnselectTrackByID");
+    AVCODEC_LOGI("UnselectTrackByID");
+    return demuxer_->UnselectTrackByID(trackIndex);
 }
 
-int32_t DemuxerEngineImpl::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                          AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t DemuxerEngineImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCodecTrace trace("DemuxerEngineImpl::CopyNextSample");
-    AVCODEC_LOGI("CopyNextSample");
-    return demuxer_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
+    AVCodecTrace trace("DemuxerEngineImpl::ReadSample");
+    AVCODEC_LOGI("ReadSample");
+    return demuxer_->ReadSample(trackIndex, sample, info, flag);
 }
 
 int32_t DemuxerEngineImpl::SeekToTime(int64_t mSeconds, AVSeekMode mode)

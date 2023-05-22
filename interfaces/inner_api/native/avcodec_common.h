@@ -131,30 +131,10 @@ public:
     static constexpr std::string_view SOURCE_LANGUAGE      = "language";         // std::string, language
     static constexpr std::string_view SOURCE_DESCRIPTION   = "description";      // std::string, description
     static constexpr std::string_view SOURCE_LYRICS        = "lyrics";           // std::string, cyrics
-    static constexpr std::string_view SOURCE_DURATION      = "duration";         // int64_t, duration based on
-                                                                                 // {@link HST_TIME_BASE}
     static constexpr std::string_view SOURCE_TYPE          = "media_type";       // std::string, sourece type
 private:
     AVSourceFormat() = delete;
     ~AVSourceFormat() = delete;
-};
-
-
-class AVSourceTrackFormat {
-public:
-    static constexpr std::string_view TRACK_INDEX               = "track_index";
-    static constexpr std::string_view TRACK_SAMPLE_COUNT        = "track_sample_count";
-    static constexpr std::string_view TRACK_TYPE                = "track_type";
-    static constexpr std::string_view TRACK_DURATION            = "duration";
-    static constexpr std::string_view TRACK_BITRATE             = "bitrate";
-    static constexpr std::string_view VIDEO_TRACK_ROTATION      = "rotation_angle";
-    static constexpr std::string_view VIDEO_TRACK_WIDTH         = "width";
-    static constexpr std::string_view VIDEO_TRACK_HEIGHT        = "height";
-    static constexpr std::string_view VIDEO_PIXEL_FORMAT        = "pixel_format";
-    static constexpr std::string_view VIDEO_BIT_STREAM_FORMAT   = "bit_stream_format";
-private:
-    AVSourceTrackFormat() = delete;
-    ~AVSourceTrackFormat() = delete;
 };
 
 enum VideoBitStreamFormat {

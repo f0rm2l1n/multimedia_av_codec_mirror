@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_AUDIO_ENCODER_DEMO_H
-#define AVCODEC_AUDIO_ENCODER_DEMO_H
+#ifndef AVCODEC_AUDIO_FLAC_ENCODER_DEMO_H
+#define AVCODEC_AUDIO_FLAC_ENCODER_DEMO_H
 
 #include <atomic>
 #include <condition_variable>
@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Media {
-namespace AudioDemo {
+namespace AudioFlacDemo {
 class AEncSignal {
 public:
     std::mutex inMutex_;
@@ -41,10 +41,10 @@ public:
     std::queue<OH_AVCodecBufferAttr> attrQueue_;
 };
 
-class AEncDemo : public NoCopyable {
+class AEncFlacDemo : public NoCopyable {
 public:
-    AEncDemo();
-    virtual ~AEncDemo();
+    AEncFlacDemo();
+    virtual ~AEncFlacDemo();
     void RunCase();
 
 private:
@@ -70,7 +70,7 @@ private:
     int64_t timeStamp_ = 0;
     uint32_t frameCount_ = 0;
 };
-} // namespace AudioDemo
+} // namespace AudioFlacDemo
 } // namespace Media
 } // namespace OHOS
-#endif // AVCODEC_AUDIO_DECODER_DEMO_H
+#endif // AVCODEC_AUDIO_FLAC_ENCODER_DEMO_H

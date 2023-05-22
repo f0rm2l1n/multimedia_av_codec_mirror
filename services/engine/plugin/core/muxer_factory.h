@@ -36,7 +36,7 @@ public:
     }
 
     std::shared_ptr<Muxer> CreatePlugin(int32_t fd, uint32_t outputFormat);
-    
+
 private:
     MuxerFactory();
 
@@ -58,9 +58,9 @@ private:
     struct RegisterImpl : PackageRegister {
         explicit RegisterImpl(std::shared_ptr<RegisterData> data, std::shared_ptr<PluginLoader> loader = nullptr)
             : pluginLoader(std::move(loader)), registerData(std::move(data)) {}
-        
+
         ~RegisterImpl() override = default;
-        
+
         Status AddPlugin(const PluginDefBase& def) override;
         Status AddPackage(const PackageDef& def) override;
         Status SetPackageDef(const PackageDef& def);

@@ -60,7 +60,7 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer)
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVDemuxer_SelectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
+OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
         "Add sourceTrack failed because input demuxer is nullptr!");
@@ -70,13 +70,13 @@ OH_AVErrCode OH_AVDemuxer_SelectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_t 
     CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
         "New DemuxerObject failed when add sourceTrack!");
 
-    int32_t ret = demuxerObj->demuxer_->SelectSourceTrackByID(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SelectSourceTrackByID failed!");
+    int32_t ret = demuxerObj->demuxer_->SelectTrackByID(trackIndex);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SelectTrackByID failed!");
 
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVDemuxer_UnselectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
+OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
         "Remove sourceTrack failed because input demuxer is nullptr!");
@@ -86,24 +86,22 @@ OH_AVErrCode OH_AVDemuxer_UnselectSourceTrackByID(OH_AVDemuxer *demuxer, uint32_
     CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
         "New DemuxerObject failed when remove sourceTrack!");
 
-    int32_t ret = demuxerObj->demuxer_->UnselectSourceTrackByID(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ UnselectSourceTrackByID failed!");
+    int32_t ret = demuxerObj->demuxer_->UnselectTrackByID(trackIndex);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ UnselectTrackByID failed!");
 
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackIndex,
-                                         uint8_t *buffer, OH_AVCodecBufferAttr *bufferInfo)
+OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
+    OH_AVMemory *sample, OH_AVCodecBufferAttr *info)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
         "Copy sample failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
     
-    CHECK_AND_RETURN_RET_LOG(trackIndex != nullptr, AV_ERR_INVALID_VAL,
-        "Copy sample failed because input trackIndex is nullptr!");
-    CHECK_AND_RETURN_RET_LOG(buffer != nullptr, AV_ERR_INVALID_VAL,
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AV_ERR_INVALID_VAL,
         "Copy sample failed because input buffer is nullptr!");
-    CHECK_AND_RETURN_RET_LOG(bufferInfo != nullptr, AV_ERR_INVALID_VAL,
+    CHECK_AND_RETURN_RET_LOG(info != nullptr, AV_ERR_INVALID_VAL,
         "Copy sample failed because input attr is nullptr!");
 
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
@@ -111,14 +109,16 @@ OH_AVErrCode OH_AVDemuxer_CopyNextSample(OH_AVDemuxer *demuxer, uint32_t *trackI
         "New DemuxerObject failed when copy sample!");
 
     struct AVCodecBufferInfo bufferInfoInner;
-    enum AVCodecBufferFlag *flag = nullptr;
-    *flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
-    int32_t ret = demuxerObj->demuxer_->CopyNextSample(*trackIndex, buffer, bufferInfoInner, *flag);
-    bufferInfo->pts = bufferInfoInner.presentationTimeUs;
-    bufferInfo->size = bufferInfoInner.size;
-    bufferInfo->offset = bufferInfoInner.offset;
-    bufferInfo->flags =static_cast<uint32_t>(*flag);
-    CHECK_AND_RETURN_RET_LOG(ret == AV_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ CopyNextSample failed!");
+    AVCodecBufferFlag bufferFlag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
+    int32_t ret = demuxerObj->demuxer_->ReadSample(trackIndex, sample->memory_, bufferInfoInner, bufferFlag);
+    info->pts = bufferInfoInner.presentationTimeUs;
+    info->size = bufferInfoInner.size;
+    info->offset = bufferInfoInner.offset;
+    info->flags =static_cast<uint32_t>(bufferFlag);
+
+    CHECK_AND_RETURN_RET_LOG(ret != AVCS_ERR_NO_MEMORY, AV_ERR_NO_MEMORY,
+        "demuxer_ ReadSample failed! sample size is too small to copy full frame data");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ ReadSample failed!");
 
     return AV_ERR_OK;
 }

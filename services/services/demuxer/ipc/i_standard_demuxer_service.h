@@ -18,6 +18,7 @@
 
 #include "avcodec_common.h"
 #include "iremote_proxy.h"
+#include "avsharedmemory.h"
 
 namespace OHOS {
 namespace Media {
@@ -26,20 +27,20 @@ public:
     virtual ~IStandardDemuxerService() = default;
 
     // 业务
-    virtual int32_t Init(uint64_t sourceAddr) = 0;
-    virtual int32_t SelectSourceTrackByID(uint32_t trackIndex) = 0;
-    virtual int32_t UnselectSourceTrackByID(uint32_t trackIndex) = 0;
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                    AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) = 0;
+    virtual int32_t Init(uintptr_t sourceAddr) = 0;
+    virtual int32_t SelectTrackByID(uint32_t trackIndex) = 0;
+    virtual int32_t UnselectTrackByID(uint32_t trackIndex) = 0;
+    virtual int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo &info, AVCodecBufferFlag &flag) = 0;
     virtual int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) = 0;
 
     virtual int32_t DestroyStub() = 0;
 
     enum DemuxerServiceMsg {
         INIT,
-        SELECT_SOURCE_TRACK_BY_ID,
-        UNSELECT_SOURCE_TRACK_BY_ID,
-        COPY_NEXT_SAMPLE,
+        SELECT_TRACK_BY_ID,
+        UNSELECT_TRACK_BY_ID,
+        READ_SAMPLE,
         SEEK_TO_TIME,
 
         DESTROY_STUB,

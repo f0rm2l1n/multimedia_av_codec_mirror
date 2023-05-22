@@ -27,7 +27,9 @@ group("av_codec_unit_test") {
   deps = []
   if (multimedia_av_codec_support_test) {
     deps += [
-      "unittest:av_audio_unit_test",
+      "unittest:av_audio_capi_unit_test",
+      "unittest:av_audio_codecbase_unit_test",
+      "unittest:av_audio_inner_unit_test",
       "unittest:av_video_unit_test",
       "unittest/avcodec_test:acodec_capi_unit_test",
       "unittest/avcodec_test:vcodec_capi_unit_test",

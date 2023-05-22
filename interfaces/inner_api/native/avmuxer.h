@@ -16,6 +16,7 @@
 #ifndef AVMUXER_H
 #define AVMUXER_H
 
+#include "avsharedmemory.h"
 #include "media_description.h"
 #include "av_common.h"
 
@@ -24,11 +25,11 @@ namespace Media {
 class AVMuxer {
 public:
     virtual ~AVMuxer() = default;
-    virtual int32_t SetLocation(float latitude, float longitude) = 0;
     virtual int32_t SetRotation(int32_t rotation) = 0;
     virtual int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) = 0;
     virtual int32_t Start() = 0;
-    virtual int32_t WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info) = 0;
+    virtual int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample,
+        const TrackSampleInfo &info) = 0;
     virtual int32_t Stop() = 0;
 };
 

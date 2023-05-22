@@ -41,7 +41,7 @@ int32_t MuxerServiceProxy::InitParameter(int32_t fd, OutputFormat format)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    
+
     bool token = data.WriteInterfaceToken(MuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Write descriptor failed!");
 
@@ -50,23 +50,6 @@ int32_t MuxerServiceProxy::InitParameter(int32_t fd, OutputFormat format)
 
     int error = Remote()->SendRequest(INIT_PARAMETER, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Call InitParameter failed, error: %{public}d", error);
-    return reply.ReadInt32();
-}
-
-int32_t MuxerServiceProxy::SetLocation(float latitude, float longitude)
-{
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-
-    bool token = data.WriteInterfaceToken(MuxerServiceProxy::GetDescriptor());
-    CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Write descriptor failed!!");
-
-    CHECK_AND_RETURN_RET_LOG(data.WriteFloat(latitude), AVCS_ERR_UNKNOWN, "WriteFloat failed!");
-    CHECK_AND_RETURN_RET_LOG(data.WriteFloat(longitude), AVCS_ERR_UNKNOWN, "WriteFloat failed!");
-
-    int32_t ret = Remote()->SendRequest(SET_LOCATION, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "SetLocation failed, error: %{public}d", ret);
     return reply.ReadInt32();
 }
 
@@ -117,7 +100,7 @@ int32_t MuxerServiceProxy::Start()
     return reply.ReadInt32();
 }
 
-int32_t MuxerServiceProxy::WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sampleBuffer, const TrackSampleInfo &info)
+int32_t MuxerServiceProxy::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -126,14 +109,15 @@ int32_t MuxerServiceProxy::WriteSampleBuffer(std::shared_ptr<AVSharedMemory> sam
     bool token = data.WriteInterfaceToken(MuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Write descriptor failed!!");
 
-    WriteAVSharedMemoryToParcel(sampleBuffer, data);
+    WriteAVSharedMemoryToParcel(sample, data);
     CHECK_AND_RETURN_RET_LOG(data.WriteUint32(info.trackIndex), AVCS_ERR_UNKNOWN, "Write track index failed!");
     CHECK_AND_RETURN_RET_LOG(data.WriteInt64(info.timeUs), AVCS_ERR_UNKNOWN, "Write timeUs failed!");
-    CHECK_AND_RETURN_RET_LOG(data.WriteUint32(info.size), AVCS_ERR_UNKNOWN, "Write size failed!");
+    CHECK_AND_RETURN_RET_LOG(data.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Write size failed!");
+    CHECK_AND_RETURN_RET_LOG(data.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Write offset failed!");
     CHECK_AND_RETURN_RET_LOG(data.WriteUint32(info.flags), AVCS_ERR_UNKNOWN, "Write flags failed!");
 
-    int32_t ret = Remote()->SendRequest(WRITE_SAMPLE_BUFFER, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "WriteSampleBuffer failed, error: %{public}d", ret);
+    int32_t ret = Remote()->SendRequest(WRITE_SAMPLE, data, reply, option);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "WriteSample failed, error: %{public}d", ret);
     return reply.ReadInt32();
 }
 

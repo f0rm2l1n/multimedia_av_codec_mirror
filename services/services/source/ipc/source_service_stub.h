@@ -29,20 +29,20 @@ public:
     virtual ~SourceServiceStub();
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     using SourceStubFunc = int32_t(SourceServiceStub::*)(MessageParcel &data, MessageParcel &reply);
-    int32_t Init(const std::string &uri) override;
+    int32_t InitWithURI(const std::string &uri) override;
+    int32_t InitWithFD(int32_t fd, int64_t offset, int64_t size) override;
     int32_t GetTrackCount(uint32_t &trackCount) override;
-    int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     int32_t GetSourceFormat(Format &format) override;
-    uint64_t GetSourceAddr() override;
+    int32_t GetSourceAddr(uintptr_t &addr) override;
     int32_t DumpInfo(int32_t fd);
     int32_t DestroyStub() override;
 private:
     SourceServiceStub();
     int32_t InitStub();
-    int32_t Init(MessageParcel &data, MessageParcel &reply);
+    int32_t InitWithURI(MessageParcel &data, MessageParcel &reply);
+    int32_t InitWithFD(MessageParcel &data, MessageParcel &reply);
     int32_t GetTrackCount(MessageParcel &data, MessageParcel &reply);
-    int32_t SetTrackFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetTrackFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetSourceFormat(MessageParcel &data, MessageParcel &reply);
     int32_t GetSourceAddr(MessageParcel &data, MessageParcel &reply);

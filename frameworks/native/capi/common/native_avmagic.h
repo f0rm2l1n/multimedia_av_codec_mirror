@@ -33,7 +33,6 @@ enum class AVMagic {
     AVCODEC_MAGIC_AVMUXER = AV_MAGIC('M', 'U', 'X', 'R'),
     AVCODEC_MAGIC_AVDEMUXER = AV_MAGIC('D', 'M', 'U', 'X'),
     AVCODEC_MAGIC_AVSOURCE = AV_MAGIC('S', 'O', 'U', 'C'),
-    AVCODEC_MAGIC_AVSOURCETRACK = AV_MAGIC('T', 'R', 'A', 'C'),
     AVCODEC_MAGIC_FORMAT = AV_MAGIC('F', 'R', 'M', 'T'),
     AVCODEC_MAGIC_SHARED_MEMORY = AV_MAGIC('S', 'M', 'E', 'M'),
 };
@@ -58,6 +57,7 @@ struct OH_AVMemory : public AVObjectMagic {
     ~OH_AVMemory() override;
     bool IsEqualMemory(const std::shared_ptr<OHOS::Media::AVSharedMemory> &mem);
     const std::shared_ptr<OHOS::Media::AVSharedMemory> memory_;
+    bool isUserCreated = false;
 };
 
 struct OH_AVCodec : public AVObjectMagic {
@@ -86,8 +86,4 @@ struct OH_AVSource : public AVObjectMagic {
     virtual ~OH_AVSource() = default;
 };
 
-struct OH_AVSourceTrack : public AVObjectMagic {
-    explicit OH_AVSourceTrack(enum AVMagic m) : AVObjectMagic(m) {}
-    virtual ~OH_AVSourceTrack() = default;
-};
 #endif // NATIVE_AVMAGIC_H

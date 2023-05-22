@@ -17,12 +17,23 @@
 #define NATIVE_AVMEMORY_H
 
 #include <stdint.h>
+#include "native_averrors.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct OH_AVMemory OH_AVMemory;
+
+/**
+ * @brief Create an OH_AVMemory instance
+ * @syscap SystemCapability.Multimedia.Media.Core
+ * @param size the memory's size, bytes.
+ * @return Returns a pointer to an OH_AVMemory instance, needs to be freed by OH_AVMemory_Destroy.
+ * @since 10
+ * @version 1.0
+ */
+OH_AVMemory *OH_AVMemory_Create(int32_t size);
 
 /**
  * @brief Get the memory's virtual address
@@ -43,6 +54,17 @@ uint8_t *OH_AVMemory_GetAddr(struct OH_AVMemory *mem);
  * @version 1.0
  */
 int32_t OH_AVMemory_GetSize(struct OH_AVMemory *mem);
+
+/**
+ * @brief Clear the internal resources of the memory and destroy the memory instance
+ * @syscap SystemCapability.Multimedia.Media.Core
+ * @param mem Encapsulate OH_AVMemory structure instance pointer
+ * @return Returns AV_ERR_OK if the execution is successful,
+ * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
+ * @since 10
+ * @version 1.0
+ */
+OH_AVErrCode OH_AVMemory_Destroy(struct OH_AVMemory *mem);
 
 #ifdef __cplusplus
 }

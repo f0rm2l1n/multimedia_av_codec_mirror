@@ -25,18 +25,17 @@
 #include "native_avcodec_audiodecoder.h"
 #include "nocopyable.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#ifdef __cplusplus
-}
-#endif
-
 namespace OHOS {
 namespace Media {
 namespace AudioDemo {
+enum AudioFormatType : int32_t {
+    TYPE_AAC = 0,
+    TYPE_FLAC = 1,
+    TYPE_MP3 = 2,
+    TYPE_VORBIS = 3,
+    TYPE_MAX = 4,
+};
+
 class ADecSignal {
 public:
     std::mutex inMutex_;
@@ -54,7 +53,7 @@ class ADecDemo : public NoCopyable {
 public:
     ADecDemo();
     virtual ~ADecDemo();
-    void RunCase();
+    void RunCase(AudioFormatType audioType);
 
 private:
     int32_t CreateDec();
@@ -66,6 +65,9 @@ private:
     int32_t Release();
     void InputFunc();
     void OutputFunc();
+    void HandleInputEOS(const uint32_t index);
+    int32_t HandleNormalInput(const uint32_t &index, const int64_t pts, const size_t size);
+    bool InitFile(AudioFormatType audioType);
 
     std::atomic<bool> isRunning_ = false;
     std::unique_ptr<std::ifstream> testFile_;
@@ -75,12 +77,10 @@ private:
     ADecSignal *signal_;
     struct OH_AVCodecAsyncCallback cb_;
     bool isFirstFrame_ = true;
-    int64_t timeStamp_ = 0;
     uint32_t frameCount_ = 0;
-
-    AVFormatContext *fmpt_ctx;
-    AVFrame *frame;
-    AVPacket pkt;
+    std::ifstream inputFile_;
+    std::ofstream pcmOutputFile_;
+    AudioFormatType audioType_;
 };
 } // namespace AudioDemo
 } // namespace Media

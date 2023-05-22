@@ -25,19 +25,19 @@ class IStandardSourceService : public IRemoteBroker {
 public:
     virtual ~IStandardSourceService() = default;
 
-    virtual int32_t Init(const std::string &uri) = 0;
+    virtual int32_t InitWithURI(const std::string &uri) = 0;
+    virtual int32_t InitWithFD(int32_t fd, int64_t offset, int64_t size) = 0;
     virtual int32_t GetTrackCount(uint32_t &trackCount) = 0;
-    virtual int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) = 0;
     virtual int32_t GetTrackFormat(Format &format, uint32_t trackIndex) = 0;
     virtual int32_t GetSourceFormat(Format &format) = 0;
-    virtual uint64_t GetSourceAddr() = 0;
+    virtual int32_t GetSourceAddr(uintptr_t &addr) = 0;
 
     virtual int32_t DestroyStub() = 0;
     enum SourceServiceMsg {
-        INIT,
+        INIT_WITH_URI,
+        INIT_WITH_FD,
         GET_TRACK_COUNT,
         DESTROY,
-        SET_TRACK_FORMAT,
         GET_TRACK_FORMAT,
         GET_SOURCE_FORMAT,
         GET_SOURCE_ADDR,

@@ -58,9 +58,14 @@ public:
 
     AVCodecBufferFlag GetFlag() const noexcept;
 
+    bool CheckIsFirstFrame() const noexcept;
+	
+    void SetFirstFrame() noexcept;
+	
 private:
     bool isHasMeta_;
     bool isEos_;
+    bool isFirstFrame_;
     std::atomic<BufferStatus> status_;
     uint32_t bufferSize_;
     uint32_t metaSize_;

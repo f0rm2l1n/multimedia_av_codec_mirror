@@ -44,6 +44,7 @@ struct VideoDecoderObject : public OH_AVCodec {
     std::atomic<bool> isFlushing_ = false;
     std::atomic<bool> isStop_ = false;
     std::atomic<bool> isEOS_ = false;
+    bool isOutputSurfaceMode_ = false;
 };
 
 class NativeVideoDecoderCallback : public AVCodecCallback {
@@ -114,7 +115,12 @@ public:
         bufferAttr.size = info.size;
         bufferAttr.offset = info.offset;
         bufferAttr.flags = flag;
-        callback_.onNeedOutputData(codec_, index, nullptr, &bufferAttr, userData_);
+        OH_AVMemory *data = nullptr;
+        if (!videoDecObj->isOutputSurfaceMode_) {
+            data = GetOutputData(codec_, index);
+            CHECK_AND_RETURN_LOG(data != nullptr, "Data is nullptr, get output data failed");
+        }
+        callback_.onNeedOutputData(codec_, index, data, &bufferAttr, userData_);
     }
 
     void StopCallback()
@@ -157,7 +163,7 @@ private:
         CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, nullptr, "Video decoder is nullptr!");
 
         std::shared_ptr<AVSharedMemory> memory = videoDecObj->videoDecoder_->GetOutputBuffer(index);
-        CHECK_AND_RETURN_RET_LOG(memory != nullptr, nullptr, "Memory is nullptr, get output buffer failed!");
+        CHECK_AND_RETURN_RET_LOG(memory != nullptr, nullptr, "Video decoder output data is nullptr!");
 
         for (auto &memoryObj : videoDecObj->memoryObjList_) {
             if (memoryObj->IsEqualMemory(memory)) {
@@ -346,13 +352,14 @@ OH_AVErrCode OH_VideoDecoder_SetSurface(OH_AVCodec *codec, OHNativeWindow *windo
     CHECK_AND_RETURN_RET_LOG(codec->magic_ == AVMagic::AVCODEC_MAGIC_VIDEO_DECODER, AV_ERR_INVALID_VAL,
                              "Codec magic error!");
     CHECK_AND_RETURN_RET_LOG(window != nullptr, AV_ERR_INVALID_VAL, "Window is nullptr!");
-    CHECK_AND_RETURN_RET_LOG(window->surface != nullptr, AV_ERR_INVALID_VAL, "Surface is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(window->surface != nullptr, AV_ERR_INVALID_VAL, "Input window surface is nullptr!");
 
     struct VideoDecoderObject *videoDecObj = reinterpret_cast<VideoDecoderObject *>(codec);
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
 
     int32_t ret = videoDecObj->videoDecoder_->SetOutputSurface(window->surface);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video decoder set output surface failed!");
+    videoDecObj->isOutputSurfaceMode_ = true;
 
     return AV_ERR_OK;
 }

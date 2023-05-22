@@ -60,7 +60,7 @@ bool AudioBuffersManager::SetBufferBusy(const uint32_t &index)
 void AudioBuffersManager::initBuffers()
 {
     std::unique_lock lock(stateMutex_);
-    AVCODEC_LOGI("start allocate %{public}s buffers,buffer size:%{public}d", name_.data(), bufferSize_);
+    AVCODEC_LOGI("start allocate %{public}s buffers,each buffer size:%{public}d", name_.data(), bufferSize_);
     for (size_t i = 0; i < DEFALT_BUFFER_LENGTH; i++) {
         bufferInfo_[i] = std::make_shared<AudioBufferInfo>(bufferSize_, name_, metaSize_, align_);
         inBufIndexQue_.push(i);
@@ -68,17 +68,17 @@ void AudioBuffersManager::initBuffers()
     AVCODEC_LOGI("end allocate %{public}s buffers", name_.data());
 }
 
-bool AudioBuffersManager::RequestNewBuffer(uint32_t *index, std::shared_ptr<AudioBufferInfo> &buffer)
+bool AudioBuffersManager::RequestNewBuffer(uint32_t &index, std::shared_ptr<AudioBufferInfo> &buffer)
 {
     buffer = createNewBuffer();
     if (buffer == nullptr) {
         return false;
     }
-    *index = bufferInfo_.size() - 1;
+    index = bufferInfo_.size() - 1;
     return true;
 }
 
-bool AudioBuffersManager::RequestAvialbaleIndex(uint32_t *index)
+bool AudioBuffersManager::RequestAvialbaleIndex(uint32_t &index)
 {
     while (inBufIndexQue_.empty() && isRunning_) {
         AVCODEC_LOGD("Request empty %{public}s buffer", name_.data());
@@ -92,22 +92,22 @@ bool AudioBuffersManager::RequestAvialbaleIndex(uint32_t *index)
     }
 
     std::unique_lock lock(stateMutex_);
-    *index = inBufIndexQue_.front();
-    bufferInfo_[*index]->SetBufferOwned();
+    index = inBufIndexQue_.front();
+    bufferInfo_[index]->SetBufferOwned();
     inBufIndexQue_.pop();
     return true;
 }
 
 void AudioBuffersManager::ReleaseAll()
 {
-    AVCODEC_LOGI("step in release all %{public}s buffer.", name_.data());
+    isRunning_ = false;
+    avilableCondition_.notify_all();
+
     for (uint32_t i = 0; i < bufferInfo_.size(); ++i) {
         bufferInfo_[i]->ResetBuffer();
         inBufIndexQue_.push(i);
     }
-    AVCODEC_LOGI("step out release all %{public}s buffer.", name_.data());
-    isRunning_ = false;
-    avilableCondition_.notify_all();
+    AVCODEC_LOGI("release all %{public}s buffer.", name_.data());
 }
 
 void AudioBuffersManager::SetRunning()

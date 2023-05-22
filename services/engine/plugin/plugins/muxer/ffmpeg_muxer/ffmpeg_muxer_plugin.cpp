@@ -57,7 +57,7 @@ int32_t Sniff(const std::string& pluginName, uint32_t outputFormat)
     if (it != g_supportedMuxer.end() && it->second == outputFormat) {
         confidence = ffmpegConfidence;
     }
-    
+
     return confidence;
 }
 
@@ -155,15 +155,6 @@ FFmpegMuxerPlugin::~FFmpegMuxerPlugin()
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
-Status FFmpegMuxerPlugin::SetLocation(float latitude, float longitude)
-{
-    std::string location = std::to_string(longitude) + " ";
-    location += std::to_string(latitude) + " ";
-    location += std::to_string(0.0f);
-    av_dict_set(&formatContext_.get()->metadata, "location", location.c_str(), 0);
-    return Status::NO_ERROR;
-}
-
 Status FFmpegMuxerPlugin::SetRotation(int32_t rotation)
 {
     rotation_ = rotation;
@@ -205,7 +196,7 @@ Status FFmpegMuxerPlugin::SetCodecParameterOfTrack(AVStream *stream, const Media
     } else {
         AVCODEC_LOGD("mimeType %{public}s is unsupported", mimeType.c_str());
     }
-    
+
     if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_BITRATE)) {
         trackDesc.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, par->bit_rate); // bit rate
     }
@@ -274,14 +265,14 @@ Status FFmpegMuxerPlugin::Stop()
     return Status::NO_ERROR;
 }
 
-Status FFmpegMuxerPlugin::WriteSampleBuffer(uint8_t *sampleBuffer, const TrackSampleInfo &info)
+Status FFmpegMuxerPlugin::WriteSample(uint8_t *sample, const TrackSampleInfo &info)
 {
-    CHECK_AND_RETURN_RET_LOG(sampleBuffer != nullptr, Status::ERROR_NULL_POINTER,
-        "av_write_frame sampleBuffer is null!");
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr, Status::ERROR_NULL_POINTER,
+        "av_write_frame sample is null!");
     CHECK_AND_RETURN_RET_LOG(info.trackIndex < formatContext_->nb_streams,
         Status::ERROR_INVALID_PARAMETER, "track index is invalid!");
     (void)memset_s(cachePacket_.get(), sizeof(AVPacket), 0, sizeof(AVPacket));
-    cachePacket_->data = sampleBuffer;
+    cachePacket_->data = sample;
     cachePacket_->size = info.size;
     cachePacket_->stream_index = static_cast<int>(info.trackIndex);
     cachePacket_->pts = ConvertTimeToFFmpeg(info.timeUs, formatContext_->streams[info.trackIndex]->time_base);

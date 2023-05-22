@@ -14,6 +14,8 @@
  */
 
 #include "avmuxer_capi_mock.h"
+#include "securec.h"
+#include "avsharedmemorybase.h"
 
 namespace OHOS {
 namespace Media {
@@ -43,20 +45,18 @@ int32_t AVMuxerCapiMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMoc
     return OH_AVMuxer_AddTrack(muxer_, &trackIndex, formatMock->GetFormat());
 }
 
-int32_t AVMuxerCapiMock::WriteSampleBuffer(uint32_t trackIndex,
-    uint8_t *sampleBuffer, const AVCodecBufferAttrMock &info)
+int32_t AVMuxerCapiMock::WriteSample(uint32_t trackIndex,
+    uint8_t *sample, const AVCodecBufferAttrMock &info)
 {
+    OH_AVMemory *avSample = OH_AVMemory_Create(info.size);
+    (void)memcpy_s(OH_AVMemory_GetAddr(avSample),
+        OH_AVMemory_GetSize(avSample), sample, info.size);
     OH_AVCodecBufferAttr bufferAttr;
     bufferAttr.pts = info.pts;
     bufferAttr.size = info.size;
     bufferAttr.offset = info.offset;
     bufferAttr.flags = info.flags;
-    return OH_AVMuxer_WriteSampleBuffer(muxer_, trackIndex, sampleBuffer, bufferAttr);
-}
-
-int32_t AVMuxerCapiMock::SetLocation(float latitude, float longitude)
-{
-    return OH_AVMuxer_SetLocation(muxer_, latitude, longitude);
+    return OH_AVMuxer_WriteSample(muxer_, trackIndex, avSample, bufferAttr);
 }
 
 int32_t AVMuxerCapiMock::SetRotation(int32_t rotation)

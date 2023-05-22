@@ -19,6 +19,7 @@
 
 #include <memory>
 #include "avcodec_common.h"
+#include "avsharedmemory.h"
 #include "avsource.h"
 
 namespace OHOS {
@@ -28,36 +29,37 @@ public:
     ~AVDemuxer() = default;
 
     /**
-     * @brief Add the sourceTrack by track id.
-     * This function can only by called before {@link CopyNextSample}.
-     * @param trackIndex The index of the track to add.
+     * @brief Select the sourceTrack by track index.
+     * This function can only by called before {@link ReadSample}.
+     * @param trackIndex The track index for being selected.
      * @return Returns {@link AVCS_ERR_OK} if success; returns an error code otherwise.
      * @since 4.0
      * @version 4.0
      */
-    virtual int32_t SelectSourceTrackByID(uint32_t trackIndex) = 0;
+    virtual int32_t SelectTrackByID(uint32_t trackIndex) = 0;
 
     /**
-     * @brief Remove the sourceTrack by track id.
-     * This function can only by called before {@link CopyNextSample}.
-     * @param trackIndex The index of the track to remove.
+     * @brief Unselect the sourceTrack by track index.
+     * This function can only by called before {@link ReadSample}.
+     * @param trackIndex The track index for being unselected.
      * @return Returns {@link AVCS_ERR_OK} if success; returns an error code otherwise.
      * @since 4.0
      * @version 4.0
      */
-    virtual int32_t UnselectSourceTrackByID(uint32_t trackIndex) = 0;
+    virtual int32_t UnselectTrackByID(uint32_t trackIndex) = 0;
 
     /**
-     * @brief Copy the current sample to buffer, and save buffer attribute to attr.
-     * @param trackIndex The param storing trackIndex of the buffer.
-     * @param buffer The buffer pointer to store data.
-     * @param attr The CodecBufferAttr pointer to store data attribute.
+     * @brief Retrieve the sample in selected tracks and store it in buffer, and store buffer's info to attr.
+     * @param trackIndex Get the sampleBuffer from this track.
+     * @param sample The AVSharedMemory handle pointer to get buffer data.
+     * @param info The CodecBufferAttr handle pointer to get buffer info.
+     * @param flag The AVCodecBufferFlag handle pointer to get buffer flags.
      * @return Returns {@link AVCS_ERR_OK} if success; returns an error code otherwise.
      * @since 4.0
      * @version 4.0
      */
-    virtual int32_t CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                   AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag) = 0;
+    virtual int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo &info, AVCodecBufferFlag &flag) = 0;
 
     /**
      * @brief All selected tracks seek near to the requested time according to the seek mode.

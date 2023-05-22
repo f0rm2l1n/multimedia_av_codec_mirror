@@ -27,33 +27,17 @@ public:
     AVSourceImpl();
     ~AVSourceImpl() override;
 
-    int32_t GetTrackCount(uint32_t &trackCount) override;
-    std::shared_ptr<AVSourceTrack> GetSourceTrackByID(uint32_t trackIndex) override;
-    uintptr_t GetSourceAddr() override;
+    int32_t GetSourceAddr(uintptr_t &addr) override;
     int32_t GetSourceFormat(Format &format) override;
-    int32_t GetTrackFormat(Format &format, uint32_t trackIndex);
-    int32_t SetTrackFormat(const Format &format, uint32_t trackIndex);
-    int32_t Init(const std::string &uri);
+    int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
+    int32_t InitWithURI(const std::string &uri);
+    int32_t InitWithFD(int32_t fd, int64_t offset, int64_t size);
 
     std::string sourceUri;
 
 private:
     std::shared_ptr<ISourceService> sourceClient_ = nullptr;
-    std::vector<std::shared_ptr<AVSourceTrack>> tracks_ {};
-    int32_t trackCount_ = -1;
-    bool TrackIndexIsValid(uint32_t trackIndex);
-};
-
-class AVSourceTrackImpl : public AVSourceTrack, public NoCopyable {
-public:
-    AVSourceTrackImpl(AVSourceImpl *source, uint32_t trackIndex);
-    ~AVSourceTrackImpl();
-
-    int32_t SetTrackFormat(const Format &format) override;
-    int32_t GetTrackFormat(Format &format) override;
-private:
-    uint32_t trackIndex_;
-    AVSourceImpl* sourceImpl_;
+    uint32_t trackCount_ = 0;
 };
 } // namespace Media
 } // namespace OHOS

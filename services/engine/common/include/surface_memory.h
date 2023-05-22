@@ -16,9 +16,9 @@
 #ifndef AV_CODEC_SURFACE_MEMORY_H
 #define AV_CODEC_SURFACE_MEMORY_H
 
+#include "avsharedmemory.h"
 #include "refbase.h"
 #include "surface.h"
-#include "avsharedmemory.h"
 #include "sync_fence.h"
 
 namespace OHOS {
@@ -60,7 +60,7 @@ private:
     int32_t fence_ = -1;
     uint32_t stride_ = 0;
     bool needRender_ = false;
-    static sptr<Surface> surfaceMem_;
+    static sptr<Surface> surface_;
     static BufferRequestConfig requestConfig_;
     static ScalingMode scalingMode_;
     static constexpr size_t INVALID_POSITION = -1;

@@ -22,21 +22,22 @@
 #include <shared_mutex>
 #include <tuple>
 #include <vector>
-#include "avcodec_common.h" // AVCodecBufferInfo & callback
-#include "avcodec_errors.h" // Errorcode
+#include "av_common.h"
+#include "avcodec_common.h"
+#include "avcodec_errors.h"
 #include "avcodec_info.h"
 #include "codec_utils.h"
 #include "codecbase.h"
 #include "media_description.h"
 #include "surface_memory.h"
 #include "task_thread.h"
+
 namespace OHOS {
 namespace Media {
 namespace Codec {
 class FCodec : public CodecBase {
 public:
     explicit FCodec(const std::string &name);
-    explicit FCodec(bool isEncoder, const std::string &mime);
     ~FCodec() override;
     int32_t Configure(const Format &format) override;
     int32_t Start() override;
@@ -46,15 +47,14 @@ public:
     int32_t Release() override;
     int32_t SetParameter(const Format &format) override;
     int32_t GetOutputFormat(Format &format) override;
-    std::shared_ptr<AVSharedMemoryBase> GetInputBuffer(size_t index) override;
-    int32_t QueueInputBuffer(size_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
-    std::shared_ptr<AVSharedMemoryBase> GetOutputBuffer(size_t index) override;
-    int32_t ReleaseOutputBuffer(size_t index) override;
+    std::shared_ptr<AVSharedMemoryBase> GetInputBuffer(uint32_t index) override;
+    int32_t QueueInputBuffer(uint32_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag flag) override;
+    std::shared_ptr<AVSharedMemoryBase> GetOutputBuffer(uint32_t index) override;
+    int32_t ReleaseOutputBuffer(uint32_t index) override;
     int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) override;
     int32_t SetOutputSurface(sptr<Surface> surface) override;
-    int32_t RenderOutputBuffer(size_t index) override;
-    int32_t Pause() override;
-    int32_t Resume() override;
+    int32_t RenderOutputBuffer(uint32_t index) override;
+    static int32_t GetCodecCapability(std::vector<CapabilityData> &capaArray);
     struct AVBuffer {
     public:
         AVBuffer() = default;
@@ -96,9 +96,8 @@ private:
     void ReceiveFrame();
     void RenderFrame();
     void ConfigureSufrace(const Format &format, const std::string_view &formatKey, uint32_t FORMAT_TYPE);
-    void ConfigureBuffer(const Format &format, const std::string_view &formatKey, int32_t minVal = 0,
-                         int32_t maxVal = INT_MAX);
-    int32_t ConfigureDefault();
+    void ConfigureDefaultVal(const Format &format, const std::string_view &formatKey, int32_t defaultVal,
+                         int32_t minVal = 0, int32_t maxVal = INT_MAX);
     void FramePostProcess(std::shared_ptr<AVBuffer> frameBuffer, int32_t status, int ret);
     int32_t AllocateInputBuffer(int32_t bufferCnt, int32_t inBufferSize);
     int32_t AllocateOutputBuffer(int32_t bufferCnt, int32_t outBufferSize);
@@ -126,10 +125,10 @@ private:
     bool isConverted_ = false;
     // Running
     std::vector<std::shared_ptr<AVBuffer>> buffers_[2];
-    std::list<size_t> codecAvailBuffers_;
-    std::list<size_t> renderBuffers_;
-    std::list<size_t> inBufQue_;
-    sptr<Surface> CodecSurface_ = nullptr;
+    std::list<uint32_t> codecAvailBuffers_;
+    std::list<uint32_t> renderBuffers_;
+    std::list<uint32_t> inBufQue_;
+    sptr<Surface> surface_ = nullptr;
     std::shared_ptr<TaskThread> sendTask_ = nullptr;
     std::shared_ptr<TaskThread> receiveTask_ = nullptr;
     std::shared_ptr<TaskThread> renderTask_ = nullptr;

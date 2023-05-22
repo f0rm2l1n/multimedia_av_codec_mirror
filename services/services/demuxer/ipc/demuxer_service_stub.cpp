@@ -52,9 +52,9 @@ int32_t DemuxerServiceStub::InitStub()
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Failed to create muxer server");
 
     demuxerFuncs_[INIT] = &DemuxerServiceStub::Init;
-    demuxerFuncs_[SELECT_SOURCE_TRACK_BY_ID] = &DemuxerServiceStub::SelectSourceTrackByID;
-    demuxerFuncs_[UNSELECT_SOURCE_TRACK_BY_ID] = &DemuxerServiceStub::UnselectSourceTrackByID;
-    demuxerFuncs_[COPY_NEXT_SAMPLE] = &DemuxerServiceStub::CopyNextSample;
+    demuxerFuncs_[SELECT_TRACK_BY_ID] = &DemuxerServiceStub::SelectTrackByID;
+    demuxerFuncs_[UNSELECT_TRACK_BY_ID] = &DemuxerServiceStub::UnselectTrackByID;
+    demuxerFuncs_[READ_SAMPLE] = &DemuxerServiceStub::ReadSample;
     demuxerFuncs_[SEEK_TO_TIME] = &DemuxerServiceStub::SeekToTime;
 
     demuxerFuncs_[DESTROY_STUB] = &DemuxerServiceStub::DestroyStub;
@@ -94,29 +94,29 @@ int32_t DemuxerServiceStub::DestroyStub()
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServiceStub::Init(uint64_t sourceAddr)
+int32_t DemuxerServiceStub::Init(uintptr_t sourceAddr)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
     return demuxerServer_->Init(sourceAddr);
 }
 
-int32_t DemuxerServiceStub::SelectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerServiceStub::SelectTrackByID(uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->SelectSourceTrackByID(trackIndex);
+    return demuxerServer_->SelectTrackByID(trackIndex);
 }
 
-int32_t DemuxerServiceStub::UnselectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerServiceStub::UnselectTrackByID(uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->UnselectSourceTrackByID(trackIndex);
+    return demuxerServer_->UnselectTrackByID(trackIndex);
 }
 
-int32_t DemuxerServiceStub::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                           AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t DemuxerServiceStub::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->CopyNextSample(trackIndex, buffer, bufferInfo, flag);
+    return demuxerServer_->ReadSample(trackIndex, sample, info, flag);
 }
 
 int32_t DemuxerServiceStub::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
@@ -139,47 +139,46 @@ int32_t DemuxerServiceStub::DumpInfo(int32_t fd)
 
 int32_t DemuxerServiceStub::Init(MessageParcel &data, MessageParcel &reply)
 {
-    uint64_t sourceAddr = data.ReadUint64();
+    uint64_t sourceAddr = data.ReadPointer();
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Init(sourceAddr)), AVCS_ERR_UNKNOWN, "Reply Init failed!");
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServiceStub::SelectSourceTrackByID(MessageParcel &data, MessageParcel &reply)
+int32_t DemuxerServiceStub::SelectTrackByID(MessageParcel &data, MessageParcel &reply)
 {
     uint32_t trackIndex = data.ReadUint32();
 
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SelectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
-        "Reply SelectSourceTrackByID failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SelectTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
+        "Reply SelectTrackByID failed!");
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServiceStub::UnselectSourceTrackByID(MessageParcel &data, MessageParcel &reply)
+int32_t DemuxerServiceStub::UnselectTrackByID(MessageParcel &data, MessageParcel &reply)
 {
     uint32_t trackIndex = data.ReadUint32();
 
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(UnselectSourceTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
-        "Reply UnselectSourceTrackByID failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(UnselectTrackByID(trackIndex)), AVCS_ERR_UNKNOWN,
+        "Reply UnselectTrackByID failed!");
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServiceStub::CopyNextSample(MessageParcel &data, MessageParcel &reply)
+int32_t DemuxerServiceStub::ReadSample(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    uint32_t trackIndex;
+    uint32_t trackIndex = data.ReadUint32();
     AVCodecBufferInfo info;
     AVCodecBufferFlag flag;
-    uint8_t *buffer = nullptr;
+    std::shared_ptr<AVSharedMemory> sample = ReadAVSharedMemoryFromParcel(data);
     
-    int32_t ret = CopyNextSample(trackIndex, buffer, info, flag);
+    int32_t ret = ReadSample(trackIndex, sample, info, flag);
 
-    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackIndex), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN,
-        "Reply CopyNextSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+    WriteAVSharedMemoryToParcel(sample, reply);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(static_cast<uint32_t>(flag)), AVCS_ERR_UNKNOWN,
-        "Reply CopyNextSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply CopyNextSample failed!");
+        "Reply ReadSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
     return AVCS_ERR_OK;
 }
 

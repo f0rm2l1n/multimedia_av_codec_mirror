@@ -47,7 +47,7 @@ int32_t DemuxerServiceProxy::DestroyStub()
     return reply.ReadInt32();
 }
 
-int32_t DemuxerServiceProxy::Init(uint64_t sourceAddr)
+int32_t DemuxerServiceProxy::Init(uintptr_t sourceAddr)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -55,26 +55,27 @@ int32_t DemuxerServiceProxy::Init(uint64_t sourceAddr)
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
 
-    data.WriteUint64(sourceAddr);
+    data.WritePointer(sourceAddr);
     int32_t error = Remote()->SendRequest(INIT, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call Init, error: %{public}d", error);
     return reply.ReadInt32();
 }
 
-int32_t DemuxerServiceProxy::SelectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerServiceProxy::SelectTrackByID(uint32_t trackIndex)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
-
-    int32_t error = Remote()->SendRequest(SELECT_SOURCE_TRACK_BY_ID, data, reply, option);
+    
+    data.WriteInt32(trackIndex);
+    int32_t error = Remote()->SendRequest(SELECT_TRACK_BY_ID, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error,
-        "Failed to call SelectSourceTrackByID, error: %{public}d", error);
+        "Failed to call SelectTrackByID, error: %{public}d", error);
     return reply.ReadInt32();
 }
-int32_t DemuxerServiceProxy::UnselectSourceTrackByID(uint32_t trackIndex)
+int32_t DemuxerServiceProxy::UnselectTrackByID(uint32_t trackIndex)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -82,27 +83,31 @@ int32_t DemuxerServiceProxy::UnselectSourceTrackByID(uint32_t trackIndex)
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
 
-    int32_t error = Remote()->SendRequest(UNSELECT_SOURCE_TRACK_BY_ID, data, reply, option);
+    data.WriteInt32(trackIndex);
+    int32_t error = Remote()->SendRequest(UNSELECT_TRACK_BY_ID, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error,
-        "Failed to call UnselectSourceTrackByID, error: %{public}d", error);
+        "Failed to call UnselectTrackByID, error: %{public}d", error);
     return reply.ReadInt32();
 }
-int32_t DemuxerServiceProxy::CopyNextSample(uint32_t &trackIndex, uint8_t *buffer,
-                                            AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+int32_t DemuxerServiceProxy::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
-
-    int32_t error = Remote()->SendRequest(COPY_NEXT_SAMPLE, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call CopyNextSample, error: %{public}d", error);
+    
+    data.WriteInt32(trackIndex);
+    WriteAVSharedMemoryToParcel(sample, data);
+    int32_t error = Remote()->SendRequest(READ_SAMPLE, data, reply, option);
+    CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call ReadSample, error: %{public}d", error);
     
     trackIndex = reply.ReadUint32();
-    bufferInfo.presentationTimeUs = reply.ReadInt64();
-    bufferInfo.size = reply.ReadInt32();
-    bufferInfo.offset = reply.ReadInt32();
+    sample = ReadAVSharedMemoryFromParcel(reply);
+    info.presentationTimeUs = reply.ReadInt64();
+    info.size = reply.ReadInt32();
+    info.offset = reply.ReadInt32();
     flag = static_cast<enum AVCodecBufferFlag>(reply.ReadUint32());
     return reply.ReadInt32();
 }
@@ -114,6 +119,8 @@ int32_t DemuxerServiceProxy::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
 
+    data.WriteInt64(mSeconds);
+    data.WriteInt32(static_cast<int32_t>(mode));
     int32_t error = Remote()->SendRequest(SEEK_TO_TIME, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call SeekToTime, error: %{public}d", error);
     return reply.ReadInt32();

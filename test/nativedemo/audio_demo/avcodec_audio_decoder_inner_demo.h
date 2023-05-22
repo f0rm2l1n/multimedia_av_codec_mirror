@@ -81,6 +81,7 @@ private:
     std::shared_ptr<ADecSignal> signal_;
     std::shared_ptr<ADecDemoCallback> cb_;
     uint32_t frameCount_ = 0;
+    std::ifstream inputFile_;
 };
 } // namespace InnerAudioDemo
 } // namespace Media

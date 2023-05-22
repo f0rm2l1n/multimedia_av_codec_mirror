@@ -13,27 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_AUDIO_CODEC_KEY_H
-#define AVCODEC_AUDIO_CODEC_KEY_H
-#include <string_view>
-
+#ifndef CODEC_UTILS_H
+#define CODEC_UTILS_H
+#include "avcodec_audio_common.h"
+#include "avcodec_audio_channel_layout.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "libavcodec/avcodec.h"
+#ifdef __cplusplus
+}
+#endif
 namespace OHOS {
 namespace Media {
-class AVCodecAudioCodecKey {
+class FFMpegConverter {
 public:
-    static constexpr std::string_view AUDIO_DECODER_MP3_NAME_KEY = "avdec_mp3";
-    static constexpr std::string_view AUDIO_DECODER_AAC_NAME_KEY = "avdec_aac";
-    static constexpr std::string_view AUDIO_DECODER_VORBIS_NAME_KEY = "avdec_vorbis";
-    static constexpr std::string_view AUDIO_DECODER_FLAC_NAME_KEY = "avdec_flac";
-
-    static constexpr std::string_view AUDIO_ENCODER_FLAC_NAME_KEY = "avenc_flac";
-    static constexpr std::string_view AUDIO_ENCODER_AAC_NAME_KEY = "avenc_aac";
+    static AudioSampleFormat ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleformate);
+    static AudioChannelLayout ConvertFFToOHAudioChannelLayout(uint64_t ffChannelLayout);
 
 private:
-    AVCodecAudioCodecKey() = delete;
-    ~AVCodecAudioCodecKey() = delete;
+    FFMpegConverter() = delete;
+    ~FFMpegConverter() = delete;
 };
 } // namespace Media
 } // namespace OHOS
-
 #endif

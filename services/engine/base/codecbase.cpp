@@ -41,7 +41,7 @@ int32_t CodecBase::SetOutputSurface(sptr<Surface> surface)
     return 0;
 }
 
-int32_t CodecBase::RenderOutputBuffer(size_t index)
+int32_t CodecBase::RenderOutputBuffer(uint32_t index)
 {
     (void)index;
     AVCODEC_LOGW("RenderOutputBuffer is not supported");

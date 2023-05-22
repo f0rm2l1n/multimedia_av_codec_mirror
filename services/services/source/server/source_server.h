@@ -28,12 +28,12 @@ public:
     SourceServer();
     ~SourceServer();
 
-    int32_t Init(const std::string &uri) override;
+    int32_t InitWithURI(const std::string &uri) override;
+    int32_t InitWithFD(int32_t fd, int64_t offset, int64_t size) override;
     int32_t GetTrackCount(uint32_t &trackCount) override;
-    int32_t SetTrackFormat(const Format &format, uint32_t trackIndex) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
     int32_t GetSourceFormat(Format &format) override;
-    uint64_t GetSourceAddr() override;
+    int32_t GetSourceAddr(uintptr_t &addr) override;
     int32_t DumpInfo(int32_t fd);
 
 private:

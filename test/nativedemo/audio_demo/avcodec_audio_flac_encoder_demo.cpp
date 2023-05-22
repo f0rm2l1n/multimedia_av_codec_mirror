@@ -22,25 +22,25 @@
 #include "native_avformat.h"
 #include "demo_log.h"
 #include "native_avcodec_base.h"
-#include "avcodec_audio_codec_key.h"
-#include "avcodec_audio_encoder_demo.h"
+#include "avcodec_codec_name.h"
+#include "avcodec_audio_flac_encoder_demo.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
-using namespace OHOS::Media::AudioDemo;
+using namespace OHOS::Media::AudioFlacDemo;
 using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
-constexpr uint32_t BITS_RATE = 112000;
-constexpr uint32_t BITS_PER_CODED_RATE = 16;
+constexpr uint32_t BITS_RATE = 169000;
+constexpr uint32_t BITS_PER_CODED_SAMPLE = 16;
 constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr uint32_t CHANNEL_LAYOUT = 3;
-constexpr int32_t SAMPLE_FORMAT = 8;
-constexpr int32_t INPUT_FRAME_BYTES = 2 * 1024 * 4;
+constexpr int32_t SAMPLE_FORMAT = 1;
+constexpr uint32_t FRAME_BYTES = 18432;
 
-constexpr string_view inputFilePath = "/data/media/test_fltp.pcm";
-constexpr string_view outputFilePath = "/data/media/encode2.aac";
+constexpr string_view inputFilePath = "/data/flac_test.pcm";
+constexpr string_view outputFilePath = "/data/flac_encoder_test.flac";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -89,7 +89,7 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
     signal_->outCond_.notify_all();
 }
 
-void AEncDemo::RunCase()
+void AEncFlacDemo::RunCase()
 {
     std::cout << "RunCase enter" << std::endl;
     DEMO_CHECK_AND_RETURN_LOG(CreateEnc() == AVCS_ERR_OK, "Fatal: CreateEnc fail");
@@ -98,7 +98,7 @@ void AEncDemo::RunCase()
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(), BITS_PER_CODED_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
 
@@ -114,25 +114,24 @@ void AEncDemo::RunCase()
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }
 
-AEncDemo::AEncDemo()
+AEncFlacDemo::AEncFlacDemo()
 {
     frameCount_ = 0;
     isRunning_ = false;
     inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
 }
 
-AEncDemo::~AEncDemo()
+AEncFlacDemo::~AEncFlacDemo()
 {
-    OH_AudioEncoder_Destroy(audioEnc_);
     if (signal_) {
         delete signal_;
         signal_ = nullptr;
     }
 }
 
-int32_t AEncDemo::CreateEnc()
+int32_t AEncFlacDemo::CreateEnc()
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecAudioCodecKey::AUDIO_ENCODER_AAC_NAME_KEY).data());
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();
@@ -145,25 +144,25 @@ int32_t AEncDemo::CreateEnc()
     return AVCS_ERR_OK;
 }
 
-int32_t AEncDemo::Configure(OH_AVFormat *format)
+int32_t AEncFlacDemo::Configure(OH_AVFormat *format)
 {
     return OH_AudioEncoder_Configure(audioEnc_, format);
 }
 
-int32_t AEncDemo::Start()
+int32_t AEncFlacDemo::Start()
 {
     isRunning_.store(true);
 
-    inputLoop_ = make_unique<thread>(&AEncDemo::InputFunc, this);
+    inputLoop_ = make_unique<thread>(&AEncFlacDemo::InputFunc, this);
     DEMO_CHECK_AND_RETURN_RET_LOG(inputLoop_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
 
-    outputLoop_ = make_unique<thread>(&AEncDemo::OutputFunc, this);
+    outputLoop_ = make_unique<thread>(&AEncFlacDemo::OutputFunc, this);
     DEMO_CHECK_AND_RETURN_RET_LOG(outputLoop_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
 
     return OH_AudioEncoder_Start(audioEnc_);
 }
 
-int32_t AEncDemo::Stop()
+int32_t AEncFlacDemo::Stop()
 {
     isRunning_.store(false);
 
@@ -184,22 +183,22 @@ int32_t AEncDemo::Stop()
     return OH_AudioEncoder_Stop(audioEnc_);
 }
 
-int32_t AEncDemo::Flush()
+int32_t AEncFlacDemo::Flush()
 {
     return OH_AudioEncoder_Flush(audioEnc_);
 }
 
-int32_t AEncDemo::Reset()
+int32_t AEncFlacDemo::Reset()
 {
     return OH_AudioEncoder_Reset(audioEnc_);
 }
 
-int32_t AEncDemo::Release()
+int32_t AEncFlacDemo::Release()
 {
     return OH_AudioEncoder_Destroy(audioEnc_);
 }
 
-void AEncDemo::HandleEOS(const uint32_t &index)
+void AEncFlacDemo::HandleEOS(const uint32_t &index)
 {
     OH_AVCodecBufferAttr info;
     info.size = 0;
@@ -207,12 +206,11 @@ void AEncDemo::HandleEOS(const uint32_t &index)
     info.pts = 0;
     info.flags = AVCODEC_BUFFER_FLAGS_EOS;
     OH_AudioEncoder_PushInputData(audioEnc_, index, info);
-    std::cout << "end buffer\n";
     signal_->inQueue_.pop();
     signal_->inBufferQueue_.pop();
 }
 
-void AEncDemo::InputFunc()
+void AEncFlacDemo::InputFunc()
 {
     DEMO_CHECK_AND_RETURN_LOG(inputFile_ != nullptr && inputFile_->is_open(), "Fatal: open file fail");
     while (true) {
@@ -227,16 +225,22 @@ void AEncDemo::InputFunc()
         uint32_t index = signal_->inQueue_.front();
         auto buffer = signal_->inBufferQueue_.front();
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
-
         if (!inputFile_->eof()) {
-            inputFile_->read((char*)OH_AVMemory_GetAddr(buffer), INPUT_FRAME_BYTES);
+            inputFile_->read((char *)OH_AVMemory_GetAddr(buffer), FRAME_BYTES);
         } else {
-            HandleEOS(index);
+            OH_AVCodecBufferAttr info;
+            info.size = 0;
+            info.offset = 0;
+            info.pts = 0;
+            info.flags = AVCODEC_BUFFER_FLAGS_EOS;
+            OH_AudioEncoder_PushInputData(audioEnc_, index, info);
+            signal_->inQueue_.pop();
+            signal_->inBufferQueue_.pop();
             break;
         }
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
         OH_AVCodecBufferAttr info;
-        info.size = INPUT_FRAME_BYTES;
+        info.size = FRAME_BYTES;
         info.offset = 0;
 
         int32_t ret = AVCS_ERR_OK;
@@ -248,19 +252,21 @@ void AEncDemo::InputFunc()
             info.flags = AVCODEC_BUFFER_FLAGS_NONE;
             ret = OH_AudioEncoder_PushInputData(audioEnc_, index, info);
         }
+
         timeStamp_ += FRAME_DURATION_US;
         signal_->inQueue_.pop();
         signal_->inBufferQueue_.pop();
         frameCount_++;
         if (ret != AVCS_ERR_OK) {
             cout << "Fatal error, exit" << endl;
+            isRunning_ = false;
             break;
         }
     }
     inputFile_->close();
 }
 
-void AEncDemo::OutputFunc()
+void AEncFlacDemo::OutputFunc()
 {
     std::ofstream outputFile;
     outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
@@ -304,10 +310,6 @@ void AEncDemo::OutputFunc()
         if (OH_AudioEncoder_FreeOutputData(audioEnc_, index) != AV_ERR_OK) {
             cout << "Fatal: FreeOutputData fail" << endl;
             break;
-        }
-        if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
-            cout << "decode eos" << endl;
-            isRunning_.store(false);
         }
     }
     outputFile.close();

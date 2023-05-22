@@ -68,7 +68,7 @@ int32_t AudioFFMpegFlacDecoderPlugin::init(const Format &format)
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bit_rate);
-    format.GetIntValue(MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY, bits_per_coded_sample);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bits_per_coded_sample);
     if (!isTrueSampleRate(sample_rate)) {
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
     } else if (channels < minChannels || channels > maxChannels) {

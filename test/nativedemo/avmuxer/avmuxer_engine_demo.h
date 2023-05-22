@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef AVMUXER_ENGINE_DEMO_H
 #define AVMUXER_ENGINE_DEMO_H
 
-#include "avmuxer_demo_base.h"
 #include "i_muxer_engine.h"
+#include "avmuxer_demo_base.h"
 
 namespace OHOS {
 namespace Media {
@@ -26,7 +27,7 @@ public:
     ~AVMuxerEngineDemo() = default;
 private:
     void DoRunMuxer() override;
-    int DoWriteSampleBuffer(uint8_t *sampleBuffer, TrackSampleInfo &info) override;
+    int DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info) override;
     int DoAddTrack(int32_t &trackIndex, MediaDescription &trackDesc) override;
     void DoRunMultiThreadCase() override;
     void DoRunMuxer(const std::string &runMode);

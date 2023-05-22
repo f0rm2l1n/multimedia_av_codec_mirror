@@ -15,7 +15,8 @@
 
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
-#include "codeclist_xml_parser.h"
+#include "codeclist_builder.h"
+#include "hcodec_loader.h"
 #include "codec_ability_singleton.h"
 
 namespace {
@@ -24,66 +25,80 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecAbili
 
 namespace OHOS {
 namespace Media {
-CodecAbilitySingleton &CodecAbilitySingleton::GetInstance()
+std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> GetCodecLists()
 {
-    AVCODEC_LOGE("CodecAbilitySingleton entered: start getting ins");
-    static CodecAbilitySingleton instance;
-    bool ret = instance.ParseCodecXml();
-    if (!ret) {
-        AVCODEC_LOGE("Parse codec xml failed");
-    }
-    return instance;
+    std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> codecLists;
+    std::shared_ptr<CodecListBase> vcodecList = std::make_shared<VideoCodecList>();
+    codecLists.insert(std::make_pair(CodecType::AVCODEC_VIDEO_CODEC, vcodecList));
+    std::shared_ptr<CodecListBase> acodecList = std::make_shared<AudioCodecList>();
+    codecLists.insert(std::make_pair(CodecType::AVCODEC_AUDIO_CODEC, acodecList));
+    return codecLists;
 }
 
-bool CodecAbilitySingleton::ParseCodecXml()
+CodecAbilitySingleton &CodecAbilitySingleton::GetInstance()
 {
-    AVCODEC_LOGE("start parsing xml");
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (isParsered_) {
-        AVCODEC_LOGE("Parse codec xml done");
-        return true;
-    }
-    CodeclistXmlParser xmlParser;
-    bool ret = xmlParser.LoadConfiguration();
-    if (!ret) {
-        this->isParsered_ = false;
-        AVCODEC_LOGE("AVCodecList LoadConfiguration failed");
-        return false;
-    }
-    ret = xmlParser.Parse();
-    if (!ret) {
-        isParsered_ = false;
-        AVCODEC_LOGE("AVCodecList Parse failed.");
-        return false;
-    }
-    std::vector<CapabilityData> data = xmlParser.GetCapabilityDataArray();
-    capabilityDataArray_.insert(capabilityDataArray_.end(), data.begin(), data.end());
-    isParsered_ = true;
-    AVCODEC_LOGE("Parse codec xml successful, num = %{public}zu", capabilityDataArray_.size());
-    return true;
+    static CodecAbilitySingleton instance;
+    AVCODEC_LOGI("Get Codec ability singleton success");
+    return instance;
 }
 
 CodecAbilitySingleton::CodecAbilitySingleton()
 {
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
+    std::vector<CapabilityData> capaArray;
+    if (HCodecLoader::GetCapabilityList(capaArray) == AVCS_ERR_OK) {
+        RegisterCapabilityArray(capaArray, CodecType::AVCODEC_HCODEC);
+    }
+    std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> codecLists = GetCodecLists();
+    for (auto iter = codecLists.begin(); iter != codecLists.end(); iter++) {
+        CodecType codecType = iter->first;
+        std::vector<CapabilityData> capaArray;
+        int32_t ret = iter->second->GetCapabilityList(capaArray);
+        if (ret == AVCS_ERR_OK) {
+            RegisterCapabilityArray(capaArray, codecType);
+        }
+    }
+    AVCODEC_LOGI("Capability instances create successful");
 }
 
 CodecAbilitySingleton::~CodecAbilitySingleton()
 {
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+    AVCODEC_LOGI("Capability instances destroy successful");
 }
 
-void CodecAbilitySingleton::RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray)
+void CodecAbilitySingleton::RegisterCapabilityArray(const std::vector<CapabilityData> &capaArray, CodecType codecType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    int32_t beginIdx = capabilityDataArray_.size();
     capabilityDataArray_.insert(capabilityDataArray_.end(), capaArray.begin(), capaArray.end());
-    AVCODEC_LOGD("RegisterCapability success");
+    for (auto iter = capaArray.begin(); iter != capaArray.end(); iter++) {
+        std::string mimeType = (*iter).mimeType;
+        std::vector<size_t> idxVec;
+        if (mimeCapIdxMap_.find(mimeType) == mimeCapIdxMap_.end()) {
+            mimeCapIdxMap_.insert(std::make_pair(mimeType, idxVec));
+        }
+        mimeCapIdxMap_.at(mimeType).emplace_back(beginIdx);
+        nameCodecTypeMap_.insert(std::make_pair((*iter).codecName, codecType));
+        beginIdx++;
+    }
+    AVCODEC_LOGD("Register capability successful");
 }
 
 std::vector<CapabilityData> CodecAbilitySingleton::GetCapabilityArray()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return capabilityDataArray_;
+}
+
+std::unordered_map<std::string, CodecType> CodecAbilitySingleton::GetNameCodecTypeMap()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return nameCodecTypeMap_;
+}
+
+std::unordered_map<std::string, std::vector<size_t>> CodecAbilitySingleton::GetMimeCapIdxMap()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return mimeCapIdxMap_;
 }
 } // namespace Media
 } // namespace OHOS
