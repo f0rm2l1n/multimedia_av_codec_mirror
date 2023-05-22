@@ -156,7 +156,8 @@ int32_t SourceServiceStub::InitWithFD(MessageParcel &data, MessageParcel &reply)
     int32_t fd = data.ReadFileDescriptor();
     int64_t offset = data.ReadInt64();
     int64_t size = data.ReadInt64();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitWithFD(fd, offset, size)), AVCS_ERR_UNKNOWN, "Reply InitWithFD failed");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitWithFD(fd, offset, size)), AVCS_ERR_UNKNOWN,
+        "Reply InitWithFD failed");
     return AVCS_ERR_OK;
 }
 
@@ -165,7 +166,8 @@ int32_t SourceServiceStub::GetTrackCount(MessageParcel &data, MessageParcel &rep
     (void)data;
     uint32_t trackCount = 0;
     int32_t ret = GetTrackCount(trackCount);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackCount), AVCS_ERR_UNKNOWN, "Write trackCount failed when call GetTrackCount");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(trackCount), AVCS_ERR_UNKNOWN,
+        "Write trackCount failed when call GetTrackCount");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetTrackCount failed");
     return AVCS_ERR_OK;
 }

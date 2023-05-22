@@ -391,7 +391,6 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
 {
     AVCODEC_LOGD("FFmpegDemuxerPlugin::SeekToTime is on call: mSeconds=%{public}" PRId64 "; mode=%{public}d",
         mSeconds, mode);
-
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
         return AVCS_ERR_SEEK_FAILED;
