@@ -81,7 +81,7 @@ void AVCodecEvent::FaultEventWrite(std::string eventName, int32_t errorCode,
         "MSG", msg_);
 }
 
-void BehaviorEventWrite(std::string status, std::string moudle)
+void BehaviorEventWrite(const std::string status, std::string moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s, current state is: %s", "state change", status.c_str())) {
@@ -91,7 +91,7 @@ void BehaviorEventWrite(std::string status, std::string moudle)
     }
 }
 
-void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle)
+void FaultEventWrite(int32_t errorCode, const std::string msg, std::string moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s", msg.c_str())) {
@@ -101,7 +101,7 @@ void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle)
     }
 }
 
-void StatisticEventWrite(std::string msg, std::string moudle)
+void StatisticEventWrite(const std::string msg, std::string moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s", msg.c_str())) {
