@@ -16,7 +16,7 @@
 #include <string>
 #include <sstream>
 #include <type_traits>
-#include <inttypes.h>
+#include <cinttypes>
 #include "securec.h"
 #include "avcodec_errors.h"
 #include "native_avcodec_base.h"
