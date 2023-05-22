@@ -355,11 +355,11 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
                 samplePacket = cacheSamplePacket;
                 break;
             }
-            if (sampleCache_[trackIndex]->Size() == sampleCache_[trackIndex]->Capacity()) {
-                AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", trackIndex);
-                sampleCache_[trackIndex]->Pop();
+            if (sampleCache_[stream_index]->Size() == sampleCache_[stream_index]->Capacity()) {
+                AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", stream_index);
+                sampleCache_[stream_index]->Pop();
             }
-            sampleCache_[trackIndex]->Push(cacheSamplePacket);
+            sampleCache_[stream_index]->Push(cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
     if (ffmpegRet<0) {
