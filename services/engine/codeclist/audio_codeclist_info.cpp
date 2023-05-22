@@ -134,7 +134,7 @@ AudioCodeclistInfo &AudioCodeclistInfo::GetInstance()
     return audioCodecList;
 }
 
-std::vector<CapabilityData> AudioCodeclistInfo::GetAudioCapacities() const noexcept
+std::vector<CapabilityData> AudioCodeclistInfo::GetAudioCapabilities() const noexcept
 {
     return audioCapbilities_;
 }

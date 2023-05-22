@@ -23,7 +23,7 @@ class AudioCodeclistInfo {
 public:
     ~AudioCodeclistInfo();
     static AudioCodeclistInfo &GetInstance();
-    std::vector<CapabilityData> GetAudioCapacities() const noexcept;
+    std::vector<CapabilityData> GetAudioCapabilities() const noexcept;
 
 private:
     std::vector<CapabilityData> audioCapbilities_;
