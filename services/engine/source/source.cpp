@@ -205,7 +205,7 @@ int32_t Source::GetTrackCount(uint32_t &trackCount)
 void Source::GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format)
 {
     AVDictionaryEntry *valPtr = nullptr;
-    valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_IGNORE_SUFFIX);
+    valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_MATCH_CASE);
     if (valPtr == nullptr) {
         AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
     } else {
