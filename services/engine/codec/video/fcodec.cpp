@@ -900,7 +900,7 @@ void FCodec::RenderFrame()
     }
 }
 
-int32_t FCodec::ReleaseOutputBuffer(size_t index)
+int32_t FCodec::ReleaseOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((IsActive() || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
