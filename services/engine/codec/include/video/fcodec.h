@@ -60,7 +60,7 @@ public:
         AVBuffer() = default;
         ~AVBuffer() = default;
 
-        enum status {
+        enum class status {
             OWNED_BY_CODEC,
             OWNED_BY_USER,
             OWNED_BY_SURFACE,
@@ -80,10 +80,7 @@ private:
         Initialized,
         Configured,
         Running,
-        Flushing,
         Flushed,
-        Stopping,
-        Releasing,
         EOS,
         Error,
     };
@@ -92,6 +89,7 @@ private:
     std::tuple<int32_t, int32_t> CalculateBufferSize();
     int32_t AllocateBuffers();
     int32_t ReleaseBuffers(bool isFlush = false);
+    int32_t UpdateBuffers(uint32_t index);
     void SendFrame();
     void ReceiveFrame();
     void RenderFrame();
@@ -102,6 +100,7 @@ private:
     int32_t AllocateInputBuffer(int32_t bufferCnt, int32_t inBufferSize);
     int32_t AllocateOutputBuffer(int32_t bufferCnt, int32_t outBufferSize);
     int32_t FillFrameBuffer(const std::shared_ptr<AVBuffer> &frameBuffer);
+    int32_t CheckFormatChange(uint32_t index, int width, int height);
     void SetSurfaceParameter(const Format &format, const std::string_view &formatKey, uint32_t FORMAT_TYPE);
     int32_t UpdateSurfaceMemory(std::shared_ptr<SurfaceMemory> &surfaceMemory, int64_t pts);
     int32_t FillFrameBufferImpl(const std::shared_ptr<AVBuffer> &frameBuffer, AVPixelFormat ffmpegFormat,
@@ -111,6 +110,7 @@ private:
     Format format_;
     int32_t width_ = 0;
     int32_t height_ = 0;
+    int32_t outBufferSize_ = 0;
     // INIT
     std::shared_ptr<AVCodec> avCodec_ = nullptr;
     // Config
@@ -123,6 +123,7 @@ private:
     int32_t scaleLineSize_[AV_NUM_DATA_POINTERS];
     std::shared_ptr<Scale> scale_ = nullptr;
     bool isConverted_ = false;
+    bool formatChange_ = false;
     // Running
     std::vector<std::shared_ptr<AVBuffer>> buffers_[2];
     std::list<uint32_t> codecAvailBuffers_;
