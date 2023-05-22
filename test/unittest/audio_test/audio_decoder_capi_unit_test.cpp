@@ -577,6 +577,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_05, TestSize.Leve
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
 }
 
@@ -589,6 +590,18 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_01, TestSize.Le
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
+}
+
+HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_02, TestSize.Level1)
+{
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
+}
+
+HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_03, TestSize.Level1)
+{
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
 }
 
 int main(int argc, char *argv[])
