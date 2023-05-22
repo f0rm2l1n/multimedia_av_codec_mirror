@@ -72,6 +72,7 @@ int32_t SourceEngineImpl::GetTrackCount(uint32_t &trackCount)
 {
     AVCodecTrace trace("SourceEngineImpl::GetTrackCount");
     AVCODEC_LOGI("GetTrackCount");
+    std::unique_lock<std::mutex> lock(mutex_);
     return source_->GetTrackCount(trackCount);
 }
 
@@ -79,6 +80,7 @@ int32_t SourceEngineImpl::GetSourceFormat(Format &format)
 {
     AVCodecTrace trace("SourceEngineImpl::GetSourceFormat");
     AVCODEC_LOGI("GetSourceFormat");
+    std::unique_lock<std::mutex> lock(mutex_);
     return source_->GetSourceFormat(format);
 }
 
@@ -86,6 +88,7 @@ int32_t SourceEngineImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
     AVCodecTrace trace("SourceEngineImpl::GetTrackFormat");
     AVCODEC_LOGI("GetTrackFormat");
+    std::unique_lock<std::mutex> lock(mutex_);
     return source_->GetTrackFormat(format, trackIndex);
 }
 
@@ -93,6 +96,7 @@ uintptr_t SourceEngineImpl::GetSourceAddr()
 {
     AVCodecTrace trace("SourceEngineImpl::GetSourceAddr");
     AVCODEC_LOGI("GetSourceAddr");
+    std::unique_lock<std::mutex> lock(mutex_);
     return source_->GetSourceAddr();
 }
 } // Media
