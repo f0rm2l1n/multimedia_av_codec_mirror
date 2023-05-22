@@ -19,15 +19,16 @@
 #include <string>
 #include <map>
 #include <mutex>
+#include <unistd.h>
 
 namespace OHOS {
 namespace Media {
 class __attribute__((visibility("default"))) AVCodecXCollie {
 public:
     static AVCodecXCollie &GetInstance();
-    int32_t SetTimer(const std::string &name, bool recovery = false, uint32_t timeout = 10); // 10s
-    int32_t SetTimerByLog(const std::string &name, uint32_t timeout = 10); // 10s
-    void CancelTimer(int32_t id);
+    uint64_t SetTimer(const std::string &name, bool recovery = false, uint32_t timeout = 10); // 10s
+    uint64_t SetTimerByLog(const std::string &name, uint32_t timeout = 10); // 10s
+    void CancelTimer(uint64_t id);
     int32_t Dump(int32_t fd);
     constexpr static uint32_t timerTimeout = 10;
 private:
@@ -36,28 +37,29 @@ private:
     void TimerCallback(void *data);
 
     std::mutex mutex_;
-    std::map<int32_t, std::string> dfxDumper_;
+    uint64_t dumperIndex_ = 0;
+    std::map<int32_t, std::pair<int32_t, std::string>> dfxDumper_;
     uint32_t threadDeadlockCount_ = 0;
 };
 
 class __attribute__((visibility("hidden"))) AVCodecXcollieTimer {
 public:
-    AVCodecXcollieTimer(const std::string &name, bool recovery = false, uint32_t timeout = 10)
+    AVCodecXcollieTimer(const std::string &name, bool recovery = false, uint32_t timeout = 1)
     {
-        id_ = AVCodecXCollie::GetInstance().SetTimer(name, recovery, timeout);
+        index_ = AVCodecXCollie::GetInstance().SetTimer(name, recovery, timeout);
     };
 
     AVCodecXcollieTimer(const std::string &name, uint32_t timeout)
     {
-        id_ = AVCodecXCollie::GetInstance().SetTimerByLog(name, timeout);
+        index_ = AVCodecXCollie::GetInstance().SetTimerByLog(name, timeout);
     }
 
     ~AVCodecXcollieTimer()
     {
-        AVCodecXCollie::GetInstance().CancelTimer(id_);
+        AVCodecXCollie::GetInstance().CancelTimer(index_);
     }
 private:
-    int32_t id_ = 0;
+    uint64_t index_ = 0;
 };
 
 #define COLLIE_LISTEN(statement, args...) { AVCodecXcollieTimer xCollie(args); statement; }

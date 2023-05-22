@@ -13,15 +13,28 @@
  * limitations under the License.
  */
 
+#include <map>
 #include "muxer_service_stub.h"
 #include "avcodec_server_manager.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "avsharedmemory_ipc.h"
 #include "avcodec_parcel.h"
+#include "avcodec_xcollie.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "MuxerServiceStub"};
+
+    const std::map<uint32_t, const std::string> MUXER_FUNC_NAME_MAP = {
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::INIT_PARAMETER, "MuxerServiceStub-InitParameter" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::SET_ROTATION, "MuxerServiceStub-SetRotation" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::ADD_TRACK, "MuxerServiceStub-AddTrack" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::START, "MuxerServiceStub-Start" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::WRITE_SAMPLE, "MuxerServiceStub-WriteSample" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::STOP, "MuxerServiceStub-Stop" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::RELEASE, "MuxerServiceStub-Release" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::DESTROY, "MuxerServiceStub-DestroyStub" },
+    };
 }
 
 namespace OHOS {
@@ -74,7 +87,11 @@ int MuxerServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
     if (itFunc != muxerFuncs_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            int32_t ret = (this->*memberFunc)(data, reply);
+            int32_t ret;
+            auto itFuncName = MUXER_FUNC_NAME_MAP.find(code);
+            std::string funcName = 
+                itFuncName != MUXER_FUNC_NAME_MAP.end() ? itFuncName->second : "MuxerServiceStub::OnRemoteRequest";
+            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
             CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call memberFunc");
             return AVCS_ERR_OK;
         }
