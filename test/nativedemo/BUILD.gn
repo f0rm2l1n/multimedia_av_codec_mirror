@@ -28,7 +28,12 @@ ohos_executable("av_codec_demo") {
     "$av_codec_root_dir/services/engine/source/hst_releated",
     "$av_codec_root_dir/services/services/factory",
     "$av_codec_root_dir/services/utils/include",
+    "//foundation/graphic/graphic_2d/frameworks/surface/include",
+    "//foundation/graphic/graphic_2d/interfaces/inner_api",
+    "//foundation/graphic/graphic_2d/interfaces/inner_api/surface",
+    "//foundation/graphic/graphic_2d/interfaces/inner_api/common",
     "./audio_demo",
+    "./video_demo",
     "./avmuxer",
     "./codeclist_demo",
     "./include",
@@ -66,6 +71,8 @@ ohos_executable("av_codec_demo") {
     "./audio_demo/avcodec_audio_decoder_inner_demo.cpp",
     "./audio_demo/avcodec_audio_encoder_inner_demo.cpp",
     "./audio_demo/avcodec_audio_flac_encoder_demo.cpp",
+    "./video_demo/avcodec_video_decoder_demo.cpp",
+    "./video_demo/avcodec_video_decoder_inner_demo.cpp",
     "./av_codec_demo.cpp",
     "./avmuxer/avmuxer_demo.cpp",
     "./avmuxer/avmuxer_demo_base.cpp",
@@ -85,6 +92,10 @@ ohos_executable("av_codec_demo") {
     "$av_codec_root_dir/services/utils:av_codec_format",
     "//third_party/bounds_checking_function:libsec_static",
     "//third_party/ffmpeg:libohosffmpeg",
+    "//foundation/graphic/graphic_2d:libsurface",
+    "//foundation/graphic/graphic_2d/utils:libgraphic_utils",
+    "//foundation/graphic/graphic_2d/utils:sync_fence",
+
   ]
 
   external_deps = [
