@@ -67,15 +67,15 @@ CapabilityData GetAACDecoderCapability()
 
 CapabilityData GetFlacDecoderCapability()
 {
-    CapabilityData audioFlacCapbility;
-    audioFlacCapbility.codecName = AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY;
-    audioFlacCapbility.codecType = AVCODEC_TYPE_AUDIO_DECODER;
-    audioFlacCapbility.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
-    audioFlacCapbility.isVendor = false;
-    audioFlacCapbility.bitrate = Range(1, MAX_BIT_RATE_FLAC);
-    audioFlacCapbility.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
-    audioFlacCapbility.sampleRate = AUDIO_SAMPLE_RATE;
-    return audioFlacCapbility;
+    CapabilityData audioFlacCapability;
+    audioFlacCapability.codecName = AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY;
+    audioFlacCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
+    audioFlacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
+    audioFlacCapability.isVendor = false;
+    audioFlacCapability.bitrate = Range(1, MAX_BIT_RATE_FLAC);
+    audioFlacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
+    audioFlacCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    return audioFlacCapability;
 }
 
 CapabilityData GetVorbisDecoderCapability()
@@ -107,14 +107,14 @@ CapabilityData GetAACEncoderCapability()
 CapabilityData GetFlacEncoderCapability()
 {
     CapabilityData audioFlacCapability;
-    audioFlacCapbility.codecName = AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY;
-    audioFlacCapbility.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
-    audioFlacCapbility.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
-    audioFlacCapbility.isVendor = false;
-    audioFlacCapbility.bitrate = Range(1, MAX_BIT_RATE_FLAC);
-    audioFlacCapbility.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
-    audioFlacCapbility.sampleRate = AUDIO_SAMPLE_RATE;
-    return audioFlacCapbility;
+    audioFlacCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY;
+    audioFlacCapability.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
+    audioFlacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
+    audioFlacCapability.isVendor = false;
+    audioFlacCapability.bitrate = Range(1, MAX_BIT_RATE_FLAC);
+    audioFlacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
+    audioFlacCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    return audioFlacCapability;
 }
 
 AudioCodeclistInfo::AudioCodeclistInfo()
