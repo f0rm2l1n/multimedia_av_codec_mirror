@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef NATIVE_OBJECT_H
+#define NATIVE_OBJECT_H
+
 #include <memory>
 #include "avsource.h"
 #include "native_avsource.h"
@@ -25,3 +28,5 @@ struct AVSourceObject : public OH_AVSource {
 
     const std::shared_ptr<OHOS::Media::AVSource> source_;
 };
+
+#endif // NATIVE_OBJECT_H
