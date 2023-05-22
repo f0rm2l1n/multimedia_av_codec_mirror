@@ -129,7 +129,7 @@ AVCodecBufferFlag FFmpegDemuxerPlugin::ConvertFlagsFromFFmpeg(AVPacket* pkt,  AV
 
 int32_t FFmpegDemuxerPlugin::Create(uintptr_t sourceAddr)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::Create is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::Create");
     if (std::is_object<decltype(sourceAddr)>::value) {
         formatContext_ = std::shared_ptr<AVFormatContext>((AVFormatContext*)sourceAddr);
         SetBitStreamFormat();
@@ -144,12 +144,12 @@ int32_t FFmpegDemuxerPlugin::Create(uintptr_t sourceAddr)
 
 FFmpegDemuxerPlugin::FFmpegDemuxerPlugin()
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::FFmpegDemuxerPlugin is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::FFmpegDemuxerPlugin");
 }
 
 FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin");
     selectedTrackIds_.clear();
     for (auto it:sampleCache_) {
         it.second->Clear();
@@ -160,7 +160,7 @@ FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
 
 int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::SetBitStreamFormat is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::SetBitStreamFormat");
     uint32_t trackCount = formatContext_->nb_streams;
     for (uint32_t i = 0; i < trackCount; i++) {
         if (formatContext_->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -172,7 +172,7 @@ int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
 
 int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID is on call: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID: trackIndex=%{public}d", trackIndex);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
@@ -204,7 +204,7 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 
 int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID is on call: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID: trackIndex=%{public}d", trackIndex);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
@@ -230,7 +230,7 @@ int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
 
 std::vector<uint32_t> FFmpegDemuxerPlugin::GetSelectedTrackIds()
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::GetSelectedTrackIds is on call");
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::GetSelectedTrackIds");
     std::vector<uint32_t> trackIds;
     trackIds = selectedTrackIds_;
     return trackIds;
@@ -238,14 +238,14 @@ std::vector<uint32_t> FFmpegDemuxerPlugin::GetSelectedTrackIds()
 
 bool FFmpegDemuxerPlugin::IsInSelectedTrack(uint32_t trackIndex)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::IsInSelectedTrack is on call");
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::IsInSelectedTrack");
     return std::any_of(selectedTrackIds_.begin(), selectedTrackIds_.end(),
                        [trackIndex](uint32_t id) { return id == trackIndex; });
 }
 
 void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::InitBitStreamContext is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::InitBitStreamContext");
     const AVBitStreamFilter* avBitStreamFilter {nullptr};
     char codeTag[AV_FOURCC_MAX_STRING_SIZE] {0};
     av_fourcc_make_string(codeTag, avStream.codecpar->codec_tag);
@@ -277,7 +277,7 @@ void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
 
 void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb is on call");
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb");
     (void)av_bsf_send_packet(avbsfContext_.get(), &pkt);
     (void)av_packet_unref(&pkt);
     (void)av_bsf_receive_packet(avbsfContext_.get(), &pkt);
@@ -328,7 +328,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
 int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
                                         AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample is on call: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample: trackIndex=%{public}d", trackIndex);
     if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
         AVCODEC_LOGE("read frame failed, track %{public}d has not been selected", trackIndex);
         return AVCS_ERR_DEMUXER_FAILED;
@@ -389,8 +389,7 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
 
 int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::SeekToTime is on call: mSeconds=%{public}" PRId64 "; mode=%{public}d",
-        mSeconds, mode);
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::SeekToTime: mSeconds=%{public}" PRId64 ", mode=%{public}d", mSeconds, mode);
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
         return AVCS_ERR_SEEK_FAILED;
@@ -426,10 +425,6 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
                 ffTime = CalculateTimeByFrameIndex(avStream, keyFrameIdx);
             }
         }
-        int64_t realSeekTime = ConvertTimeFromFFmpeg(ffTime, avStream->time_base);
-        AVCODEC_LOGD("seek param: trackIndex=%{public}d, ffTime=%{public}" PRId64 ", \
-                     realSeekTime=%{public}" PRId64 ", flags=%{public}d",
-                     trackIndex, ffTime, realSeekTime, flags);
         auto rtv = av_seek_frame(formatContext_.get(), trackIndex, ffTime, flags);
         if (rtv < 0) {
             AVCODEC_LOGE("seek failed, return value: ffmpeg error:%{public}d", rtv);
