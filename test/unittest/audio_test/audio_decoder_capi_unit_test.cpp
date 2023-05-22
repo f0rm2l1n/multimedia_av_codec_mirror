@@ -84,8 +84,8 @@ public:
     ADecSignal *userData_;
     virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
     virtual void OnOutputFormatChanged(const Format &format) override;
-    virtual void OnInputBufferAvailable(size_t index) override;
-    virtual void OnOutputBufferAvailable(size_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+    virtual void OnInputBufferAvailable(uint32_t index) override;
+    virtual void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 };
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
