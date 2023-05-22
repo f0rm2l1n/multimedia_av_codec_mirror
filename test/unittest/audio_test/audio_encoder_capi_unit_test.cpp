@@ -1,0 +1,610 @@
+/*
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <vector>
+#include <queue>
+#include <mutex>
+#include <gtest/gtest.h>
+#include <iostream>
+#include <unistd.h>
+#include <atomic>
+#include <fstream>
+#include <queue>
+#include <string>
+#include <thread>
+#include "avcodec_codec_name.h"
+#include "avcodec_common.h"
+#include "avcodec_errors.h"
+#include "media_description.h"
+#include "native_avcodec_base.h"
+#include "native_avformat.h"
+#include "avcodec_common.h"
+#include "avcodec_errors.h"
+#include "native_avcodec_audioencoder.h"
+#include "securec.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#ifdef __cplusplus
+}
+#endif
+
+
+using namespace std;
+using namespace testing::ext;
+using namespace OHOS::Media;
+
+namespace {
+const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY);
+const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY);
+constexpr uint32_t CHANNEL_COUNT = 2;
+constexpr uint32_t SAMPLE_RATE = 44100;
+constexpr uint32_t BITS_RATE = 169000;
+constexpr uint32_t BITS_PER_CODED_SAMPLE = 16;
+constexpr uint32_t FRAME_DURATION_US = 33000;
+constexpr uint32_t CHANNEL_LAYOUT = 3;
+constexpr int32_t SAMPLE_FORMAT = 1;
+constexpr uint32_t FRAME_BYTES = 18432;
+constexpr int32_t COMPLIANCE_LEVEL = -2;
+
+constexpr string_view inputFilePath = "/data/encoderTest.pcm";
+constexpr string_view outputFilePath = "/data/encoderTest.flac";
+} // namespace
+
+namespace OHOS {
+namespace Media {
+class AEncSignal {
+public:
+    std::mutex inMutex_;
+    std::mutex outMutex_;
+    std::condition_variable inCond_;
+    std::condition_variable outCond_;
+    std::queue<uint32_t> inQueue_;
+    std::queue<uint32_t> outQueue_;
+    std::queue<OH_AVMemory *> inBufferQueue_;
+    std::queue<OH_AVMemory *> outBufferQueue_;
+    std::queue<OH_AVCodecBufferAttr> attrQueue_;
+};
+
+class BufferCallback : public AVCodecCallback {
+public:
+    explicit BufferCallback(AEncSignal *userData) : userData_(userData) {}
+    virtual ~BufferCallback() = default;
+    AEncSignal *userData_;
+    virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    virtual void OnOutputFormatChanged(const Format &format) override;
+    virtual void OnInputBufferAvailable(size_t index) override;
+    virtual void OnOutputBufferAvailable(size_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+};
+
+static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
+{
+    (void)codec;
+    (void)errorCode;
+    (void)userData;
+    cout << "Error received, errorCode:" << errorCode << endl;
+}
+
+static void OnOutputFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *userData)
+{
+    (void)codec;
+    (void)format;
+    (void)userData;
+    cout << "OnOutputFormatChanged received" << endl;
+}
+
+static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
+{
+    (void)codec;
+    AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
+    cout << "OnInputBufferAvailable received, index:" << index << endl;
+    unique_lock<mutex> lock(signal_->inMutex_);
+    signal_->inQueue_.push(index);
+    signal_->inBufferQueue_.push(data);
+    signal_->inCond_.notify_all();
+}
+
+
+static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
+                                    void *userData)
+{
+    (void)codec;
+    AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
+    cout << "OnOutputBufferAvailable received, index:" << index << endl;
+    unique_lock<mutex> lock(signal_->outMutex_);
+    signal_->outQueue_.push(index);
+    signal_->outBufferQueue_.push(data);
+    if (attr) {
+        cout << "OnOutputBufferAvailable received, index:" << index << ", attr->size:" << attr->size
+             << ", attr->flags:" << attr->flags << endl;
+        signal_->attrQueue_.push(*attr);
+    } else {
+        cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
+    }
+    signal_->outCond_.notify_all();
+}
+
+class AudioCodeCapiEncoderUnitTest : public testing::Test {
+public:
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    void SetUp();
+    void TearDown();
+    int32_t ProceFunc();
+    void InputFunc();
+    void OutputFunc();
+protected:
+    std::atomic<bool> isRunning_ = false;
+    std::unique_ptr<std::ifstream> inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
+    std::unique_ptr<std::thread> inputLoop_;
+    std::unique_ptr<std::thread> outputLoop_;
+    int32_t index_;
+
+    struct OH_AVCodecAsyncCallback cb_;
+    AEncSignal *signal_;
+    OH_AVCodec *audioEnc_;
+    OH_AVFormat *format;
+    bool isFirstFrame_ = true;
+    int64_t timeStamp_ = 0;
+    uint32_t frameCount_ = 0;
+
+    AVFormatContext *fmpt_ctx;
+    AVFrame *frame;
+    AVPacket pkt;
+};
+
+void AudioCodeCapiEncoderUnitTest::SetUpTestCase(void)
+{
+    cout << "[SetUpTestCase]: " << endl;
+}
+
+void AudioCodeCapiEncoderUnitTest::TearDownTestCase(void)
+{
+    cout << "[TearDownTestCase]: " << endl;
+}
+
+void AudioCodeCapiEncoderUnitTest::SetUp(void)
+{
+    cout << "[SetUp]: SetUp!!!" << endl;
+}
+
+void AudioCodeCapiEncoderUnitTest::TearDown(void)
+{
+    cout << "[TearDown]: over!!!" << endl;
+}
+
+void AudioCodeCapiEncoderUnitTest::InputFunc()
+{
+    while (true) {
+        if (!isRunning_.load()) {
+            break;
+        }
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.wait(lock, [this]() { return (signal_->inQueue_.size() > 0 || !isRunning_.load()); });
+        if (!isRunning_.load()) {
+            break;
+        }
+        uint32_t index = signal_->inQueue_.front();
+        auto buffer = signal_->inBufferQueue_.front();
+        if (!inputFile_->eof()) {
+            inputFile_->read((char *)OH_AVMemory_GetAddr(buffer), FRAME_BYTES);
+        } else {
+            OH_AVCodecBufferAttr info;
+            info.size = 0;
+            info.offset = 0;
+            info.pts = 0;
+            info.flags = AVCODEC_BUFFER_FLAGS_EOS;
+            OH_AudioEncoder_PushInputData(audioEnc_, index, info);
+            signal_->inQueue_.pop();
+            signal_->inBufferQueue_.pop();
+            break;
+        }
+        OH_AVCodecBufferAttr info;
+        info.size = FRAME_BYTES;
+        info.offset = 0;
+
+        int32_t ret = AVCS_ERR_OK;
+        if (isFirstFrame_) {
+            info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
+            ret = OH_AudioEncoder_PushInputData(audioEnc_, index, info);
+            isFirstFrame_ = false;
+        } else {
+            info.flags = AVCODEC_BUFFER_FLAGS_NONE;
+            ret = OH_AudioEncoder_PushInputData(audioEnc_, index, info);
+        }
+
+        timeStamp_ += FRAME_DURATION_US;
+        signal_->inQueue_.pop();
+        signal_->inBufferQueue_.pop();
+        frameCount_++;
+        if (ret != AVCS_ERR_OK) {
+            isRunning_ = false;
+            break;
+        }
+    }
+    inputFile_->close();
+}
+
+void AudioCodeCapiEncoderUnitTest::OutputFunc()
+{
+    std::ofstream outputFile;
+    outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
+
+    while (true) {
+        if (!isRunning_.load()) {
+            cout << "stop, exit" << endl;
+            break;
+        }
+
+        unique_lock<mutex> lock(signal_->outMutex_);
+        cout << "lock, before" << endl;
+        signal_->outCond_.wait(lock, [this]() { return (signal_->outQueue_.size() > 0 || !isRunning_.load()); });
+        cout << "lock, after" << endl;
+
+        if (!isRunning_.load()) {
+            cout << "wait to stop, exit" << endl;
+            break;
+        }
+
+        uint32_t index = signal_->outQueue_.front();
+
+        OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
+        OH_AVMemory *data = signal_->outBufferQueue_.front();
+        if (data != nullptr) {
+            cout << "OutputFunc write file,buffer index" << index << ", data size = :" << attr.size << endl;
+            outputFile.write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
+        }
+        cout << "attr.flags: " << attr.flags << endl;
+        if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS || attr.size == 0) {
+            cout << "encode eos" << endl;
+            isRunning_.store(false);
+        }
+
+        signal_->outBufferQueue_.pop();
+        signal_->attrQueue_.pop();
+        signal_->outQueue_.pop();
+        if (OH_AudioEncoder_FreeOutputData(audioEnc_, index) != AV_ERR_OK) {
+            cout << "Fatal: FreeOutputData fail" << endl;
+            break;
+        }
+    }
+    outputFile.close();
+}
+
+int32_t AudioCodeCapiEncoderUnitTest::ProceFunc(void)
+{
+    audioEnc_ = OH_AudioEncoder_CreateByName("avenc_flac");
+    EXPECT_NE((OH_AVCodec *)nullptr, audioEnc_);
+    
+    signal_ = new AEncSignal();
+    EXPECT_NE(nullptr, signal);
+
+    cb_ = {&OnError, &OnOutputFormatChanged, &OnInputBufferAvailable, &OnOutputBufferAvailable};
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_SetCallback(audioEnc_, cb_, signal_));
+
+    format = OH_AVFormat_Create();
+    return AVCS_ERR_OK;
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_CreateByName_01, TestSize.Level1)
+{
+    audioEnc_ = OH_AudioEncoder_CreateByName("avenc_flac");
+    EXPECT_NE(nullptr, audioEnc_);
+}
+
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_SetParameter_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    isRunning_.store(true);
+
+    inputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::InputFunc, this);
+    EXPECT_NE(nullptr, inputLoop_);
+
+    outputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::OutputFunc, this);
+    EXPECT_NE(nullptr, outputLoop_);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Start(audioEnc_));
+        while (isRunning_.load()) {
+        sleep(1); // sleep 1s
+    }
+
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+    }
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+    }
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Flush(audioEnc_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_SetParameter(audioEnc_, format));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_SetParameter_02, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_SetParameter(audioEnc_, format));
+}
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_Configure_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    isRunning_.store(true);
+
+    inputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::InputFunc, this);
+    EXPECT_NE(nullptr, inputLoop_);
+
+    outputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::OutputFunc, this);
+    EXPECT_NE(nullptr, outputLoop_);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Start(audioEnc_));
+    while (isRunning_.load()) {
+        sleep(1); // sleep 1s
+    }
+    
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+    }
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+    }
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Destroy(audioEnc_));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_02, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    isRunning_.store(true);
+    inputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::InputFunc, this);
+    EXPECT_NE(nullptr, inputLoop_);
+    outputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::OutputFunc, this);
+    EXPECT_NE(nullptr, outputLoop_);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Start(audioEnc_));
+    while (isRunning_.load()) {
+        sleep(1); // sleep 1s
+    }
+    
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+    }
+
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+    }
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Stop(audioEnc_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Destroy(audioEnc_));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_03, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    isRunning_.store(true);
+
+    inputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::InputFunc, this);
+    EXPECT_NE(nullptr, inputLoop_);
+
+    outputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::OutputFunc, this);
+    EXPECT_NE(nullptr, outputLoop_);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Start(audioEnc_));
+    while (isRunning_.load()) {
+        sleep(1); // sleep 1s
+    }
+    
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+    }
+
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+    }
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Flush(audioEnc_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Destroy(audioEnc_));
+}
+
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_04, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    isRunning_.store(true);
+
+    inputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::InputFunc, this);
+    EXPECT_NE(nullptr, inputLoop_);
+
+    outputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::OutputFunc, this);
+    EXPECT_NE(nullptr, outputLoop_);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Start(audioEnc_));
+    while (isRunning_.load()) {
+        sleep(1); // sleep 1s
+    }
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+    }
+
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+    }
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Reset(audioEnc_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Destroy(audioEnc_));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_05, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    isRunning_.store(true);
+
+    inputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::InputFunc, this);
+    EXPECT_NE(nullptr, inputLoop_);
+    outputLoop_ = make_unique<thread>(&AudioCodeCapiEncoderUnitTest::OutputFunc, this);
+    EXPECT_NE(nullptr, outputLoop_);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Start(audioEnc_));
+    while (isRunning_.load()) {
+        sleep(1); // sleep 1s
+    }
+    
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+    }
+
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+    }
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Flush(audioEnc_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Destroy(audioEnc_));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_abnormalcase_01, TestSize.Level1)
+{
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+}
+
+int main(int argc, char *argv[])
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+}  // namespace Media
+}  // namespace OHOS
