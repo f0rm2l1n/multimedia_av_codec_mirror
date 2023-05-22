@@ -232,7 +232,6 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("copyright", AVSourceFormat::SOURCE_COPYRIGHT, format);
     GetStringFormatFromMetadata("language", AVSourceFormat::SOURCE_LANGUAGE, format);
     GetStringFormatFromMetadata("description", AVSourceFormat::SOURCE_DESCRIPTION, format);
-    GetStringFormatFromMetadata("media_type", AVSourceFormat::SOURCE_TYPE, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
 
     bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, formatContext_->duration);
