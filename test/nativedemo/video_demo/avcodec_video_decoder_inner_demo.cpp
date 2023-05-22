@@ -277,7 +277,6 @@ int32_t VDecInnerDemo::ExtractPacket()
         data_ = inbuf_;
         (void)inputFile_->read(reinterpret_cast<char *>(data_ + data_size_), VIDEO_INBUF_SIZE - data_size_);
         len = inputFile_->gcount();
-
         if (len > 0) {
             data_size_ += len;
         } else if (len == 0 && data_size_ == 0) {
@@ -356,18 +355,14 @@ void VDecInnerDemo::OutputFunc()
 
         unique_lock<mutex> lock(signal_->outMutex_);
         signal_->outCond_.wait(lock, [this]() { return signal_->outQueue_.size() > 0; });
-
         if (!isRunning_.load()) {
             break;
         }
 
         uint32_t index = signal_->outQueue_.front();
-
         auto buffer = isSurfaceMode_ ? nullptr : videoDec_->GetOutputBuffer(index);
-
         auto attr = signal_->infoQueue_.front();
         auto flag = signal_->flagQueue_.front();
-
         if (flag == AVCODEC_BUFFER_FLAG_EOS) {
             cout << "decode eos, write frame:" << writeFrameCount << endl;
             isRunning_.store(false);

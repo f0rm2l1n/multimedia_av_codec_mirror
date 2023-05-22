@@ -46,7 +46,7 @@ public:
 private:
     int64_t timestamp_ = 0;
     Rect damage_ = {};
-    sptr<Surface> cs_{nullptr};
+    sptr<Surface> cs_ = nullptr;
     uint32_t &acquireFrameCount_;
     std::unique_ptr<std::ofstream> outFile_;
 };

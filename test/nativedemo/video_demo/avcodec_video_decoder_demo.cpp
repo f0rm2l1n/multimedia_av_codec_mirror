@@ -277,7 +277,6 @@ int32_t VDecDemo::ExtractPacket()
         data_ = inbuf_;
         (void)inputFile_->read(reinterpret_cast<char *>(data_ + data_size_), VIDEO_INBUF_SIZE - data_size_);
         len = inputFile_->gcount();
-
         if (len > 0) {
             data_size_ += len;
         } else if (len == 0 && data_size_ == 0) {
