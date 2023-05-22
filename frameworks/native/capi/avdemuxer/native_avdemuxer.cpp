@@ -43,7 +43,7 @@ struct OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source)
     struct AVSourceObject *sourceObj = reinterpret_cast<AVSourceObject *>(source);
 
     std::shared_ptr<AVDemuxer> demuxer = AVDemuxerFactory::CreateWithSource(*(sourceObj->source_));
-    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, nullptr, "New demuxer with fd by AVDemuxerFactory failed!");
+    CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, nullptr, "New demuxer with source by AVDemuxerFactory failed!");
 
     struct DemuxerObject *object = new(std::nothrow) DemuxerObject(demuxer);
     CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "New demuxerObject failed when create demuxer!");
@@ -63,12 +63,12 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer)
 OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
-        "Add sourceTrack failed because input demuxer is nullptr!");
+        "Select track failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
     CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
-        "New DemuxerObject failed when add sourceTrack!");
+        "New DemuxerObject failed when select track!");
 
     int32_t ret = demuxerObj->demuxer_->SelectTrackByID(trackIndex);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SelectTrackByID failed!");
@@ -79,12 +79,12 @@ OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackI
 OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
-        "Remove sourceTrack failed because input demuxer is nullptr!");
+        "Unselect track failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
     
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
     CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
-        "New DemuxerObject failed when remove sourceTrack!");
+        "New DemuxerObject failed when unselect track!");
 
     int32_t ret = demuxerObj->demuxer_->UnselectTrackByID(trackIndex);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ UnselectTrackByID failed!");

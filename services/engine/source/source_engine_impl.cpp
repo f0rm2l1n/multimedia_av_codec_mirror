@@ -61,7 +61,7 @@ SourceEngineImpl::SourceEngineImpl(int32_t appUid, int32_t appPid, const std::st
 
 SourceEngineImpl::~SourceEngineImpl()
 {
-    AVCODEC_LOGD("Destroy");
+    AVCODEC_LOGD("Destroy SourceEngineImpl");
     appUid_ = -1;
     appPid_ = -1;
     source_ = nullptr;

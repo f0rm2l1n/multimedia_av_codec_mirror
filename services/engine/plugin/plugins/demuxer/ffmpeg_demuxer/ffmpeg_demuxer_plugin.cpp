@@ -172,7 +172,7 @@ int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
 
 int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID is on call: trackIndex=%{public}d", trackIndex);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
@@ -204,7 +204,7 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 
 int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID is on call");
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID is on call: trackIndex=%{public}d", trackIndex);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
@@ -328,7 +328,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
 int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
                                         AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample is on call");
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample is on call: trackIndex=%{public}d", trackIndex);
     if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
         AVCODEC_LOGE("read frame failed, track %{public}d has not been selected", trackIndex);
         return AVCS_ERR_DEMUXER_FAILED;
@@ -389,6 +389,9 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
 
 int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
 {
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::SeekToTime is on call: mSeconds=%{public}" PRId64 "; mode=%{public}d",
+        mSeconds, mode);
+
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
         return AVCS_ERR_SEEK_FAILED;

@@ -33,7 +33,7 @@ std::shared_ptr<IDemuxerEngine> IDemuxerEngineFactory::CreateDemuxerEngine(
     AVCodecTrace trace("IDemuxerEngineFactory::CreateDemuxerEngine");
     std::shared_ptr<IDemuxerEngine> demuxerEngineImpl =
         std::make_shared<DemuxerEngineImpl>(appUid, appPid, sourceAddr);
-    CHECK_AND_RETURN_RET_LOG(demuxerEngineImpl != nullptr, nullptr, "create MuxerEngine implementation failed");
+    CHECK_AND_RETURN_RET_LOG(demuxerEngineImpl != nullptr, nullptr, "create DemuxerEngine implementation failed");
     return demuxerEngineImpl;
 }
 
