@@ -43,7 +43,9 @@ AudioFfmpegDecoderPlugin::AudioFfmpegDecoderPlugin()
 AudioFfmpegDecoderPlugin::~AudioFfmpegDecoderPlugin()
 {
     CloseCtxLocked();
-    avCodecContext_.reset();
+    if (avCodecContext_ != nullptr) {
+        avCodecContext_.reset();
+    }
 }
 
 int32_t AudioFfmpegDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
@@ -211,7 +213,9 @@ int32_t AudioFfmpegDecoderPlugin::Release()
 {
     std::unique_lock lock(avMutext_);
     auto ret = CloseCtxLocked();
-    avCodecContext_.reset();
+    if (avCodecContext_ != nullptr) {
+        avCodecContext_.reset();
+    }
     return ret;
 }
 
@@ -243,6 +247,8 @@ int32_t AudioFfmpegDecoderPlugin::AllocateContext(const std::string &name)
         context = avcodec_alloc_context3(avCodec_.get());
 
         avCodecContext_ = std::shared_ptr<AVCodecContext>(context, [](AVCodecContext *ptr) {
+            ptr->extradata = nullptr;
+            ptr->extradata_size = 0;
             avcodec_free_context(&ptr);
             avcodec_close(ptr);
         });
@@ -252,13 +258,14 @@ int32_t AudioFfmpegDecoderPlugin::AllocateContext(const std::string &name)
 
 int32_t AudioFfmpegDecoderPlugin::InitContext(const Format &format)
 {
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avCodecContext_->channels);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avCodecContext_->sample_rate);
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize_);
+    format_ = format;
+    format_.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avCodecContext_->channels);
+    format_.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avCodecContext_->sample_rate);
+    format_.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
+    format_.GetLongValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize_);
 
     size_t extraSize;
-    if (format.GetBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, &avCodecContext_->extradata, extraSize)) {
+    if (format_.GetBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, &avCodecContext_->extradata, extraSize)) {
         avCodecContext_->extradata_size = extraSize;
         hasExtra_ = true;
     }
@@ -268,7 +275,6 @@ int32_t AudioFfmpegDecoderPlugin::InitContext(const Format &format)
     avCodecContext_->workaround_bugs =
         static_cast<uint32_t>(avCodecContext_->workaround_bugs) | static_cast<uint32_t>(FF_BUG_AUTODETECT);
     avCodecContext_->err_recognition = 1;
-    format_ = format;
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 

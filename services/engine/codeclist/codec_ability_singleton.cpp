@@ -16,6 +16,7 @@
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
 #include "codeclist_builder.h"
+#include "hcodec_loader.h"
 #include "codec_ability_singleton.h"
 
 namespace {
@@ -27,7 +28,6 @@ namespace Media {
 std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> GetCodecLists()
 {
     std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> codecLists;
-    // For HCodec: codecLists.insert(std::make_pair(CodecType::AVCODEC_HCODEC, nullptr));
     std::shared_ptr<CodecListBase> vcodecList = std::make_shared<VideoCodecList>();
     codecLists.insert(std::make_pair(CodecType::AVCODEC_VIDEO_CODEC, vcodecList));
     std::shared_ptr<CodecListBase> acodecList = std::make_shared<AudioCodecList>();
@@ -44,6 +44,10 @@ CodecAbilitySingleton &CodecAbilitySingleton::GetInstance()
 
 CodecAbilitySingleton::CodecAbilitySingleton()
 {
+    std::vector<CapabilityData> capaArray;
+    if (HCodecLoader::GetCapabilityList(capaArray) == AVCS_ERR_OK) {
+        RegisterCapabilityArray(capaArray, CodecType::AVCODEC_HCODEC);
+    }
     std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> codecLists = GetCodecLists();
     for (auto iter = codecLists.begin(); iter != codecLists.end(); iter++) {
         CodecType codecType = iter->first;

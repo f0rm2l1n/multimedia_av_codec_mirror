@@ -113,6 +113,7 @@ MuxerEngineImpl::MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, Out
     } else {
         AVCODEC_LOGE("state_ is UNINITIALIZED");
     }
+    BehaviorEventWrite(ConvertStateToString(state_), "Muxer");
 }
 
 MuxerEngineImpl::~MuxerEngineImpl()
@@ -190,8 +191,8 @@ int32_t MuxerEngineImpl::Start()
     Plugin::Status ret = muxer_->Start();
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "Start failed");
     state_ = State::STARTED;
+    BehaviorEventWrite(ConvertStateToString(state_), "Muxer");
     StartThread("muxer_write_loop");
-
     return AVCS_ERR_OK;
 }
 
@@ -234,6 +235,7 @@ int32_t MuxerEngineImpl::Stop()
     CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED. The current state is %{public}s", ConvertStateToString(state_).c_str());
     state_ = State::STOPPED;
+    BehaviorEventWrite(ConvertStateToString(state_), "Muxer");
     que_.SetActive(false, false);
     cond_.wait(lock, [this] { return que_.Empty(); });
     StopThread();
