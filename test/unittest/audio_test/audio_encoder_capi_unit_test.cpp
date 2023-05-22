@@ -35,16 +35,6 @@
 #include "native_avcodec_audioencoder.h"
 #include "securec.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#ifdef __cplusplus
-}
-#endif
-
-
 using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Media;
@@ -119,7 +109,6 @@ static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemor
     signal_->inCond_.notify_all();
 }
 
-
 static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
                                     void *userData)
 {
@@ -162,10 +151,6 @@ protected:
     bool isFirstFrame_ = true;
     int64_t timeStamp_ = 0;
     uint32_t frameCount_ = 0;
-
-    AVFormatContext *fmpt_ctx;
-    AVFrame *frame;
-    AVPacket pkt;
 };
 
 void AudioCodeCapiEncoderUnitTest::SetUpTestCase(void)
