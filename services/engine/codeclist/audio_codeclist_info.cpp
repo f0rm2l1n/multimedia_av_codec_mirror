@@ -41,80 +41,80 @@ constexpr int MAX_BIT_RATE_AAC_ENCODER = 448000;
 
 CapabilityData GetMP3DecoderCapability()
 {
-    CapabilityData AudioMp3Capability;
-    AudioMp3Capability.codecName = AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY;
-    AudioMp3Capability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
-    AudioMp3Capability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG;
-    AudioMp3Capability.isVendor = false;
-    AudioMp3Capability.bitrate = Range(1, MAX_BIT_RATE_MP3);
-    AudioMp3Capability.channels = Range(1, MAX_CHANNEL_COUNT_MP3);
-    AudioMp3Capability.sampleRate = AUDIO_SAMPLE_RATE;
-    return AudioMp3Capability;
+    CapabilityData audioMp3Capability;
+    audioMp3Capability.codecName = AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY;
+    audioMp3Capability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
+    audioMp3Capability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG;
+    audioMp3Capability.isVendor = false;
+    audioMp3Capability.bitrate = Range(1, MAX_BIT_RATE_MP3);
+    audioMp3Capability.channels = Range(1, MAX_CHANNEL_COUNT_MP3);
+    audioMp3Capability.sampleRate = AUDIO_SAMPLE_RATE;
+    return audioMp3Capability;
 }
 
 CapabilityData GetAACDecoderCapability()
 {
-    CapabilityData AudioAACCapability;
-    AudioAACCapability.codecName = AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY;
-    AudioAACCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
-    AudioAACCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC;
-    AudioAACCapability.isVendor = false;
-    AudioAACCapability.bitrate = Range(MIN_BIT_RATE_AAC, MAX_BIT_RATE_AAC);
-    AudioAACCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
-    AudioAACCapability.sampleRate = AUDIO_SAMPLE_RATE;
-    return AudioAACCapability;
+    CapabilityData audioAACCapability;
+    audioAACCapability.codecName = AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY;
+    audioAACCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
+    audioAACCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC;
+    audioAACCapability.isVendor = false;
+    audioAACCapability.bitrate = Range(MIN_BIT_RATE_AAC, MAX_BIT_RATE_AAC);
+    audioAACCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
+    audioAACCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    return audioAACCapability;
 }
 
 CapabilityData GetFlacDecoderCapability()
 {
-    CapabilityData AudioFlacCapability;
-    AudioFlacCapability.codecName = AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY;
-    AudioFlacCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
-    AudioFlacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
-    AudioFlacCapability.isVendor = false;
-    AudioFlacCapability.bitrate = Range(1, MAX_BIT_RATE_FLAC);
-    AudioFlacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
-    AudioFlacCapability.sampleRate = AUDIO_SAMPLE_RATE;
-    return AudioFlacCapability;
+    CapabilityData audioFlacCapbility;
+    audioFlacCapbility.codecName = AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY;
+    audioFlacCapbility.codecType = AVCODEC_TYPE_AUDIO_DECODER;
+    audioFlacCapbility.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
+    audioFlacCapbility.isVendor = false;
+    audioFlacCapbility.bitrate = Range(1, MAX_BIT_RATE_FLAC);
+    audioFlacCapbility.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
+    audioFlacCapbility.sampleRate = AUDIO_SAMPLE_RATE;
+    return audioFlacCapbility;
 }
 
 CapabilityData GetVorbisDecoderCapability()
 {
-    CapabilityData AudioVorbisCapability;
-    AudioVorbisCapability.codecName = AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY;
-    AudioVorbisCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
-    AudioVorbisCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_VORBIS;
-    AudioVorbisCapability.isVendor = false;
-    AudioVorbisCapability.bitrate = Range(MIN_BIT_RATE_VORBIS, MAX_BIT_RATE_VORBIS);
-    AudioVorbisCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
-    AudioVorbisCapability.sampleRate = AUDIO_VORBIS_SAMPLE_RATE;
-    return AudioVorbisCapability;
+    CapabilityData audioVorbisCapability;
+    audioVorbisCapability.codecName = AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY;
+    audioVorbisCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
+    audioVorbisCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_VORBIS;
+    audioVorbisCapability.isVendor = false;
+    audioVorbisCapability.bitrate = Range(MIN_BIT_RATE_VORBIS, MAX_BIT_RATE_VORBIS);
+    audioVorbisCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
+    audioVorbisCapability.sampleRate = AUDIO_VORBIS_SAMPLE_RATE;
+    return audioVorbisCapability;
 }
 
 CapabilityData GetAACEncoderCapability()
 {
-    CapabilityData AudioAACCapability;
-    AudioAACCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY;
-    AudioAACCapability.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
-    AudioAACCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC;
-    AudioAACCapability.isVendor = false;
-    AudioAACCapability.bitrate = Range(MIN_BIT_RATE_AAC_ENCODER, MAX_BIT_RATE_AAC_ENCODER);
-    AudioAACCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
-    AudioAACCapability.sampleRate = AUDIO_SAMPLE_RATE;
-    return AudioAACCapability;
+    CapabilityData audioAACCapability;
+    audioAACCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY;
+    audioAACCapability.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
+    audioAACCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC;
+    audioAACCapability.isVendor = false;
+    audioAACCapability.bitrate = Range(MIN_BIT_RATE_AAC_ENCODER, MAX_BIT_RATE_AAC_ENCODER);
+    audioAACCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
+    audioAACCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    return audioAACCapability;
 }
 
 CapabilityData GetFlacEncoderCapability()
 {
-    CapabilityData AudioFlacCapability;
-    AudioFlacCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY;
-    AudioFlacCapability.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
-    AudioFlacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
-    AudioFlacCapability.isVendor = false;
-    AudioFlacCapability.bitrate = Range(1, MAX_BIT_RATE_FLAC);
-    AudioFlacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
-    AudioFlacCapability.sampleRate = AUDIO_SAMPLE_RATE;
-    return AudioFlacCapability;
+    CapabilityData audioFlacCapability;
+    audioFlacCapbility.codecName = AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY;
+    audioFlacCapbility.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
+    audioFlacCapbility.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
+    audioFlacCapbility.isVendor = false;
+    audioFlacCapbility.bitrate = Range(1, MAX_BIT_RATE_FLAC);
+    audioFlacCapbility.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
+    audioFlacCapbility.sampleRate = AUDIO_SAMPLE_RATE;
+    return audioFlacCapbility;
 }
 
 AudioCodeclistInfo::AudioCodeclistInfo()

@@ -20,7 +20,7 @@
 #include "media_description.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegAdapter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegAdapter"};
 }
 
 namespace OHOS {
@@ -236,7 +236,7 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetInputBuffer(uint32_t 
     }
     if (index < 0) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}zu error", index);
+        AVCODEC_LOGE("index=%{public}u error", index);
         return nullptr;
     }
 
@@ -267,7 +267,7 @@ int32_t AudioFFMpegAdapter::QueueInputBuffer(uint32_t index, const AVCodecBuffer
 
     if (index < 0) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}zu error", index);
+        AVCODEC_LOGE("index=%{public}u error", index);
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
@@ -303,7 +303,7 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetOutputBuffer(uint32_t
 
     if (index < 0) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}zu error", index);
+        AVCODEC_LOGE("index=%{public}u error", index);
         return nullptr;
     }
 
@@ -332,14 +332,14 @@ int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(uint32_t index)
     }
 
     if (index < 0) {
-        AVCODEC_LOGE("index=%{public}zu error", index);
+        AVCODEC_LOGE("index=%{public}u error", index);
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
     auto outBufferInfo = worker_->GetOutputBufferInfo(index);
     if (outBufferInfo == nullptr) {
-        AVCODEC_LOGE("index=%{public}zu error", index);
+        AVCODEC_LOGE("index=%{public}u error", index);
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }
@@ -347,7 +347,7 @@ int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(uint32_t index)
 
     auto outBuffer = worker_->GetOutputBuffer();
     if (outBuffer == nullptr) {
-        AVCODEC_LOGE("index=%{public}zu error", index);
+        AVCODEC_LOGE("index=%{public}u error", index);
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }
