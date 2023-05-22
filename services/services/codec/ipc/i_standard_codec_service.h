@@ -49,6 +49,7 @@ public:
     virtual int32_t GetOutputFormat(Format &format) = 0;
     virtual int32_t ReleaseOutputBuffer(uint32_t index, bool render) = 0;
     virtual int32_t SetParameter(const Format &format) = 0;
+    virtual int32_t GetInputFormat(Format &format) = 0;
 
     virtual int32_t DestroyStub() = 0;
 
@@ -76,6 +77,7 @@ public:
         SET_INPUT_SURFACE,
         DEQUEUE_INPUT_BUFFER,
         DEQUEUE_OUTPUT_BUFFER,
+        GET_INPUT_FORMAT,
 
         DESTROY_STUB
     };

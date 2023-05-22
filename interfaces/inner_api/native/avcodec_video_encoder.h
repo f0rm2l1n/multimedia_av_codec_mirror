@@ -201,6 +201,18 @@ public:
      * @version 3.1
      */
     virtual int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) = 0;
+
+    /**
+     * @brief Gets the format of the input data that accepted by the video encoder.
+     *
+     * This function must be called after {@link Configure}
+     *
+     * @param format
+     * @return Returns {@link AVCS_ERR_OK} if success; returns an error code otherwise.
+     * @since 4.0
+     * @version 4.0
+     */
+    virtual int32_t GetInputFormat(Format &format) = 0;
 };
 
 class __attribute__((visibility("default"))) VideoEncoderFactory {
