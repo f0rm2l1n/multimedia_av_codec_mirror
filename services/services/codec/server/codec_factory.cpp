@@ -23,6 +23,7 @@
 #include "fcodec.h"
 #include "codeclist_core.h"
 #include "codeclist_utils.h"
+#include "hcodec_loader.h"
 #include "format.h"
 
 namespace {
@@ -31,9 +32,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecFacto
 
 namespace OHOS {
 namespace Media {
-const std::string VIDEOMIMETYPE = "video/avc";
-const std::string VIDEOCODECNAME = "video_decoder.avc";
-
 CodecFactory &CodecFactory::Instance()
 {
     static CodecFactory inst;
@@ -68,6 +66,7 @@ std::shared_ptr<CodecBase> CodecFactory::CreateCodecByName(const std::string &na
     std::shared_ptr<CodecBase> codec = nullptr;
     switch (codecType) {
         case CodecType::AVCODEC_HCODEC:
+            codec = HCodecLoader::CreateByName(name);
             break;
         case CodecType::AVCODEC_VIDEO_CODEC:
             codec = std::make_shared<Codec::FCodec>(name);

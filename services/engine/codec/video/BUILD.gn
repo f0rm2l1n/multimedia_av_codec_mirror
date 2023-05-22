@@ -43,7 +43,10 @@ ohos_static_library("av_codec_video_ffmpeg_codec") {
   defines = []
   defines += av_codec_defines
 
-  sources = [ "$av_codec_root_dir/services/engine/codec/video/fcodec.cpp" ]
+  sources = [
+    "$av_codec_root_dir/services/engine/codec/video/fcodec.cpp",
+    "$av_codec_root_dir/services/engine/codec/video/hcodec_loader.cpp",
+  ]
 
   deps = [
     "$av_codec_root_dir/services/engine/base:av_codec_codec_base",
