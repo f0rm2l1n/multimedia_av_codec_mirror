@@ -22,6 +22,7 @@
 #include "codec_factory.h"
 #include "avcodec_dump_utils.h"
 #include "media_description.h"
+#include "avcodec_bitstream_dump.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecServer"};
@@ -319,6 +320,7 @@ int32_t CodecServer::SetCallback(const std::shared_ptr<AVCodecCallback> &callbac
 
 int32_t CodecServer::DumpInfo(int32_t fd)
 {
+    CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "Codecbase is nullptr");
     Format codecFormat;
     int32_t ret = codecBase_->GetOutputFormat(codecFormat);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Get codec format failed.");
@@ -340,9 +342,10 @@ int32_t CodecServer::DumpInfo(int32_t fd)
             break;
     }
 
+    auto statusIt = CODEC_STATE_MAP.find(status_);
     dumpControler.AddInfo(DUMP_CODEC_INFO_INDEX, codecInfo);
     dumpControler.AddInfo(DUMP_STATUS_INDEX,
-        "Status", CODEC_STATE_MAP.find(status_)->second);
+        "Status", statusIt != CODEC_STATE_MAP.end() ? statusIt->second : "");
     dumpControler.AddInfo(DUMP_LAST_ERROR_INDEX,
         "Last_Error", lastErrMsg_.size() ? lastErrMsg_ : "Null");
 
@@ -353,7 +356,7 @@ int32_t CodecServer::DumpInfo(int32_t fd)
             codecFormat, iter.first, iter.second);
         dumpIndex++;
     }
-        
+
     std::string dumpString;
     dumpControler.GetDumpString(dumpString);
     write(fd, dumpString.c_str(), dumpString.size());

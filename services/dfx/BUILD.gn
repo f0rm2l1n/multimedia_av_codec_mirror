@@ -33,6 +33,7 @@ ohos_shared_library("av_codec_service_dfx") {
     "avcodec_log_dump.cpp",
     "avcodec_xcollie.cpp",
     "avcodec_dump_utils.cpp",
+    "avcodec_bitstream_dump.cpp",
   ]
 
   include_dirs = [
