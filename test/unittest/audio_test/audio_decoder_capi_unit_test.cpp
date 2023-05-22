@@ -321,7 +321,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_SetParameter_01, TestSize.Le
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -361,7 +361,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_SetParameter_02, TestSize.Le
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -373,7 +373,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Configure_01, TestSize.Level
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -385,7 +385,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_01, TestSize.Leve
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -424,7 +424,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_02, TestSize.Leve
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -463,7 +463,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_03, TestSize.Leve
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -505,7 +505,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_04, TestSize.Leve
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -545,7 +545,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_05, TestSize.Leve
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
@@ -584,7 +584,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_01, TestSize.Le
 {
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY.data(),
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                 DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 

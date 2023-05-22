@@ -234,11 +234,6 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetInputBuffer(uint32_t 
         AVCODEC_LOGE("adapter get input buffer error, call back not initlized .");
         return nullptr;
     }
-    if (index < 0) {
-        callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}u error", index);
-        return nullptr;
-    }
 
     std::shared_ptr<AudioBufferInfo> result = worker_->GetInputBufferInfo(index);
     if (result == nullptr) {
@@ -263,12 +258,6 @@ int32_t AudioFFMpegAdapter::QueueInputBuffer(uint32_t index, const AVCodecBuffer
     if (!callback_) {
         AVCODEC_LOGE("adapter queue input buffer error, call back not initlized .");
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
-    }
-
-    if (index < 0) {
-        callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}u error", index);
-        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
     auto result = worker_->GetInputBufferInfo(index);
@@ -301,12 +290,6 @@ std::shared_ptr<AVSharedMemoryBase> AudioFFMpegAdapter::GetOutputBuffer(uint32_t
         return nullptr;
     }
 
-    if (index < 0) {
-        callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        AVCODEC_LOGE("index=%{public}u error", index);
-        return nullptr;
-    }
-
     auto result = worker_->GetOutputBufferInfo(index);
     if (result == nullptr) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
@@ -329,12 +312,6 @@ int32_t AudioFFMpegAdapter::ReleaseOutputBuffer(uint32_t index)
     if (!callback_) {
         AVCODEC_LOGE("adapter release output buffer error, call back not initlized .");
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
-    }
-
-    if (index < 0) {
-        AVCODEC_LOGE("index=%{public}u error", index);
-        callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL);
-        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
     auto outBufferInfo = worker_->GetOutputBufferInfo(index);

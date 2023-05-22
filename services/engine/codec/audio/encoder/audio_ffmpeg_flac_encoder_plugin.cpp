@@ -71,7 +71,7 @@ int32_t AudioFFMpegFlacEncoderPlugin::init(const Format &format)
     int32_t bits_per_coded_sample;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
-    format.GetIntValue(MediaDescriptionKey::MD_BITS_PER_CODED_SAMPLE_KEY, bits_per_coded_sample);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bits_per_coded_sample);
     if (!isTrueSampleRate(sample_rate)) {
         AVCODEC_LOGE("init failed, because sample rate=%{public}d not in table.", sample_rate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
