@@ -96,7 +96,7 @@ int32_t FCodec::Init(const std::string &name)
     return AVCS_ERR_OK;
 }
 
-void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &formatKey,int32_t minVal,
+void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &formatKey, int32_t minVal,
                                  int32_t maxVal)
 {
     int32_t val32 = 0;
