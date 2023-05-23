@@ -219,7 +219,9 @@ OH_AVErrCode OH_VideoDecoder_Destroy(struct OH_AVCodec *codec)
     struct VideoDecoderObject *videoDecObj = reinterpret_cast<VideoDecoderObject *>(codec);
 
     if (videoDecObj != nullptr && videoDecObj->videoDecoder_ != nullptr) {
-        videoDecObj->callback_->StopCallback();
+        if (videoDecObj->callback_ != nullptr) {
+            videoDecObj->callback_->StopCallback();
+        }
         videoDecObj->memoryObjList_.clear();
         videoDecObj->isStop_.store(false);
         int32_t ret = videoDecObj->videoDecoder_->Release();

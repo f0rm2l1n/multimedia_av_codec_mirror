@@ -213,7 +213,9 @@ OH_AVErrCode OH_AudioEncoder_Destroy(struct OH_AVCodec *codec)
     struct AudioEncoderObject *audioEncObj = reinterpret_cast<AudioEncoderObject *>(codec);
 
     if (audioEncObj != nullptr && audioEncObj->audioEncoder_ != nullptr) {
-        audioEncObj->callback_->StopCallback();
+        if (audioEncObj->callback_ != nullptr) {
+            audioEncObj->callback_->StopCallback();
+        }
         audioEncObj->memoryObjList_.clear();
         int32_t ret = audioEncObj->audioEncoder_->Release();
         if (ret != AVCS_ERR_OK) {
