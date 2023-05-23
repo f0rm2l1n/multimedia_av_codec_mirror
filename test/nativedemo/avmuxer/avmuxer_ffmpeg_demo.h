@@ -28,7 +28,7 @@ namespace Plugin {
 class AVMuxerFFmpegDemo : public AVMuxerDemoBase {
 public:
     AVMuxerFFmpegDemo();
-    ~AVMuxerFFmpegDemo() = default;
+    ~AVMuxerFFmpegDemo() override = default;
 private:
     struct FfmpegRegister : PackageRegister {
         Status AddPlugin(const PluginDefBase& def) override;

@@ -24,7 +24,7 @@ namespace Media {
 class AVMuxerEngineDemo : public AVMuxerDemoBase {
 public:
     AVMuxerEngineDemo() = default;
-    ~AVMuxerEngineDemo() = default;
+    ~AVMuxerEngineDemo() override = default;
 private:
     void DoRunMuxer() override;
     int DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info) override;

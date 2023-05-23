@@ -46,7 +46,7 @@ int32_t AVMuxerCapiMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMoc
 }
 
 int32_t AVMuxerCapiMock::WriteSample(uint32_t trackIndex,
-    uint8_t *sample, const AVCodecBufferAttrMock &info)
+    const uint8_t *sample, const AVCodecBufferAttrMock &info)
 {
     OH_AVMemory *avSample = OH_AVMemory_Create(info.size);
     (void)memcpy_s(OH_AVMemory_GetAddr(avSample),

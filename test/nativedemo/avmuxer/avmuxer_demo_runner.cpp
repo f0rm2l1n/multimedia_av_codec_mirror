@@ -28,7 +28,7 @@ using namespace OHOS::Media::Plugin;
 constexpr int RUN_TIME = 600;
 constexpr int DEMO_THREAD_COUNT = 10;
 
-static int RunLoopNativeMuxer(string out)
+static int RunLoopNativeMuxer(const string &out)
 {
     time_t startTime = 0;
     time_t curTime = 0;
@@ -44,10 +44,6 @@ static int RunLoopNativeMuxer(string out)
 static int RunAVMuxer()
 {
     auto avmuxer = std::make_unique<AVMuxerDemo>();
-    if (avmuxer == nullptr) {
-        cout << "avmuxer is null" << endl;
-        return 0;
-    }
     avmuxer->RunCase();
     cout << "demo avmuxer end" << endl;
     return 0;
@@ -56,10 +52,6 @@ static int RunAVMuxer()
 static int RunAVMuxerWithMultithread()
 {
     auto avmuxer = std::make_unique<AVMuxerDemo>();
-    if (avmuxer == nullptr) {
-        cout << "avmuxer is null" << endl;
-        return 0;
-    }
     avmuxer->RunMultiThreadCase();
     cout << "demo multi thread avmuxer end" << endl;
     return 0;
@@ -68,10 +60,6 @@ static int RunAVMuxerWithMultithread()
 static int RunFfmpegMuxer()
 {
     std::unique_ptr<AVMuxerDemoBase> ffmpegMuxer = std::make_unique<AVMuxerFFmpegDemo>();
-    if (ffmpegMuxer == nullptr) {
-        cout << "ffmpegMuxer is null" << endl;
-        return 0;
-    }
     ffmpegMuxer->RunCase();
     cout << "demo ffmpegMuxer end" << endl;
     return 0;
@@ -80,10 +68,6 @@ static int RunFfmpegMuxer()
 static int RunEngineMuxer()
 {
     std::unique_ptr<AVMuxerDemoBase> muxer = std::make_unique<AVMuxerEngineDemo>();
-    if (muxer == nullptr) {
-        cout << "AVMuxerEngineDemo is null" << endl;
-        return 0;
-    }
     muxer->RunCase();
     cout << "demo engine demo end" << endl;
     return 0;
