@@ -1040,7 +1040,6 @@ int32_t FCodec::GetCodecCapability(std::vector<CapabilityData> &capaArray)
         capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_HIGH));
         capaArray.emplace_back(capsData);
     }
-    AVCODEC_LOGI("Get %{public}lu capability successful", capaArray.size());
     return AVCS_ERR_OK;
 }
 } // namespace Codec
