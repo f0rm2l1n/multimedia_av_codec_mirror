@@ -234,7 +234,19 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("description", AVSourceFormat::SOURCE_DESCRIPTION, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
     
-    bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, formatContext_->duration);
+    int64_t duration = formatContext_->duration;
+    AVRational timeBase = AV_TIME_BASE_Q;
+    if (duration == AV_NOPTS_VALUE) {
+        for (int32_t i = 0; i < formatContext_->nb_streams;i++) {
+            auto streamDuration = formatContext_->streams[i]->duration;
+            if (streamDuration > duration) {
+                duration = streamDuration;
+                timeBase = {formatContext_->streams[i]->time_base.num, formatContext_->streams[i]->time_base.den};
+            }
+        }
+    }
+    double newDuration = duration * av_q2d(timeBase);
+    bool ret = format.PutDoubleValue(MediaDescriptionKey::MD_KEY_DURATION, newDuration);
     if (!ret) {
         AVCODEC_LOGW("Put track info failed: miss duration info in file");
     }

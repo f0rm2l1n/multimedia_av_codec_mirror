@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "avmuxer_demo_runner.h"
+#include "avdemuxer_demo_runner.h"
 #include "avcodec_audio_decoder_inner_demo.h"
 #include "avcodec_audio_encoder_inner_demo.h"
 #include "avcodec_audio_decoder_demo.h"
@@ -171,6 +172,7 @@ static void OptionPrint()
     cout << "3:Audio Inner Encoder" << endl;
     cout << "4:muxer demo" << endl;
     cout << "6:codeclist" << endl;
+    cout << "7:demuxer demo" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -195,7 +197,9 @@ int main(int argc, char *argv[])
         (void)AvmuxerDemoCase();
     } else if (mode == "6") {
         (void)RunCodecList();
-    }  else {
+    } else if (mode == "7") {
+        (void)AVSourceDemuxerDemoCase();
+    } else {
         cout << "no that selection" << endl;
     }
     return 0;
