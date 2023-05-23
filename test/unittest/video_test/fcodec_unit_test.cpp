@@ -56,10 +56,10 @@ public:
     explicit BufferCallback(VDecSignal *userData) : userData_(userData) {}
     virtual ~BufferCallback() = default;
     VDecSignal *userData_;
-    void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
-    void OnOutputFormatChanged(const Format &format) override;
-    void OnInputBufferAvailable(uint32_t index) override;
-    void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+    virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    virtual void OnOutputFormatChanged(const Format &format) override;
+    virtual void OnInputBufferAvailable(uint32_t index) override;
+    virtual void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 };
 
 void BufferCallback::OnError(AVCodecErrorType errorType, int32_t errorCode)
