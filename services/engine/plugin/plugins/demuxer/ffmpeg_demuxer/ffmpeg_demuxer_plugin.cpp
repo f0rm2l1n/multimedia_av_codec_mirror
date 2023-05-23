@@ -16,6 +16,7 @@
 #include <string>
 #include <sstream>
 #include <type_traits>
+#include <cinttypes>
 #include "securec.h"
 #include "avcodec_errors.h"
 #include "native_avcodec_base.h"
@@ -316,7 +317,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt_->data+samplePacket->offset_, copySize);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
-    AVCODEC_LOGD("Copy from %{public}llu, copy size %{public}llu", samplePacket->offset_, copySize);
+    AVCODEC_LOGD("Copy from %{public}" PRIu64 ", copy size %{public}" PRIu64, samplePacket->offset_, copySize);
     if (copySize != copyFrameSize) {
         samplePacket->offset_ += copySize;
         return AVCS_ERR_NO_MEMORY;

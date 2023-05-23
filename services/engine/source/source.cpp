@@ -341,9 +341,7 @@ int32_t Source::Create(std::string& uri)
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
-    size_t size;
-    sourcePlugin_->GetSize(size);
-    AVCODEC_LOGD("mp4 fileSize: %{public}d", size);
+
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when set data source for plugin!");
     ret = LoadInputFormatList();
