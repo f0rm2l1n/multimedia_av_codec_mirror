@@ -19,14 +19,14 @@
 #include "media_description.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
-    constexpr int minChannels = 1;
-    constexpr int maxChannels = 2;
-    constexpr int bitrate_ratio = 150;
-    constexpr int samplerate_ratio = 31;
-    constexpr int bitrate_max = 320000;
-    constexpr int support_sample_rate = 9;
-    constexpr int bufferDiff = 128;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
+constexpr int MIN_CHANNELS = 1;
+constexpr int MAX_CHANNELS = 2;
+constexpr int BIT_RATE_RATIO = 150;
+constexpr int SAMPLE_RATE_RATIO = 31;
+constexpr int MAX_BIT_RATE = 320000;
+constexpr int SUPPORT_SAMPLE_RATE = 9;
+constexpr int BUFFER_DIFF = 128;
 }
 
 namespace OHOS {
@@ -91,7 +91,7 @@ int32_t AudioFFMpegMp3DecoderPlugin::flush()
 
 uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
 {
-    auto size = int(bit_rate / bitrate_ratio);
+    auto size = int(bit_rate / BIT_RATE_RATIO);
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > size) {
         maxSize = size;
@@ -101,7 +101,7 @@ uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
 
 uint32_t AudioFFMpegMp3DecoderPlugin::getOutputBufferSize() const
 {
-    uint32_t size = (int(sample_rate / samplerate_ratio) + bufferDiff) * channels * sizeof(short);
+    uint32_t size = (int(sample_rate / SAMPLE_RATE_RATIO) + BUFFER_DIFF) * channels * sizeof(short);
     return size;
 }
 
@@ -112,22 +112,22 @@ Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
 
 int32_t AudioFFMpegMp3DecoderPlugin::checkinit(const Format &format)
 {
-    int sample_rate_pick[support_sample_rate] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
+    int sample_rate_pick[SUPPORT_SAMPLE_RATE] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bit_rate);
-    if (channels < minChannels || channels > maxChannels) {
+    if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
-    if (bit_rate > bitrate_max) {
+    if (bit_rate > MAX_BIT_RATE) {
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
-    for (int i = 0; i < support_sample_rate; i++) {
+    for (int i = 0; i < SUPPORT_SAMPLE_RATE; i++) {
         if (sample_rate == sample_rate_pick[i]) {
             break;
-        } else if (i == support_sample_rate - 1) {
+        } else if (i == SUPPORT_SAMPLE_RATE - 1) {
             return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
         }
     }

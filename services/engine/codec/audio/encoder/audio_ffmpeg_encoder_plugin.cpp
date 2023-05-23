@@ -21,7 +21,7 @@
 #include "securec.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegEncoderPlugin"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegEncoderPlugin"};
 }
 
 namespace OHOS {
@@ -36,14 +36,12 @@ AudioFfmpegEncoderPlugin::~AudioFfmpegEncoderPlugin()
 
 int32_t AudioFfmpegEncoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
-    {
-        std::unique_lock lock(avMutext_);
-        if (avCodecContext_ == nullptr) {
-            AVCODEC_LOGE("avCodecContext_ is nullptr");
-            return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
-        }
-        return SendBuffer(inputBuffer);
+    if (avCodecContext_ == nullptr) {
+        AVCODEC_LOGE("avCodecContext_ is nullptr");
+        return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
     }
+    std::unique_lock lock(avMutext_);
+    return SendBuffer(inputBuffer);
 }
 
 static std::string AVStrError(int errnum)

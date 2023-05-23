@@ -36,14 +36,14 @@ constexpr uint32_t BITS_PER_SAMPLE = 16;
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr uint32_t DEFAULT_AAC_TYPE = 1;
 constexpr int64_t BITS_RETE[TYPE_MAX] = {197000, 543000, 128000, 160000};
-constexpr string_view inputAacFilePath = "/data/aac_44100_2.dat";
-constexpr string_view outputAacPcmFilePath = "/data/aac_44100_2.pcm";
-constexpr string_view inputFlacFilePath = "/data/flac_44100_2.dat";
-constexpr string_view outputFlacPcmFilePath = "/data/flac_44100_2.pcm";
-constexpr string_view inputMp3FilePath = "/data/mp3_2c_44100hz_128k.dat";
-constexpr string_view outputMp3PcmFilePath = "/data/mp3_2c_44100hz_128k.pcm";
-constexpr string_view inputVorbisFilePath = "/data/vorbis_2c_44100hz_160k.dat";
-constexpr string_view outputVorbisPcmFilePath = "/data/vorbis_2c_44100hz_160k.pcm";
+constexpr string_view INPUT_AAC_FILE_PATH = "/data/aac_44100_2.dat";
+constexpr string_view OUTPUT_AAC_PCM_FILE_PATH = "/data/aac_44100_2.pcm";
+constexpr string_view INPUT_FLAC_FILE_PATH = "/data/flac_44100_2.dat";
+constexpr string_view OUTPUT_FLAC_PCM_FILE_PATH = "/data/flac_44100_2.pcm";
+constexpr string_view INPUT_MP3_FILE_PATH = "/data/mp3_2c_44100hz_128k.dat";
+constexpr string_view OUTPUT_MP3_PCM_FILE_PATH = "/data/mp3_2c_44100hz_128k.pcm";
+constexpr string_view INPUT_VORBIS_FILE_PATH = "/data/vorbis_2c_44100hz_160k.dat";
+constexpr string_view OUTPUT_VORBIS_PCM_FILE_PATH = "/data/vorbis_2c_44100hz_160k.pcm";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -91,17 +91,17 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
 bool ADecDemo::InitFile(AudioFormatType audioType)
 {
     if (audioType == TYPE_AAC) {
-        inputFile_.open(inputAacFilePath, std::ios::binary);
-        pcmOutputFile_.open(outputAacPcmFilePath.data(), std::ios::out | std::ios::binary);
+        inputFile_.open(INPUT_AAC_FILE_PATH, std::ios::binary);
+        pcmOutputFile_.open(OUTPUT_AAC_PCM_FILE_PATH.data(), std::ios::out | std::ios::binary);
     } else if (audioType == TYPE_FLAC) {
-        inputFile_.open(inputFlacFilePath, std::ios::binary);
-        pcmOutputFile_.open(outputFlacPcmFilePath.data(), std::ios::out | std::ios::binary);
+        inputFile_.open(INPUT_FLAC_FILE_PATH, std::ios::binary);
+        pcmOutputFile_.open(OUTPUT_FLAC_PCM_FILE_PATH.data(), std::ios::out | std::ios::binary);
     } else if (audioType == TYPE_MP3) {
-        inputFile_.open(inputMp3FilePath, std::ios::binary);
-        pcmOutputFile_.open(outputMp3PcmFilePath.data(), std::ios::out | std::ios::binary);
+        inputFile_.open(INPUT_MP3_FILE_PATH, std::ios::binary);
+        pcmOutputFile_.open(OUTPUT_MP3_PCM_FILE_PATH.data(), std::ios::out | std::ios::binary);
     } else if (audioType == TYPE_VORBIS) {
-        inputFile_.open(inputVorbisFilePath, std::ios::binary);
-        pcmOutputFile_.open(outputVorbisPcmFilePath.data(), std::ios::out | std::ios::binary);
+        inputFile_.open(INPUT_VORBIS_FILE_PATH, std::ios::binary);
+        pcmOutputFile_.open(OUTPUT_VORBIS_PCM_FILE_PATH.data(), std::ios::out | std::ios::binary);
     } else {
         std::cout << "audio format type not support\n";
         return false;
