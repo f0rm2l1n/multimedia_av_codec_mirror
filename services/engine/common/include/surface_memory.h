@@ -38,8 +38,8 @@ public:
     static void SetConfig(int32_t width, int32_t height, int32_t format, uint64_t usage = USAGE,
                           int32_t strideAlign = SURFACE_STRIDE_ALIGN, int32_t timeout = TIMEOUT);
     static void SetScaleType(ScalingMode videoScaleMode);
-    size_t Write(const uint8_t *in, size_t writeSize, size_t position = INVALID_POSITION);
-    size_t Read(uint8_t *out, size_t readSize, size_t position = INVALID_POSITION);
+    uint32_t Write(const uint8_t *in, uint32_t writeSize, uint32_t position = INVALID_POSITION);
+    uint32_t Read(uint8_t *out, uint32_t readSize, uint32_t position = INVALID_POSITION);
     void ClearUsedSize();
     void AllocSurfaceBuffer();
     void ReleaseSurfaceBuffer();
@@ -56,14 +56,14 @@ public:
 private:
     // Allocated memory size.
     sptr<SurfaceBuffer> surfaceBuffer_ = nullptr;
-    size_t size_ = 0;
+    uint32_t size_ = 0;
     int32_t fence_ = -1;
     uint32_t stride_ = 0;
     bool needRender_ = false;
     static sptr<Surface> surface_;
     static BufferRequestConfig requestConfig_;
     static ScalingMode scalingMode_;
-    static constexpr size_t INVALID_POSITION = -1;
+    static constexpr int32_t INVALID_POSITION = -1;
 };
 } // namespace Media
 } // namespace OHOS

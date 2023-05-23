@@ -52,14 +52,14 @@ constexpr struct {
 } SupportCodec[] = {
     {AVCodecCodecName::VIDEO_DECODER_AVC_NAME_KEY, CodecMimeType::VIDEO_AVC, "h264", false},
 };
-constexpr size_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
+constexpr uint32_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
 }
 FCodec::FCodec(const std::string &name)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_LOG(!name.empty(), "Create codec failed:  empty name");
     std::string fcodecName;
-    for (size_t i = 0; i < numSupportCodec; ++i) {
+    for (uint32_t i = 0; i < numSupportCodec; ++i) {
         if (SupportCodec[i].codecName == name) {
             fcodecName = SupportCodec[i].ffmpegCodec;
             break;
@@ -96,8 +96,8 @@ int32_t FCodec::Init(const std::string &name)
     return AVCS_ERR_OK;
 }
 
-void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &formatKey, int32_t defaultVal,
-                                 int32_t minVal, int32_t maxVal)
+void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &formatKey,int32_t minVal,
+                                 int32_t maxVal)
 {
     int32_t val32 = 0;
     if (format.GetIntValue(formatKey, val32) && val32 > minVal && val32 < maxVal) {
@@ -105,7 +105,6 @@ void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &f
     } else {
         AVCODEC_LOGW("Set parameter failed: %{public}s, which minimum threshold=%{public}d, "
                      "maximum threshold=%{public}d", formatKey.data(), minVal, maxVal);
-        format_.PutIntValue(formatKey, defaultVal);
     }
 }
 
@@ -152,13 +151,13 @@ int32_t FCodec::Configure(const Format &format)
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT, DEFAULT_IN_BUFFER_CNT);
     for (auto &it : format.GetFormatMap()) {
         if (it.first == MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT) {
-            ConfigureDefaultVal(format, it.first, DEFAULT_OUT_BUFFER_CNT, DEFAULT_MIN_BUFFER_CNT);
+            ConfigureDefaultVal(format, it.first, DEFAULT_MIN_BUFFER_CNT);
         } else if (it.first == MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT) {
-            ConfigureDefaultVal(format, it.first, DEFAULT_IN_BUFFER_CNT, DEFAULT_MIN_BUFFER_CNT);
+            ConfigureDefaultVal(format, it.first, DEFAULT_MIN_BUFFER_CNT);
         } else if (it.first == MediaDescriptionKey::MD_KEY_WIDTH) {
-            ConfigureDefaultVal(format, it.first, DEFAULT_VIDEO_WIDTH, 0, VIDEO_MAX_SIZE);
+            ConfigureDefaultVal(format, it.first, 0, VIDEO_MAX_SIZE);
         } else if (it.first == MediaDescriptionKey::MD_KEY_HEIGHT) {
-            ConfigureDefaultVal(format, it.first, DEFAULT_VIDEO_HEIGHT, 0, VIDEO_MAX_SIZE);
+            ConfigureDefaultVal(format, it.first, 0, VIDEO_MAX_SIZE);
         } else if (it.first == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT ||
                    it.first == MediaDescriptionKey::MD_KEY_ROTATION_ANGLE ||
                    it.first == MediaDescriptionKey::MD_KEY_SCALE_TYPE) {
@@ -180,7 +179,6 @@ int32_t FCodec::Configure(const Format &format)
     CHECK_AND_RETURN_RET_LOG(avCodecContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                              "Configure codec failed: Allocate context error");
     avCodecContext_->codec_type = AVMEDIA_TYPE_VIDEO;
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_WIDTH, width_);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height_);
     avCodecContext_->width = width_;
@@ -626,10 +624,10 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(uint32_t index)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(IsActive(), nullptr, "Get input buffer failed: not in Running or Flushed state");
     std::vector<std::shared_ptr<AVBuffer>> &avBuffers = buffers_[INDEX_INPUT];
-    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr, "Get buffer failed with bad index, index=%{public}zu",
+    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr, "Get buffer failed with bad index, index=%{public}u",
                              index);
     CHECK_AND_RETURN_RET_LOG(avBuffers[index]->owner_ == AVBuffer::status::OWNED_BY_USER, nullptr,
-                             "Get buffer failed with index=%{public}zu, buffer is not available", index);
+                             "Get buffer failed with index=%{public}u, buffer is not available", index);
     std::shared_lock<std::shared_mutex> iLock(inputMutex_);
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
 }
@@ -641,10 +639,10 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetOutputBuffer(uint32_t index)
                              "Get output buffer failed: not in Running/Flushed/EOS state");
     CHECK_AND_RETURN_RET_LOG(surface_ == nullptr, nullptr, "Get output buffer failed: surface output");
     std::vector<std::shared_ptr<AVBuffer>> &avBuffers = buffers_[INDEX_OUTPUT];
-    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr, "Get buffer failed with bad index, index=%{public}zu",
+    CHECK_AND_RETURN_RET_LOG(index < avBuffers.size(), nullptr, "Get buffer failed with bad index, index=%{public}u",
                              index);
     CHECK_AND_RETURN_RET_LOG(avBuffers[index]->owner_ == AVBuffer::status::OWNED_BY_USER, nullptr,
-                             "Get buffer failed with index=%{public}zu, buffer is not available", index);
+                             "Get buffer failed with index=%{public}u, buffer is not available", index);
 
     std::unique_lock<std::mutex> oLock(outputMutex_);
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
@@ -657,10 +655,10 @@ int32_t FCodec::QueueInputBuffer(uint32_t index, const AVCodecBufferInfo &info, 
                              "Queue input buffer failed: not in Running or Flushed state");
     std::vector<std::shared_ptr<AVBuffer>> &inBuffers = buffers_[INDEX_INPUT];
     CHECK_AND_RETURN_RET_LOG(index < inBuffers.size(), AVCS_ERR_INVALID_VAL,
-                             "Queue input buffer failed with bad index, index=%{public}zu, buffer_size=%{public}zu",
+                             "Queue input buffer failed with bad index, index=%{public}u, buffer_size=%{public}zu",
                              index, inBuffers.size());
     CHECK_AND_RETURN_RET_LOG(inBuffers[index]->owner_ == AVBuffer::status::OWNED_BY_USER, AVCS_ERR_INVALID_OPERATION,
-                             "Queue input buffer failed: buffer with index=%{public}zu is not available", index);
+                             "Queue input buffer failed: buffer with index=%{public}u is not available", index);
     std::unique_lock<std::shared_mutex> iLock(inputMutex_);
     inBufQue_.emplace_back(index);
     inBuffers[index]->owner_ = AVBuffer::status::OWNED_BY_CODEC;
@@ -887,7 +885,7 @@ void FCodec::RenderFrame()
         if (surfaceMemory->GetSurfaceBuffer() == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         } else {
-            AVCODEC_LOGD("render frame success, index=%{public}zu", index);
+            AVCODEC_LOGD("render frame success, index=%{public}u", index);
             std::lock_guard<std::mutex> oLock(outputMutex_);
             codecAvailBuffers_.emplace_back(index);
             renderBuffers_.pop_front();
@@ -922,7 +920,7 @@ int32_t FCodec::ReleaseOutputBuffer(uint32_t index)
         }
         return AVCS_ERR_OK;
     } else {
-        AVCODEC_LOGE("Release output buffer failed: check your index=%{public}zu", index);
+        AVCODEC_LOGE("Release output buffer failed: check your index=%{public}u", index);
         return AVCS_ERR_INVALID_VAL;
     }
 }
@@ -969,7 +967,7 @@ int32_t FCodec::RenderOutputBuffer(uint32_t index)
         renderBuffers_.emplace_back(index);
         return AVCS_ERR_OK;
     } else {
-        AVCODEC_LOGE("Failed to render output buffer with bad index, index=%{public}zu", index);
+        AVCODEC_LOGE("Failed to render output buffer with bad index, index=%{public}u", index);
         return AVCS_ERR_INVALID_VAL;
     }
 }
@@ -1005,7 +1003,7 @@ int32_t FCodec::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
 
 int32_t FCodec::GetCodecCapability(std::vector<CapabilityData> &capaArray)
 {
-    for (size_t i = 0; i < numSupportCodec; ++i) {
+    for (uint32_t i = 0; i < numSupportCodec; ++i) {
         CapabilityData capsData;
         capsData.codecName = static_cast<std::string>(SupportCodec[i].codecName);
         capsData.mimeType = static_cast<std::string>(SupportCodec[i].mimeType);
@@ -1042,7 +1040,7 @@ int32_t FCodec::GetCodecCapability(std::vector<CapabilityData> &capaArray)
         capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_HIGH));
         capaArray.emplace_back(capsData);
     }
-    AVCODEC_LOGI("Get %{public}d capability successful", capaArray.size());
+    AVCODEC_LOGI("Get %{public}lu capability successful", capaArray.size());
     return AVCS_ERR_OK;
 }
 } // namespace Codec
