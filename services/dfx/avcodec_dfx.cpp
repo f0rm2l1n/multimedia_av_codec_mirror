@@ -44,8 +44,8 @@ bool AVCodecEvent::CreateMsg(const char *format, ...)
     return true;
 }
 
-void AVCodecEvent::StatisticEventWrite(std::string eventName,
-    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
+void AVCodecEvent::StatisticEventWrite(const std::string &eventName,
+    OHOS::HiviewDFX::HiSysEvent::EventType type, const std::string &module)
 {
     int32_t pid = getpid();
     uint32_t uid = getuid();
@@ -56,8 +56,8 @@ void AVCodecEvent::StatisticEventWrite(std::string eventName,
         "MSG", msg_);
 }
 
-void AVCodecEvent::BehaviorEventWrite(std::string eventName,
-    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
+void AVCodecEvent::BehaviorEventWrite(const std::string &eventName,
+    OHOS::HiviewDFX::HiSysEvent::EventType type, const std::string &module)
 {
     int32_t pid = getpid();
     uint32_t uid = getuid();
@@ -68,8 +68,8 @@ void AVCodecEvent::BehaviorEventWrite(std::string eventName,
         "STATE", msg_);
 }
 
-void AVCodecEvent::FaultEventWrite(std::string eventName, int32_t errorCode,
-    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
+void AVCodecEvent::FaultEventWrite(const std::string &eventName, int32_t errorCode,
+    OHOS::HiviewDFX::HiSysEvent::EventType type, const std::string &module)
 {
     int32_t pid = getpid();
     uint32_t uid = getuid();
@@ -81,7 +81,7 @@ void AVCodecEvent::FaultEventWrite(std::string eventName, int32_t errorCode,
         "MSG", msg_);
 }
 
-void BehaviorEventWrite(const std::string status, std::string moudle)
+void BehaviorEventWrite(const std::string &status, const std::string &moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s, current state is: %s", "state change", status.c_str())) {
@@ -91,7 +91,7 @@ void BehaviorEventWrite(const std::string status, std::string moudle)
     }
 }
 
-void FaultEventWrite(int32_t errorCode, const std::string msg, std::string moudle)
+void FaultEventWrite(int32_t errorCode, const std::string &msg, const std::string &moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s", msg.c_str())) {
@@ -101,7 +101,7 @@ void FaultEventWrite(int32_t errorCode, const std::string msg, std::string moudl
     }
 }
 
-void StatisticEventWrite(const std::string msg, std::string moudle)
+void StatisticEventWrite(const std::string &msg, const std::string &moudle)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s", msg.c_str())) {
