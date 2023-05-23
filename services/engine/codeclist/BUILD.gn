@@ -34,6 +34,7 @@ ohos_static_library("av_codec_engine_codeclist") {
   ]
 
   sources = [
+    "audio_codeclist_info.cpp",
     "codec_ability_singleton.cpp",
     "codeclist_builder.cpp",
     "codeclist_core.cpp",
