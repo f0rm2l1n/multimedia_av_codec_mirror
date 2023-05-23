@@ -181,7 +181,7 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
         formatContext_.get()->nb_streams, trackIndex);
     AVCODEC_LOGI("Selected tracks in file: %{public}s.", selectedTracksString.str().c_str());
 
-    if (trackIndex < 0 || trackIndex >= static_cast<uint32_t>(formatContext_.get()->nb_streams)) {
+    if (trackIndex >= static_cast<uint32_t>(formatContext_.get()->nb_streams)) {
         AVCODEC_LOGE("trackIndex is invalid! Just have %{public}d tracks in file", formatContext_.get()->nb_streams);
         return AVCS_ERR_INVALID_VAL;
     }

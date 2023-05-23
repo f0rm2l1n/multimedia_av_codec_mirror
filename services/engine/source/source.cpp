@@ -233,10 +233,10 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("language", AVSourceFormat::SOURCE_LANGUAGE, format);
     GetStringFormatFromMetadata("description", AVSourceFormat::SOURCE_DESCRIPTION, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
-
+    
     bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, formatContext_->duration);
     if (!ret) {
-        AVCODEC_LOGW("Put track info failed: miss album_artist info in file");
+        AVCODEC_LOGW("Put track info failed: miss duration info in file");
     }
 
     ret = format.PutIntValue(
@@ -315,7 +315,7 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
     AVCODEC_LOGI("Source::GetTrackFormat is on call: trackIndex=%{public}d", trackIndex);
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                              "GetTrackFormat failed, formatContext_ is nullptr!");
-    if (trackIndex < 0 || trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {
+    if (trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {
         AVCODEC_LOGE("trackIndex is invalid!");
         return AVCS_ERR_INVALID_VAL;
     }
