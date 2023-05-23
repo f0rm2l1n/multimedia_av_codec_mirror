@@ -109,7 +109,7 @@ int32_t AVDemuxerImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
 {
     AVCodecTrace trace("AVDemuxer::ReadSample");
 
-    AVCODEC_LOGI("ReadSample");
+    AVCODEC_LOGI("ReadSample: trackIndex=%{public}d", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "demuxer service died when read sample!");

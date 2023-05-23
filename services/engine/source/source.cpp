@@ -205,7 +205,7 @@ int32_t Source::GetTrackCount(uint32_t &trackCount)
 void Source::GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format)
 {
     AVDictionaryEntry *valPtr = nullptr;
-    valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_IGNORE_SUFFIX);
+    valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_MATCH_CASE);
     if (valPtr == nullptr) {
         AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
     } else {
@@ -232,12 +232,11 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("copyright", AVSourceFormat::SOURCE_COPYRIGHT, format);
     GetStringFormatFromMetadata("language", AVSourceFormat::SOURCE_LANGUAGE, format);
     GetStringFormatFromMetadata("description", AVSourceFormat::SOURCE_DESCRIPTION, format);
-    GetStringFormatFromMetadata("media_type", AVSourceFormat::SOURCE_TYPE, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
-
+    
     bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, formatContext_->duration);
     if (!ret) {
-        AVCODEC_LOGW("Put track info failed: miss album_artist info in file");
+        AVCODEC_LOGW("Put track info failed: miss duration info in file");
     }
 
     ret = format.PutIntValue(
@@ -245,6 +244,8 @@ int32_t Source::GetSourceFormat(Format &format)
     if (!ret) {
         AVCODEC_LOGW("Put track info failed: miss track count info in file");
     }
+
+    AVCODEC_LOGD("Source::GetSourceFormat result: %{public}s", format.Stringify().c_str());
     return AVCS_ERR_OK;
 }
 
@@ -311,10 +312,10 @@ void Source::GetAudioTrackFormat(Format &format, AVStream *avStream)
 
 int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
-    AVCODEC_LOGI("Source::GetTrackFormat is on call");
+    AVCODEC_LOGI("Source::GetTrackFormat is on call: trackIndex=%{public}d", trackIndex);
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                              "GetTrackFormat failed, formatContext_ is nullptr!");
-    if (trackIndex < 0 || trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {
+    if (trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {
         AVCODEC_LOGE("trackIndex is invalid!");
         return AVCS_ERR_INVALID_VAL;
     }
@@ -325,6 +326,8 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
         GetAudioTrackFormat(format, avStream);
     }
+
+    AVCODEC_LOGD("Source::GetTrackFormat result: %{public}s", format.Stringify().c_str());
     return AVCS_ERR_OK;
 }
 
@@ -341,9 +344,7 @@ int32_t Source::Create(std::string& uri)
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
-    size_t size;
-    sourcePlugin_->GetSize(size);
-    AVCODEC_LOGD("mp4 fileSize: %{public}d", size);
+
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when set data source for plugin!");
     ret = LoadInputFormatList();
@@ -574,7 +575,7 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
         if (customIOContext->position != customIOContext->offset) {
             int32_t err = static_cast<int32_t>(customIOContext->sourcePlugin->SeekTo(customIOContext->offset));
             if (err < 0) {
-                AVCODEC_LOGD("ERROR: Seek to %{public}zu fail,err=%{public}d\n", customIOContext->offset, err);
+                AVCODEC_LOGD("ERROR: Seek to %{public}zu fail,err=%{public}d", customIOContext->offset, err);
                 return AVCS_ERR_SEEK_FAILED;
             }
             customIOContext->position = customIOContext->offset;

@@ -65,7 +65,6 @@ const char *OH_MD_KEY_LANGUAGE = "language";
 const char *OH_MD_KEY_DESCRIPTION = "description";
 const char *OH_MD_KEY_LYRICS = "lyrics";
 const char *OH_MD_KEY_TRACK_COUNT = "track_count";
-const char *OH_MD_KEY_MEDIA_TYPE = "media_type";
 #ifdef __cplusplus
 }
 #endif
