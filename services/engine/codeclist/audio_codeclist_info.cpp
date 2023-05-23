@@ -52,7 +52,7 @@ CapabilityData GetMP3DecoderCapability()
     return audioMp3Capability;
 }
 
-CapabilityData GetAACDecoderCapability()
+CapabilityData GetAacDecoderCapability()
 {
     CapabilityData audioAACCapability;
     audioAACCapability.codecName = AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY;
@@ -91,7 +91,7 @@ CapabilityData GetVorbisDecoderCapability()
     return audioVorbisCapability;
 }
 
-CapabilityData GetAACEncoderCapability()
+CapabilityData GetAacEncoderCapability()
 {
     CapabilityData audioAACCapability;
     audioAACCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY;
@@ -119,8 +119,8 @@ CapabilityData GetFlacEncoderCapability()
 
 AudioCodeclistInfo::AudioCodeclistInfo()
 {
-    audioCapabilities_ = {GetMP3DecoderCapability(),    GetAACDecoderCapability(), GetFlacDecoderCapability(),
-                          GetVorbisDecoderCapability(), GetAACEncoderCapability(), GetFlacEncoderCapability()};
+    audioCapabilities_ = {GetMP3DecoderCapability(),    GetAacDecoderCapability(), GetFlacDecoderCapability(),
+                          GetVorbisDecoderCapability(), GetAacEncoderCapability(), GetFlacEncoderCapability()};
 }
 
 AudioCodeclistInfo::~AudioCodeclistInfo()

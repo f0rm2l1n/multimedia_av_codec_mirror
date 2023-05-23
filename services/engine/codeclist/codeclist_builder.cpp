@@ -34,8 +34,8 @@ int32_t VideoCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
 
 int32_t AudioCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
 {
-    auto audioCapacities = AudioCodeclistInfo::GetInstance().GetAudioCapabilities();
-    for (const auto &v : audioCapacities) {
+    auto audioCapabilities = AudioCodeclistInfo::GetInstance().GetAudioCapabilities();
+    for (const auto &v : audioCapabilities) {
         caps.emplace_back(v);
     }
     return AVCS_ERR_OK;
