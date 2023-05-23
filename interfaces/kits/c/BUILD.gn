@@ -75,10 +75,7 @@ ohos_shared_library("native_av_codec_core") {
   ]
 
   if (multimedia_av_codec_support_codeclist) {
-    sources += [
-      "$av_codec_root_dir/frameworks/native/capi/avcodec/native_codeclist.cpp",
-      "$av_codec_root_dir/frameworks/native/capi/common/native_avcapability.cpp",
-    ]
+    sources += [ "$av_codec_root_dir/frameworks/native/capi/common/native_avcapability.cpp" ]
   }
 
   deps = [

@@ -30,7 +30,7 @@ public:
 
     std::string FindDecoder(const Format &format) override;
     std::string FindEncoder(const Format &format) override;
-    CapabilityData CreateCapability(const std::string codecName) override;
+    CapabilityData GetCapability(const std::string mime, const bool isEncoder, const AVCodecCategory category) override;
 
 private:
     bool Init();

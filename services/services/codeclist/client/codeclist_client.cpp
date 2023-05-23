@@ -24,17 +24,15 @@ namespace OHOS {
 namespace Media {
 std::shared_ptr<CodecListClient> CodecListClient::Create(const sptr<IStandardCodecListService> &ipcProxy)
 {
-    CHECK_AND_RETURN_RET_LOG(ipcProxy != nullptr, nullptr, "ipcProxy is nullptr..");
-
+    CHECK_AND_RETURN_RET_LOG(ipcProxy != nullptr, nullptr, "Create codeclist client failed: ipcProxy is nullptr");
     std::shared_ptr<CodecListClient> codecList = std::make_shared<CodecListClient>(ipcProxy);
-
     return codecList;
 }
 
 CodecListClient::CodecListClient(const sptr<IStandardCodecListService> &ipcProxy)
     : codecListProxy_(ipcProxy)
 {
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
+    AVCODEC_LOGD("Create CodecListClient instances successful");
 }
 
 CodecListClient::~CodecListClient()
@@ -43,7 +41,7 @@ CodecListClient::~CodecListClient()
     if (codecListProxy_ != nullptr) {
         (void)codecListProxy_->DestroyStub();
     }
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+    AVCODEC_LOGD("Destroy codecListClient instances successful");
 }
 
 void CodecListClient::AVCodecServerDied()
@@ -55,24 +53,24 @@ void CodecListClient::AVCodecServerDied()
 std::string CodecListClient::FindDecoder(const Format &format)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, "", "codeclist service does not exist.");
+    CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, "", "Find decoder failed: codeclist service does not exist.");
     return codecListProxy_->FindDecoder(format);
 }
 
 std::string CodecListClient::FindEncoder(const Format &format)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, "", "codeclist service does not exist.");
+    CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, "", "Find encoder failed: codeclist service does not exist.");
     return codecListProxy_->FindEncoder(format);
 }
 
-CapabilityData CodecListClient::CreateCapability(std::string codecName)
+CapabilityData CodecListClient::GetCapability(std::string mime, bool isEncoder, AVCodecCategory category)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CapabilityData capData;
     CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, capData,
-        "codeclist service does not exist.");
-    return codecListProxy_->CreateCapability(codecName);
+        "Get capability failed: codeclist service does not exist.");
+    return codecListProxy_->GetCapability(mime, isEncoder, category);
 }
 } // namespace Media
 } // namespace OHOS
