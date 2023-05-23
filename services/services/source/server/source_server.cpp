@@ -43,7 +43,6 @@ namespace {
         { OHOS::Media::AVSourceFormat::SOURCE_LANGUAGE, "Language" },
         { OHOS::Media::AVSourceFormat::SOURCE_DESCRIPTION, "Description" },
         { OHOS::Media::AVSourceFormat::SOURCE_LYRICS, "Lyrics" },
-        { OHOS::Media::AVSourceFormat::SOURCE_TYPE, "Type" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_TRACK_DUMP_TABLE = {

@@ -131,7 +131,6 @@ public:
     static constexpr std::string_view SOURCE_LANGUAGE      = "language";         // std::string, language
     static constexpr std::string_view SOURCE_DESCRIPTION   = "description";      // std::string, description
     static constexpr std::string_view SOURCE_LYRICS        = "lyrics";           // std::string, cyrics
-    static constexpr std::string_view SOURCE_TYPE          = "media_type";       // std::string, sourece type
 private:
     AVSourceFormat() = delete;
     ~AVSourceFormat() = delete;

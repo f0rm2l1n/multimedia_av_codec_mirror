@@ -86,7 +86,7 @@ int32_t AVDemuxerImpl::SelectTrackByID(uint32_t trackIndex)
 {
     AVCodecTrace trace("AVDemuxer::SelectTrackByID");
 
-    AVCODEC_LOGI("select track: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("select track: trackIndex=%{public}u", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "demuxer service died when select track by index!");
@@ -97,7 +97,7 @@ int32_t AVDemuxerImpl::UnselectTrackByID(uint32_t trackIndex)
 {
     AVCodecTrace trace("AVDemuxer::UnselectTrackByID");
 
-    AVCODEC_LOGI("unselect track: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("unselect track: trackIndex=%{public}u", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "demuxer service died when unselect track by index!");
@@ -109,7 +109,7 @@ int32_t AVDemuxerImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
 {
     AVCodecTrace trace("AVDemuxer::ReadSample");
 
-    AVCODEC_LOGI("ReadSample");
+    AVCODEC_LOGI("ReadSample: trackIndex=%{public}u", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "demuxer service died when read sample!");
