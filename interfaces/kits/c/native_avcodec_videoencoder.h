@@ -228,7 +228,6 @@ OH_AVErrCode OH_VideoEncoder_PushInputData(OH_AVCodec *codec, uint32_t index, OH
  * @param codec Pointer to an OH_AVCodec instance
  * @return Returns a pointer to an OH_AVFormat instance
  * @since 10
- * @version 4.0
  */
 OH_AVFormat *OH_VideoEncoder_GetInputDescription(OH_AVCodec *codec);
 
