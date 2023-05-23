@@ -69,7 +69,7 @@ int32_t DemuxerServiceProxy::SelectTrackByID(uint32_t trackIndex)
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
     
-    data.WriteInt32(trackIndex);
+    data.WriteUint32(trackIndex);
     int32_t error = Remote()->SendRequest(SELECT_TRACK_BY_ID, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error,
         "Failed to call SelectTrackByID, error: %{public}d", error);
@@ -83,7 +83,7 @@ int32_t DemuxerServiceProxy::UnselectTrackByID(uint32_t trackIndex)
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
 
-    data.WriteInt32(trackIndex);
+    data.WriteUint32(trackIndex);
     int32_t error = Remote()->SendRequest(UNSELECT_TRACK_BY_ID, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error,
         "Failed to call UnselectTrackByID, error: %{public}d", error);
@@ -98,12 +98,11 @@ int32_t DemuxerServiceProxy::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
     
-    data.WriteInt32(trackIndex);
+    data.WriteUint32(trackIndex);
     WriteAVSharedMemoryToParcel(sample, data);
     int32_t error = Remote()->SendRequest(READ_SAMPLE, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call ReadSample, error: %{public}d", error);
     
-    trackIndex = reply.ReadUint32();
     sample = ReadAVSharedMemoryFromParcel(reply);
     info.presentationTimeUs = reply.ReadInt64();
     info.size = reply.ReadInt32();

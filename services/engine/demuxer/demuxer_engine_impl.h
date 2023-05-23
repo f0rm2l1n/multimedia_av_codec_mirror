@@ -17,8 +17,7 @@
 #define DEMUXER_ENGINE_IMPL_H
 
 #include <map>
-#include <atomic>
-#include <thread>
+#include <mutex>
 #include <condition_variable>
 #include "i_demuxer_engine.h"
 #include "demuxer.h"
@@ -39,6 +38,7 @@ private:
     int32_t appUid_ = -1;
     int32_t appPid_ = -1;
     uintptr_t sourceAddr_;
+    std::mutex mutex_;
     std::shared_ptr<Plugin::Demuxer> demuxer_ = nullptr;
 };
 } // namespace Media
