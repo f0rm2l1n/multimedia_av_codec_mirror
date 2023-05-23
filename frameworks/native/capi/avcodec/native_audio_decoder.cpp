@@ -210,7 +210,9 @@ OH_AVErrCode OH_AudioDecoder_Destroy(struct OH_AVCodec *codec)
     struct AudioDecoderObject *audioDecObj = reinterpret_cast<AudioDecoderObject *>(codec);
 
     if (audioDecObj != nullptr && audioDecObj->audioDecoder_ != nullptr) {
-        audioDecObj->callback_->StopCallback();
+        if (audioDecObj->callback_ != nullptr) {
+            audioDecObj->callback_->StopCallback();
+        }
         audioDecObj->memoryObjList_.clear();
         audioDecObj->isStop_.store(true);
         int32_t ret = audioDecObj->audioDecoder_->Release();
