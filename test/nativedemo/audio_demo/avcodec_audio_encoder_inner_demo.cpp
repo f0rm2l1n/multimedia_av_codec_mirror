@@ -165,7 +165,7 @@ void AEnInnerDemo::InputFunc()
             std::cout << "buffer is null:" << index << "\n";
             break;
         }
-        inputFile.read((char *)buffer->GetBase(), frameBytes);
+        inputFile.read(reinterpret_cast<char *>(buffer->GetBase()), frameBytes);
         int readBytes = inputFile.gcount();
         AVCodecBufferInfo attr;
         AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
@@ -209,7 +209,7 @@ void AEnInnerDemo::OutputFunc()
             break;
         }
         auto attr = signal_->sizeQueue_.front();
-        outputFile.write((char *)buffer->GetBase(), attr.size);
+        outputFile.write(reinterpret_cast<char *>(buffer->GetBase()), attr.size);
         cout << "output write size = " << attr.size << endl;
         if (audioEn_->ReleaseOutputBuffer(index) != AVCS_ERR_OK) {
             cout << "Fatal: ReleaseOutputBuffer fail" << endl;

@@ -243,7 +243,7 @@ void ADecInnerDemo::OutputFunc()
             cout << "decode eos" << endl;
             isRunning_.store(false);
         }
-        outputFile.write((char *)buffer->GetBase(), attr.size);
+        outputFile.write(reinterpret_cast<char *>(buffer->GetBase()), attr.size);
         if (audioDec_->ReleaseOutputBuffer(index) != AVCS_ERR_OK) {
             cout << "Fatal: ReleaseOutputBuffer fail" << endl;
             break;

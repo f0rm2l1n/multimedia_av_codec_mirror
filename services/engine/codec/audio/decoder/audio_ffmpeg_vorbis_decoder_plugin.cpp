@@ -53,10 +53,6 @@ std::shared_ptr<AVCodecContext> AudioFFMpegVorbisDecoderPlugin::GenEncodeContext
     }
     auto encodeContext =
         std::shared_ptr<AVCodecContext>(context, [](AVCodecContext *ptr) { avcodec_free_context(&ptr); });
-    if (encodeContext == nullptr) {
-        AVCODEC_LOGE("AVCodecContext null pointer.");
-        return nullptr;
-    }
     encodeContext->sample_fmt = AV_SAMPLE_FMT_FLTP;
 
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, encodeContext->channels); // todo: 统一KEY定义
@@ -109,6 +105,10 @@ int32_t AudioFFMpegVorbisDecoderPlugin::init(const Format &format)
     auto codecCtx = basePlugin->GetCodecContext();
     if (!basePlugin->hasExtraData()) {
         ret = AssignExtradata(codecCtx, format);
+    }
+    if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("AssignExtradata failed, ret=%{public}d", ret);
+        return ret;
     }
 
     return basePlugin->OpenContext();

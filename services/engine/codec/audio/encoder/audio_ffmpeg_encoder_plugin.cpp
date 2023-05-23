@@ -36,16 +36,14 @@ AudioFfmpegEncoderPlugin::~AudioFfmpegEncoderPlugin()
 
 int32_t AudioFfmpegEncoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
-    int32_t ret = AVCodecServiceErrCode::AVCS_ERR_OK;
     {
         std::unique_lock lock(avMutext_);
         if (avCodecContext_ == nullptr) {
             AVCODEC_LOGE("avCodecContext_ is nullptr");
             return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
         }
-        ret = SendBuffer(inputBuffer);
+        return SendBuffer(inputBuffer);
     }
-    return ret;
 }
 
 static std::string AVStrError(int errnum)
@@ -162,11 +160,11 @@ int32_t AudioFfmpegEncoderPlugin::ReceivePacketSucc(std::shared_ptr<AudioBufferI
     if (headerFuncValid_) {
         std::string header;
         GetHeaderFunc_(header, headerSize, avCodecContext_, avPacket_->size);
-        if (headerSize <= 0) {
+        if (headerSize == 0) {
             AVCODEC_LOGE("Get header failed.");
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
-        auto len = memory->Write((uint8_t *)header.c_str(), headerSize);
+        uint32_t len = memory->Write(reinterpret_cast<uint8_t *>(const_cast<char*>(header.c_str())), headerSize);
         if (len < headerSize) {
             AVCODEC_LOGE("Write header failed, len = %{public}d", len);
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
@@ -254,6 +252,13 @@ int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
     int32_t sampleFormat;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, sampleFormat);
     avCodecContext_->sample_fmt = (AVSampleFormat)sampleFormat;
+
+    AVCODEC_LOGI("avcodec name: %{public}s", avCodec_->name);
+    if (!strcmp(avCodec_->name, "flac")) {
+        int32_t compliance_level;
+        format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, compliance_level);
+        avCodecContext_->strict_std_compliance = compliance_level;
+    }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 

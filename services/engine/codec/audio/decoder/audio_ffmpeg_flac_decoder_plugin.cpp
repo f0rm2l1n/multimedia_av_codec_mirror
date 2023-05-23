@@ -16,17 +16,20 @@
 #include "audio_ffmpeg_flac_decoder_plugin.h"
 #include "avcodec_errors.h"
 #include "media_description.h"
+#include "avcodec_dfx.h"
+#include "avcodec_log.h"
 
 namespace {
-constexpr int getInputBufferSize_ = 65536;
-constexpr int getOutputBufferSize_ = 65536;
-constexpr int minChannels = 1;
-constexpr int maxChannels = 8;
-static const int flac_encoder_sample_rate_table[] = {
-    0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
-};
-static const int flac_encoder_bits_sample_table[] = {16, 24, 32};
-} // namespace
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacDecoderPlugin"};
+    constexpr int32_t getInputBufferSize_ = 65536;
+    constexpr int32_t getOutputBufferSize_ = 65536;
+    constexpr int32_t minChannels = 1;
+    constexpr int32_t maxChannels = 8;
+    static const uint32_t flac_encoder_sample_rate_table[] = {
+        0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
+    };
+    static const uint32_t flac_encoder_bits_sample_table[] = {16, 24, 32};
+}
 
 namespace OHOS {
 namespace Media {
@@ -41,17 +44,17 @@ AudioFFMpegFlacDecoderPlugin::~AudioFFMpegFlacDecoderPlugin()
     basePlugin = nullptr;
 }
 
-static bool isTrueSampleRate(int sample)
+static bool isTrueSampleRate(uint32_t sample_rate)
 {
     for (auto i : flac_encoder_sample_rate_table) {
-        if (i == sample) {
+        if (i == sample_rate) {
             return true;
         }
     }
     return false;
 }
 
-static bool isTrueBitsPerSample(int bits_per_coded_sample)
+static bool isTrueBitsPerSample(uint32_t bits_per_coded_sample)
 {
     for (auto i : flac_encoder_bits_sample_table) {
         if (i == bits_per_coded_sample) {
@@ -61,36 +64,51 @@ static bool isTrueBitsPerSample(int bits_per_coded_sample)
     return false;
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::init(const Format &format)
+int32_t AudioFFMpegFlacDecoderPlugin::CheckFormat(const Format &format) const
 {
-    int channels, sample_rate, bits_per_coded_sample;
-    int64_t bit_rate;
+    int32_t channels, sample_rate, bits_per_coded_sample;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bit_rate);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bits_per_coded_sample);
     if (!isTrueSampleRate(sample_rate)) {
+        AVCODEC_LOGE("init failed, because sample rate=%{public}d not in table.", sample_rate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
     } else if (channels < minChannels || channels > maxChannels) {
+        AVCODEC_LOGE("init failed, because channels=%{public}d not support.", channels);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
     } else if (!isTrueBitsPerSample(bits_per_coded_sample)) {
+        AVCODEC_LOGE("init failed, because bits_per_coded_sample=%{public}d not support.", bits_per_coded_sample);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
     }
+    return AVCodecServiceErrCode::AVCS_ERR_OK;
+}
 
+int32_t AudioFFMpegFlacDecoderPlugin::init(const Format &format)
+{
     int32_t ret = basePlugin->AllocateContext("flac");
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because AllocateContext failed. ret=%{public}d", ret);
+        return ret;
+    }
+    
+    ret = CheckFormat(format);
+    if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because CheckFormat failed. ret=%{public}d", ret);
         return ret;
     }
 
     ret = basePlugin->InitContext(format);
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because InitContext failed. ret=%{public}d", ret);
         return ret;
     }
 
     ret = basePlugin->OpenContext();
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because OpenContext failed. ret=%{public}d", ret);
         return ret;
     }
+    
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 

@@ -36,13 +36,13 @@ constexpr uint32_t BITS_PER_SAMPLE = 16;
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr uint32_t DEFAULT_AAC_TYPE = 1;
 constexpr int64_t BITS_RETE[TYPE_MAX] = {197000, 543000, 128000, 160000};
-constexpr string_view inputAacFilePath = "/data/aac_2c_44100hz_197k.dat";;
-constexpr string_view outputAacPcmFilePath = "/data/aac_2c_44100hz_197k.pcm";
-constexpr string_view inputFlacFilePath = "/data/flac_2c_44100hz_543k.dat";;
-constexpr string_view outputFlacPcmFilePath = "/data/flac_2c_44100hz_543k.pcm";
-constexpr string_view inputMp3FilePath = "/data/mp3_2c_44100hz_128k.dat";;
+constexpr string_view inputAacFilePath = "/data/aac_44100_2.dat";
+constexpr string_view outputAacPcmFilePath = "/data/aac_44100_2.pcm";
+constexpr string_view inputFlacFilePath = "/data/flac_44100_2.dat";
+constexpr string_view outputFlacPcmFilePath = "/data/flac_44100_2.pcm";
+constexpr string_view inputMp3FilePath = "/data/mp3_2c_44100hz_128k.dat";
 constexpr string_view outputMp3PcmFilePath = "/data/mp3_2c_44100hz_128k.pcm";
-constexpr string_view inputVorbisFilePath = "/data/vorbis_2c_44100hz_160k.dat";;
+constexpr string_view inputVorbisFilePath = "/data/vorbis_2c_44100hz_160k.dat";
 constexpr string_view outputVorbisPcmFilePath = "/data/vorbis_2c_44100hz_160k.pcm";
 } // namespace
 

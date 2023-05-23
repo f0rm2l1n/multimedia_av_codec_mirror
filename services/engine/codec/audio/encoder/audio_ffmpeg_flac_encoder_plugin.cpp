@@ -21,14 +21,16 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
-    constexpr int minChannel = 1;
-    constexpr int maxChannel = 8;
-    constexpr int getInputBufferSize_ = 65536;
-    constexpr int getOutputBufferSize_ = 65536;
-    static const int flac_encoder_sample_rate_table[] = {
+    constexpr int32_t minChannels = 1;
+    constexpr int32_t maxChannels = 8;
+    constexpr int32_t minLevel = -2;
+    constexpr int32_t maxLevel = 2;
+    constexpr int32_t getInputBufferSize_ = 65536;
+    constexpr int32_t getOutputBufferSize_ = 65536;
+    static const uint32_t flac_encoder_sample_rate_table[] = {
         0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
     };
-    static const int flac_encoder_bits_sample_table[] = {16, 24, 32};
+    static const uint32_t flac_encoder_bits_sample_table[] = {16, 24, 32};
 }
 
 namespace OHOS {
@@ -45,17 +47,17 @@ AudioFFMpegFlacEncoderPlugin::~AudioFFMpegFlacEncoderPlugin()
     basePlugin = nullptr;
 }
 
-static bool isTrueSampleRate(int sample)
+static bool isTrueSampleRate(uint32_t sample_rate)
 {
     for (auto i : flac_encoder_sample_rate_table) {
-        if (i == sample) {
+        if (i == sample_rate) {
             return true;
         }
     }
     return false;
 }
 
-static bool isTrueBitsPerSample(int bits_per_coded_sample)
+static bool isTrueBitsPerSample(uint32_t bits_per_coded_sample)
 {
     for (auto i : flac_encoder_bits_sample_table) {
         if (i == bits_per_coded_sample) {
@@ -65,27 +67,40 @@ static bool isTrueBitsPerSample(int bits_per_coded_sample)
     return false;
 }
 
-int32_t AudioFFMpegFlacEncoderPlugin::init(const Format &format)
+int32_t AudioFFMpegFlacEncoderPlugin::CheckFormat(const Format &format) const
 {
-    int32_t channels, sample_rate;
-    int32_t bits_per_coded_sample;
+    int32_t compliance_level, channels, sample_rate, bits_per_coded_sample;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bits_per_coded_sample);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, compliance_level);
     if (!isTrueSampleRate(sample_rate)) {
         AVCODEC_LOGE("init failed, because sample rate=%{public}d not in table.", sample_rate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
-    } else if (channels < minChannel || channels > maxChannel) {
+    } else if (channels < minChannels || channels > maxChannels) {
         AVCODEC_LOGE("init failed, because channels=%{public}d not support.", channels);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
     } else if (!isTrueBitsPerSample(bits_per_coded_sample)) {
         AVCODEC_LOGE("init failed, because bits_per_coded_sample=%{public}d not support.", bits_per_coded_sample);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
+    } else if (compliance_level < minLevel || compliance_level > maxLevel) {
+        AVCODEC_LOGE("init failed, because compliance_level=%{public}d not support.", compliance_level);
+        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     }
+    return AVCodecServiceErrCode::AVCS_ERR_OK;
+}
 
+int32_t AudioFFMpegFlacEncoderPlugin::init(const Format &format)
+{
     int32_t ret = basePlugin->AllocateContext("flac");
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         AVCODEC_LOGE("init failed, because AllocateContext failed. ret=%{public}d", ret);
+        return ret;
+    }
+
+    ret = CheckFormat(format);
+    if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because CheckFormat failed. ret=%{public}d", ret);
         return ret;
     }
 

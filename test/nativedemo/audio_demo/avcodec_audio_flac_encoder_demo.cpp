@@ -38,6 +38,7 @@ constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr uint32_t CHANNEL_LAYOUT = 3;
 constexpr int32_t SAMPLE_FORMAT = 1;
 constexpr uint32_t FRAME_BYTES = 18432;
+constexpr int32_t COMPLIANCE_LEVEL = -2;
 
 constexpr string_view inputFilePath = "/data/flac_test.pcm";
 constexpr string_view outputFilePath = "/data/flac_encoder_test.flac";
@@ -101,6 +102,7 @@ void AEncFlacDemo::RunCase()
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
 
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
@@ -228,14 +230,7 @@ void AEncFlacDemo::InputFunc()
         if (!inputFile_->eof()) {
             inputFile_->read((char *)OH_AVMemory_GetAddr(buffer), FRAME_BYTES);
         } else {
-            OH_AVCodecBufferAttr info;
-            info.size = 0;
-            info.offset = 0;
-            info.pts = 0;
-            info.flags = AVCODEC_BUFFER_FLAGS_EOS;
-            OH_AudioEncoder_PushInputData(audioEnc_, index, info);
-            signal_->inQueue_.pop();
-            signal_->inBufferQueue_.pop();
+            HandleEOS(index);
             break;
         }
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");

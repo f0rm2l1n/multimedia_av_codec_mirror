@@ -42,6 +42,7 @@ public:
     }
 
 private:
+    int32_t CheckFormat(const Format &format) const;
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
 } // namespace Media
