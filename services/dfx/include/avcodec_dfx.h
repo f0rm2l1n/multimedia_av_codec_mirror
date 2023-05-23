@@ -39,7 +39,7 @@ private:
 };
 
 __attribute__((visibility("default"))) void BehaviorEventWrite(const std::string &status, const std::string &moudle);
-__attribute__((visibility("default"))) void FaultEventWrite(int32_t errorCode, 
+__attribute__((visibility("default"))) void FaultEventWrite(int32_t errorCode,
                                                             const std::string &msg, const std::string &moudle);
 __attribute__((visibility("default"))) void StatisticEventWrite(const std::string &msg, const std::string &moudle);
 
