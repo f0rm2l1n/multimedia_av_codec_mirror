@@ -48,15 +48,20 @@ int32_t AVMuxerCapiMock::AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMoc
 int32_t AVMuxerCapiMock::WriteSample(uint32_t trackIndex,
     const uint8_t *sample, const AVCodecBufferAttrMock &info)
 {
+    int32_t ret = AV_ERR_NO_MEMORY;
     OH_AVMemory *avSample = OH_AVMemory_Create(info.size);
-    (void)memcpy_s(OH_AVMemory_GetAddr(avSample),
-        OH_AVMemory_GetSize(avSample), sample, info.size);
-    OH_AVCodecBufferAttr bufferAttr;
-    bufferAttr.pts = info.pts;
-    bufferAttr.size = info.size;
-    bufferAttr.offset = info.offset;
-    bufferAttr.flags = info.flags;
-    return OH_AVMuxer_WriteSample(muxer_, trackIndex, avSample, bufferAttr);
+    uint8_t *data = OH_AVMemory_GetAddr(avSample);
+    int32_t size = OH_AVMemory_GetSize(avSample);
+    if (memcpy_s(data, size, sample, info.size) == EOK) {
+        OH_AVCodecBufferAttr bufferAttr;
+        bufferAttr.pts = info.pts;
+        bufferAttr.size = info.size;
+        bufferAttr.offset = info.offset;
+        bufferAttr.flags = info.flags;
+        ret = OH_AVMuxer_WriteSample(muxer_, trackIndex, avSample, bufferAttr);
+    }
+    (void)OH_AVMemory_Destroy(avSample);
+    return ret;
 }
 
 int32_t AVMuxerCapiMock::SetRotation(int32_t rotation)

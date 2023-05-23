@@ -363,7 +363,7 @@ int GetInputNum(int defaultNum)
     if (scanf_s("%d", &num) <= 0) {
         num = defaultNum;
     }
-    while ((getchar()) != '\n');
+    while ((getchar()) != '\n') {}
     return num;
 }
 
