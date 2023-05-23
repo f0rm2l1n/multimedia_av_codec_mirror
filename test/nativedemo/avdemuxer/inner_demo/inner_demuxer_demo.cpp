@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <cinttypes>
 #include "native_avmemory.h"
 #include "avdemuxer.h"
 #include "inner_demuxer_demo.h"
@@ -64,7 +64,7 @@ int32_t InnerDemuxerDemo::UnselectTrackByID(uint32_t trackIndex)
 int32_t InnerDemuxerDemo::PrintInfo(int32_t tracks)
 {
     for (int32_t i = 0; i < tracks; i++) {
-        printf("streams[%d]==>total frames=%lld,KeyFrames=%lld\n", i,
+        printf("streams[%d]==>total frames=%" PRId64 ",KeyFrames=%" PRId64 "\n", i,
             frames_[i], key_frames_[i]);
     }
     return 0;
@@ -89,7 +89,7 @@ int32_t InnerDemuxerDemo::ReadAllSamples(std::shared_ptr<AVSharedMemory> SampleM
             }
             if (bufferFlag == AVCODEC_BUFFER_FLAG_EOS) {
                 frames_[i]++;
-                printf("streams[%d]==>sampleInfo:pts=%lld,size=%d,offset=%d\n",
+                printf("streams[%d]==>sampleInfo:pts=%" PRId64 ",size=%d,offset=%d\n",
                     i, sampleInfo.presentationTimeUs, sampleInfo.size, sampleInfo.offset);
             }
             if (bufferFlag == AVCODEC_BUFFER_FLAG_SYNC_FRAME) {

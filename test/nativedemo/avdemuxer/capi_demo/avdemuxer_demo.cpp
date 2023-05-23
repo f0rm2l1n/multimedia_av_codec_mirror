@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <cinttypes>
 #include "avdemuxer_demo.h"
 
 namespace OHOS {
@@ -73,7 +73,7 @@ int32_t AVDemuxerDemo::UnselectTrackByID(uint32_t trackIndex)
 int32_t AVDemuxerDemo::PrintInfo(int32_t tracks)
 {
     for (int32_t i = 0; i < tracks; i++) {
-        printf("streams[%d]==>total frames=%lld,KeyFrames=%lld\n", i,
+        printf("streams[%d]==>total frames=%" PRId64 ",KeyFrames=%" PRId64 "\n", i,
             frames_[i], key_frames_[i]);
     }
     return 0;
@@ -106,7 +106,7 @@ int32_t AVDemuxerDemo::ReadAllSamples(OH_AVMemory *sample, int32_t tracks)
             }
             if (bufferInfo.flags == AVCODEC_BUFFER_FLAGS_EOS) {
                 frames_[i]++;
-                printf("streams[%d]==>bufferInfo:pts=%lld,size=%d,offset=%d\n",
+                printf("streams[%d]==>bufferInfo:pts=%" PRId64 ",size=%d,offset=%d\n",
                     i, bufferInfo.pts, bufferInfo.size, bufferInfo.offset);
             }
             if (bufferInfo.flags == AVCODEC_BUFFER_FLAGS_SYNC_FRAME) {
