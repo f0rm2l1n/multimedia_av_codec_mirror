@@ -172,12 +172,12 @@ int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
 
 int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID: trackIndex=%{public}u", trackIndex);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
     }
-    AVCODEC_LOGI("Total track in file: %{public}d | add track index: %{public}d",
+    AVCODEC_LOGI("Total track in file: %{public}d | add track index: %{public}u",
         formatContext_.get()->nb_streams, trackIndex);
     AVCODEC_LOGI("Selected tracks in file: %{public}s.", selectedTracksString.str().c_str());
 
@@ -197,19 +197,19 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
                         "track_sample_cache_" + std::to_string(trackIndex))));
         }
     } else {
-        AVCODEC_LOGW("track %{public}d is already in selected list!", trackIndex);
+        AVCODEC_LOGW("track %{public}u is already in selected list!", trackIndex);
     }
     return AVCS_ERR_OK;
 }
 
 int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID: trackIndex=%{public}u", trackIndex);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
         selectedTracksString << index;
     }
-    AVCODEC_LOGI("Selected track in file: %{public}s | remove track: %{public}d",
+    AVCODEC_LOGI("Selected track in file: %{public}s | remove track: %{public}u",
         selectedTracksString.str().c_str(), trackIndex);
 
     auto index = std::find_if(selectedTrackIds_.begin(), selectedTrackIds_.end(),
@@ -222,7 +222,7 @@ int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
             sampleCache_.erase(trackIndex);
         }
     } else {
-        AVCODEC_LOGW("Unselect track failed, track %{public}d is not in selected list!", trackIndex);
+        AVCODEC_LOGW("Unselect track failed, track %{public}u is not in selected list!", trackIndex);
         return AVCS_ERR_INVALID_VAL;
     }
     return AVCS_ERR_OK;
@@ -328,9 +328,9 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
 int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
                                         AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample: trackIndex=%{public}u", trackIndex);
     if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
-        AVCODEC_LOGE("read frame failed, track %{public}d has not been selected", trackIndex);
+        AVCODEC_LOGE("read frame failed, track %{public}u has not been selected", trackIndex);
         return AVCS_ERR_DEMUXER_FAILED;
     }
     AVStream* avStream = formatContext_->streams[trackIndex];
