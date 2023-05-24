@@ -41,13 +41,13 @@ struct FdListStr {
     int inCoverFd;
 };
 
-extern const struct AudioTrackParam g_audioMpegPar;
-extern const struct AudioTrackParam g_audioAacPar;
-extern const struct VideoTrackParam g_videoH264Par;
-extern const struct VideoTrackParam g_videoMpeg4Par;
-extern const struct VideoTrackParam g_jpegCoverPar;
-extern const struct VideoTrackParam g_pngCoverPar;
-extern const struct VideoTrackParam g_bmpCoverPar;
+extern struct AudioTrackParam g_audioMpegPar;
+extern struct AudioTrackParam g_audioAacPar;
+extern struct VideoTrackParam g_videoH264Par;
+extern struct VideoTrackParam g_videoMpeg4Par;
+extern struct VideoTrackParam g_jpegCoverPar;
+extern struct VideoTrackParam g_pngCoverPar;
+extern struct VideoTrackParam g_bmpCoverPar;
 extern const char *RUN_NORMAL;
 extern const char *RUN_MUL_THREAD;
 #ifdef __cplusplus
