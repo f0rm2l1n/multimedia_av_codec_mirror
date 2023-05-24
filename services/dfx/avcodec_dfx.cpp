@@ -103,17 +103,13 @@ void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string& module)
                     "MEMORY", useMemory);
 }
 
-void StatisticEventWrite(uint32_t codecCount,
-                         uint32_t muxerCount,
-                         uint32_t sourceCount,
-                         uint32_t demuxerCount,
-                         uint32_t codeclistCount,
-                         const std::string& module)
+void StatisticEventWrite(const SubAbilityCount& subAbilityCount, const std::string& module)
 {
     HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "AV_CODEC_SUB_ABILITY_COUNT",
                     OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "MODULE", module.c_str(), "CODEC_COUNT",
-                    codecCount, "MUXER_COUNT", muxerCount, "SOURCE_COUNT", sourceCount, "DEMUXER_COUNT", demuxerCount,
-                    "CODECLIST_COUNT", codeclistCount);
+                    subAbilityCount.codecCount, "MUXER_COUNT", subAbilityCount.muxerCount, "SOURCE_COUNT",
+                    subAbilityCount.sourceCount, "DEMUXER_COUNT", subAbilityCount.demuxerCount, "CODECLIST_COUNT",
+                    subAbilityCount.codeclistCount);
 }
 
 AVCodecTrace::AVCodecTrace(const std::string& funcName)

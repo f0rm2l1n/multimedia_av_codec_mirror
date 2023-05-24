@@ -30,6 +30,14 @@ enum class FaultType : int32_t {
     FAULT_TYPE_INNER_ERROR = 2,
 };
 
+struct SubAbilityCount {
+    uint32_t codecCount = 0;
+    uint32_t muxerCount = 0;
+    uint32_t sourceCount = 0;
+    uint32_t demuxerCount = 0;
+    uint32_t codeclistCount = 0;
+};
+
 class __attribute__((visibility("default"))) AVCodecEvent : public NoCopyable {
 public:
     AVCodecEvent() = default;
@@ -48,14 +56,10 @@ private:
 };
 
 __attribute__((visibility("default"))) void BehaviorEventWrite(const std::string& status, const std::string& module);
-__attribute__((visibility("default"))) void
-    FaultEventWrite(FaultType faultType, const std::string& msg, const std::string& module);
+__attribute__((visibility("default"))) void FaultEventWrite(FaultType faultType, const std::string& msg, 
+                                                            const std::string& module);
 __attribute__((visibility("default"))) void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string& module);
-__attribute__((visibility("default"))) void StatisticEventWrite(uint32_t codecCount,
-                                                                uint32_t muxerCount,
-                                                                uint32_t sourceCount,
-                                                                uint32_t demuxerCount,
-                                                                uint32_t codeclistCount,
+__attribute__((visibility("default"))) void StatisticEventWrite(const SubAbilityCount& subAbilityCount,
                                                                 const std::string& module);
 
 #define AVCODEC_SYNC_TRACE AVCodecTrace trace(std::string(__FUNCTION__))
