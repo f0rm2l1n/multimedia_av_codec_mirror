@@ -95,7 +95,7 @@ CodecServer::CodecServer()
 CodecServer::~CodecServer()
 {
     std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(&CodecServer::ExitProcessor, this);
-    if (thread != nullptr && thread->joinable()) {
+    if (thread->joinable()) {
         thread->join();
     }
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
@@ -218,7 +218,7 @@ int32_t CodecServer::Release()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(&CodecServer::ExitProcessor, this);
-    if (thread != nullptr && thread->joinable()) {
+    if (thread->joinable()) {
         thread->join();
     }
     return AVCS_ERR_OK;
@@ -339,7 +339,7 @@ int32_t CodecServer::DumpInfo(int32_t fd)
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Get codec format failed.");
     CodecType codecType = GetCodecType();
     auto it = CODEC_DUMP_TABLE.find(codecType);
-    auto &dumpTable = it != CODEC_DUMP_TABLE.end() ? it->second : DEFAULT_DUMP_TABLE;
+    const auto &dumpTable = it != CODEC_DUMP_TABLE.end() ? it->second : DEFAULT_DUMP_TABLE;
     AVCodecDumpControler dumpControler;
     std::string codecInfo;
 
