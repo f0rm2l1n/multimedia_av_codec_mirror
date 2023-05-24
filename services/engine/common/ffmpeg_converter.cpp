@@ -14,7 +14,6 @@
  */
 #include "ffmpeg_converter.h"
 #include <vector>
-#include <string_view>
 namespace OHOS {
 namespace Media {
 // ffmpeg channel layout to histreamer channel layout
