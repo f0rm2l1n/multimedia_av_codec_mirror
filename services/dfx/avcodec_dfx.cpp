@@ -19,12 +19,13 @@
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
 #include "hitrace_meter.h"
+#include "dump_usage.h"
 
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecDFX"};
     constexpr uint32_t MAX_STRING_SIZE = 256;
-    constexpr char HISYSEVENT_DOMAIN_AVCODEC[] = "AVCODEC";
+    constexpr char HISYSEVENT_DOMAIN_AVCODEC[] = "AV_CODEC";
 }
 
 namespace OHOS {
@@ -44,71 +45,80 @@ bool AVCodecEvent::CreateMsg(const char *format, ...)
     return true;
 }
 
-void AVCodecEvent::StatisticEventWrite(std::string eventName,
-    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
+void AVCodecEvent::BehaviorEventWrite(const std::string &eventName,
+    OHOS::HiviewDFX::HiSysEvent::EventType type, const std::string &module)
 {
-    int32_t pid = getpid();
-    uint32_t uid = getuid();
     HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, eventName, type,
-        "PID", pid,
-        "UID", uid,
-        "MODULE", module,
-        "MSG", msg_);
-}
-
-void AVCodecEvent::BehaviorEventWrite(std::string eventName,
-    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
-{
-    int32_t pid = getpid();
-    uint32_t uid = getuid();
-    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, eventName, type,
-        "PID", pid,
-        "UID", uid,
         "MODULE", module,
         "STATE", msg_);
 }
 
-void AVCodecEvent::FaultEventWrite(std::string eventName, int32_t errorCode,
-    OHOS::HiviewDFX::HiSysEvent::EventType type, std::string module)
+void AVCodecEvent::FaultEventWrite(const std::string &eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
+     FaultType faultType, const std::string &module)
 {
-    int32_t pid = getpid();
-    uint32_t uid = getuid();
+    std::string faultName;
+    switch (faultType) {
+        case FaultType::FAULT_TYPE_FREEZE:
+            faultName = "Freeze";
+            break;
+        case FaultType::FAULT_TYPE_CRASH:
+            faultName = "Crash";
+            break;
+        case FaultType::FAULT_TYPE_INNER_ERROR:
+            faultName = "Inner error";
+            break;
+        default:
+            AVCODEC_LOGE("Invalid fault type:%{public}d", faultType);
+    }
     HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, eventName, type,
-        "PID", pid,
-        "UID", uid,
         "MODULE", module,
-        "ERRORCODE", errorCode,
+        "FAULTTYPE", faultName,
         "MSG", msg_);
 }
 
-void BehaviorEventWrite(std::string status, std::string moudle)
+void BehaviorEventWrite(const std::string &status, const std::string &module)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s, current state is: %s", "state change", status.c_str())) {
-        event.BehaviorEventWrite("AVCODEC_STATE", OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, moudle);
+        event.BehaviorEventWrite("AV_CODEC_SUB_ABILITY_STATE", OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+                                module);
     } else {
         AVCODEC_LOGW("Failed to call CreateMsg");
     }
 }
 
-void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle)
+void FaultEventWrite(FaultType faultType, const std::string &msg, const std::string &module)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s", msg.c_str())) {
-        event.FaultEventWrite("AVCODEC_ERR", errorCode, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT, moudle);
+        event.FaultEventWrite("AV_CODEC_FAULT", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT, faultType, module);
     } else {
         AVCODEC_LOGW("Failed to call CreateMsg");
     }
 }
 
-void StatisticEventWrite(std::string msg, std::string moudle)
+void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string &module)
 {
-    AVCodecEvent event;
-    if (event.CreateMsg("%s", msg.c_str())) {
-        event.StatisticEventWrite("AVCODEC_STATISTIC", OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, moudle);
-    } else {
-        AVCODEC_LOGW("Failed to call CreateMsg");
-    }
+    OHOS::HiviewDFX::DumpUsage dumpUse;
+    uint32_t useMemory = dumpUse.GetPss(getpid());
+    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "AV_CODEC_SERVER_STATISTICS", 
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "MODULE", module.c_str(),
+        "TIME", useTime,
+        "MEMORY", useMemory);
+}
+
+void StatisticEventWrite(uint32_t codecCount, uint32_t muxerCount, uint32_t sourceCount,
+                        uint32_t demuxerCount, uint32_t codeclistCount, const std::string &module)
+{
+    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "AV_CODEC_SUB_ABILITY_COUNT", 
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "MODULE", module.c_str(),
+        "CODEC_COUNT", codecCount,
+        "MUXER_COUNT", muxerCount,
+        "SOURCE_COUNT", sourceCount,
+        "DEMUXER_COUNT", demuxerCount,
+        "CODECLIST_COUNT", codeclistCount);
 }
 
 AVCodecTrace::AVCodecTrace(const std::string &funcName)

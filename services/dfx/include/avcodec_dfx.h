@@ -23,24 +23,33 @@
 
 namespace OHOS {
 namespace Media {
+enum class FaultType : int32_t {
+    FAULT_TYPE_INVALID = -1,
+    FAULT_TYPE_FREEZE = 0,
+    FAULT_TYPE_CRASH = 1,
+    FAULT_TYPE_INNER_ERROR = 2,
+};
+
 class __attribute__((visibility("default"))) AVCodecEvent : public NoCopyable {
 public:
     AVCodecEvent() = default;
     ~AVCodecEvent() = default;
     bool CreateMsg(const char *format, ...) __attribute__((__format__(printf, 2, 3)));
-    void StatisticEventWrite(std::string eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module);
-    void BehaviorEventWrite(std::string eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module);
-    void FaultEventWrite(std::string eventName, int32_t errorCode, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module);
+    void BehaviorEventWrite(const std::string &eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
+        const std::string &module);
+    void FaultEventWrite(const std::string &eventName, OHOS::HiviewDFX::HiSysEvent::EventType type, FaultType faultType,
+        const std::string &module);
 private:
     std::string msg_;
 };
 
-__attribute__((visibility("default"))) void BehaviorEventWrite(std::string status, std::string moudle);
-__attribute__((visibility("default"))) void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle);
-__attribute__((visibility("default"))) void StatisticEventWrite(std::string msg, std::string moudle);
+__attribute__((visibility("default"))) void BehaviorEventWrite(const std::string &status, const std::string &module);
+__attribute__((visibility("default"))) void FaultEventWrite(FaultType faultType, const std::string &msg,
+                                            const std::string &module);
+__attribute__((visibility("default"))) void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string &module);
+__attribute__((visibility("default"))) void StatisticEventWrite(uint32_t codecCount, uint32_t muxerCount,
+                                            uint32_t sourceCount, uint32_t demuxerCount, uint32_t codeclistCount,
+                                            const std::string &module);
 
 #define AVCODEC_SYNC_TRACE AVCodecTrace trace(std::string(__FUNCTION__))
 

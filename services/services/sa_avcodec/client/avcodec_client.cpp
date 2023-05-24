@@ -17,6 +17,7 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "avcodec_dfx.h"
 
 #ifdef SUPPORT_DEMUXER
 #include "i_standard_demuxer_service.h"
@@ -260,6 +261,7 @@ void AVCodecClient::AVCodecServerDied(pid_t pid)
 {
     AVCODEC_LOGE("av_codec server is died, pid:%{public}d!", pid);
     avCodecClientInstance.DoAVCodecServerDied();
+    FaultEventWrite(FaultType::FAULT_TYPE_CRASH, "AV_CODEC server is died", "AV_CODEC client");
 }
 
 void AVCodecClient::DoAVCodecServerDied()
