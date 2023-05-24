@@ -19,41 +19,39 @@
 #include <utility>
 #include "openssl/sha.h"
 #include "openssl/crypto.h"
-#define SECOND_TO_MIRCO 1000*1000
+#define SECOND_TO_MIRCO 1000 * 1000
 
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace std;
 namespace {
-    const string MIME_TYPE = "video_decoder.avc";
-    const string CODEC_NAME = "avdec_h264";
-    constexpr int64_t NANOS_IN_SECOND = 1000000000L;
-    constexpr int64_t NANOS_IN_MICRO = 1000L;
-    SHA512_CTX c;  
-    unsigned char md[SHA512_DIGEST_LENGTH];
+const string MIME_TYPE = "video_decoder.avc";
+const string CODEC_NAME = "avdec_h264";
+constexpr int64_t NANOS_IN_SECOND = 1000000000L;
+constexpr int64_t NANOS_IN_MICRO = 1000L;
+SHA512_CTX c;
+unsigned char md[SHA512_DIGEST_LENGTH];
 
-    void clearIntqueue (std::queue<uint32_t>& q)
-    {
-        std::queue<uint32_t> empty;
-        swap(empty, q);
-    }
-
-    void clearBufferqueue (std::queue<OH_AVCodecBufferAttr>& q)
-    {
-        std::queue<OH_AVCodecBufferAttr> empty;
-        swap(empty, q);
-    }
-}
-
-VDecNdkSample::~VDecNdkSample()
+void clearIntqueue(std::queue<uint32_t> &q)
 {
+    std::queue<uint32_t> empty;
+    swap(empty, q);
 }
+
+void clearBufferqueue(std::queue<OH_AVCodecBufferAttr> &q)
+{
+    std::queue<OH_AVCodecBufferAttr> empty;
+    swap(empty, q);
+}
+} // namespace
+
+VDecNdkSample::~VDecNdkSample() {}
 
 void VdecError(OH_AVCodec *codec, int32_t errorCode, void *userData)
 {
     cout << "Error errorCode=" << errorCode << endl;
-    VDecSignal* signal = static_cast<VDecSignal *>(userData);
-    if(errorCode != AV_ERR_OK)
+    VDecSignal *signal = static_cast<VDecSignal *>(userData);
+    if (errorCode != AV_ERR_OK)
         signal->errCount_++;
 }
 
@@ -64,17 +62,17 @@ void VdecFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *userData)
 
 void VdecInputDataReady(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
 {
-    VDecSignal* signal = static_cast<VDecSignal *>(userData);
+    VDecSignal *signal = static_cast<VDecSignal *>(userData);
     unique_lock<mutex> lock(signal->inMutex_);
     signal->inIdxQueue_.push(index);
     signal->inBufferQueue_.push(data);
     signal->inCond_.notify_all();
 }
 
-void VdecOutputDataReady(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data,
-    OH_AVCodecBufferAttr *attr, void *userData)
+void VdecOutputDataReady(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
+                         void *userData)
 {
-    VDecSignal* signal = static_cast<VDecSignal *>(userData);
+    VDecSignal *signal = static_cast<VDecSignal *>(userData);
     unique_lock<mutex> lock(signal->outMutex_);
     signal->outIdxQueue_.push(index);
     signal->attrQueue_.push(*attr);
@@ -82,7 +80,8 @@ void VdecOutputDataReady(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data,
     signal->outCond_.notify_all();
 }
 
-bool VDecNdkSample::MdCompare(unsigned char* buffer, int len, const char* source[]) {
+bool VDecNdkSample::MdCompare(unsigned char *buffer, int len, const char *source[])
+{
     bool result = true;
     for (int i = 0; i < len; i++) {
         char std[SHA512_DIGEST_LENGTH] = {0};
@@ -119,7 +118,7 @@ int32_t VDecNdkSample::ConfigureVideoDecoder()
     (void)OH_AVFormat_SetIntValue(format, widthStr.c_str(), DEFAULT_WIDTH);
     (void)OH_AVFormat_SetIntValue(format, heightStr.c_str(), DEFAULT_HEIGHT);
     (void)OH_AVFormat_SetIntValue(format, frameRateStr.c_str(), DEFAULT_FRAME_RATE);
-    
+
     int ret = OH_VideoDecoder_Configure(vdec_, format);
     OH_AVFormat_Destroy(format);
     return ret;
@@ -128,7 +127,7 @@ int32_t VDecNdkSample::ConfigureVideoDecoder()
 void VDecNdkSample::RunVideoDec(OHNativeWindow *window, string codeName)
 {
     if (SURFACE_OUTPUT) {
-        if (window == nullptr){
+        if (window == nullptr) {
             return;
         }
     }
@@ -136,9 +135,9 @@ void VDecNdkSample::RunVideoDec(OHNativeWindow *window, string codeName)
     int err = CreateVideoDecoder(codeName);
     if (err != AV_ERR_OK) {
         cout << "Failed to create video decoder" << endl;
-        return; 
+        return;
     }
-    
+
     err = SetVideoDecoderCallback();
     if (err != AV_ERR_OK) {
         cout << "Failed to setCallback" << endl;
@@ -158,7 +157,7 @@ void VDecNdkSample::RunVideoDec(OHNativeWindow *window, string codeName)
         if (err != AV_ERR_OK) {
             cout << "Failed to set output surface" << endl;
             Release();
-            return;        
+            return;
         }
     }
 
@@ -216,19 +215,18 @@ void VDecNdkSample::ReleaseInFile()
     }
 }
 
-void VDecNdkSample::StopInloop() 
+void VDecNdkSample::StopInloop()
 {
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         unique_lock<mutex> lock(signal_->inMutex_);
         clearIntqueue(signal_->inIdxQueue_);
         signal_->inCond_.notify_all();
         lock.unlock();
-        
+
         inputLoop_->join();
         inputLoop_.reset();
     }
 }
-
 
 int32_t VDecNdkSample::StartVideoDecoder()
 {
@@ -333,7 +331,8 @@ int32_t VDecNdkSample::StartVideoDecoderNdkTest()
     return AV_ERR_OK;
 }
 
-void VDecNdkSample::WaitForEOS(){
+void VDecNdkSample::WaitForEOS()
+{
     outputLoop_->join();
 }
 
@@ -346,7 +345,7 @@ void VDecNdkSample::InputFunc()
         }
         uint32_t index;
         unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.wait(lock, [this](){ return signal_->inIdxQueue_.size() > 0; });
+        signal_->inCond_.wait(lock, [this]() { return signal_->inIdxQueue_.size() > 0; });
         if (!isRunning_.load()) {
             break;
         }
@@ -364,8 +363,9 @@ void VDecNdkSample::InputFunc()
                 (void)OH_VideoDecoder_PushInputData(vdec_, index, attr);
                 cout << "OH_VideoDecoder_PushInputData    EOS" << endl;
                 break;
-            } 
-            uint32_t bufferSize = (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << 8) | ((ch[1] & 0xFF) << 16) | (ch[0] & 0xFF << 24));
+            }
+            uint32_t bufferSize =
+                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << 8) | ((ch[1] & 0xFF) << 16) | (ch[0] & 0xFF << 24));
             char *fileBuffer = new char[bufferSize + 4];
             if (fileBuffer == nullptr) {
                 cout << "Fatal: no memory" << endl;
@@ -385,7 +385,7 @@ void VDecNdkSample::InputFunc()
                 attr.flags = AVCODEC_BUFFER_FLAGS_NONE;
             }
             int32_t size = OH_AVMemory_GetSize(buffer);
-            if(size < bufferSize) {
+            if (size < bufferSize) {
                 delete[] fileBuffer;
                 cout << "bufferSize is " << endl;
                 continue;
@@ -396,8 +396,9 @@ void VDecNdkSample::InputFunc()
                 continue;
             }
             int32_t result = OH_VideoDecoder_PushInputData(vdec_, index, attr);
-            cout << "OH_VideoDecoder_PushInputData, code = " << result << "  index=" << index << "  flags=" << attr.flags << " bufferSize=" << bufferSize << endl;
-            if(result != 0) {
+            cout << "OH_VideoDecoder_PushInputData, code = " << result << "  index=" << index
+                 << "  flags=" << attr.flags << " bufferSize=" << bufferSize << endl;
+            if (result != 0) {
                 errCount = errCount + 1;
                 break;
             }
@@ -411,7 +412,7 @@ void VDecNdkSample::InputFunc()
 
 void VDecNdkSample::OutputFunc()
 {
-    SHA512_Init(&c);  
+    SHA512_Init(&c);
     while (true) {
         if (!isRunning_.load()) {
             break;
@@ -419,7 +420,7 @@ void VDecNdkSample::OutputFunc()
         OH_AVCodecBufferAttr attr;
         uint32_t index;
         unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.wait(lock, [this](){ return signal_->outIdxQueue_.size() > 0; });
+        signal_->outCond_.wait(lock, [this]() { return signal_->outIdxQueue_.size() > 0; });
         if (!isRunning_.load()) {
             break;
         }
@@ -432,15 +433,15 @@ void VDecNdkSample::OutputFunc()
             SHA512_Final(md, &c);
             OPENSSL_cleanse(&c, sizeof(c));
             bool result = MdCompare(md, SHA512_DIGEST_LENGTH, fileSourcesha256);
-            cout << "dec finish " << INP_DIR << " MdCompare result:"<< result << endl;
-            if(AFTER_EOS_DESTORY_CODEC) {
+            cout << "dec finish " << INP_DIR << " MdCompare result:" << result << endl;
+            if (AFTER_EOS_DESTORY_CODEC) {
                 (void)Stop();
                 Release();
             }
             break;
         }
-        int64_t decTs= GetSystemTimeUs() - attr.pts;
-        cout << "dec " << INP_DIR << " time:"<< decTs << "  attr.flags:" << attr.flags << endl;
+        int64_t decTs = GetSystemTimeUs() - attr.pts;
+        cout << "dec " << INP_DIR << " time:" << decTs << "  attr.flags:" << attr.flags << endl;
         if (!SURFACE_OUTPUT) {
             int size = attr.size;
             OH_AVMemory *buffer = signal_->outBufferQueue_.front();
@@ -452,7 +453,7 @@ void VDecNdkSample::OutputFunc()
                 fwrite(OH_AVMemory_GetAddr(buffer), 1, size, outFile);
             }
             fclose(outFile);
-            SHA512_Update(&c, OH_AVMemory_GetAddr(buffer), size); 
+            SHA512_Update(&c, OH_AVMemory_GetAddr(buffer), size);
             if (OH_VideoDecoder_FreeOutputData(vdec_, index) != AV_ERR_OK) {
                 cout << "Fatal: ReleaseOutputBuffer fail" << endl;
                 errCount = errCount + 1;
@@ -471,13 +472,13 @@ void VDecNdkSample::OutputFunc()
                 continue;
             }
         }
-        if(errCount > 0) {
+        if (errCount > 0) {
             break;
         }
         signal_->outIdxQueue_.pop();
         signal_->attrQueue_.pop();
         signal_->outBufferQueue_.pop();
-    } 
+    }
 }
 
 void VDecNdkSample::InputFuncTest()
@@ -488,19 +489,19 @@ void VDecNdkSample::InputFuncTest()
         if (!isRunning_.load()) {
             break;
         }
-        if(REPEAT_START_FLUSH_BEFORE_EOS > 0) {
+        if (REPEAT_START_FLUSH_BEFORE_EOS > 0) {
             REPEAT_START_FLUSH_BEFORE_EOS--;
             OH_VideoDecoder_Flush(vdec_);
             OH_VideoDecoder_Start(vdec_);
         }
-        if(REPEAT_START_STOP_BEFORE_EOS > 0) {
+        if (REPEAT_START_STOP_BEFORE_EOS > 0) {
             REPEAT_START_STOP_BEFORE_EOS--;
             OH_VideoDecoder_Stop(vdec_);
             OH_VideoDecoder_Start(vdec_);
         }
         uint32_t index;
         unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.wait(lock, [this](){ return signal_->inIdxQueue_.size() > 0; });
+        signal_->inCond_.wait(lock, [this]() { return signal_->inIdxQueue_.size() > 0; });
         if (!isRunning_.load()) {
             break;
         }
@@ -508,7 +509,7 @@ void VDecNdkSample::InputFuncTest()
         auto buffer = signal_->inBufferQueue_.front();
         OH_AVCodecBufferAttr attr;
         if (!inFile_->eof()) {
-            if(BEFORE_EOS_INPUT && frameCount_ > 10) {
+            if (BEFORE_EOS_INPUT && frameCount_ > 10) {
                 attr.pts = 0;
                 attr.size = 0;
                 attr.offset = 0;
@@ -516,7 +517,7 @@ void VDecNdkSample::InputFuncTest()
                 (void)OH_VideoDecoder_PushInputData(vdec_, index, attr);
                 break;
             }
-            if(BEFORE_EOS_INPUT_INPUT && frameCount_ > 10) {
+            if (BEFORE_EOS_INPUT_INPUT && frameCount_ > 10) {
                 attr.pts = 0;
                 attr.size = 0;
                 attr.offset = 0;
@@ -533,8 +534,9 @@ void VDecNdkSample::InputFuncTest()
                 (void)OH_VideoDecoder_PushInputData(vdec_, index, attr);
                 cout << "OH_VideoDecoder_PushInputData    EOS" << endl;
                 break;
-            } 
-            uint32_t bufferSize = (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << 8) | ((ch[1] & 0xFF) << 16) | (ch[0] & 0xFF << 24));
+            }
+            uint32_t bufferSize =
+                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << 8) | ((ch[1] & 0xFF) << 16) | (ch[0] & 0xFF << 24));
             char *fileBuffer = new char[bufferSize + 4];
             if (fileBuffer == nullptr) {
                 cout << "Fatal: no memory" << endl;
@@ -554,7 +556,7 @@ void VDecNdkSample::InputFuncTest()
                 attr.flags = AVCODEC_BUFFER_FLAGS_NONE;
             }
             int32_t size = OH_AVMemory_GetSize(buffer);
-            if(size < bufferSize) {
+            if (size < bufferSize) {
                 delete[] fileBuffer;
                 cout << "bufferSize is " << endl;
                 continue;
@@ -565,7 +567,8 @@ void VDecNdkSample::InputFuncTest()
                 continue;
             }
             int32_t result = OH_VideoDecoder_PushInputData(vdec_, index, attr);
-            cout << "OH_VideoDecoder_PushInputData, code = " << result << "  index=" << index << "  flags=" << attr.flags << " bufferSize=" << bufferSize << endl;
+            cout << "OH_VideoDecoder_PushInputData, code = " << result << "  index=" << index
+                 << "  flags=" << attr.flags << " bufferSize=" << bufferSize << endl;
             delete[] fileBuffer;
             frameCount_ = frameCount_ + 1;
         }
@@ -584,7 +587,7 @@ void VDecNdkSample::OutputFuncTest()
         OH_AVCodecBufferAttr attr;
         uint32_t index;
         unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.wait(lock, [this](){ return signal_->outIdxQueue_.size() > 0; });
+        signal_->outCond_.wait(lock, [this]() { return signal_->outIdxQueue_.size() > 0; });
         if (!isRunning_.load()) {
             break;
         }
@@ -597,15 +600,15 @@ void VDecNdkSample::OutputFuncTest()
             SHA512_Final(md, &c);
             OPENSSL_cleanse(&c, sizeof(c));
             bool result = MdCompare(md, SHA512_DIGEST_LENGTH, fileSourcesha256);
-            cout << "dec finish " << INP_DIR << " MdCompare result:"<< result << endl;
-            if(AFTER_EOS_DESTORY_CODEC) {
+            cout << "dec finish " << INP_DIR << " MdCompare result:" << result << endl;
+            if (AFTER_EOS_DESTORY_CODEC) {
                 (void)Stop();
                 Release();
             }
             break;
         }
-        int64_t decTs= GetSystemTimeUs() - attr.pts;
-        cout << "dec " << INP_DIR << " time:"<< decTs << "  attr.flags:" << attr.flags << endl;
+        int64_t decTs = GetSystemTimeUs() - attr.pts;
+        cout << "dec " << INP_DIR << " time:" << decTs << "  attr.flags:" << attr.flags << endl;
         if (!SURFACE_OUTPUT) {
             int size = attr.size;
             OH_AVMemory *buffer = signal_->outBufferQueue_.front();
@@ -617,7 +620,7 @@ void VDecNdkSample::OutputFuncTest()
                 fwrite(OH_AVMemory_GetAddr(buffer), 1, size, outFile);
             }
             fclose(outFile);
-            SHA512_Update(&c, OH_AVMemory_GetAddr(buffer), size); 
+            SHA512_Update(&c, OH_AVMemory_GetAddr(buffer), size);
             if (OH_VideoDecoder_FreeOutputData(vdec_, index) != AV_ERR_OK) {
                 cout << "Fatal: ReleaseOutputBuffer fail" << endl;
                 continue;
@@ -648,15 +651,16 @@ bool VDecNdkSample::IsRender()
     if (curTimeUs - lastRenderedTimeUs_ > SECOND_TO_MIRCO / DEFAULT_FRAME_RATE / 2) {
         lastRenderedTimeUs_ = curTimeUs;
         return true;
-    } 
+    }
     return false;
 }
 
-int32_t VDecNdkSample::EOS(){
+int32_t VDecNdkSample::EOS()
+{
     OH_AVCodecBufferAttr attr;
     int32_t index = 0;
     unique_lock<mutex> lock(signal_->outMutex_);
-    signal_->outCond_.wait(lock, [this](){ return signal_->outIdxQueue_.size() > 0; });
+    signal_->outCond_.wait(lock, [this]() { return signal_->outIdxQueue_.size() > 0; });
     index = signal_->outIdxQueue_.front();
     attr = signal_->attrQueue_.front();
     attr.pts = 0;
@@ -677,7 +681,7 @@ int32_t VDecNdkSample::Flush()
     clearBufferqueue(signal_->attrQueue_);
     signal_->outCond_.notify_all();
     outLock.unlock();
-    
+
     return OH_VideoDecoder_Flush(vdec_);
 }
 
@@ -691,8 +695,6 @@ int32_t VDecNdkSample::Reset()
     ReleaseInFile();
     return OH_VideoDecoder_Reset(vdec_);
 }
-
-
 
 int32_t VDecNdkSample::Release()
 {
@@ -714,7 +716,8 @@ int32_t VDecNdkSample::Stop()
     return OH_VideoDecoder_Stop(vdec_);
 }
 
-int32_t VDecNdkSample::Start(){
+int32_t VDecNdkSample::Start()
+{
     return OH_VideoDecoder_Start(vdec_);
 }
 
