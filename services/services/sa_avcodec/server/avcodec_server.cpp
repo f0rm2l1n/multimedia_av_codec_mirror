@@ -55,7 +55,7 @@ void AVCodecServer::OnStart()
         AVCODEC_LOGD("AVCodecServer OnStart res=%{public}d", res);
     }
     (void)gettimeofday(&end, nullptr);
-    size_t useTime = (end.tv_sec - start.tv_sec) *1000000 + end.tv_usec - start.tv_usec;
+    uint32_t useTime = (end.tv_sec - start.tv_sec) *1000000 + end.tv_usec - start.tv_usec;
     StatisticTimeMemoryEventWrite(useTime, "AV_CODEC service");
 }
 

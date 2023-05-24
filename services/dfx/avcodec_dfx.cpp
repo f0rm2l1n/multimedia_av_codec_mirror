@@ -100,7 +100,7 @@ void FaultEventWrite(FaultType faultType, const std::string &msg, const std::str
 void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string &module)
 {
     OHOS::HiviewDFX::DumpUsage dumpUse;
-    uint32_t useMemory = dumpUse.GetPss(getpid());
+    uint64_t useMemory = dumpUse.GetPss(getpid());
     HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "AV_CODEC_SERVER_STATISTICS", 
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "MODULE", module.c_str(),
