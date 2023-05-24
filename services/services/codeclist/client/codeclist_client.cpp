@@ -17,7 +17,7 @@
 #include "avcodec_log.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListClient"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListClient"};
 }
 
 namespace OHOS {
@@ -29,8 +29,7 @@ std::shared_ptr<CodecListClient> CodecListClient::Create(const sptr<IStandardCod
     return codecList;
 }
 
-CodecListClient::CodecListClient(const sptr<IStandardCodecListService> &ipcProxy)
-    : codecListProxy_(ipcProxy)
+CodecListClient::CodecListClient(const sptr<IStandardCodecListService> &ipcProxy) : codecListProxy_(ipcProxy)
 {
     AVCODEC_LOGD("Create CodecListClient instances successful");
 }
@@ -64,12 +63,13 @@ std::string CodecListClient::FindEncoder(const Format &format)
     return codecListProxy_->FindEncoder(format);
 }
 
-CapabilityData CodecListClient::GetCapability(std::string mime, bool isEncoder, AVCodecCategory category)
+CapabilityData CodecListClient::GetCapability(const std::string &mime, const bool isEncoder,
+                                              const AVCodecCategory &category)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CapabilityData capData;
     CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, capData,
-        "Get capability failed: codeclist service does not exist.");
+                             "Get capability failed: codeclist service does not exist.");
     return codecListProxy_->GetCapability(mime, isEncoder, category);
 }
 } // namespace Media

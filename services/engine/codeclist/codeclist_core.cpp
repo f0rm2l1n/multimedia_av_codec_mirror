@@ -228,7 +228,8 @@ CodecType CodecListCore::FindCodecType(std::string codecName)
     return CodecType::AVCODEC_INVALID;
 }
 
-CapabilityData CodecListCore::GetCapability(std::string mime, bool isEncoder, AVCodecCategory category)
+CapabilityData CodecListCore::GetCapability(const std::string &mime, const bool isEncoder,
+                                            const AVCodecCategory &category)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CapabilityData capData;
@@ -242,7 +243,7 @@ CapabilityData CodecListCore::GetCapability(std::string mime, bool isEncoder, AV
     } else {
         codecType = isEncoder ? AVCODEC_TYPE_AUDIO_ENCODER : AVCODEC_TYPE_AUDIO_DECODER;
     }
-    bool isVendor = (category == AVCodecCategory::AVCODEC_HARDWARE) ? true: false;
+    bool isVendor = (category == AVCodecCategory::AVCODEC_HARDWARE) ? true : false;
     std::vector<CapabilityData> capsDataArray = CodecAbilitySingleton::GetInstance().GetCapabilityArray();
     std::unordered_map<std::string, std::vector<size_t>> mimeCapIdxMap =
         CodecAbilitySingleton::GetInstance().GetMimeCapIdxMap();
