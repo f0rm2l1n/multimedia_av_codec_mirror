@@ -559,7 +559,7 @@ void VDecNdkSample::InputFuncTest()
             attr.pts = GetSystemTimeUs();
             attr.size = bufferSize + FOUR;
             attr.offset = 0;
-            if ((fileBuffer[FOUR] & HEX_MAX == HEX_SEVEN)) {
+            if ((fileBuffer[FOUR] & HEX_MAX) == HEX_SEVEN) {
                 attr.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
             } else {
                 attr.flags = AVCODEC_BUFFER_FLAGS_NONE;
