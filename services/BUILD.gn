@@ -24,5 +24,3 @@ group("av_codec_services_package") {
     deps += [ "engine/codec/video/hcodec:hcodec" ]
   }
 }
-
-
