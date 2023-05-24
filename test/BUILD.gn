@@ -39,5 +39,8 @@ group("av_codec_unit_test") {
       "unittest/format_test:avformat_capi_unit_test",
       "unittest/format_test:avformat_inner_unit_test",
     ]
+    if (multimedia_av_codec_support_hcodec) {
+      deps + ["unittest/hcodec_test:hcodec_unit_test]
+    }
   }
 }
