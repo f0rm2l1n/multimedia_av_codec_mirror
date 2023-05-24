@@ -41,7 +41,6 @@ char HEX_ZERO = 0x00;
 char HEX_ONE = 0x01;
 char HEX_MAX = 0x1f;
 char HEX_SEVEN = 0x07;
-char HEX_MAX_MAX = 0xFF;
 SHA512_CTX c;
 unsigned char md[SHA512_DIGEST_LENGTH];
 
