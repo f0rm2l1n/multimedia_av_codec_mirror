@@ -46,7 +46,7 @@ void AVCodecXCollie::TimerCallback(void *data)
     AVCODEC_LOGE("Task %{public}s timeout", name.c_str());
     static constexpr uint32_t threshold = 5; // >5 Restart service
     if (threadDeadlockCount_ >= threshold) {
-        AVCODEC_LOGF("Process timeout, go exit.");
+        AVCODEC_LOGF("Process timeout, av_codec service process exit.");
         _exit(-1);
     }
 }
