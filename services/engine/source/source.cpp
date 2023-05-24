@@ -245,7 +245,7 @@ int32_t Source::GetSourceFormat(Format &format)
     int64_t duration = formatContext_->duration;
     AVRational timeBase = AV_TIME_BASE_Q;
     if (duration == AV_NOPTS_VALUE) {
-        for (int32_t i = 0; i < formatContext_->nb_streams;i++) {
+        for (uint32_t i = 0; i < formatContext_->nb_streams;i++) {
             auto streamDuration = formatContext_->streams[i]->duration;
             if (streamDuration > duration) {
                 duration = streamDuration;
@@ -637,6 +637,10 @@ int32_t Source::InitAVFormatContext()
     formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
     int32_t ret = -1;
     ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
+    if (avformat_find_stream_info(formatContext, NULL) < 0) {
+        AVCODEC_LOGE("Could not find stream information");
+        return AVCS_ERR_INVALID_OPERATION;
+    }
     if (ret == 0) {
         formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
             if (ptr) {
