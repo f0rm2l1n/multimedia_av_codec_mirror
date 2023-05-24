@@ -35,41 +35,39 @@ using namespace OHOS;
 using namespace OHOS::Media;
 using namespace testing::ext;
 namespace OHOS {
-    namespace Media {
-        class ActsCodecApiNdkTest : public testing::Test {
-        public:
-            // SetUpTestCase: Called before all test cases
-            static void SetUpTestCase(void);
-            // TearDownTestCase: Called after all test case
-            static void TearDownTestCase(void);
-            // SetUp: Called before each test cases
-            void SetUp(void);
-            // TearDown: Called after each test cases
-            void TearDown(void);
-        };
+namespace Media {
+class ActsCodecApiNdkTest : public testing::Test {
+public:
+    // SetUpTestCase: Called before all test cases
+    static void SetUpTestCase(void);
+    // TearDownTestCase: Called after all test case
+    static void TearDownTestCase(void);
+    // SetUp: Called before each test cases
+    void SetUp(void);
+    // TearDown: Called after each test cases
+    void TearDown(void);
+};
 
-        OH_AVCodec *vdec_ = NULL;
+OH_AVCodec *vdec_ = NULL;
 
-        const string INVALID_CODEC_NAME = "avdec_h264";
-        const string CODEC_NAME = "video_decoder.avc";
-        constexpr uint32_t DEFAULT_WIDTH = 1920;
-        constexpr uint32_t DEFAULT_HEIGHT = 1080;
-        constexpr uint32_t DEFAULT_FRAME_RATE = 30;
+const string INVALID_CODEC_NAME = "avdec_h264";
+const string CODEC_NAME = "video_decoder.avc";
+constexpr uint32_t DEFAULT_WIDTH = 1920;
+constexpr uint32_t DEFAULT_HEIGHT = 1080;
+constexpr uint32_t DEFAULT_FRAME_RATE = 30;
 
-        void ActsCodecApiNdkTest::SetUpTestCase() {}
-        void ActsCodecApiNdkTest::TearDownTestCase() {}
-        void ActsCodecApiNdkTest::SetUp() {}
-        void ActsCodecApiNdkTest::TearDown()
-        {
-            if (vdec_ != NULL){
-                OH_VideoDecoder_Destroy(vdec_);
-                vdec_ = nullptr;
-            }
-
-        }
-    } // namespace Media
+void ActsCodecApiNdkTest::SetUpTestCase() {}
+void ActsCodecApiNdkTest::TearDownTestCase() {}
+void ActsCodecApiNdkTest::SetUp() {}
+void ActsCodecApiNdkTest::TearDown()
+{
+    if (vdec_ != NULL) {
+        OH_VideoDecoder_Destroy(vdec_);
+        vdec_ = nullptr;
+    }
+}
+} // namespace Media
 } // namespace OHOS
-
 
 /**
  * @tc.number    : VIDEO_SWDEC_ILLEGAL_PARA_0100
@@ -612,7 +610,6 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_API_0700, TestSize.Level2)
     ASSERT_EQ(AV_ERR_OK, OH_VideoDecoder_Flush(vdec_));
     ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_Flush(vdec_));
 }
-
 
 /**
  * @tc.number    : VIDEO_SWDEC_API_0800

@@ -35,7 +35,6 @@
 
 namespace OHOS {
 namespace Media {
-
 class VDecSignal {
 public:
     std::mutex inMutex_;
@@ -47,7 +46,6 @@ public:
     std::queue<OH_AVCodecBufferAttr> attrQueue_;
     std::queue<OH_AVMemory *> inBufferQueue_;
     std::queue<OH_AVMemory *> outBufferQueue_;
-    uint32_t errCount_{0};
 };
 
 class VDecNdkSample : public NoCopyable {
@@ -112,9 +110,8 @@ private:
     OH_AVCodec *vdec_;
 
     OH_AVCodecAsyncCallback cb_;
-    int64_t timeStamp_{0};
 
-    int64_t lastRenderedTimeUs_{0};
+    int64_t lastRenderedTimeUs_{ 0 };
 
     bool isFirstFrame_ = true;
 };
@@ -126,4 +123,4 @@ void VdecFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *userData);
 void VdecInputDataReady(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData);
 void VdecOutputDataReady(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
                          void *userData);
-#endif // VIDEODEC_NDK_SAMPLE_H
+#endif

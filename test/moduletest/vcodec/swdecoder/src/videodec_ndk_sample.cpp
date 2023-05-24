@@ -19,7 +19,6 @@
 #include <utility>
 #include "openssl/sha.h"
 #include "openssl/crypto.h"
-#define SECOND_TO_MIRCO 1000 * 1000
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -29,6 +28,18 @@ const string MIME_TYPE = "video_decoder.avc";
 const string CODEC_NAME = "avdec_h264";
 constexpr int64_t NANOS_IN_SECOND = 1000000000L;
 constexpr int64_t NANOS_IN_MICRO = 1000L;
+constexpr int64_t SECOND_TO_MIRCO = 1000000L;
+constexpr int32_t TWO = 2;
+constexpr int32_t FOUR = 4;
+constexpr int32_t EIGHT = 8;
+constexpr int32_t SIXTEEN = 16;
+constexpr int32_t TWENTY_FOUR = 24;
+constexpr int32_t TEN = 10;
+char HEX_ZERO = 0x00;
+char HEX_ONE = 0x01;
+char HEX_MAX = 0x1f;
+char HEX_SEVEN = 0x07;
+char HEX_MAX_MAX = 0xFF;
 SHA512_CTX c;
 unsigned char md[SHA512_DIGEST_LENGTH];
 
@@ -50,9 +61,6 @@ VDecNdkSample::~VDecNdkSample() {}
 void VdecError(OH_AVCodec *codec, int32_t errorCode, void *userData)
 {
     cout << "Error errorCode=" << errorCode << endl;
-    VDecSignal *signal = static_cast<VDecSignal *>(userData);
-    if (errorCode != AV_ERR_OK)
-        signal->errCount_++;
 }
 
 void VdecFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *userData)
@@ -85,7 +93,6 @@ bool VDecNdkSample::MdCompare(unsigned char *buffer, int len, const char *source
     bool result = true;
     for (int i = 0; i < len; i++) {
         char std[SHA512_DIGEST_LENGTH] = {0};
-        sprintf(std, "%02X", buffer[i]);
         int re = strcmp(source[i], std);
         if (re != 0) {
             result = false;
@@ -354,7 +361,7 @@ void VDecNdkSample::InputFunc()
         OH_AVCodecBufferAttr attr;
         if (!inFile_->eof()) {
             char ch[4] = {};
-            (void)inFile_->read(ch, 4);
+            (void)inFile_->read(ch, FOUR);
             if (inFile_->eof()) {
                 attr.pts = 0;
                 attr.size = 0;
@@ -365,21 +372,21 @@ void VDecNdkSample::InputFunc()
                 break;
             }
             uint32_t bufferSize =
-                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << 8) | ((ch[1] & 0xFF) << 16) | (ch[0] & 0xFF << 24));
+                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << EIGHT) | ((ch[1] & 0xFF) << SIXTEEN) | (ch[0] & 0xFF << TWENTY_FOUR));
             char *fileBuffer = new char[bufferSize + 4];
             if (fileBuffer == nullptr) {
                 cout << "Fatal: no memory" << endl;
                 continue;
             }
-            fileBuffer[0] = 0x00;
-            fileBuffer[1] = 0x00;
-            fileBuffer[2] = 0x00;
-            fileBuffer[3] = 0x01;
-            (void)inFile_->read(fileBuffer + 4, bufferSize);
+            fileBuffer[0] = HEX_ZERO;
+            fileBuffer[1] = HEX_ZERO;
+            fileBuffer[2] = HEX_ZERO;
+            fileBuffer[3] = HEX_ONE;
+            (void)inFile_->read(fileBuffer + FOUR, bufferSize);
             attr.pts = GetSystemTimeUs();
-            attr.size = bufferSize + 4;
+            attr.size = bufferSize + FOUR;
             attr.offset = 0;
-            if (0x07 == (fileBuffer[4] & 0x1f)) {
+            if ((fileBuffer[4] & HEX_MAX) == HEX_SEVEN) {
                 attr.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
             } else {
                 attr.flags = AVCODEC_BUFFER_FLAGS_NONE;
@@ -390,7 +397,7 @@ void VDecNdkSample::InputFunc()
                 cout << "bufferSize is " << endl;
                 continue;
             }
-            if (memcpy_s(OH_AVMemory_GetAddr(buffer), bufferSize + 4, fileBuffer, bufferSize + 4) != EOK) {
+            if (memcpy_s(OH_AVMemory_GetAddr(buffer), bufferSize + FOUR, fileBuffer, bufferSize + FOUR) != EOK) {
                 delete[] fileBuffer;
                 cout << "Fatal: memcpy fail" << endl;
                 continue;
@@ -509,7 +516,7 @@ void VDecNdkSample::InputFuncTest()
         auto buffer = signal_->inBufferQueue_.front();
         OH_AVCodecBufferAttr attr;
         if (!inFile_->eof()) {
-            if (BEFORE_EOS_INPUT && frameCount_ > 10) {
+            if (BEFORE_EOS_INPUT && frameCount_ > TEN) {
                 attr.pts = 0;
                 attr.size = 0;
                 attr.offset = 0;
@@ -517,7 +524,7 @@ void VDecNdkSample::InputFuncTest()
                 (void)OH_VideoDecoder_PushInputData(vdec_, index, attr);
                 break;
             }
-            if (BEFORE_EOS_INPUT_INPUT && frameCount_ > 10) {
+            if (BEFORE_EOS_INPUT_INPUT && frameCount_ > TEN) {
                 attr.pts = 0;
                 attr.size = 0;
                 attr.offset = 0;
@@ -525,7 +532,7 @@ void VDecNdkSample::InputFuncTest()
                 BEFORE_EOS_INPUT_INPUT = false;
             }
             char ch[4] = {};
-            (void)inFile_->read(ch, 4);
+            (void)inFile_->read(ch, FOUR);
             if (inFile_->eof()) {
                 attr.pts = 0;
                 attr.size = 0;
@@ -536,21 +543,21 @@ void VDecNdkSample::InputFuncTest()
                 break;
             }
             uint32_t bufferSize =
-                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << 8) | ((ch[1] & 0xFF) << 16) | (ch[0] & 0xFF << 24));
-            char *fileBuffer = new char[bufferSize + 4];
+                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << EIGHT) | ((ch[1] & 0xFF) << SIXTEEN) | (ch[0] & 0xFF << TWENTY_FOUR));
+            char *fileBuffer = new char[bufferSize + FOUR];
             if (fileBuffer == nullptr) {
                 cout << "Fatal: no memory" << endl;
                 continue;
             }
-            fileBuffer[0] = 0x00;
-            fileBuffer[1] = 0x00;
-            fileBuffer[2] = 0x00;
-            fileBuffer[3] = 0x01;
-            (void)inFile_->read(fileBuffer + 4, bufferSize);
+            fileBuffer[0] = HEX_ZERO;
+            fileBuffer[1] = HEX_ZERO;
+            fileBuffer[2] = HEX_ZERO;
+            fileBuffer[3] = HEX_ONE;
+            (void)inFile_->read(fileBuffer + FOUR, bufferSize);
             attr.pts = GetSystemTimeUs();
-            attr.size = bufferSize + 4;
+            attr.size = bufferSize + FOUR;
             attr.offset = 0;
-            if (0x07 == (fileBuffer[4] & 0x1f)) {
+            if ((fileBuffer[4] & HEX_MAX == HEX_SEVEN)) {
                 attr.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
             } else {
                 attr.flags = AVCODEC_BUFFER_FLAGS_NONE;
@@ -561,7 +568,7 @@ void VDecNdkSample::InputFuncTest()
                 cout << "bufferSize is " << endl;
                 continue;
             }
-            if (memcpy_s(OH_AVMemory_GetAddr(buffer), bufferSize + 4, fileBuffer, bufferSize + 4) != EOK) {
+            if (memcpy_s(OH_AVMemory_GetAddr(buffer), bufferSize + FOUR, fileBuffer, bufferSize + FOUR) != EOK) {
                 delete[] fileBuffer;
                 cout << "Fatal: memcpy fail" << endl;
                 continue;
@@ -648,7 +655,7 @@ bool VDecNdkSample::IsRender()
         return true;
     }
     int64_t curTimeUs = GetSystemTimeUs();
-    if (curTimeUs - lastRenderedTimeUs_ > SECOND_TO_MIRCO / DEFAULT_FRAME_RATE / 2) {
+    if (curTimeUs - lastRenderedTimeUs_ > SECOND_TO_MIRCO / DEFAULT_FRAME_RATE / TWO) {
         lastRenderedTimeUs_ = curTimeUs;
         return true;
     }
