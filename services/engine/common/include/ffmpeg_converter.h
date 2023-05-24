@@ -13,11 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef CODEC_UTILS_H
-#define CODEC_UTILS_H
+#ifndef FFMPEG_CONVERTER_H
+#define FFMPEG_CONVERTER_H
+
+#include <string_view>
 #include "avcodec_audio_common.h"
 #include "avcodec_audio_channel_layout.h"
-#include <string_view>
 #ifdef __cplusplus
 extern "C" {
 #endif
