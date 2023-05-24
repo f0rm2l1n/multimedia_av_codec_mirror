@@ -75,7 +75,7 @@ int32_t AudioDecNativeMock::SetCallback(std::shared_ptr<AVCodecCallbackMock> cb)
 {
     if (cb != nullptr) {
         auto callback = std::make_shared<AudioDecCallbackMock>(cb, audioDec_);
-        if (audioDec_ != nullptr && callback != nullptr) {
+        if (audioDec_ != nullptr) {
             return audioDec_->SetCallback(callback);
         }
     }

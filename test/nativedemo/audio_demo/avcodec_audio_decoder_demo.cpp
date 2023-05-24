@@ -65,27 +65,27 @@ static void OnOutputFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *
 static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
 {
     (void)codec;
-    ADecSignal *signal_ = static_cast<ADecSignal *>(userData);
-    unique_lock<mutex> lock(signal_->inMutex_);
-    signal_->inQueue_.push(index);
-    signal_->inBufferQueue_.push(data);
-    signal_->inCond_.notify_all();
+    ADecSignal *signal = static_cast<ADecSignal *>(userData);
+    unique_lock<mutex> lock(signal->inMutex_);
+    signal->inQueue_.push(index);
+    signal->inBufferQueue_.push(data);
+    signal->inCond_.notify_all();
 }
 
 static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
                                     void *userData)
 {
     (void)codec;
-    ADecSignal *signal_ = static_cast<ADecSignal *>(userData);
-    unique_lock<mutex> lock(signal_->outMutex_);
-    signal_->outQueue_.push(index);
-    signal_->outBufferQueue_.push(data);
+    ADecSignal *signal = static_cast<ADecSignal *>(userData);
+    unique_lock<mutex> lock(signal->outMutex_);
+    signal->outQueue_.push(index);
+    signal->outBufferQueue_.push(data);
     if (attr) {
-        signal_->attrQueue_.push(*attr);
+        signal->attrQueue_.push(*attr);
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
     }
-    signal_->outCond_.notify_all();
+    signal->outCond_.notify_all();
 }
 
 bool ADecDemo::InitFile(AudioFormatType audioType)
@@ -155,9 +155,7 @@ void ADecDemo::RunCase(AudioFormatType audioType)
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }
 
-ADecDemo::ADecDemo()
-{
-}
+ADecDemo::ADecDemo() : audioDec_(nullptr), signal_(nullptr) {}
 
 ADecDemo::~ADecDemo()
 {
