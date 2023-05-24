@@ -56,7 +56,7 @@ private:
 };
 
 __attribute__((visibility("default"))) void BehaviorEventWrite(const std::string& status, const std::string& module);
-__attribute__((visibility("default"))) void FaultEventWrite(FaultType faultType, const std::string& msg, 
+__attribute__((visibility("default"))) void FaultEventWrite(FaultType faultType, const std::string& msg,
                                                             const std::string& module);
 __attribute__((visibility("default"))) void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string& module);
 __attribute__((visibility("default"))) void StatisticEventWrite(const SubAbilityCount& subAbilityCount,
