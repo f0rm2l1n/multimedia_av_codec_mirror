@@ -34,32 +34,40 @@ class __attribute__((visibility("default"))) AVCodecEvent : public NoCopyable {
 public:
     AVCodecEvent() = default;
     ~AVCodecEvent() = default;
-    bool CreateMsg(const char *format, ...) __attribute__((__format__(printf, 2, 3)));
-    void BehaviorEventWrite(const std::string &eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        const std::string &module);
-    void FaultEventWrite(const std::string &eventName, OHOS::HiviewDFX::HiSysEvent::EventType type, FaultType faultType,
-        const std::string &module);
+    bool CreateMsg(const char* format, ...) __attribute__((__format__(printf, 2, 3)));
+    void BehaviorEventWrite(const std::string& eventName,
+                            OHOS::HiviewDFX::HiSysEvent::EventType type,
+                            const std::string& module);
+    void FaultEventWrite(const std::string& eventName,
+                         OHOS::HiviewDFX::HiSysEvent::EventType type,
+                         FaultType faultType,
+                         const std::string& module);
+
 private:
     std::string msg_;
 };
 
-__attribute__((visibility("default"))) void BehaviorEventWrite(const std::string &status, const std::string &module);
-__attribute__((visibility("default"))) void FaultEventWrite(FaultType faultType, const std::string &msg,
-                                            const std::string &module);
-__attribute__((visibility("default"))) void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string &module);
-__attribute__((visibility("default"))) void StatisticEventWrite(uint32_t codecCount, uint32_t muxerCount,
-                                            uint32_t sourceCount, uint32_t demuxerCount, uint32_t codeclistCount,
-                                            const std::string &module);
+__attribute__((visibility("default"))) void BehaviorEventWrite(const std::string& status, const std::string& module);
+__attribute__((visibility("default"))) void
+    FaultEventWrite(FaultType faultType, const std::string& msg, const std::string& module);
+__attribute__((visibility("default"))) void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string& module);
+__attribute__((visibility("default"))) void StatisticEventWrite(uint32_t codecCount,
+                                                                uint32_t muxerCount,
+                                                                uint32_t sourceCount,
+                                                                uint32_t demuxerCount,
+                                                                uint32_t codeclistCount,
+                                                                const std::string& module);
 
 #define AVCODEC_SYNC_TRACE AVCodecTrace trace(std::string(__FUNCTION__))
 
 class __attribute__((visibility("default"))) AVCodecTrace : public NoCopyable {
 public:
-    explicit AVCodecTrace(const std::string &funcName);
-    static void TraceBegin(const std::string &funcName, int32_t taskId);
-    static void TraceEnd(const std::string &funcName, int32_t taskId);
-    static void CounterTrace(const std::string &varName, int32_t val);
+    explicit AVCodecTrace(const std::string& funcName);
+    static void TraceBegin(const std::string& funcName, int32_t taskId);
+    static void TraceEnd(const std::string& funcName, int32_t taskId);
+    static void CounterTrace(const std::string& varName, int32_t val);
     ~AVCodecTrace();
+
 private:
     bool isSync_ = false;
 };
