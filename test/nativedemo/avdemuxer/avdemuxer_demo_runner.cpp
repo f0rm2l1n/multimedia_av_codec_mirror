@@ -40,13 +40,18 @@ using namespace OHOS::Media;
 static int64_t seek_time = 1000;
 static int64_t start_time = 0;
 
-void RunNativeDemuxer(const std::string filePath)
+void RunNativeDemuxer(const std::string filePath, const std::string fileMode)
 {
-    int32_t fd = open(filePath.c_str(), O_RDONLY);
     auto avSourceDemo = std::make_shared<AVSourceDemo>();
-    size_t filesize = avSourceDemo->GetFileSize(filePath);
+    if (fileMode == "0") {
+        int32_t fd = open(filePath.c_str(), O_RDONLY);
+        size_t filesize = avSourceDemo->GetFileSize(filePath);
+        avSourceDemo->CreateWithFD(fd, 0, filesize);
+    }
+    if (fileMode == "1") {
+        avSourceDemo->CreateWithURI((char*)(filePath.c_str()));
+    }
     auto avDemuxerDemo = std::make_shared<AVDemuxerDemo>();
-    avSourceDemo->CreateWithFD(fd, 0, filesize);
     OH_AVSource* av_source = avSourceDemo->GetAVSource();
     avDemuxerDemo->CreateWithSource(av_source);
     int32_t trackCount = 0;
@@ -87,13 +92,18 @@ void RunNativeDemuxer(const std::string filePath)
     avSourceDemo->Destroy();
 }
 
-void RunInnerSourceDemuxer(const std::string filePath)
+void RunInnerSourceDemuxer(const std::string filePath, const std::string fileMode)
 {
-    int32_t fd = open(filePath.c_str(), O_RDONLY);
     auto innerSourceDemo = std::make_shared<InnerSourceDemo>();
+    if (fileMode == "0") {
+        int32_t fd = open(filePath.c_str(), O_RDONLY);
+        size_t filesize = innerSourceDemo->GetFileSize(filePath);
+        innerSourceDemo->CreateWithFD(fd, 0, filesize);
+    }
+    if (fileMode == "1") {
+        innerSourceDemo->CreateWithURI(filePath);
+    }
     auto innerDemuxerDemo = std::make_shared<InnerDemuxerDemo>();
-    size_t filesize = innerSourceDemo->GetFileSize(filePath);
-    innerSourceDemo->CreateWithFD(fd, 0, filesize);
     innerDemuxerDemo->CreateWithSource(*(innerSourceDemo->avsource_));
     int32_t trackCount = 0;
     double duration = 0;
@@ -137,14 +147,17 @@ void AVSourceDemuxerDemoCase(void)
     cout << "0:native_demuxer" << endl;
     cout << "1:ffmpeg_demuxer" << endl;
     string mode;
+    string fileMode;
     string filePath;
     (void)getline(cin, mode);
-    cout << "Please input local file path " << endl;
+    cout << "Please select file path (0) or uri (1)" << endl;
+    (void)getline(cin, fileMode);
+     cout << "Please input file path  or uri:" << endl;
     (void)getline(cin, filePath);
     if (mode == "0" || mode == "") {
-        RunNativeDemuxer(filePath);
+        RunNativeDemuxer(filePath, fileMode);
     } else if (mode =="1") {
-        RunInnerSourceDemuxer(filePath);
+        RunInnerSourceDemuxer(filePath, fileMode);
     } else {
         printf("select 0 or 1\n");
     }

@@ -28,6 +28,14 @@
 #include "media_source.h"
 #include "format.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "libavutil/avstring.h"
+#ifdef __cplusplus
+}
+#endif
+
 static std::string g_libFileHead = "libhistreamer_plugin_";
 static std::string g_fileSeparator = "/";
 static std::string g_libFileTail = ".z.so";
@@ -355,6 +363,8 @@ int32_t Source::Create(std::string& uri)
         AVCODEC_LOGE("load sourcePlugin_ fail !");
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
+    SourceCallback cb;
+    sourcePlugin_->SetCallback(&cb);
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
 
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
@@ -442,7 +452,8 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
     for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); iter++) {
         std::shared_ptr<AVInputFormat> inputFormat = iter->second;
-        if (uriSuffix == inputFormat->name) {
+        int32_t ret = av_match_name(uriSuffix.c_str(), inputFormat->extensions);
+        if (ret == 1) {
             bestInputFormat = inputFormat;
             AVCODEC_LOGD("find input fromat successful: %{public}s", inputFormat->name);
             break;

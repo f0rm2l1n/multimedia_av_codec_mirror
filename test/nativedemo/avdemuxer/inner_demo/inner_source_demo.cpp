@@ -32,7 +32,7 @@ InnerSourceDemo::~InnerSourceDemo()
     printf("~SourceDemo ()\n");
 }
 
-int32_t InnerSourceDemo::CreateWithURI(std::string& uri)
+int32_t InnerSourceDemo::CreateWithURI(const std::string& uri)
 {
     this->avsource_ = AVSourceFactory::CreateWithURI(uri.c_str());
     if (!avsource_) {

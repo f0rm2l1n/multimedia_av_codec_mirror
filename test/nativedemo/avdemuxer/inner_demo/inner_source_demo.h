@@ -24,7 +24,7 @@ class InnerSourceDemo {
 public:
     InnerSourceDemo();
     ~InnerSourceDemo();
-    int32_t CreateWithURI(std::string &uri);
+    int32_t CreateWithURI(const std::string &uri);
     size_t GetFileSize(const std::string& fileName);
     int32_t CreateWithFD(int32_t fd, int64_t offset, int64_t size);
     Format GetSourceFormat();
