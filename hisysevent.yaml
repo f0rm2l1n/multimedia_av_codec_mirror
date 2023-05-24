@@ -13,28 +13,28 @@
 
 domain: AV_CODEC
 
-AV_CODEC_FAULT:
+FAULT:
   __BASE: {type: FAULT, level: CRITICAL, desc: AV_CODEC fault}
   MODULE: {type: STRING, desc: Module name}
   FAULTTYPE: {type: STRING, desc: Fault type}
   MSG: {type: STRING, desc: Fault description}
 
-AV_CODEC_SERVER_STATISTICS:
+SERVER_STATISTICS:
   __BASE: {type: STATISTIC, level: MINOR, desc: AV_CODEC server statistics}
   MODULE: {type: STRING, desc: Server name}
   TIME: {type: UINT32, desc: AV_CODEC server start time us}
   MEMORY: {type: UINT32, desc: AV_CODEC server start use memory kb}
 
-AV_CODEC_SUB_ABILITY_COUNT:
+SUB_ABILITY_COUNT:
   __BASE: {type: STATISTIC, level: MINOR, desc: Sub ability count statistics}
   MODULE: {type: STRING, desc: Server name}
   CODEC_COUNT: {type: UINT32, desc: Codec sub ability count}
   MUXER_COUNT: {type: UINT32, desc: Muxer sub ability count}
   SOURCE_COUNT: {type: UINT32, desc: Source sub ability count}
   DEMUXER_COUNT: {type: UINT32, desc: Demuxer sub ability count}
-  CODECLIST_COUNT: {type: UINT32, desc: CODECLIST sub ability count}
+  CODECLIST_COUNT: {type: UINT32, desc: Codeclist sub ability count}
 
-AV_CODEC_SUB_ABILITY_STATE:
+SUB_ABILITY_STATE:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: AV_CODEC sub ability state}
   MODULE: {type: STRING, desc: Module name}
   STATE: {type: STRING, desc: AV_CODEC sub ability current state}

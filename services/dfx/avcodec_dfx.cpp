@@ -77,7 +77,7 @@ void BehaviorEventWrite(const std::string& status, const std::string& module)
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s, current state is: %s", "state change", status.c_str())) {
-        event.BehaviorEventWrite("AV_CODEC_SUB_ABILITY_STATE", OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        event.BehaviorEventWrite("SUB_ABILITY_STATE", OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
                                  module);
     } else {
         AVCODEC_LOGW("Failed to call CreateMsg");
@@ -88,7 +88,7 @@ void FaultEventWrite(FaultType faultType, const std::string& msg, const std::str
 {
     AVCodecEvent event;
     if (event.CreateMsg("%s", msg.c_str())) {
-        event.FaultEventWrite("AV_CODEC_FAULT", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT, faultType, module);
+        event.FaultEventWrite("FAULT", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT, faultType, module);
     } else {
         AVCODEC_LOGW("Failed to call CreateMsg");
     }
@@ -98,14 +98,14 @@ void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string& module)
 {
     OHOS::HiviewDFX::DumpUsage dumpUse;
     uint64_t useMemory = dumpUse.GetPss(getpid());
-    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "AV_CODEC_SERVER_STATISTICS",
+    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "SERVER_STATISTICS",
                     OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "MODULE", module.c_str(), "TIME", useTime,
                     "MEMORY", useMemory);
 }
 
 void StatisticEventWrite(const SubAbilityCount& subAbilityCount, const std::string& module)
 {
-    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "AV_CODEC_SUB_ABILITY_COUNT",
+    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "SUB_ABILITY_COUNT",
                     OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "MODULE", module.c_str(), "CODEC_COUNT",
                     subAbilityCount.codecCount, "MUXER_COUNT", subAbilityCount.muxerCount, "SOURCE_COUNT",
                     subAbilityCount.sourceCount, "DEMUXER_COUNT", subAbilityCount.demuxerCount, "CODECLIST_COUNT",
