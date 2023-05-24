@@ -30,11 +30,13 @@ constexpr int64_t NANOS_IN_SECOND = 1000000000L;
 constexpr int64_t NANOS_IN_MICRO = 1000L;
 constexpr int64_t SECOND_TO_MIRCO = 1000000L;
 constexpr int32_t TWO = 2;
+constexpr int32_t THREE = 3;
 constexpr int32_t FOUR = 4;
 constexpr int32_t EIGHT = 8;
+constexpr int32_t TEN = 10;
 constexpr int32_t SIXTEEN = 16;
 constexpr int32_t TWENTY_FOUR = 24;
-constexpr int32_t TEN = 10;
+
 char HEX_ZERO = 0x00;
 char HEX_ONE = 0x01;
 char HEX_MAX = 0x1f;
@@ -371,8 +373,8 @@ void VDecNdkSample::InputFunc()
                 cout << "OH_VideoDecoder_PushInputData    EOS" << endl;
                 break;
             }
-            uint32_t bufferSize =
-                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << EIGHT) | ((ch[1] & 0xFF) << SIXTEEN) | (ch[0] & 0xFF << TWENTY_FOUR));
+            uint32_t bufferSize = (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << EIGHT) |
+                                             ((ch[1] & 0xFF) << SIXTEEN) | (ch[0] & 0xFF << TWENTY_FOUR));
             char *fileBuffer = new char[bufferSize + 4];
             if (fileBuffer == nullptr) {
                 cout << "Fatal: no memory" << endl;
@@ -380,13 +382,13 @@ void VDecNdkSample::InputFunc()
             }
             fileBuffer[0] = HEX_ZERO;
             fileBuffer[1] = HEX_ZERO;
-            fileBuffer[2] = HEX_ZERO;
-            fileBuffer[3] = HEX_ONE;
+            fileBuffer[TWO] = HEX_ZERO;
+            fileBuffer[THREE] = HEX_ONE;
             (void)inFile_->read(fileBuffer + FOUR, bufferSize);
             attr.pts = GetSystemTimeUs();
             attr.size = bufferSize + FOUR;
             attr.offset = 0;
-            if ((fileBuffer[4] & HEX_MAX) == HEX_SEVEN) {
+            if ((fileBuffer[FOUR] & HEX_MAX) == HEX_SEVEN) {
                 attr.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
             } else {
                 attr.flags = AVCODEC_BUFFER_FLAGS_NONE;
@@ -542,8 +544,8 @@ void VDecNdkSample::InputFuncTest()
                 cout << "OH_VideoDecoder_PushInputData    EOS" << endl;
                 break;
             }
-            uint32_t bufferSize =
-                (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << EIGHT) | ((ch[1] & 0xFF) << SIXTEEN) | (ch[0] & 0xFF << TWENTY_FOUR));
+            uint32_t bufferSize = (uint32_t)(((ch[3] & 0xFF)) | ((ch[2] & 0xFF) << EIGHT) |
+                                             ((ch[1] & 0xFF) << SIXTEEN) | (ch[0] & 0xFF << TWENTY_FOUR));
             char *fileBuffer = new char[bufferSize + FOUR];
             if (fileBuffer == nullptr) {
                 cout << "Fatal: no memory" << endl;
@@ -551,13 +553,13 @@ void VDecNdkSample::InputFuncTest()
             }
             fileBuffer[0] = HEX_ZERO;
             fileBuffer[1] = HEX_ZERO;
-            fileBuffer[2] = HEX_ZERO;
-            fileBuffer[3] = HEX_ONE;
+            fileBuffer[TWO] = HEX_ZERO;
+            fileBuffer[THREE] = HEX_ONE;
             (void)inFile_->read(fileBuffer + FOUR, bufferSize);
             attr.pts = GetSystemTimeUs();
             attr.size = bufferSize + FOUR;
             attr.offset = 0;
-            if ((fileBuffer[4] & HEX_MAX == HEX_SEVEN)) {
+            if ((fileBuffer[FOUR] & HEX_MAX == HEX_SEVEN)) {
                 attr.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
             } else {
                 attr.flags = AVCODEC_BUFFER_FLAGS_NONE;

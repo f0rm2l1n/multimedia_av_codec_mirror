@@ -101,7 +101,7 @@ public:
     uint32_t errCount = 0;
 
 private:
-    std::atomic<bool> isRunning_{false};
+    std::atomic<bool> isRunning_ {false};
     std::unique_ptr<std::ifstream> inFile_;
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
@@ -111,7 +111,7 @@ private:
 
     OH_AVCodecAsyncCallback cb_;
 
-    int64_t lastRenderedTimeUs_{ 0 };
+    int64_t lastRenderedTimeUs_ {0};
 
     bool isFirstFrame_ = true;
 };
