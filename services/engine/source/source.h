@@ -50,7 +50,8 @@ private:
 struct SourceCallback : Callback {
     SourceCallback() = default;
     ~SourceCallback() = default;
-    void OnEvent(const PluginEvent &event) {
+    void OnEvent(const PluginEvent &event)
+    {
         (void)event;
     }
 };
