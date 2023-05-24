@@ -17,17 +17,18 @@
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "media_description.h"
+#include "avcodec_mime_type.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
-    constexpr int minChannels = 1;
-    constexpr int maxChannels = 2;
-    constexpr int bitrate_ratio = 150;
-    constexpr int samplerate_ratio = 31;
-    constexpr int bitrate_max = 320000;
-    constexpr int support_sample_rate = 9;
-    constexpr int bufferDiff = 128;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
+constexpr int minChannels = 1;
+constexpr int maxChannels = 2;
+constexpr int bitrate_ratio = 150;
+constexpr int samplerate_ratio = 31;
+constexpr int bitrate_max = 320000;
+constexpr int support_sample_rate = 9;
+constexpr int bufferDiff = 128;
+} // namespace
 
 namespace OHOS {
 namespace Media {
@@ -107,7 +108,9 @@ uint32_t AudioFFMpegMp3DecoderPlugin::getOutputBufferSize() const
 
 Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG);
+    return format;
 }
 
 int32_t AudioFFMpegMp3DecoderPlugin::checkinit(const Format &format)

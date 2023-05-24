@@ -16,13 +16,13 @@
 #ifndef AUDIO_FFMPEG_MP3_DECODER_PLUGIN_H
 #define AUDIO_FFMPEG_MP3_DECODER_PLUGIN_H
 
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "audio_ffmpeg_decoder_plugin.h"
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegMp3DecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegMp3DecoderPlugin> {
+class AudioFFMpegMp3DecoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegMp3DecoderPlugin> {
 public:
     AudioFFMpegMp3DecoderPlugin();
     ~AudioFFMpegMp3DecoderPlugin() override;

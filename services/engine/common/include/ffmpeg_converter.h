@@ -17,6 +17,7 @@
 #define CODEC_UTILS_H
 #include "avcodec_audio_common.h"
 #include "avcodec_audio_channel_layout.h"
+#include <string_view>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,6 +31,7 @@ class FFMpegConverter {
 public:
     static AudioSampleFormat ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleformate);
     static AudioChannelLayout ConvertFFToOHAudioChannelLayout(uint64_t ffChannelLayout);
+    static std::string_view ConvertOHAudioChannelLayoutToString(AudioChannelLayout layout);
 
 private:
     FFMpegConverter() = delete;

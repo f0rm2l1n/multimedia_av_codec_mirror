@@ -14,6 +14,7 @@
  */
 #include "ffmpeg_converter.h"
 #include <vector>
+#include <string_view>
 namespace OHOS {
 namespace Media {
 // ffmpeg channel layout to histreamer channel layout
@@ -55,6 +56,40 @@ const std::vector<std::pair<AVSampleFormat, AudioSampleFormat>> g_pFfSampleFmtMa
     {AVSampleFormat::AV_SAMPLE_FMT_FLT, AudioSampleFormat::SAMPLE_F32LE},
 };
 
+const std::vector<std::pair<AudioChannelLayout, std::string_view>> g_ChannelLayoutToString = {
+    {AudioChannelLayout::MONO, "MONO"},
+    {AudioChannelLayout::STEREO, "STEREO"},
+    {AudioChannelLayout::CH_2POINT1, "2POINT1"},
+    {AudioChannelLayout::CH_2_1, "CH_2_1"},
+    {AudioChannelLayout::SURROUND, "SURROUND"},
+    {AudioChannelLayout::CH_3POINT1, "3POINT1"},
+    {AudioChannelLayout::CH_4POINT0, "4POINT0"},
+    {AudioChannelLayout::CH_4POINT1, "4POINT1"},
+    {AudioChannelLayout::CH_2_2, "CH_2_2"},
+    {AudioChannelLayout::QUAD, "QUAD"},
+    {AudioChannelLayout::CH_5POINT0, "5POINT0"},
+    {AudioChannelLayout::CH_5POINT1, "5POINT1"},
+    {AudioChannelLayout::CH_5POINT0_BACK, "5POINT0_BACK"},
+    {AudioChannelLayout::CH_5POINT1_BACK, "5POINT1_BACK"},
+    {AudioChannelLayout::CH_6POINT0, "6POINT0"},
+    {AudioChannelLayout::CH_6POINT0_FRONT, "6POINT0_FRONT"},
+    {AudioChannelLayout::HEXAGONAL, "HEXAGONAL"},
+    {AudioChannelLayout::CH_6POINT1, "6POINT1"},
+    {AudioChannelLayout::CH_6POINT1_BACK, "6POINT1_BACK"},
+    {AudioChannelLayout::CH_6POINT1_FRONT, "6POINT1_FRONT"},
+    {AudioChannelLayout::CH_7POINT0, "7POINT0"},
+    {AudioChannelLayout::CH_7POINT0_FRONT, "7POINT0_FRONT"},
+    {AudioChannelLayout::CH_7POINT1, "7POINT1"},
+    {AudioChannelLayout::CH_7POINT1_WIDE, "7POINT1_WIDE"},
+    {AudioChannelLayout::CH_7POINT1_WIDE_BACK, "7POINT1_WIDE_BACK"},
+    {AudioChannelLayout::OCTAGONAL, "OCTAGONAL"},
+    {AudioChannelLayout::HEXADECAGONAL, "HEXADECAGONAL"},
+    {AudioChannelLayout::STEREO_DOWNMIX, "STEREO_DOWNMIX"},
+    {AudioChannelLayout::HOA_FIRST, "HOA_FIRST"},
+    {AudioChannelLayout::HOA_SECOND, "HOA_SECOND"},
+    {AudioChannelLayout::HOA_THIRD, "HOA_THIRD"},
+};
+
 AudioSampleFormat FFMpegConverter::ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleformate)
 {
     auto ite = std::find_if(g_pFfSampleFmtMap.begin(), g_pFfSampleFmtMap.end(),
@@ -64,6 +99,7 @@ AudioSampleFormat FFMpegConverter::ConvertFFMpegToOHAudioFormat(AVSampleFormat f
     }
     return ite->second;
 }
+
 AudioChannelLayout FFMpegConverter::ConvertFFToOHAudioChannelLayout(uint64_t ffChannelLayout)
 {
     auto ite = std::find_if(g_toFFMPEGChannelLayout.begin(), g_toFFMPEGChannelLayout.end(),
@@ -72,6 +108,16 @@ AudioChannelLayout FFMpegConverter::ConvertFFToOHAudioChannelLayout(uint64_t ffC
         return AudioChannelLayout::MONO;
     }
     return ite->first;
+}
+
+std::string_view FFMpegConverter::ConvertOHAudioChannelLayoutToString(AudioChannelLayout layout)
+{
+    auto ite = std::find_if(g_ChannelLayoutToString.begin(), g_ChannelLayoutToString.end(),
+                            [&layout](const auto &item) -> bool { return item.first == layout; });
+    if (ite == g_ChannelLayoutToString.end()) {
+        return g_ChannelLayoutToString[0].second;
+    }
+    return ite->second;
 }
 } // namespace Media
 } // namespace OHOS
