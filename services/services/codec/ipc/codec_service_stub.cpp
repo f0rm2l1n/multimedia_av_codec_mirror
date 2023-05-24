@@ -26,6 +26,34 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecServiceStub"};
+
+    const std::map<int32_t, std::string> CODEC_FUNC_NAME = {
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_LISTENER_OBJ, "CodecServiceStub SetListenerObject" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::INIT, "CodecServiceStub Init" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::CONFIGURE, "CodecServiceStub Configure" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::START, "CodecServiceStub Start" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::STOP, "CodecServiceStub Stop" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::FLUSH, "CodecServiceStub Flush" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::RESET, "CodecServiceStub Reset" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::RELEASE, "CodecServiceStub Release" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::NOTIFY_EOS, "CodecServiceStub NotifyEos" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::CREATE_INPUT_SURFACE,
+            "CodecServiceStub CreateInputSurface" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_OUTPUT_SURFACE, "CodecServiceStub SetOutputSurface" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::GET_INPUT_BUFFER, "CodecServiceStub GetInputBuffer" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::QUEUE_INPUT_BUFFER, "CodecServiceStub QueueInputBuffer" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::GET_OUTPUT_BUFFER, "CodecServiceStub GetOutputBuffer" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::GET_OUTPUT_FORMAT, "CodecServiceStub GetOutputFormat" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::RELEASE_OUTPUT_BUFFER,
+            "CodecServiceStub ReleaseOutputBuffer" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_PARAMETER, "CodecServiceStub SetParameter" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_INPUT_SURFACE, "CodecServiceStub SetInputSurface" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::DEQUEUE_INPUT_BUFFER,
+            "CodecServiceStub DequeueInputBuffer" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::DEQUEUE_OUTPUT_BUFFER,
+            "CodecServiceStub DequeueOutputBuffer" },
+        { OHOS::Media::CodecServiceStub::CodecServiceMsg::DESTROY_STUB, "CodecServiceStub DestroyStub" },
+    };
 }
 
 namespace OHOS {
@@ -161,8 +189,10 @@ int CodecServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             int32_t ret = -1;
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply),
-                "CodecServiceStub::OnRemoteRequest");
+            auto itFuncName = CODEC_FUNC_NAME.find(code);
+            std::string funcName =
+                itFuncName != CODEC_FUNC_NAME.end() ? itFuncName->second : "CodecServiceStub OnRemoteRequest";
+            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
             if (ret != AVCS_ERR_OK) {
                 AVCODEC_LOGE("Calling member func failed.");
             }

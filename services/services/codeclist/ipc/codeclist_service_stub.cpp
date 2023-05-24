@@ -14,6 +14,8 @@
  */
 
 #include <unistd.h>
+#include <string>
+#include <map>
 #include "avsharedmemory_ipc.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -22,7 +24,18 @@
 #include "codeclist_service_stub.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceStub"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceStub"};
+
+    const std::map<int32_t, std::string> CODECLIST_FUNC_NAME = {
+        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_DECODER,
+            "CodecListServiceStub DoFindDecoder" },
+        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_ENCODER,
+            "CodecListServiceStub DoFindEncoder" },
+        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::CREATE_CAPABILITY,
+            "CodecListServiceStub DoCreateCapability" },
+        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::DESTROY,
+            "CodecListServiceStub DoDestroyStub" },
+    };
 }
 
 namespace OHOS {
@@ -81,7 +94,10 @@ int CodecListServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             int32_t ret = -1;
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), "CodecListServiceStub::OnRemoteRequest");
+            auto itFuncName = CODECLIST_FUNC_NAME.find(code);
+            std::string funcName =
+                itFuncName != CODECLIST_FUNC_NAME.end() ? itFuncName->second : "CodecListServiceStub OnRemoteRequest";
+            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
             if (ret != AVCS_ERR_OK) {
                 AVCODEC_LOGE("calling memberFunc is failed.");
             }

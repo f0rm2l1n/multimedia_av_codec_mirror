@@ -19,7 +19,6 @@
 #include <string>
 #include <map>
 #include <mutex>
-#include <unistd.h>
 
 namespace OHOS {
 namespace Media {
@@ -44,7 +43,7 @@ private:
 
 class __attribute__((visibility("hidden"))) AVCodecXcollieTimer {
 public:
-    AVCodecXcollieTimer(const std::string &name, bool recovery = false, uint32_t timeout = 1)
+    AVCodecXcollieTimer(const std::string &name, bool recovery = false, uint32_t timeout = 10)
     {
         index_ = AVCodecXCollie::GetInstance().SetTimer(name, recovery, timeout);
     };
