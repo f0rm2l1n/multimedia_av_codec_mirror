@@ -31,7 +31,7 @@ public:
     std::string FindEncoder(const Format &format);
     std::string FindDecoder(const Format &format);
     CodecType FindCodecType(std::string codecName);
-    CapabilityData CreateCapability(std::string codecName);
+    CapabilityData GetCapability(std::string mime, bool isEncoder, AVCodecCategory category);
 
 private:
     bool CheckBitrate(const Format &format, const CapabilityData &data);

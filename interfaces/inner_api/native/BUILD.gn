@@ -162,6 +162,7 @@ ohos_shared_library("av_codec_client") {
   }
   if (multimedia_av_codec_support_codeclist) {
     sources += [
+      "$av_codec_root_dir/frameworks/native/avcodeclist/avcodec_info.cpp",
       "$av_codec_root_dir/frameworks/native/avcodeclist/avcodeclist_impl.cpp",
       "$av_codec_root_dir/services/services/codeclist/client/codeclist_client.cpp",
       "$av_codec_root_dir/services/services/codeclist/ipc/codeclist_service_proxy.cpp",

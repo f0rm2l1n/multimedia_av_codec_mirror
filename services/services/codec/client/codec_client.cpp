@@ -238,5 +238,14 @@ int32_t CodecClient::SetCallback(const std::shared_ptr<AVCodecCallback> &callbac
     listenerStub_->SetCallback(callback);
     return AVCS_ERR_OK;
 }
+
+int32_t CodecClient::GetInputFormat(Format &format)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(codecProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "Codec service does not exist.");
+
+    AVCODEC_LOGD("GetInputFormat");
+    return codecProxy_->GetInputFormat(format);
+}
 } // namespace Media
 } // namespace OHOS
