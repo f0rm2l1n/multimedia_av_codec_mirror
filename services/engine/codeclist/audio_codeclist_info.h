@@ -12,30 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef AUDIO_CODECLIST_INFO_H
+#define AUDIO_CODECLIST_INFO_H
 
-#ifndef CODECLIST_SERVER_H
-#define CODECLIST_SERVER_H
-
-#include "i_codeclist_service.h"
-#include "codeclist_core.h"
-#include "nocopyable.h"
+#include "avcodec_info.h"
 
 namespace OHOS {
 namespace Media {
-class CodecListServer : public ICodecListService, public NoCopyable {
+class AudioCodeclistInfo {
 public:
-    static std::shared_ptr<ICodecListService> Create();
-    CodecListServer();
-    virtual ~CodecListServer();
-
-    std::string FindDecoder(const Format &format) override;
-    std::string FindEncoder(const Format &format) override;
-    CapabilityData GetCapability(const std::string mime, const bool isEncoder, const AVCodecCategory category) override;
+    ~AudioCodeclistInfo();
+    static AudioCodeclistInfo &GetInstance();
+    std::vector<CapabilityData> GetAudioCapabilities() const noexcept;
 
 private:
-    bool Init();
-    std::shared_ptr<CodecListCore> codecListCore_;
+    std::vector<CapabilityData> audioCapabilities_;
+    AudioCodeclistInfo();
 };
 } // namespace Media
 } // namespace OHOS
-#endif // CODECLIST_SERVER_H
+#endif

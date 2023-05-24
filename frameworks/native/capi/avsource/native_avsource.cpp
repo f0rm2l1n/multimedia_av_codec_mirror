@@ -60,6 +60,7 @@ OH_AVErrCode OH_AVSource_Destroy(OH_AVSource *source)
 {
     CHECK_AND_RETURN_RET_LOG(source != nullptr, AV_ERR_INVALID_VAL,
         "Destroy source failed because input source is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(source->magic_ == AVMagic::AVCODEC_MAGIC_AVSOURCE, AV_ERR_INVALID_VAL, "magic error!");
 
     delete source;
     return AV_ERR_OK;
