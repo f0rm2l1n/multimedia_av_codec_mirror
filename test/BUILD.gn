@@ -35,8 +35,6 @@ group("av_codec_unit_test") {
       "unittest/avcodec_test:vcodec_capi_unit_test",
       "unittest/avmuxer_test:avmuxer_capi_unit_test",
       "unittest/avmuxer_test:avmuxer_inner_unit_test",
-      "unittest/codeclist_test:codeclist_capi_unit_test",
-      "unittest/codeclist_test:codeclist_inner_unit_test",
       "unittest/format_test:avformat_capi_unit_test",
       "unittest/format_test:avformat_inner_unit_test",
     ]

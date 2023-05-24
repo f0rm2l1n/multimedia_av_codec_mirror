@@ -22,17 +22,13 @@ namespace Media {
 void CodecListDemo::RunCase()
 {
     std::cout << "===== ============== ======" << std::endl;
-    const char *mime = "video/mpeg2";
-    OH_AVFormat *format = OH_AVFormat_Create();
-    OH_AVFormat_SetStringValue(format, "codec_mime", mime);
-    const char *codecName = OH_AVCodec_FindDecoder(format);
-    std::cout << codecName << std::endl;
-    std::cout << "start getting caps" << std::endl;
-    OH_AVCapability *cap = OH_AVCodec_CreateCapability(codecName);
-    const char *mimetype = OH_AVCapability_GetMimeType(cap);
+    const char *mime = "video/avc";
+    OH_AVCapability *cap = OH_AVCodec_GetCapability(mime, false);
+    // OH_AVCodec_GetCapabilityByCategory
     CapabilityData capsData = cap->capabilityData_;
-    std::cout << mimetype << std::endl;
     std::cout << capsData.maxInstance << std::endl;
+    const char *name = OH_AVCapability_GetName(cap);
+    std::cout << name << std::endl;
     std::cout << "get caps successful" << std::endl;
 }
 } // namespace Media

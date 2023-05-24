@@ -49,7 +49,7 @@ DemuxerServiceStub::~DemuxerServiceStub()
 int32_t DemuxerServiceStub::InitStub()
 {
     demuxerServer_ = DemuxerServer::Create();
-    CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Failed to create muxer server");
+    CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Failed to create demuxer server");
 
     demuxerFuncs_[INIT] = &DemuxerServiceStub::Init;
     demuxerFuncs_[SELECT_TRACK_BY_ID] = &DemuxerServiceStub::SelectTrackByID;
@@ -173,11 +173,14 @@ int32_t DemuxerServiceStub::ReadSample(MessageParcel &data, MessageParcel &reply
     int32_t ret = ReadSample(trackIndex, sample, info, flag);
 
     WriteAVSharedMemoryToParcel(sample, reply);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN,
+        "Write info presentationTimeUs failed when call ReadSample!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.size), AVCS_ERR_UNKNOWN,
+        "Write info size failed when call ReadSample!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(info.offset), AVCS_ERR_UNKNOWN,
+        "Write info offset failed when call ReadSample!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteUint32(static_cast<uint32_t>(flag)), AVCS_ERR_UNKNOWN,
-        "Reply ReadSample failed!");
+        "Write info flag failed when call ReadSample!");
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply ReadSample failed!");
     return AVCS_ERR_OK;
 }

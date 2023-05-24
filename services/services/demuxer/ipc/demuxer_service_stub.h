@@ -53,7 +53,6 @@ private:
     int32_t GetDumpInfo(std::string& dumpInfo);
     int32_t DestroyStub(MessageParcel &data, MessageParcel &reply);
 
-    std::mutex mutex_;
     std::shared_ptr<IDemuxerService> demuxerServer_ = nullptr;
     std::map<uint32_t, DemuxerStubFunc> demuxerFuncs_;
 };

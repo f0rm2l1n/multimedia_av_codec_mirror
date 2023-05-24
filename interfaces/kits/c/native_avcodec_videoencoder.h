@@ -221,6 +221,17 @@ OH_AVErrCode OH_VideoEncoder_NotifyEndOfStream(OH_AVCodec *codec);
 OH_AVErrCode OH_VideoEncoder_PushInputData(OH_AVCodec *codec, uint32_t index, OH_AVCodecBufferAttr attr);
 
 /**
+ * @brief Get the description information that accepted by the video encoder, call this after configure, refer to {@link
+ * OH_AVFormat} for details. It should be noted that the life cycle of the OH_AVFormat instance pointed to by the return
+ * value * needs to be manually released by the caller.
+ * @syscap SystemCapability.Multimedia.Media.VideoEncoder
+ * @param codec Pointer to an OH_AVCodec instance
+ * @return Returns a pointer to an OH_AVFormat instance
+ * @since 10
+ */
+OH_AVFormat *OH_VideoEncoder_GetInputDescription(OH_AVCodec *codec);
+
+/**
  * @brief Check whether the current codec instance is valid. It can be used fault recovery or app
  * switchback from the background
  * @syscap SystemCapability.Multimedia.Media.VideoEncoder

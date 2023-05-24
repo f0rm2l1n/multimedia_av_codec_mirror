@@ -31,8 +31,7 @@ public:
     // ICodecListService override
     std::string FindDecoder(const Format &format) override;
     std::string FindEncoder(const Format &format) override;
-    CapabilityData CreateCapability(std::string codecName) override;
-    
+    CapabilityData GetCapability(std::string mime, bool isEncoder, AVCodecCategory category) override;
     void AVCodecServerDied();
 private:
     sptr<IStandardCodecListService> codecListProxy_ = nullptr;

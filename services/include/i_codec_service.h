@@ -46,6 +46,7 @@ public:
     virtual int32_t ReleaseOutputBuffer(uint32_t index, bool render = false) = 0;
     virtual int32_t SetParameter(const Format &format) = 0;
     virtual int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) = 0;
+    virtual int32_t GetInputFormat(Format &format) = 0;
 };
 } // namespace Media
 } // namespace OHOS

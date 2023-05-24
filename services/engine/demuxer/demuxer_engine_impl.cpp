@@ -33,7 +33,7 @@ std::shared_ptr<IDemuxerEngine> IDemuxerEngineFactory::CreateDemuxerEngine(
     AVCodecTrace trace("IDemuxerEngineFactory::CreateDemuxerEngine");
     std::shared_ptr<IDemuxerEngine> demuxerEngineImpl =
         std::make_shared<DemuxerEngineImpl>(appUid, appPid, sourceAddr);
-    CHECK_AND_RETURN_RET_LOG(demuxerEngineImpl != nullptr, nullptr, "create MuxerEngine implementation failed");
+    CHECK_AND_RETURN_RET_LOG(demuxerEngineImpl != nullptr, nullptr, "create DemuxerEngine implementation failed");
     return demuxerEngineImpl;
 }
 
@@ -64,6 +64,7 @@ int32_t DemuxerEngineImpl::SelectTrackByID(uint32_t trackIndex)
 {
     AVCodecTrace trace("DemuxerEngineImpl::SelectTrackByID");
     AVCODEC_LOGI("SelectTrackByID");
+    std::unique_lock<std::mutex> lock(mutex_);
     return demuxer_->SelectTrackByID(trackIndex);
 }
 
@@ -71,6 +72,7 @@ int32_t DemuxerEngineImpl::UnselectTrackByID(uint32_t trackIndex)
 {
     AVCodecTrace trace("DemuxerEngineImpl::UnselectTrackByID");
     AVCODEC_LOGI("UnselectTrackByID");
+    std::unique_lock<std::mutex> lock(mutex_);
     return demuxer_->UnselectTrackByID(trackIndex);
 }
 
@@ -79,6 +81,7 @@ int32_t DemuxerEngineImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSha
 {
     AVCodecTrace trace("DemuxerEngineImpl::ReadSample");
     AVCODEC_LOGI("ReadSample");
+    std::unique_lock<std::mutex> lock(mutex_);
     return demuxer_->ReadSample(trackIndex, sample, info, flag);
 }
 
@@ -86,6 +89,7 @@ int32_t DemuxerEngineImpl::SeekToTime(int64_t mSeconds, AVSeekMode mode)
 {
     AVCodecTrace trace("DemuxerEngineImpl::SeekToTime");
     AVCODEC_LOGI("SeekToTime");
+    std::unique_lock<std::mutex> lock(mutex_);
     return demuxer_->SeekToTime(mSeconds, mode);
 }
 } // Media
