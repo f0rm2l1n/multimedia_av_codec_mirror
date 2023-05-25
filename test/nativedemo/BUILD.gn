@@ -28,7 +28,12 @@ ohos_executable("av_codec_demo") {
     "$av_codec_root_dir/services/engine/source/hst_releated",
     "$av_codec_root_dir/services/services/factory",
     "$av_codec_root_dir/services/utils/include",
+    "$av_codec_root_dir/../../graphic/graphic_2d/frameworks/surface/include",
+    "$av_codec_root_dir/../../graphic/graphic_2d/interfaces/inner_api",
+    "$av_codec_root_dir/../../graphic/graphic_2d/interfaces/inner_api/surface",
+    "$av_codec_root_dir/../../graphic/graphic_2d/interfaces/inner_api/common",
     "./audio_demo",
+    "./video_demo",
     "./avmuxer",
     "./avdemuxer",
     "./codeclist_demo",
@@ -81,9 +86,14 @@ ohos_executable("av_codec_demo") {
     "./avmuxer/avmuxer_ffmpeg_demo.cpp",
     "./avmuxer/native_avmuxer_demo.c",
     "./codeclist_demo/codeclist_demo.cpp",
+    "./video_demo/avcodec_video_decoder_demo.cpp",
+    "./video_demo/avcodec_video_decoder_inner_demo.cpp",
   ]
 
   deps = [
+    "$av_codec_root_dir/../../graphic/graphic_2d:libsurface",
+    "$av_codec_root_dir/../../graphic/graphic_2d/utils:libgraphic_utils",
+    "$av_codec_root_dir/../../graphic/graphic_2d/utils:sync_fence",
     "$av_codec_root_dir/interfaces/inner_api/native:av_codec_client",
     "$av_codec_root_dir/interfaces/kits/c:capi_packages",
     "$av_codec_root_dir/interfaces/kits/c:native_av_codec_avmuxer",

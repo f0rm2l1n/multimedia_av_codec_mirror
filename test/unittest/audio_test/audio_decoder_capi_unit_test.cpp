@@ -82,10 +82,10 @@ public:
     explicit BufferCallback(ADecSignal *userData) : userData_(userData) {}
     virtual ~BufferCallback() = default;
     ADecSignal *userData_;
-    virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
-    virtual void OnOutputFormatChanged(const Format &format) override;
-    virtual void OnInputBufferAvailable(size_t index) override;
-    virtual void OnOutputBufferAvailable(size_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+    void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    void OnOutputFormatChanged(const Format &format) override;
+    void OnInputBufferAvailable(uint32_t index) override;
+    void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 };
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -107,11 +107,11 @@ static void OnOutputFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *
 static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
 {
     (void)codec;
-    ADecSignal *signal_ = static_cast<ADecSignal *>(userData);
-    unique_lock<mutex> lock(signal_->inMutex_);
-    signal_->inQueue_.push(index);
-    signal_->inBufferQueue_.push(data);
-    signal_->inCond_.notify_all();
+    ADecSignal *signal = static_cast<ADecSignal *>(userData);
+    unique_lock<mutex> lock(signal->inMutex_);
+    signal->inQueue_.push(index);
+    signal->inBufferQueue_.push(data);
+    signal->inCond_.notify_all();
 }
 
 
@@ -119,16 +119,16 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
                                     void *userData)
 {
     (void)codec;
-    ADecSignal *signal_ = static_cast<ADecSignal *>(userData);
-    unique_lock<mutex> lock(signal_->outMutex_);
-    signal_->outQueue_.push(index);
-    signal_->outBufferQueue_.push(data);
+    ADecSignal *signal = static_cast<ADecSignal *>(userData);
+    unique_lock<mutex> lock(signal->outMutex_);
+    signal->outQueue_.push(index);
+    signal->outBufferQueue_.push(data);
     if (attr) {
-        signal_->attrQueue_.push(*attr);
+        signal->attrQueue_.push(*attr);
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
     }
-    signal_->outCond_.notify_all();
+    signal->outCond_.notify_all();
 }
 
 class AudioCodeCapiDecoderUnitTest : public testing::Test {
@@ -577,6 +577,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_05, TestSize.Leve
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
 }
 
@@ -591,10 +592,16 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_01, TestSize.Le
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
 }
 
-int main(int argc, char *argv[])
+HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_02, TestSize.Level1)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
+}
+
+HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_03, TestSize.Level1)
+{
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
 }
 }  // namespace Media
 }  // namespace OHOS

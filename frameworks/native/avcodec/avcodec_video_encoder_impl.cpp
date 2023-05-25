@@ -221,5 +221,14 @@ int32_t AVCodecVideoEncoderImpl::SetCallback(const std::shared_ptr<AVCodecCallba
     AVCODEC_SYNC_TRACE;
     return codecService_->SetCallback(callback);
 }
+
+int32_t AVCodecVideoEncoderImpl::GetInputFormat(Format &format)
+{
+    CHECK_AND_RETURN_RET_LOG(codecService_ != nullptr,
+        AVCS_ERR_INVALID_OPERATION, "Codec service is nullptr");
+
+    AVCODEC_SYNC_TRACE;
+    return codecService_->GetInputFormat(format);
+}
 } // namespace Media
 } // namespace OHOS

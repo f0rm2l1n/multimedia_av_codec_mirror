@@ -30,6 +30,7 @@ extern "C" {
 namespace OHOS {
 namespace Media {
 namespace Codec {
+const int32_t VIDEO_ALIGN_SIZE = 16;
 struct ScalePara {
     int32_t srcWidth = 0;
     int32_t srcHeight = 0;
@@ -37,7 +38,7 @@ struct ScalePara {
     int32_t dstWidth = 0;
     int32_t dstHeight = 0;
     AVPixelFormat dstFfFmt = AVPixelFormat::AV_PIX_FMT_RGBA;
-    int32_t align = 16;
+    int32_t align = VIDEO_ALIGN_SIZE;
 };
 struct Scale {
 public:

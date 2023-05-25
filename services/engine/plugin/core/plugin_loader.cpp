@@ -41,27 +41,23 @@ std::shared_ptr<PluginLoader> PluginLoader::Create(const std::string& name, cons
     return CheckSymbol(LoadPluginFile(path), name);
 }
 
-RegisterFunc PluginLoader::FetchRegisterFunction()
+RegisterFunc PluginLoader::FetchRegisterFunction() const
 {
     return registerFunc_;
 }
 
-UnregisterFunc PluginLoader::FetchUnregisterFunction()
+UnregisterFunc PluginLoader::FetchUnregisterFunction() const
 {
     return unregisterFunc_;
 }
 
 void* PluginLoader::LoadPluginFile(const std::string& path)
 {
-    auto pathStr = path.c_str();
-    if (pathStr) {
-        auto ptr = ::dlopen(pathStr, RTLD_NOW | RTLD_LOCAL);
-        if (ptr == nullptr) {
-            AVCODEC_LOGE("dlopen failed due to %{public}s", ::dlerror());
-        }
-        return ptr;
+    auto ptr = ::dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
+    if (ptr == nullptr) {
+        AVCODEC_LOGE("dlopen failed due to %{public}s", ::dlerror());
     }
-    return nullptr;
+    return ptr;
 }
 
 std::shared_ptr<PluginLoader> PluginLoader::CheckSymbol(void* handler, const std::string& name)

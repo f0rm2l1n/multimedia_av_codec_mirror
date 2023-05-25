@@ -332,7 +332,7 @@ void Source::GetAudioTrackFormat(Format &format, AVStream *avStream)
 
 int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
-    AVCODEC_LOGI("Source::GetTrackFormat is on call: trackIndex=%{public}d", trackIndex);
+    AVCODEC_LOGI("Source::GetTrackFormat is on call: trackIndex=%{public}u", trackIndex);
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                              "GetTrackFormat failed, formatContext_ is nullptr!");
     if (trackIndex >= static_cast<uint32_t>(formatContext_->nb_streams)) {

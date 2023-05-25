@@ -56,8 +56,8 @@ int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, ui
     format.GetIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, fmt);
     VideoPixelFormat pixFmt = static_cast<VideoPixelFormat>(fmt);
     if (pixFmt == VideoPixelFormat::RGBA || pixFmt == VideoPixelFormat::BGRA) {
-        size_t srcPos = 0;
-        size_t dstPos = 0;
+        uint32_t srcPos = 0;
+        uint32_t dstPos = 0;
         int32_t writeSize = scaleLineSize[0];
         for (int32_t colNum = 0; colNum < height; colNum++) {
             frameBuffer->Write(scaleData[0] + srcPos, writeSize, dstPos);
@@ -78,16 +78,16 @@ int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase> &frameBuffer, uin
     format.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, fmt);
     VideoPixelFormat pixFmt = static_cast<VideoPixelFormat>(fmt);
-    size_t ySize = static_cast<size_t>(scaleLineSize[0] * height);      // yuv420: 411 nv21
-    size_t uvSize = static_cast<size_t>(scaleLineSize[1] * height / 2); // 2
-    size_t frameSize = 0;
+    uint32_t ySize = static_cast<uint32_t>(scaleLineSize[0] * height);      // yuv420: 411 nv21
+    uint32_t uvSize = static_cast<uint32_t>(scaleLineSize[1] * height / 2); // 2
+    uint32_t frameSize = 0;
     if (pixFmt == VideoPixelFormat::YUV420P) {
         frameSize = ySize + (uvSize * 2); // 2
     } else if (pixFmt == VideoPixelFormat::NV21 || pixFmt == VideoPixelFormat::NV12) {
         frameSize = ySize + uvSize;
     }
     CHECK_AND_RETURN_RET_LOG(frameBuffer->GetSize() >= (int32_t)frameSize, AVCS_ERR_NO_MEMORY,
-                             "output buffer size is not enough: real[%{public}d], need[%{public}zu]",
+                             "output buffer size is not enough: real[%{public}d], need[%{public}u]",
                              frameBuffer->GetSize(), frameSize);
     if (pixFmt == VideoPixelFormat::YUV420P) {
         frameBuffer->Write(scaleData[0], ySize);
@@ -117,9 +117,9 @@ int32_t WriteRgbData(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t 
     if (stride % width) {
         return WriteRgbDataStride(frameBuffer, scaleData, scaleLineSize, stride, format);
     }
-    size_t frameSize = static_cast<size_t>(scaleLineSize[0] * height);
+    uint32_t frameSize = static_cast<uint32_t>(scaleLineSize[0] * height);
     CHECK_AND_RETURN_RET_LOG(frameBuffer->GetSize() >= (int32_t)frameSize, AVCS_ERR_NO_MEMORY,
-                             "output buffer size is not enough: real[%{public}d], need[%{public}zu]",
+                             "output buffer size is not enough: real[%{public}d], need[%{public}u]",
                              frameBuffer->GetSize(), frameSize);
     if (pixFmt == VideoPixelFormat::RGBA || pixFmt == VideoPixelFormat::BGRA) {
         frameBuffer->Write(scaleData[0], frameSize);

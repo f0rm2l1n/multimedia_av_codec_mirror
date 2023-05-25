@@ -24,6 +24,8 @@
 #include "avcodec_audio_aac_encoder_demo.h"
 #include "avcodec_audio_flac_encoder_demo.h"
 #include "codeclist_demo.h"
+#include "avcodec_video_decoder_demo.h"
+#include "avcodec_video_decoder_inner_demo.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -31,6 +33,8 @@ using namespace OHOS::Media::AudioDemo;
 using namespace OHOS::Media::AudioFlacDemo;
 using namespace OHOS::Media::AudioAacDemo;
 using namespace OHOS::Media::InnerAudioDemo;
+using namespace OHOS::Media::VideoDemo;
+using namespace OHOS::Media::InnerVideoDemo;
 using namespace std;
 
 static int RunAudioDecoder()
@@ -51,7 +55,7 @@ static int RunAudioDecoder()
         audioFormatType = TYPE_MP3;
     } else if (mode == "3") {
         audioFormatType = TYPE_VORBIS;
-    }  else {
+    } else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -81,7 +85,7 @@ static int RunAudioEncoder()
         if (audioEnc) {
             audioEnc->RunCase();
         }
-    }  else {
+    } else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -118,7 +122,7 @@ static int RunAudioInnerDecoder()
         if (audioDec) {
             audioDec->RunCase();
         }
-    }  else {
+    } else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -143,7 +147,7 @@ static int RunAudioInnerEncoder()
         if (audioEnc) {
             audioEnc->RunCase();
         }
-    }  else {
+    } else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -163,6 +167,30 @@ static int RunCodecList()
     return 0;
 }
 
+static int RunVideoDecoder(bool isSurfaceMode)
+{
+    auto videoDec = std::make_unique<VDecDemo>();
+    if (videoDec == nullptr) {
+        cout << "video decoder is null" << endl;
+        return 0;
+    }
+    videoDec->RunCase(isSurfaceMode);
+    cout << "demo video decoder end" << endl;
+    return 0;
+}
+
+static int RunVideoInnerDecoder(bool isSurfaceMode)
+{
+    auto videoDec = std::make_unique<VDecInnerDemo>();
+    if (videoDec == nullptr) {
+        cout << "video decoder is null" << endl;
+        return 0;
+    }
+    videoDec->RunCase(isSurfaceMode);
+    cout << "demo video decoder end" << endl;
+    return 0;
+}
+
 static void OptionPrint()
 {
     cout << "Please select a demo scenario number(default Audio Decoder): " << endl;
@@ -172,7 +200,10 @@ static void OptionPrint()
     cout << "3:Audio Inner Encoder" << endl;
     cout << "4:muxer demo" << endl;
     cout << "6:codeclist" << endl;
-    cout << "7:demuxer demo" << endl;
+    cout << "7:Video Decoder (buffer mode)" << endl;
+    cout << "8:Video Decoder (surface mode)" << endl;
+    cout << "9:Video Inner Decoder (buffer mode)" << endl;
+    cout << "10:Video Inner Decoder (surface mode)" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -198,7 +229,13 @@ int main(int argc, char *argv[])
     } else if (mode == "6") {
         (void)RunCodecList();
     } else if (mode == "7") {
-        (void)AVSourceDemuxerDemoCase();
+        (void)RunVideoDecoder(false);
+    } else if (mode == "8") {
+        (void)RunVideoDecoder(true);
+    } else if (mode == "9") {
+        (void)RunVideoInnerDecoder(false);
+    } else if (mode == "10") {
+        (void)RunVideoInnerDecoder(true);
     } else {
         cout << "no that selection" << endl;
     }
