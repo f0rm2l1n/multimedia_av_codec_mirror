@@ -17,8 +17,8 @@
 
 #include "capi_demo/avsource_demo.h"
 
-void RunNativeDemuxer(const std::string filePath);
-void RunInnerSourceDemuxer(const std::string filePath);
+static void RunNativeDemuxer(const std::string filePath);
+static void RunInnerSourceDemuxer(const std::string filePath);
 void AVSourceDemuxerDemoCase(void);
 
 #endif  // AVDEEMUXER_DEMO_RUNNER_H

@@ -40,7 +40,7 @@ using namespace OHOS::Media;
 static int64_t seek_time = 1000;
 static int64_t start_time = 0;
 
-void RunNativeDemuxer(const std::string filePath, const std::string fileMode)
+static void RunNativeDemuxer(const std::string filePath, const std::string fileMode)
 {
     auto avSourceDemo = std::make_shared<AVSourceDemo>();
     if (fileMode == "0") {
@@ -92,7 +92,7 @@ void RunNativeDemuxer(const std::string filePath, const std::string fileMode)
     avSourceDemo->Destroy();
 }
 
-void RunInnerSourceDemuxer(const std::string filePath, const std::string fileMode)
+static void RunInnerSourceDemuxer(const std::string filePath, const std::string fileMode)
 {
     auto innerSourceDemo = std::make_shared<InnerSourceDemo>();
     if (fileMode == "0") {
