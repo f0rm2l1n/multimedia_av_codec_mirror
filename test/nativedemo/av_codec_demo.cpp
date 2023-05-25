@@ -204,6 +204,7 @@ static void OptionPrint()
     cout << "8:Video Decoder (surface mode)" << endl;
     cout << "9:Video Inner Decoder (buffer mode)" << endl;
     cout << "10:Video Inner Decoder (surface mode)" << endl;
+    cout << "11:demuxer demo" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -236,6 +237,8 @@ int main(int argc, char *argv[])
         (void)RunVideoInnerDecoder(false);
     } else if (mode == "10") {
         (void)RunVideoInnerDecoder(true);
+    } else if (mode == "11") {
+        (void)AVSourceDemuxerDemoCase();
     } else {
         cout << "no that selection" << endl;
     }

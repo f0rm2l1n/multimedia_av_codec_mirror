@@ -588,10 +588,10 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
                          customIOContext->offset, customIOContext->fileSize);
             return AVCS_ERR_SEEK_FAILED;
         }
-        if (static_cast<size_t>(customIOContext->offset+bufSize) > customIOContext->fileSize) {
+        if (static_cast<size_t>(customIOContext->offset + bufSize) > customIOContext->fileSize) {
             readSize = customIOContext->fileSize - customIOContext->offset;
         }
-        if (buf!=nullptr && bufferVector->GetMemory()!=nullptr) {
+        if (buf != nullptr && bufferVector->GetMemory() != nullptr) {
             auto memSize = static_cast<int>(bufferVector->GetMemory()->GetCapacity());
             readSize = (readSize > memSize) ? memSize : readSize;
         }
@@ -612,7 +612,7 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
             customIOContext->offset += rtv;
             customIOContext->position += rtv;
         } else if (static_cast<int>(result) == 1) {
-            customIOContext->eof=true;
+            customIOContext->eof = true;
             rtv = AVERROR_EOF;
         } else {
             AVCODEC_LOGE("AVReadPacket failed with rtv = %{public}d", static_cast<int>(result));
