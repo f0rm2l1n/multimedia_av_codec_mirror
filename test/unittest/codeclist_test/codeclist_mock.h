@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "avcodec_codec_name.h"
 #include "avcodec_common.h"
 #include "avcodec_info.h"
 #include "avcodec_list.h"
@@ -28,6 +29,7 @@
 #include "native_avcodec_base.h"
 #include "native_averrors.h"
 #include "nocopyable.h"
+
 
 namespace OHOS {
 namespace Media {
@@ -71,20 +73,16 @@ private:
 };
 
 namespace CodecListTestParam {
-using PairCapGet = std::pair<std::string, bool>;
-const std::vector<PairCapGet> CAPABILITY_LIST = {PairCapGet(std::string(CodecMimeType::VIDEO_AVC), false),
-                                                 PairCapGet(std::string(CodecMimeType::AUDIO_MPEG), false),
-                                                 PairCapGet(std::string(CodecMimeType::AUDIO_AAC), false),
-                                                 PairCapGet(std::string(CodecMimeType::AUDIO_VORBIS), false),
-                                                 PairCapGet(std::string(CodecMimeType::AUDIO_FLAC), false),
-                                                 PairCapGet(std::string(CodecMimeType::AUDIO_AAC), true),
-                                                 PairCapGet(std::string(CodecMimeType::AUDIO_FLAC), true)};
-const std::map<std::string, std::string> CAPABILITY_NAME = {
-    {std::string(CodecMimeType::VIDEO_AVC), "video_decoder.avc"},
-    {std::string(CodecMimeType::AUDIO_MPEG), "avdec_mp3"},
-    {std::string(CodecMimeType::AUDIO_AAC), "avdec_aac"},
-    {std::string(CodecMimeType::AUDIO_VORBIS), "avdec_vorbis"},
-    {std::string(CodecMimeType::AUDIO_FLAC), "avdec_flac"}};
+const std::map<std::string, std::string> CAPABILITY_DECODER_NAME = {
+    {std::string(CodecMimeType::AUDIO_MPEG), std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME)},
+    {std::string(CodecMimeType::AUDIO_AAC), std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME)},
+    {std::string(CodecMimeType::AUDIO_VORBIS), std::string(AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME)},
+    {std::string(CodecMimeType::AUDIO_FLAC), std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME)},
+    {std::string(CodecMimeType::VIDEO_AVC), std::string(AVCodecCodecName::VIDEO_DECODER_AVC_NAME)}};
+
+const std::map<std::string, std::string> CAPABILITY_ENCODER_NAME = {
+    {std::string(CodecMimeType::AUDIO_FLAC), std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME)},
+    {std::string(CodecMimeType::AUDIO_AAC), std::string(AVCodecCodecName::AUDIO_ENCODER_AAC_NAME)}};
 
 const std::string DEFAULT_AUDIO_MIME = std::string(CodecMimeType::AUDIO_AAC);
 const std::string DEFAULT_VIDEO_MIME = std::string(CodecMimeType::VIDEO_AVC);

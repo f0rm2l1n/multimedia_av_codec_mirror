@@ -73,10 +73,16 @@ HWTEST_F(CodecListUnitTest, CodecList_GetCapabilityByCategory_001, TestSize.Leve
  */
 HWTEST_F(CodecListUnitTest, CodecList_GetCapability_001, TestSize.Level1)
 {
-    for (auto it = CAPABILITY_LIST.begin(); it != CAPABILITY_LIST.end(); ++it) {
+    for (auto it = CAPABILITY_DECODER_NAME.begin(); it != CAPABILITY_DECODER_NAME.end(); ++it) {
         std::string mime = it->first;
-        bool isEncoder = it->second;
-        capability_ = CodecListMockFactory::GetCapability(mime, isEncoder);
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, false);
+        EXPECT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
+    }
+    for (auto it = CAPABILITY_ENCODER_NAME.begin(); it != CAPABILITY_ENCODER_NAME.end(); ++it) {
+        std::string mime = it->first;
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, true);
         EXPECT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
     }
 }
@@ -129,13 +135,21 @@ HWTEST_F(CodecListUnitTest, CodecList_IsHardware_001, TestSize.Level1)
  */
 HWTEST_F(CodecListUnitTest, CodecList_GetName_001, TestSize.Level1)
 {
-    for (auto it = CAPABILITY_LIST.begin(); it != CAPABILITY_LIST.end(); ++it) {
+    for (auto it = CAPABILITY_DECODER_NAME.begin(); it != CAPABILITY_DECODER_NAME.end(); ++it) {
         std::string mime = it->first;
-        bool isEncoder = it->second;
-        capability_ = CodecListMockFactory::GetCapability(mime, isEncoder);
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, false);
         ASSERT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
         std::string codecName = capability_->GetName();
-        EXPECT_EQ(CAPABILITY_NAME.at(mime), codecName) << mime << " get error name: " << codecName << std::endl;
+        EXPECT_EQ(nameOfMime, codecName) << mime << " get error name: " << codecName << std::endl;
+    }
+    for (auto it = CAPABILITY_ENCODER_NAME.begin(); it != CAPABILITY_ENCODER_NAME.end(); ++it) {
+        std::string mime = it->first;
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, true);
+        ASSERT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
+        std::string codecName = capability_->GetName();
+        EXPECT_EQ(nameOfMime, codecName) << mime << " get error name: " << codecName << std::endl;
     }
 }
 
