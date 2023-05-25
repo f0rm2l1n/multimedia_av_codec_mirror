@@ -22,6 +22,7 @@ namespace Media {
 const std::vector<int32_t> AUDIO_SAMPLE_RATE = {8000,  11025, 12000, 16000, 22050, 24000,
                                                 32000, 44100, 48000, 64000, 88200, 96000};
 constexpr int MAX_AUDIO_CHANNEL_COUNT = 8;
+constexpr int MAX_SUPPORT_AUDIO_INSTANCE = 16;
 
 constexpr int MAX_BIT_RATE_MP3 = 320000;
 constexpr int MAX_CHANNEL_COUNT_MP3 = 2;
@@ -49,6 +50,7 @@ CapabilityData GetMP3DecoderCapability()
     audioMp3Capability.bitrate = Range(1, MAX_BIT_RATE_MP3);
     audioMp3Capability.channels = Range(1, MAX_CHANNEL_COUNT_MP3);
     audioMp3Capability.sampleRate = AUDIO_SAMPLE_RATE;
+    audioMp3Capability.maxInstance = MAX_SUPPORT_AUDIO_INSTANCE;
     return audioMp3Capability;
 }
 
@@ -62,6 +64,7 @@ CapabilityData GetAacDecoderCapability()
     audioAacCapability.bitrate = Range(MIN_BIT_RATE_AAC, MAX_BIT_RATE_AAC);
     audioAacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
     audioAacCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    audioAacCapability.maxInstance = MAX_SUPPORT_AUDIO_INSTANCE;
     return audioAacCapability;
 }
 
@@ -75,6 +78,7 @@ CapabilityData GetFlacDecoderCapability()
     audioFlacCapability.bitrate = Range(1, MAX_BIT_RATE_FLAC);
     audioFlacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
     audioFlacCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    audioFlacCapability.maxInstance = MAX_SUPPORT_AUDIO_INSTANCE;
     return audioFlacCapability;
 }
 
@@ -88,6 +92,7 @@ CapabilityData GetVorbisDecoderCapability()
     audioVorbisCapability.bitrate = Range(MIN_BIT_RATE_VORBIS, MAX_BIT_RATE_VORBIS);
     audioVorbisCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
     audioVorbisCapability.sampleRate = AUDIO_VORBIS_SAMPLE_RATE;
+    audioVorbisCapability.maxInstance = MAX_SUPPORT_AUDIO_INSTANCE;
     return audioVorbisCapability;
 }
 
@@ -101,6 +106,7 @@ CapabilityData GetAacEncoderCapability()
     audioAacCapability.bitrate = Range(MIN_BIT_RATE_AAC_ENCODER, MAX_BIT_RATE_AAC_ENCODER);
     audioAacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
     audioAacCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    audioAacCapability.maxInstance = MAX_SUPPORT_AUDIO_INSTANCE;
     return audioAacCapability;
 }
 
@@ -114,6 +120,7 @@ CapabilityData GetFlacEncoderCapability()
     audioFlacCapability.bitrate = Range(1, MAX_BIT_RATE_FLAC);
     audioFlacCapability.channels = Range(1, MAX_AUDIO_CHANNEL_COUNT);
     audioFlacCapability.sampleRate = AUDIO_SAMPLE_RATE;
+    audioFlacCapability.maxInstance = MAX_SUPPORT_AUDIO_INSTANCE;
     return audioFlacCapability;
 }
 
