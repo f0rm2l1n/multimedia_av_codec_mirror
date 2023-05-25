@@ -46,7 +46,7 @@
 | OH_AVSource *OH_AVSource_CreateWithFD(int32_t fd, int64_t offset, int64_t size);   | 根据 FD 创建OH_AVSource       |
 | OH_AVErrCode OH_AVSource_Destroy(OH_AVSource *source);    | 销毁 OH_AVSource       |
 | OH_AVFormat *OH_AVSource_GetSourceFormat(OH_AVSource *source);   | 获取 source 信息       |
-| OH_AVFormat OH_AVSource_GetTrackFormat(OH_AVSource *source, uint32_t trackIndex);    | 获取 track 信息       |
+| OH_AVFormat *OH_AVSource_GetTrackFormat(OH_AVSource *source, uint32_t trackIndex);    | 获取 track 信息       |
 
 **表2 avdemuxer开放能力接口**
 | 接口名                                                       | 描述                 |
@@ -61,7 +61,7 @@
 
 ## 开发步骤
 
-详细的API说明请参考avdemuxer native API、avsource native API
+详细的API说明请参考 avdemuxer native API、avsource native API
 
 1. 创建解封装器实例对象
 
@@ -78,7 +78,7 @@
 
 
 
-2. 获取文件轨道数（非必须）
+2. 获取文件轨道数（可选，若用户已知轨道信息，可跳过此步）
 
    ``` c
    // 获取文件 source 信息
@@ -90,7 +90,7 @@
 
    
 
-3. 获取轨道index及信息（非必须）
+3. 获取轨道index及信息（可选，若用户已知轨道信息，可跳过此步）
 
    ``` c
    uint32_t audioTrackIndex = 0;
@@ -117,7 +117,6 @@
 4. 添加解封装轨道
 
    ``` c
-   // 若用户已知轨道信息，直接调用 OH_AVDemuxer_SelectTrackByID 选取轨道，无需通过 source format 和 track count 判断
    if(OH_AVDemuxer_SelectTrackByID(audioTrackIndex) != AV_ERR_OK){
       // 异常处理
    }
@@ -142,8 +141,7 @@
    ``` c
    // 创建 buffer，用户获取解封装数据
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
-   OH_AVCodecBufferAttr info; // 参考OH_AVCodecBufferFlags
-   // 选择读取轨
+   OH_AVCodecBufferAttr info;
    bool isEnd = false;
    while (!isEnd) {
       // 获取音频帧数据
@@ -172,11 +170,11 @@
    if (OH_AVSource_Destroy(source) != AV_ERR_OK) {
        // 异常处理
    }
-   source = NULL;
+   source = nullptr;
    if (OH_AVDemuxer_Destroy(demuxer) != AV_ERR_OK) {
        // 异常处理
    }
-   demuxer = NULL;
+   demuxer = nullptr;
    close(fd); // 关闭文件描述符
    ```
 
