@@ -46,7 +46,7 @@ namespace Plugin {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "Source"};
 
-    inline bool FileIsExists (const char* name)
+    inline bool FileIsExists(const char* name)
     {
         struct stat buffer;
         return (stat(name, &buffer) == 0);
@@ -518,8 +518,8 @@ void Source::InitAVIOContext(int flags)
         AVCODEC_LOGE("seek to 0 failed when set data source for plugin!");
         return;
     }
-    customIOContext_.offset=0;
-    customIOContext_.eof=false;
+    customIOContext_.offset = 0;
+    customIOContext_.eof = false;
     auto buffer = static_cast<unsigned char*>(av_malloc(bufferSize));
     auto bufferVector = std::make_shared<Buffer>();
     customIOContext_.bufMemory = bufferVector;
