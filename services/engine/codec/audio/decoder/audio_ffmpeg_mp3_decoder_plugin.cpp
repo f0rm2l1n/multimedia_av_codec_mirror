@@ -48,7 +48,7 @@ AudioFFMpegMp3DecoderPlugin::~AudioFFMpegMp3DecoderPlugin()
 int32_t AudioFFMpegMp3DecoderPlugin::Init(const Format &format)
 {
     int32_t ret = basePlugin->AllocateContext("mp3");
-    int32_t checkresult = AudioFFMpegMp3DecoderPlugin::checkinit(format);
+    int32_t checkresult = AudioFFMpegMp3DecoderPlugin::Checkinit(format);
     if (checkresult != AVCodecServiceErrCode::AVCS_ERR_OK) {
         return checkresult;
     }
@@ -89,9 +89,9 @@ int32_t AudioFFMpegMp3DecoderPlugin::Flush()
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
+int32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 {
-    auto size = int(bit_rate / BIT_RATE_RATIO);
+    auto size = bit_rate / BIT_RATE_RATIO;
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > size) {
         maxSize = size;
@@ -99,9 +99,9 @@ uint32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
+int32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
 {
-    uint32_t size = (int(sample_rate / SAMPLE_RATE_RATIO) + BUFFER_DIFF) * channels * sizeof(short);
+    int32_t size = (sample_rate / SAMPLE_RATE_RATIO + BUFFER_DIFF) * channels * sizeof(short);
     return size;
 }
 

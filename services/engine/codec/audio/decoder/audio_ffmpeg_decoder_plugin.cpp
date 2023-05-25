@@ -65,7 +65,7 @@ static std::string AVStrError(int errnum)
     return std::string(errbuf);
 }
 
-int64_t AudioFfmpegDecoderPlugin::GetMaxInputSize() const noexcept
+int32_t AudioFfmpegDecoderPlugin::GetMaxInputSize() const noexcept
 {
     return maxInputSize_;
 }
@@ -258,7 +258,7 @@ int32_t AudioFfmpegDecoderPlugin::InitContext(const Format &format)
     format_.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avCodecContext_->channels);
     format_.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avCodecContext_->sample_rate);
     format_.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
-    format_.GetLongValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize_);
+    format_.GetIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize_);
 
     size_t extraSize;
     if (format_.GetBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, &avCodecContext_->extradata, extraSize)) {

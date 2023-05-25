@@ -33,8 +33,8 @@ public:
     int32_t Reset() override;
     int32_t Release() override;
     int32_t Flush() override;
-    uint32_t GetInputBufferSize() const override;
-    uint32_t GetOutputBufferSize() const override;
+    int32_t GetInputBufferSize() const override;
+    int32_t GetOutputBufferSize() const override;
     Format GetFormat() const noexcept override;
     const static std::string Identify()
     {

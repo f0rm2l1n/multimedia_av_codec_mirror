@@ -139,7 +139,7 @@ int32_t AudioFFMpegFlacDecoderPlugin::Flush()
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegFlacDecoderPlugin::GetInputBufferSize() const
+int32_t AudioFFMpegFlacDecoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > GET_INPUT_BUFFER_SIZE) {
@@ -148,7 +148,7 @@ uint32_t AudioFFMpegFlacDecoderPlugin::GetInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegFlacDecoderPlugin::GetOutputBufferSize() const
+int32_t AudioFFMpegFlacDecoderPlugin::GetOutputBufferSize() const
 {
     return GET_OUTPUT_BUFFER_SIZE;
 }

@@ -26,8 +26,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-static constexpr uint32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
-static constexpr uint32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
+static constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
+static constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
 
 AudioFFMpegVorbisDecoderPlugin::AudioFFMpegVorbisDecoderPlugin()
     : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
@@ -103,7 +103,7 @@ int32_t AudioFFMpegVorbisDecoderPlugin::Init(const Format &format)
         return ret;
     }
     auto codecCtx = basePlugin->GetCodecContext();
-    if (!basePlugin->hasExtraData()) {
+    if (!basePlugin->HasExtraData()) {
         ret = AssignExtradata(codecCtx, format);
     }
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
@@ -139,7 +139,7 @@ int32_t AudioFFMpegVorbisDecoderPlugin::Flush()
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegVorbisDecoderPlugin::GetInputBufferSize() const
+int32_t AudioFFMpegVorbisDecoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
@@ -148,7 +148,7 @@ uint32_t AudioFFMpegVorbisDecoderPlugin::GetInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegVorbisDecoderPlugin::GetOutputBufferSize() const
+int32_t AudioFFMpegVorbisDecoderPlugin::GetOutputBufferSize() const
 {
     return OUTPUT_BUFFER_SIZE_DEFAULT;
 }
