@@ -21,15 +21,15 @@ namespace OHOS {
 namespace Media {
 class AVCodecCodecName {
 public:
-    static constexpr std::string_view AUDIO_DECODER_MP3_NAME_KEY = "OH.Media.Codec.Decoder.Audio.Mpeg";
-    static constexpr std::string_view AUDIO_DECODER_AAC_NAME_KEY = "OH.Media.Codec.Decoder.Audio.AAC";
-    static constexpr std::string_view AUDIO_DECODER_VORBIS_NAME_KEY = "OH.Media.Codec.Decoder.Audio.Vorbis";
-    static constexpr std::string_view AUDIO_DECODER_FLAC_NAME_KEY = "OH.Media.Codec.Decoder.Audio.Mpeg";
+    static constexpr std::string_view AUDIO_DECODER_MP3_NAME = "OH.Media.Codec.Decoder.Audio.Mpeg";
+    static constexpr std::string_view AUDIO_DECODER_AAC_NAME = "OH.Media.Codec.Decoder.Audio.AAC";
+    static constexpr std::string_view AUDIO_DECODER_VORBIS_NAME = "OH.Media.Codec.Decoder.Audio.Vorbis";
+    static constexpr std::string_view AUDIO_DECODER_FLAC_NAME = "OH.Media.Codec.Decoder.Audio.Mpeg";
 
-    static constexpr std::string_view AUDIO_ENCODER_FLAC_NAME_KEY = "OH.Media.Codec.Encoder.Audio.Flac";
-    static constexpr std::string_view AUDIO_ENCODER_AAC_NAME_KEY = "OH.Media.Codec.Encoder.Audio.AAC";
+    static constexpr std::string_view AUDIO_ENCODER_FLAC_NAME = "OH.Media.Codec.Encoder.Audio.Flac";
+    static constexpr std::string_view AUDIO_ENCODER_AAC_NAME = "OH.Media.Codec.Encoder.Audio.AAC";
 
-    static constexpr std::string_view VIDEO_DECODER_AVC_NAME_KEY = "OH.Media.Codec.Decoder.Video.AVC";
+    static constexpr std::string_view VIDEO_DECODER_AVC_NAME = "OH.Media.Codec.Decoder.Video.AVC";
 
 private:
     AVCodecCodecName() = delete;

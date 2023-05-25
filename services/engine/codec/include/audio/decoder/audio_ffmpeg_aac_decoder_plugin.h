@@ -38,7 +38,7 @@ public:
     Format GetFormat() const noexcept override;
     const static std::string identify()
     {
-        return std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY);
+        return std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME);
     }
 
 private:

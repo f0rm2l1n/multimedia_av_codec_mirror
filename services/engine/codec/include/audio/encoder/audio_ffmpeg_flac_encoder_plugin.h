@@ -39,7 +39,7 @@ public:
 
     const static std::string identify()
     {
-        return std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY);
+        return std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME);
     }
 
 private:
