@@ -16,6 +16,7 @@
 #include "audio_ffmpeg_flac_decoder_plugin.h"
 #include "avcodec_errors.h"
 #include "media_description.h"
+#include "avcodec_mime_type.h"
 
 namespace {
 constexpr int getInputBufferSize_ = 65536;
@@ -135,7 +136,9 @@ uint32_t AudioFFMpegFlacDecoderPlugin::getOutputBufferSize() const
 
 Format AudioFFMpegFlacDecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC);
+    return format;
 }
 } // namespace Media
 } // namespace OHOS

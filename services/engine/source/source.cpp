@@ -628,6 +628,7 @@ int32_t Source::InitAVFormatContext()
         AVCODEC_LOGE("InitAVFormatContext failed, because  alloc AVFormatContext failed.");
         return AVCS_ERR_INVALID_OPERATION;
     }
+
     InitAVIOContext(AVIO_FLAG_READ);
     if (avioContext_ == nullptr) {
         AVCODEC_LOGE("InitAVFormatContext failed, because  init AVIOContext failed.");
@@ -635,26 +636,29 @@ int32_t Source::InitAVFormatContext()
     }
     formatContext->pb = avioContext_;
     formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
-    int32_t ret = -1;
-    ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
-    if (avformat_find_stream_info(formatContext, NULL) < 0) {
-        AVCODEC_LOGE("Could not find stream information");
-        return AVCS_ERR_INVALID_OPERATION;
-    }
-    if (ret == 0) {
-        formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
-            if (ptr) {
-                auto ctx = ptr->pb;
-                if (ctx) {
-                    av_freep(&ctx->buffer);
-                    av_free(ctx);
-                }
-            }
-        });
-    } else {
+
+    int32_t ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
+    if (ret != 0) {
         AVCODEC_LOGE("avformat_open_input failed by %{public}s", inputFormat_->name);
         return AVCS_ERR_INVALID_OPERATION;
     }
+
+    ret = avformat_find_stream_info(formatContext, NULL);
+    if (ret < 0) {
+        AVCODEC_LOGE("avformat_find_stream_info failed by %{public}s", inputFormat_->name);
+        return AVCS_ERR_INVALID_OPERATION;
+    }
+
+    formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
+        if (ptr) {
+            auto ctx = ptr->pb;
+            if (ctx) {
+                av_freep(&ctx->buffer);
+                av_free(ctx);
+            }
+        }
+    });
+
     return AVCS_ERR_OK;
 }
 

@@ -50,7 +50,7 @@ public:
 
 #ifdef SUPPORT_DEMUXER
     std::shared_ptr<IDemuxerService> CreateDemuxerService() override;
-    int32_t DestroyDemuxerService(std::shared_ptr<IDemuxerService> demuxer) override;
+    int32_t DestroyDemuxerService(std::shared_ptr<IDemuxerService> demuxerClient) override;
 #endif
 
 #ifdef SUPPORT_MUXER
@@ -70,7 +70,7 @@ public:
 
 #ifdef SUPPORT_SOURCE
     std::shared_ptr<ISourceService> CreateSourceService() override;
-    int32_t DestroySourceService(std::shared_ptr<ISourceService> source) override;
+    int32_t DestroySourceService(std::shared_ptr<ISourceService> sourceClient) override;
 #endif
 
 private:

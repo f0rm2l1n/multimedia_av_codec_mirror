@@ -132,7 +132,7 @@ AEncAacDemo::~AEncAacDemo()
 
 int32_t AEncAacDemo::CreateEnc()
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY).data());
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_AAC_NAME).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();

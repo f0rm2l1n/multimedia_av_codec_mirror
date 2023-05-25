@@ -37,8 +37,8 @@ using namespace testing::ext;
 using namespace OHOS::Media;
 
 namespace {
-const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY);
-const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY);
+const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME);
+const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_ENCODER_AAC_NAME);
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 169000;
@@ -130,6 +130,7 @@ public:
     int32_t ProceFunc();
     void InputFunc();
     void OutputFunc();
+
 protected:
     std::atomic<bool> isRunning_ = false;
     std::unique_ptr<std::ifstream> inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
@@ -264,7 +265,7 @@ int32_t AudioCodeCapiEncoderUnitTest::ProceFunc(void)
 {
     audioEnc_ = OH_AudioEncoder_CreateByName("avenc_flac");
     EXPECT_NE((OH_AVCodec *)nullptr, audioEnc_);
-    
+
     signal_ = new AEncSignal();
     EXPECT_NE(nullptr, signal);
 
@@ -280,7 +281,6 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_CreateByName_01, TestSize.Le
     audioEnc_ = OH_AudioEncoder_CreateByName("avenc_flac");
     EXPECT_NE(nullptr, audioEnc_);
 }
-
 
 HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_SetParameter_01, TestSize.Level1)
 {
@@ -376,7 +376,7 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_01, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         unique_lock<mutex> lock(signal_->inMutex_);
@@ -415,7 +415,7 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_02, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         unique_lock<mutex> lock(signal_->inMutex_);
@@ -458,7 +458,7 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_03, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         unique_lock<mutex> lock(signal_->inMutex_);
@@ -476,7 +476,6 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_03, TestSize.Leve
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Flush(audioEnc_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Destroy(audioEnc_));
 }
-
 
 HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_04, TestSize.Level1)
 {
@@ -543,7 +542,7 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_normalcase_05, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         unique_lock<mutex> lock(signal_->inMutex_);
@@ -580,5 +579,5 @@ int main(int argc, char *argv[])
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-}  // namespace Media
-}  // namespace OHOS
+} // namespace Media
+} // namespace OHOS

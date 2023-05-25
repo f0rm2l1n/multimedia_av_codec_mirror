@@ -33,7 +33,7 @@ const std::string_view OUTPUT_BUFFER = "outputBuffer";
 const std::string_view ASYNC_HANDLE_INPUT = "AsyncHandleInput";
 const std::string_view ASYNC_DECODE_FRAME = "AsyncDecodeFrame";
 
-AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioFFMpegBaseCodec> &codec,
+AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioBaseCodec> &codec,
                                    const std::shared_ptr<AVCodecCallback> &callback)
     : isFirFrame_(true),
       isRunning(true),

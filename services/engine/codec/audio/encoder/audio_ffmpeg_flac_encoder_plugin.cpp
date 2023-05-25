@@ -18,23 +18,23 @@
 #include "avcodec_errors.h"
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
+#include "avcodec_mime_type.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
-    constexpr int minChannel = 1;
-    constexpr int maxChannel = 8;
-    constexpr int getInputBufferSize_ = 65536;
-    constexpr int getOutputBufferSize_ = 65536;
-    static const int flac_encoder_sample_rate_table[] = {
-        0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
-    };
-    static const int flac_encoder_bits_sample_table[] = {16, 24, 32};
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
+constexpr int minChannel = 1;
+constexpr int maxChannel = 8;
+constexpr int getInputBufferSize_ = 65536;
+constexpr int getOutputBufferSize_ = 65536;
+static const int flac_encoder_sample_rate_table[] = {
+    0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
+};
+static const int flac_encoder_bits_sample_table[] = {16, 24, 32};
+} // namespace
 
 namespace OHOS {
 namespace Media {
-AudioFFMpegFlacEncoderPlugin::AudioFFMpegFlacEncoderPlugin()
-    : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>())
+AudioFFMpegFlacEncoderPlugin::AudioFFMpegFlacEncoderPlugin() : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>())
 {
 }
 
@@ -151,7 +151,9 @@ uint32_t AudioFFMpegFlacEncoderPlugin::getOutputBufferSize() const
 
 Format AudioFFMpegFlacEncoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC);
+    return format;
 }
 } // namespace Media
 } // namespace OHOS

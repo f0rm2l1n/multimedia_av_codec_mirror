@@ -113,7 +113,7 @@ MuxerEngineImpl::MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, Out
         BehaviorEventWrite(ConvertStateToString(state_), "Muxer");
     } else {
         AVCODEC_LOGE("state_ is UNINITIALIZED");
-        FaultEventWrite(AVCS_ERR_INVALID_STATE, AVCSErrorToString(AVCS_ERR_INVALID_STATE), "Muxer");
+        FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, AVCSErrorToString(AVCS_ERR_INVALID_STATE), "Muxer");
     }
 }
 

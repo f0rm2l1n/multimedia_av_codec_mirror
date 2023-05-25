@@ -17,7 +17,7 @@
 #define AUDIO_FFMPEG_DECODER_PLUGIN
 
 #include <mutex>
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "nocopyable.h"
 
 #ifdef __cplusplus

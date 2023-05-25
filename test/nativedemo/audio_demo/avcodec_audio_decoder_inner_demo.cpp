@@ -74,7 +74,7 @@ void ADecInnerDemo::RunCase()
 
 int32_t ADecInnerDemo::CreateDec()
 {
-    audioDec_ = AudioDecoderFactory::CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY).data());
+    audioDec_ = AudioDecoderFactory::CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = make_shared<ADecSignal>();
