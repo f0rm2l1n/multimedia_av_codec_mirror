@@ -26,10 +26,10 @@ constexpr int32_t GET_INPUT_BUFFER_SIZE = 65536;
 constexpr int32_t GET_OUTPUT_BUFFER_SIZE = 65536;
 constexpr int32_t MIN_CHANNELS = 1;
 constexpr int32_t MAX_CHANNELS = 8;
-static const uint32_t flacEncoderSampleRateTable[] = {
+static const uint32_t FLAC_DECODER_SAMPLE_RATE_TABLE[] = {
     0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
-static const uint32_t flacEncoderBitsSampleTable[] = {16, 24, 32};
+static const uint32_t FLAC_DECODER_BITS_SAMPLE_TABLE[] = {16, 24, 32};
 }
 
 namespace OHOS {
@@ -47,7 +47,7 @@ AudioFFMpegFlacDecoderPlugin::~AudioFFMpegFlacDecoderPlugin()
 
 static bool CheckSampleRate(uint32_t sampleRate)
 {
-    for (auto i : flacEncoderSampleRateTable) {
+    for (auto i : FLAC_DECODER_SAMPLE_RATE_TABLE) {
         if (i == sampleRate) {
             return true;
         }
@@ -57,7 +57,7 @@ static bool CheckSampleRate(uint32_t sampleRate)
 
 static bool CheckBitsPerSample(uint32_t bitsPerCodedSample)
 {
-    for (auto i : flacEncoderBitsSampleTable) {
+    for (auto i : FLAC_DECODER_BITS_SAMPLE_TABLE) {
         if (i == bitsPerCodedSample) {
             return true;
         }
