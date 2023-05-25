@@ -157,7 +157,7 @@ FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
             continue;
         }
         if (!it.second->Empty()) {
-            for (auto ele = it.second->Pop(); ele != nullptr; ) {
+            for (auto ele = it.second->Pop(); ele != nullptr;) {
                 av_packet_free(&(ele->pkt_));
                 ele = nullptr;
             }
