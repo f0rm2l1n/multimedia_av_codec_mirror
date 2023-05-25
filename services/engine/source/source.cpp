@@ -605,6 +605,7 @@ int32_t Source::InitAVFormatContext()
         AVCODEC_LOGE("InitAVFormatContext failed, because  alloc AVFormatContext failed.");
         return AVCS_ERR_INVALID_OPERATION;
     }
+
     InitAVIOContext(AVIO_FLAG_READ);
     if (avioContext_ == nullptr) {
         AVCODEC_LOGE("InitAVFormatContext failed, because  init AVIOContext failed.");
@@ -612,9 +613,8 @@ int32_t Source::InitAVFormatContext()
     }
     formatContext->pb = avioContext_;
     formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
-    int32_t ret = -1;
-    ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
 
+    int32_t ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
     if (ret != 0) {
         AVCODEC_LOGE("avformat_open_input failed by %{public}s", inputFormat_->name);
         return AVCS_ERR_INVALID_OPERATION;
