@@ -353,8 +353,7 @@ void WriteTrackCover(OH_AVMuxer *muxer, int coverTrackIndex, int fdInput)
 
 int GetInputNum(int defaultNum)
 {
-    int num = defaultNum;
-    num = getchar();
+    int num = getchar();
     if (num == '\n') { // default
         return defaultNum;
     }
@@ -364,19 +363,14 @@ int GetInputNum(int defaultNum)
     if (scanf_s("%d", &num) <= 0) {
         num = defaultNum;
     }
-    if (fflush(stdin) != 0) {
-        printf("GetInputNum fflush failed!");
-    }
+    while ((getchar()) != '\n') {}
     return num;
 }
 
-
 void NativeSelectMuxerType(void)
 {
-    int num;
-
     printf("\nplese select muxer type : 0.mp4 1.m4a\n");
-    num = GetInputNum(0);
+    int num = GetInputNum(0);
     switch (num) {
         case MODE_ZERO:
             g_muxerParam.outputFormat = AV_OUTPUT_FORMAT_MPEG_4;
@@ -396,12 +390,10 @@ void NativeSelectMuxerType(void)
 
 void NativeSelectRunMode(void)
 {
-    int num;
-
     printf("\nplese select audio vide wrtie mode:\n");
     printf("0. audio video write in sample thread\n");
     printf("1. audio video write in different thread\n");
-    num = GetInputNum(0);
+    int num = GetInputNum(0);
     switch (num) {
         case MODE_ZERO:
             g_muxerParam.runMode = NORMAL;
@@ -421,10 +413,8 @@ void NativeSelectRunMode(void)
 
 void NativeSelectAudio(void)
 {
-    int num;
-
     printf("\nplese select audio mode: 0.noAudio 1.aac 2.mpeg\n");
-    num = GetInputNum(1);
+    int num = GetInputNum(1);
     switch (num) {
         case MODE_ONE:
             g_muxerParam.audioParams = &g_audioAacPar;
@@ -444,10 +434,8 @@ void NativeSelectAudio(void)
 
 void NativeSelectVideo(void)
 {
-    int num;
-
     printf("\nplese select video mode: 0.noVideo 1.h264 2.mpeg4\n");
-    num = GetInputNum(1);
+    int num = GetInputNum(1);
     switch (num) {
         case MODE_ONE:
             g_muxerParam.videoParams = &g_videoH264Par;
@@ -467,10 +455,8 @@ void NativeSelectVideo(void)
 
 void NativeSelectCover(void)
 {
-    int num;
-
     printf("\nplese select cover mode: 0.noCover 1.jpg 2.png 3.bmp\n");
-    num = GetInputNum(1);
+    int num = GetInputNum(1);
     switch (num) {
         case MODE_ONE:
             g_muxerParam.coverParams = &g_jpegCoverPar;
@@ -603,7 +589,7 @@ int DoRunMuxer(FdListStr *fdStr, OH_AVMuxer *muxer)
 void CloseAllFd(FdListStr *fdStr)
 {
     printf("close fd : [");
-    int fdTotalCount = sizeof(*fdStr) /sizeof(fdStr->start[0]);
+    int fdTotalCount = sizeof(*fdStr) / sizeof(fdStr->start[0]);
     for (int i = 0; i < fdTotalCount; i++) {
         printf("%d, ", fdStr->start[i]);
         if (fdStr->start[i] > 0) {
@@ -617,7 +603,7 @@ void CloseAllFd(FdListStr *fdStr)
 int RunNativeMuxer(const char *out)
 {
     FdListStr fdStr;
-    int fdTotalCount = sizeof(fdStr) /sizeof(fdStr.start[0]);
+    int fdTotalCount = sizeof(fdStr) / sizeof(fdStr.start[0]);
     printf("fd list total size is %d\n", fdTotalCount);
     for (int i = 0; i < fdTotalCount; i++) {
         fdStr.start[i] = -1;

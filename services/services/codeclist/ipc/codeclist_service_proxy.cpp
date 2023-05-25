@@ -28,12 +28,12 @@ namespace Media {
 CodecListServiceProxy::CodecListServiceProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IStandardCodecListService>(impl)
 {
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
+    AVCODEC_LOGD("Create codeclist proxy successful");
 }
 
 CodecListServiceProxy::~CodecListServiceProxy()
 {
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+    AVCODEC_LOGD("Destroy codecList proxy successful");
 }
 
 std::string CodecListServiceProxy::FindDecoder(const Format &format)
@@ -41,14 +41,12 @@ std::string CodecListServiceProxy::FindDecoder(const Format &format)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
     bool token = data.WriteInterfaceToken(CodecListServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, "", "Failed to write descriptor!");
-
     (void)AVCodecParcel::Marshalling(data, format);
-    int32_t ret = Remote()->SendRequest(FIND_DECODER, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, "", "FindDecoder failed");
-
+    int32_t ret =
+        Remote()->SendRequest(static_cast<uint32_t>(AVCodecListServiceMsg::FIND_DECODER), data, reply, option);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, "", "Find decoder failed");
     return reply.ReadString();
 }
 
@@ -57,32 +55,30 @@ std::string CodecListServiceProxy::FindEncoder(const Format &format)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
     bool token = data.WriteInterfaceToken(CodecListServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, "", "Failed to write descriptor!");
-
     (void)AVCodecParcel::Marshalling(data, format);
-    int32_t ret = Remote()->SendRequest(FIND_ENCODER, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, "", "FindEncoder failed");
-
+    int32_t ret =
+        Remote()->SendRequest(static_cast<uint32_t>(AVCodecListServiceMsg::FIND_ENCODER), data, reply, option);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, "", "Find encoder failed");
     return reply.ReadString();
 }
 
-CapabilityData CodecListServiceProxy::CreateCapability(std::string codecName)
+CapabilityData CodecListServiceProxy::GetCapability(std::string mime, bool isEncoder, AVCodecCategory category)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     Format profileFormat;
     CapabilityData capabilityData;
-
     bool token = data.WriteInterfaceToken(CodecListServiceProxy::GetDescriptor());
-    CHECK_AND_RETURN_RET_LOG(token, capabilityData, "Failed to write descriptor!");
-
-    (void)data.WriteString(codecName);
-    int32_t ret = Remote()->SendRequest(CREATE_CAPABILITY, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, capabilityData, "GetCodecCapabilityInfos failed, error: %{public}d",
-                             ret);
+    CHECK_AND_RETURN_RET_LOG(token, capabilityData, "Write descriptor failed!");
+    (void)data.WriteString(mime);
+    (void)data.WriteBool(isEncoder);
+    (void)data.WriteInt32(static_cast<int32_t>(category));
+    int32_t ret =
+        Remote()->SendRequest(static_cast<uint32_t>(AVCodecListServiceMsg::GET_CAPABILITY), data, reply, option);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, capabilityData, "GetCodecCapabilityInfos failed, send request error");
     (void)CodecListParcel::Unmarshalling(reply, capabilityData);
 
     return capabilityData;
@@ -93,13 +89,11 @@ int32_t CodecListServiceProxy::DestroyStub()
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
     bool token = data.WriteInterfaceToken(CodecListServiceProxy::GetDescriptor());
-    CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
-
-    int32_t ret = Remote()->SendRequest(DESTROY, data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "DestroyStub failed, error: %{public}d",
-                             ret);
+    CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Write descriptor failed!");
+    int32_t ret = Remote()->SendRequest(static_cast<uint32_t>(AVCodecListServiceMsg::DESTROY), data, reply, option);
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION,
+                             "Destroy codeclist stub failed, send request error");
     return reply.ReadInt32();
 }
 } // namespace Media

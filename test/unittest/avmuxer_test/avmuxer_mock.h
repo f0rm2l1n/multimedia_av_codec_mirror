@@ -33,7 +33,7 @@ public:
     virtual int32_t Start() = 0;
     virtual int32_t Stop() = 0;
     virtual int32_t AddTrack(int32_t &trackIndex, std::shared_ptr<FormatMock> &trackFormat) = 0;
-    virtual int32_t WriteSample(uint32_t trackIndex, uint8_t *sample,
+    virtual int32_t WriteSample(uint32_t trackIndex, const uint8_t *sample,
         const AVCodecBufferAttrMock &info)  = 0;
     virtual int32_t SetRotation(int32_t rotation) = 0;
 };

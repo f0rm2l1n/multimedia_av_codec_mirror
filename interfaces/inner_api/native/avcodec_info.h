@@ -29,7 +29,7 @@ namespace Media {
  * @brief AVCodec Type
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum AVCodecType : int32_t {
     AVCODEC_TYPE_NONE = -1,
@@ -40,10 +40,22 @@ enum AVCodecType : int32_t {
 };
 
 /**
+ * @brief AVCodec Category
+ *
+ * @since 3.1
+ * @version 4.0
+ */
+enum class AVCodecCategory : int32_t {
+    AVCODEC_NONE = -1,
+    AVCODEC_HARDWARE = 0,
+    AVCODEC_SOFTWARE,
+};
+
+/**
  * @brief Range contain min and max value
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 struct Range {
     int32_t minVal;
@@ -84,7 +96,7 @@ struct Range {
  * @brief ImgSize contain width and height
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 struct ImgSize {
     int32_t width;
@@ -108,7 +120,7 @@ struct ImgSize {
  * @brief Capability Data struct of Codec, parser from config file
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 struct CapabilityData {
     std::string codecName = "";
@@ -168,7 +180,7 @@ public:
      * @brief Get name of this codec, used to create the codec instance.
      * @return Returns codec name.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::string GetName();
 
@@ -176,7 +188,7 @@ public:
      * @brief Get type of this codec
      * @return Returns codec type, see {@link AVCodecType}
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     AVCodecType GetType();
 
@@ -184,7 +196,7 @@ public:
      * @brief Get mime type of this codec
      * @return Returns codec mime type, see {@link CodecMimeType}
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::string GetMimeType();
 
@@ -192,15 +204,23 @@ public:
      * @brief Check whether the codec is accelerated by hardware.
      * @return Returns true if the codec is hardware accelerated; false otherwise.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     bool IsHardwareAccelerated();
+
+    /**
+     * @brief Check whether the codec is accelerated by hardware.
+     * @return Returns true if the codec is hardware accelerated; false otherwise.
+     * @since 3.1
+     * @version 4.0
+     */
+    int32_t GetMaxSupportedInstances();
 
     /**
      * @brief Check whether the codec is software implemented only.
      * @return Returns true if the codec is software implemented only; false otherwise.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     bool IsSoftwareOnly();
 
@@ -208,10 +228,17 @@ public:
      * @brief Check whether the codec is provided by vendor.
      * @return Returns true if the codec is provided by vendor; false otherwise.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     bool IsVendor();
 
+    /**
+     * @brief Get supported codec profile number.
+     * @return Returns an array of supported codec profile number. For details, see {@link AACProfile}.
+     * @since 3.1
+     * @version 4.0
+     */
+    std::map<int32_t, std::vector<int32_t>> GetSupportedLevelsForProfile();
 private:
     CapabilityData data_;
 };
@@ -227,7 +254,7 @@ public:
      * and whether the codec is provided by the vendor.
      * @return Returns the pointer of {@link AVCodecInfo}.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::shared_ptr<AVCodecInfo> GetCodecInfo();
 
@@ -235,7 +262,7 @@ public:
      * @brief Get supported bitrate range.
      * @return Returns the range of supported bitrates.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedBitrate();
 
@@ -243,7 +270,7 @@ public:
      * @brief Get supported video raw formats.
      * @return Returns an array of supported formats. For Details, see {@link VideoPixelFormat}.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedFormats();
 
@@ -251,7 +278,7 @@ public:
      * @brief Get supported alignment of video height, only used for video codecs.
      * @return Returns the supported alignment of video height (in pixels).
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     int32_t GetSupportedHeightAlignment();
 
@@ -259,7 +286,7 @@ public:
      * @brief Get supported alignment of video width, only used for video codecs.
      * @return Returns the supported alignment of video width (in pixels).
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     int32_t GetSupportedWidthAlignment();
 
@@ -267,7 +294,7 @@ public:
      * @brief Get supported width range of video.
      * @return Returns the supported width range of video.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedWidth();
 
@@ -275,7 +302,7 @@ public:
      * @brief Get supported height range of video.
      * @return Returns the supported height range of video.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedHeight();
 
@@ -289,7 +316,7 @@ public:
      * returns {@link MPEG4Profile} array if codec is mpeg4,
      * returns {@link VP8Profile} array if codec is vp8.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedProfiles();
 
@@ -297,7 +324,7 @@ public:
      * @brief Get supported codec level array.
      * @return Returns an array of supported codec level number.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedLevels();
 
@@ -305,7 +332,7 @@ public:
      * @brief Get supported video encode quality Range.
      * @return Returns an array of supported video encode quality Range.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedEncodeQuality();
 
@@ -315,7 +342,7 @@ public:
      * @param height Indicates the specified video height (in pixels).
      * @return Returns true if the codec supports {@link width} * {@link height} size video, false otherwise.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     bool IsSizeSupported(int32_t width, int32_t height);
 
@@ -323,7 +350,7 @@ public:
      * @brief Get supported frameRate.
      * @return Returns the supported frameRate range of video.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedFrameRate();
 
@@ -333,7 +360,7 @@ public:
      * @param height Indicates the specified video height (in pixels).
      * @return Returns the supported frameRate range for the specified width and height.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedFrameRatesFor(int32_t width, int32_t height);
 
@@ -344,7 +371,7 @@ public:
      * @param frameRate Indicates the specified video frameRate.
      * @return Returns true if the codec supports the specified size and frameRate; false otherwise.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     bool IsSizeAndRateSupported(int32_t width, int32_t height, double frameRate);
 
@@ -355,7 +382,7 @@ public:
      * @param height Indicates the specified video height (in pixels).
      * @return Returns preferred frameRate range for the specified width and height.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetPreferredFrameRate(int32_t width, int32_t height);
 
@@ -363,7 +390,7 @@ public:
      * @brief Get supported encode bitrate mode.
      * @return Returns an array of supported encode bitrate mode. For details, see {@link VideoEncodeBitrateMode}.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedBitrateMode();
 
@@ -371,7 +398,7 @@ public:
      * @brief Get supported encode qualit range.
      * @return Returns supported encode qualit range.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedQuality();
 
@@ -379,7 +406,7 @@ public:
      * @brief Get supported encode complexity range.
      * @return Returns supported encode complexity range.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedComplexity();
 
@@ -387,9 +414,12 @@ public:
      * @brief Check video encoder wether support request key frame dynamicly.
      * @return Returns true if support, false not support.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     bool IsSupportDynamicIframe();
+
+    Range GetVideoHeightRangeForWidth(int32_t width);
+    Range GetVideoWidthRangeForHeight(int32_t height);
 
 private:
     CapabilityData data_;
@@ -426,7 +456,7 @@ public:
      * and whether the codec is provided by the vendor.
      * @return Returns the pointer of {@link AVCodecInfo}
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::shared_ptr<AVCodecInfo> GetCodecInfo();
 
@@ -434,7 +464,7 @@ public:
      * @brief Get supported bitrate range.
      * @return Returns the range of supported bitrates.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedBitrate();
 
@@ -442,7 +472,7 @@ public:
      * @brief Get supported channel range.
      * @return Returns the range of supported channel.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedChannel();
 
@@ -450,7 +480,7 @@ public:
      * @brief Get supported audio raw format range.
      * @return Returns the range of supported audio raw format. For details, see {@link AudioSampleFormat}.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedFormats();
 
@@ -458,7 +488,7 @@ public:
      * @brief Get supported audio samplerates.
      * @return Returns an array of supported samplerates.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedSampleRates();
 
@@ -466,7 +496,7 @@ public:
      * @brief Get supported codec profile number.
      * @return Returns an array of supported codec profile number. For details, see {@link AACProfile}.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedProfiles();
 
@@ -474,7 +504,7 @@ public:
      * @brief Get supported codec level array.
      * @return Returns an array of supported codec level number.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     std::vector<int32_t> GetSupportedLevels();
 
@@ -482,7 +512,7 @@ public:
      * @brief Get supported encode complexity range.
      * @return Returns supported encode complexity range.
      * @since 3.1
-     * @version 3.1
+     * @version 4.0
      */
     Range GetSupportedComplexity();
 
@@ -519,7 +549,7 @@ public:
  * @brief AVC Profile
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum AVCProfile : int32_t {
     AVC_PROFILE_BASELINE = 0,
@@ -537,7 +567,7 @@ enum AVCProfile : int32_t {
  * @brief HEVC Profile
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum HEVCProfile : int32_t {
     HEVC_PROFILE_MAIN = 0,
@@ -551,7 +581,7 @@ enum HEVCProfile : int32_t {
  * @brief MPEG2 Profile
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum MPEG2Profile : int32_t {
     MPEG2_PROFILE_422 = 0,
@@ -566,7 +596,7 @@ enum MPEG2Profile : int32_t {
  * @brief MPEG4 Profile
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum MPEG4Profile : int32_t {
     MPEG4_PROFILE_ADVANCED_CODING = 0,
@@ -591,7 +621,7 @@ enum MPEG4Profile : int32_t {
  * @brief H263 Profile
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum H263Profile : int32_t {
     H263_PROFILE_BACKWARD_COMPATIBLE = 0,
@@ -609,7 +639,7 @@ enum H263Profile : int32_t {
  * @brief
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum VP8Profile : int32_t {
     VP8_PROFILE_MAIN = 0,
@@ -619,7 +649,7 @@ enum VP8Profile : int32_t {
  * @brief
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum AVCLevel : int32_t {
     AVC_LEVEL_1 = 0,
@@ -644,7 +674,7 @@ enum AVCLevel : int32_t {
  * @brief
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum HEVCLevel : int32_t {
     HEVC_LEVEL_1 = 0,
@@ -666,7 +696,7 @@ enum HEVCLevel : int32_t {
  * @brief
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum MPEG2Level : int32_t {
     MPEG2_LEVEL_LL = 0,
@@ -679,7 +709,7 @@ enum MPEG2Level : int32_t {
  * @brief
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum MPEG4Level : int32_t {
     MPEG4_LEVEL_0 = 0,
@@ -696,7 +726,7 @@ enum MPEG4Level : int32_t {
  * @brief
  *
  * @since 3.1
- * @version 3.1
+ * @version 4.0
  */
 enum VideoEncodeBitrateMode : int32_t {
     /**
