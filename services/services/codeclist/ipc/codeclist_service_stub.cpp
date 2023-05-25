@@ -43,31 +43,32 @@ namespace Media {
 sptr<CodecListServiceStub> CodecListServiceStub::Create()
 {
     sptr<CodecListServiceStub> codecListStub = new (std::nothrow) CodecListServiceStub();
-    CHECK_AND_RETURN_RET_LOG(codecListStub != nullptr, nullptr, "failed to new CodecListServiceStub");
+    CHECK_AND_RETURN_RET_LOG(codecListStub != nullptr, nullptr, "Create codeclist service stub failed");
 
     int32_t ret = codecListStub->Init();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "failed to codeclist stub init");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "Init codeclist stub failed");
     return codecListStub;
 }
 
 CodecListServiceStub::CodecListServiceStub()
 {
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
+    AVCODEC_LOGD("Create codeclist service stub instance successful");
 }
 
 CodecListServiceStub::~CodecListServiceStub()
 {
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+    AVCODEC_LOGD("Destroy codeclist service stub instance successful");
 }
 
 int32_t CodecListServiceStub::Init()
 {
     codecListServer_ = CodecListServer::Create();
-    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, AVCS_ERR_NO_MEMORY, "failed to create CodecListServer");
-    codecListFuncs_[FIND_DECODER] = &CodecListServiceStub::DoFindDecoder;
-    codecListFuncs_[FIND_ENCODER] = &CodecListServiceStub::DoFindEncoder;
-    codecListFuncs_[CREATE_CAPABILITY] = &CodecListServiceStub::DoCreateCapability;
-    codecListFuncs_[DESTROY] = &CodecListServiceStub::DoDestroyStub;
+    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Create codecList server failed");
+    codecListFuncs_[static_cast<uint32_t>(AVCodecListServiceMsg::FIND_DECODER)] = &CodecListServiceStub::DoFindDecoder;
+    codecListFuncs_[static_cast<uint32_t>(AVCodecListServiceMsg::FIND_ENCODER)] = &CodecListServiceStub::DoFindEncoder;
+    codecListFuncs_[static_cast<uint32_t>(AVCodecListServiceMsg::GET_CAPABILITY)] =
+        &CodecListServiceStub::DoGetCapability;
+    codecListFuncs_[static_cast<uint32_t>(AVCodecListServiceMsg::DESTROY)] = &CodecListServiceStub::DoDestroyStub;
     return AVCS_ERR_OK;
 }
 
@@ -99,7 +100,7 @@ int CodecListServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
                 itFuncName != CODECLIST_FUNC_NAME.end() ? itFuncName->second : "CodecListServiceStub OnRemoteRequest";
             COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
             if (ret != AVCS_ERR_OK) {
-                AVCODEC_LOGE("calling memberFunc is failed.");
+                AVCODEC_LOGE("Calling memberFunc is failed.");
             }
             return AVCS_ERR_OK;
         }
@@ -111,21 +112,23 @@ int CodecListServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
 
 std::string CodecListServiceStub::FindDecoder(const Format &format)
 {
-    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, "", "avcodeclist server is nullptr");
+    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, "", "Find decoder failed: avcodeclist server is nullptr");
     return codecListServer_->FindDecoder(format);
 }
 
 std::string CodecListServiceStub::FindEncoder(const Format &format)
 {
-    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, "", "avcodeclist server is nullptr");
+    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, "", "Find encoder failed: avcodeclist server is nullptr");
     return codecListServer_->FindEncoder(format);
 }
 
-CapabilityData CodecListServiceStub::CreateCapability(const std::string codecName)
+CapabilityData CodecListServiceStub::GetCapability(const std::string mime, const bool isEncoder,
+                                                   const AVCodecCategory category)
 {
     CapabilityData capabilityData;
-    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, capabilityData, "avcodeclist server is nullptr");
-    return codecListServer_->CreateCapability(codecName);
+    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, capabilityData,
+                             "Get capability failed: avcodeclist server is null");
+    return codecListServer_->GetCapability(mime, isEncoder, category);
 }
 
 int32_t CodecListServiceStub::DoFindDecoder(MessageParcel &data, MessageParcel &reply)
@@ -144,13 +147,13 @@ int32_t CodecListServiceStub::DoFindEncoder(MessageParcel &data, MessageParcel &
     return AVCS_ERR_OK;
 }
 
-int32_t CodecListServiceStub::DoCreateCapability(MessageParcel &data, MessageParcel &reply)
+int32_t CodecListServiceStub::DoGetCapability(MessageParcel &data, MessageParcel &reply)
 {
-    std::string codecName = data.ReadString();
-    CapabilityData capabilityData = CreateCapability(codecName);
-
+    std::string mime = data.ReadString();
+    bool isEncoder = data.ReadBool();
+    AVCodecCategory category = static_cast<AVCodecCategory>(data.ReadInt32());
+    CapabilityData capabilityData = GetCapability(mime, isEncoder, category);
     (void)CodecListParcel::Marshalling(reply, capabilityData);
-
     return AVCS_ERR_OK;
 }
 

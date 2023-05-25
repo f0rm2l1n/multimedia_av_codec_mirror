@@ -25,7 +25,7 @@ public:
     virtual ~ICodecListService() = default;
     virtual std::string FindDecoder(const Format &format) = 0;
     virtual std::string FindEncoder(const Format &format) = 0;
-    virtual CapabilityData CreateCapability(const std::string codecName) = 0;
+    virtual CapabilityData GetCapability(std::string mime, bool isEncoder, AVCodecCategory category) = 0;
 };
 } // namespace Media
 } // namespace OHOS

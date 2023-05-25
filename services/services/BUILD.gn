@@ -112,7 +112,7 @@ ohos_shared_library("av_codec_service") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   configs = [

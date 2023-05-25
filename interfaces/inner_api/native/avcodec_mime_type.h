@@ -13,29 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef CODECLIST_SERVER_H
-#define CODECLIST_SERVER_H
-
-#include "i_codeclist_service.h"
-#include "codeclist_core.h"
-#include "nocopyable.h"
+#ifndef AVCODEC_MIME_TYPE_H
+#define AVCODEC_MIME_TYPE_H
+#include <string_view>
 
 namespace OHOS {
 namespace Media {
-class CodecListServer : public ICodecListService, public NoCopyable {
+/**
+ * @enum Media mime type
+ *
+ * @since 4.0
+ */
+class AVCodecMimeType {
 public:
-    static std::shared_ptr<ICodecListService> Create();
-    CodecListServer();
-    virtual ~CodecListServer();
+    static constexpr std::string_view MEDIA_MIMETYPE_AUDIO_AAC = "audio/mp4a-latm";
+    static constexpr std::string_view MEDIA_MIMETYPE_AUDIO_FLAC = "audio/flac";
+    static constexpr std::string_view MEDIA_MIMETYPE_AUDIO_VORBIS = "audio/vorbis";
+    static constexpr std::string_view MEDIA_MIMETYPE_AUDIO_MPEG = "audio/mpeg";
 
-    std::string FindDecoder(const Format &format) override;
-    std::string FindEncoder(const Format &format) override;
-    CapabilityData GetCapability(const std::string mime, const bool isEncoder, const AVCodecCategory category) override;
+    static constexpr std::string_view MEDIA_MIMETYPE_VIDEO_AVC = "video/avc";
 
 private:
-    bool Init();
-    std::shared_ptr<CodecListCore> codecListCore_;
+    AVCodecMimeType() = delete;
+    ~AVCodecMimeType() = delete;
 };
 } // namespace Media
 } // namespace OHOS
-#endif // CODECLIST_SERVER_H
+#endif

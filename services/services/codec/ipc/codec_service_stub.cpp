@@ -154,6 +154,7 @@ int32_t CodecServiceStub::InitStub()
     recFuncs_[RELEASE_OUTPUT_BUFFER] = &CodecServiceStub::ReleaseOutputBuffer;
     recFuncs_[GET_OUTPUT_FORMAT] = &CodecServiceStub::GetOutputFormat;
     recFuncs_[SET_PARAMETER] = &CodecServiceStub::SetParameter;
+    recFuncs_[GET_INPUT_FORMAT] = &CodecServiceStub::GetInputFormat;
 
     recFuncs_[DESTROY_STUB] = &CodecServiceStub::DestroyStub;
     return AVCS_ERR_OK;
@@ -323,6 +324,12 @@ int32_t CodecServiceStub::SetParameter(const Format &format)
 {
     CHECK_AND_RETURN_RET_LOG(codecServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Codec server is nullptr");
     return codecServer_->SetParameter(format);
+}
+
+int32_t CodecServiceStub::GetInputFormat(Format &format)
+{
+    CHECK_AND_RETURN_RET_LOG(codecServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Codec server is nullptr");
+    return codecServer_->GetInputFormat(format);
 }
 
 int32_t CodecServiceStub::DestroyStub(MessageParcel &data, MessageParcel &reply)
@@ -539,6 +546,17 @@ int32_t CodecServiceStub::SetParameter(MessageParcel &data, MessageParcel &reply
     
     bool ret = reply.WriteInt32(SetParameter(format));
     CHECK_AND_RETURN_RET_LOG(ret == true, AVCS_ERR_INVALID_OPERATION, "Reply write failed");
+    return AVCS_ERR_OK;
+}
+
+int32_t CodecServiceStub::GetInputFormat(MessageParcel &data, MessageParcel &reply)
+{
+    AVCODEC_SYNC_TRACE;
+
+    (void)data;
+    Format format;
+    (void)GetInputFormat(format);
+    (void)AVCodecParcel::Marshalling(reply, format);
     return AVCS_ERR_OK;
 }
 } // namespace Media
