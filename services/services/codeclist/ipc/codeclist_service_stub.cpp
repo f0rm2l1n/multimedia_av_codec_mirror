@@ -107,7 +107,7 @@ std::string CodecListServiceStub::FindEncoder(const Format &format)
 }
 
 CapabilityData CodecListServiceStub::GetCapability(const std::string &mime, const bool isEncoder,
-                                                   const AVCodecCategory category)
+                                                   const AVCodecCategory &category)
 {
     CapabilityData capabilityData;
     CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, capabilityData,

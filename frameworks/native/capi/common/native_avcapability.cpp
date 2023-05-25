@@ -94,16 +94,15 @@ OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability, c
 OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capability, int32_t profile,
                                                           const int32_t **levels, uint32_t *levelNum)
 {
-    std::vector<int32_t> empty;
-    *levels = empty.data();
-    *levelNum = empty.size();
     if (capability == nullptr) {
+        *levels = nullptr;
+        *levelNum = 0;
         return AV_ERR_INVALID_VAL;
     }
 
     std::shared_ptr<AVCodecInfo> codecInfo = std::make_shared<AVCodecInfo>(capability->capabilityData_);
-    auto profileLevelsMap = codecInfo->GetSupportedLevelsForProfile();
-    auto levelsmatch = profileLevelsMap.find(profile);
+    const auto &profileLevelsMap = codecInfo->GetSupportedLevelsForProfile();
+    const auto &levelsmatch = profileLevelsMap.find(profile);
     if (levelsmatch == profileLevelsMap.end()) {
         return AV_ERR_INVALID_VAL;
     }
@@ -118,8 +117,8 @@ bool OH_AVCapability_AreProfileAndLevelSupported(OH_AVCapability *capability, in
         return false;
     }
     std::shared_ptr<AVCodecInfo> codecInfo = std::make_shared<AVCodecInfo>(capability->capabilityData_);
-    auto profileLevelsMap = codecInfo->GetSupportedLevelsForProfile();
-    auto levels = profileLevelsMap.find(profile);
+    const auto &profileLevelsMap = codecInfo->GetSupportedLevelsForProfile();
+    const auto &levels = profileLevelsMap.find(profile);
     if (levels == profileLevelsMap.end()) {
         return false;
     }
@@ -135,7 +134,7 @@ OH_AVErrCode OH_AVCapability_GetEncoderBitrateRange(OH_AVCapability *capability,
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<AudioCaps> codecInfo = std::make_shared<AudioCaps>(capability->capabilityData_);
-    auto bitrate = codecInfo->GetSupportedBitrate();
+    const auto &bitrate = codecInfo->GetSupportedBitrate();
     bitrateRange->minVal = bitrate.minVal;
     bitrateRange->maxVal = bitrate.maxVal;
     return AV_ERR_OK;
@@ -149,7 +148,7 @@ OH_AVErrCode OH_AVCapability_GetEncoderQualityRange(OH_AVCapability *capability,
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto quality = codecInfo->GetSupportedEncodeQuality();
+    const auto &quality = codecInfo->GetSupportedEncodeQuality();
     qualityRange->minVal = quality.minVal;
     qualityRange->maxVal = quality.maxVal;
     return AV_ERR_OK;
@@ -163,7 +162,7 @@ OH_AVErrCode OH_AVCapability_GetEncoderComplexityRange(OH_AVCapability *capabili
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto complexity = codecInfo->GetSupportedComplexity();
+    const auto &complexity = codecInfo->GetSupportedComplexity();
     complexityRange->minVal = complexity.minVal;
     complexityRange->maxVal = complexity.maxVal;
     return AV_ERR_OK;
@@ -175,7 +174,7 @@ bool OH_AVCapability_IsEncoderBitrateModeSupported(OH_AVCapability *capability, 
         return false;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto bitrateModeVec = codecInfo->GetSupportedBitrateMode();
+    const auto &bitrateModeVec = codecInfo->GetSupportedBitrateMode();
     return find(bitrateModeVec.begin(), bitrateModeVec.end(), bitrateMode) != bitrateModeVec.end();
 }
 
@@ -183,29 +182,28 @@ OH_AVErrCode OH_AVCapability_GetAudioSupportedSampleRates(OH_AVCapability *capab
                                                           uint32_t *sampleRateNum)
 {
     if (capability == nullptr) {
-        std::vector<int32_t> empty;
-        *sampleRates = empty.data();
-        *sampleRateNum = empty.size();
+        *sampleRates = nullptr;
+        *sampleRateNum = 0;
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<AudioCaps> codecInfo = std::make_shared<AudioCaps>(capability->capabilityData_);
-    auto vec = codecInfo->GetSupportedSampleRates();
+    const auto &vec = codecInfo->GetSupportedSampleRates();
     *sampleRates = vec.data();
     *sampleRateNum = vec.size();
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVCapability_GetAudioChannelsRange(OH_AVCapability *capability, OH_AVRange *channelsRange)
+OH_AVErrCode OH_AVCapability_GetAudioChannelCountRange(OH_AVCapability *capability, OH_AVRange *channelCountRange)
 {
     if (capability == nullptr) {
-        channelsRange->minVal = 0;
-        channelsRange->maxVal = 0;
+        channelCountRange->minVal = 0;
+        channelCountRange->maxVal = 0;
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<AudioCaps> codecInfo = std::make_shared<AudioCaps>(capability->capabilityData_);
-    auto channels = codecInfo->GetSupportedChannel();
-    channelsRange->minVal = channels.minVal;
-    channelsRange->maxVal = channels.maxVal;
+    const auto &channels = codecInfo->GetSupportedChannel();
+    channelCountRange->minVal = channels.minVal;
+    channelCountRange->maxVal = channels.maxVal;
     return AV_ERR_OK;
 }
 
@@ -213,13 +211,12 @@ OH_AVErrCode OH_AVCapability_GetVideoSupportedPixelFormats(OH_AVCapability *capa
                                                            uint32_t *pixFormatNum)
 {
     if (capability == nullptr) {
-        std::vector<int32_t> empty;
-        *pixFormats = empty.data();
-        *pixFormatNum = empty.size();
+        *pixFormats = nullptr;
+        *pixFormatNum = 0;
         return AV_ERR_INVALID_VAL;
     }
-    std::shared_ptr<AudioCaps> codecInfo = std::make_shared<AudioCaps>(capability->capabilityData_);
-    auto vec = codecInfo->GetSupportedFormats();
+    std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
+    const auto &vec = codecInfo->GetSupportedFormats();
     *pixFormats = vec.data();
     *pixFormatNum = vec.size();
     return AV_ERR_OK;
@@ -256,7 +253,7 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthRangeForHeight(OH_AVCapability *capabi
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto width = codecInfo->GetVideoWidthRangeForHeight(height);
+    const auto &width = codecInfo->GetVideoWidthRangeForHeight(height);
     widthRange->minVal = width.minVal;
     widthRange->maxVal = width.maxVal;
     return AV_ERR_OK;
@@ -271,7 +268,7 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightRangeForWidth(OH_AVCapability *capabi
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto height = codecInfo->GetVideoHeightRangeForWidth(width);
+    const auto &height = codecInfo->GetVideoHeightRangeForWidth(width);
     heightRange->minVal = height.minVal;
     heightRange->maxVal = height.maxVal;
     return AV_ERR_OK;
@@ -285,7 +282,7 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthRange(OH_AVCapability *capability, OH_
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto width = codecInfo->GetSupportedWidth();
+    const auto &width = codecInfo->GetSupportedWidth();
     widthRange->minVal = width.minVal;
     widthRange->maxVal = width.maxVal;
     return AV_ERR_OK;
@@ -300,7 +297,7 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightRange(OH_AVCapability *capability, OH
     }
 
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto height = codecInfo->GetSupportedHeight();
+    const auto &height = codecInfo->GetSupportedHeight();
     heightRange->minVal = height.minVal;
     heightRange->maxVal = height.maxVal;
     return AV_ERR_OK;
@@ -323,9 +320,9 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRange(OH_AVCapability *capability,
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> videoCap = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto ret = videoCap->GetSupportedFrameRate();
-    frameRateRange->minVal = ret.minVal;
-    frameRateRange->maxVal = ret.maxVal;
+    const auto &frameRate = videoCap->GetSupportedFrameRate();
+    frameRateRange->minVal = frameRate.minVal;
+    frameRateRange->maxVal = frameRate.maxVal;
     return AV_ERR_OK;
 }
 
@@ -338,9 +335,9 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capa
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> videoCap = std::make_shared<VideoCaps>(capability->capabilityData_);
-    auto ret = videoCap->GetSupportedFrameRatesFor(width, height);
-    frameRateRange->minVal = ret.minVal;
-    frameRateRange->maxVal = ret.maxVal;
+    const auto &frameRate = videoCap->GetSupportedFrameRatesFor(width, height);
+    frameRateRange->minVal = frameRate.minVal;
+    frameRateRange->maxVal = frameRate.maxVal;
     return AV_ERR_OK;
 }
 

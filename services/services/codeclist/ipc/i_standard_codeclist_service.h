@@ -30,7 +30,7 @@ public:
     virtual std::string FindDecoder(const Format &format) = 0;
     virtual std::string FindEncoder(const Format &format) = 0;
     virtual CapabilityData GetCapability(const std::string &mime, const bool isEncoder,
-                                         const AVCodecCategory category) = 0;
+                                         const AVCodecCategory &category) = 0;
     virtual int32_t DestroyStub() = 0;
 
     /**
