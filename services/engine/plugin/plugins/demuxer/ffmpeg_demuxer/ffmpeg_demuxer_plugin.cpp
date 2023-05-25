@@ -152,11 +152,19 @@ FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin");
     selectedTrackIds_.clear();
-    for (auto it:sampleCache_) {
+    for (auto& it : sampleCache_) {
+        if (it.second == nullptr) {
+            continue;
+        }
+        if (!it.second->Empty()) {
+            for (auto ele = it.second->Pop(); ele != nullptr; ) {
+                av_packet_free(&(ele->pkt_));
+                ele = nullptr;
+            }
+        }
         it.second->Clear();
-        sampleCache_.erase(it.first);
+        it.second = nullptr;
     }
-    formatContext_ = nullptr;
 }
 
 int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
