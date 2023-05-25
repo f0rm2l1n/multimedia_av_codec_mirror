@@ -16,13 +16,13 @@
 #ifndef AUDIO_FFMPEG_VORBIS_DECODER_PLUGIN_H
 #define AUDIO_FFMPEG_VORBIS_DECODER_PLUGIN_H
 
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "audio_ffmpeg_decoder_plugin.h"
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegVorbisDecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegVorbisDecoderPlugin> {
+class AudioFFMpegVorbisDecoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegVorbisDecoderPlugin> {
 public:
     AudioFFMpegVorbisDecoderPlugin();
     ~AudioFFMpegVorbisDecoderPlugin() override;
@@ -39,7 +39,7 @@ public:
 
     const static std::string identify()
     {
-        return std::string(AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY);
+        return std::string(AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME);
     }
 
 private:

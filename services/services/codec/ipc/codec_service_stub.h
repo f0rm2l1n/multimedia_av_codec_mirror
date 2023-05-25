@@ -51,6 +51,7 @@ public:
     int32_t GetOutputFormat(Format &format) override;
     int32_t ReleaseOutputBuffer(uint32_t index, bool render) override;
     int32_t SetParameter(const Format &format) override;
+    int32_t GetInputFormat(Format &format) override;
 
     int32_t DestroyStub() override;
 
@@ -76,6 +77,7 @@ private:
     int32_t GetOutputFormat(MessageParcel &data, MessageParcel &reply);
     int32_t ReleaseOutputBuffer(MessageParcel &data, MessageParcel &reply);
     int32_t SetParameter(MessageParcel &data, MessageParcel &reply);
+    int32_t GetInputFormat(MessageParcel &data, MessageParcel &reply);
     int32_t DestroyStub(MessageParcel &data, MessageParcel &reply);
 
     std::shared_ptr<ICodecService> codecServer_ = nullptr;

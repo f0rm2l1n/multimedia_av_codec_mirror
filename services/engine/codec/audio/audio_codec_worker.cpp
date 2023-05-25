@@ -27,13 +27,13 @@ constexpr uint8_t LOGD_FREQUENCY = 5;
 namespace OHOS {
 namespace Media {
 constexpr short DEFAULT_TRY_DECODE_TIME = 10;
-constexpr int timeoutMs = 1000;
+constexpr int TIMEOUT_MS = 1000;
 const std::string_view INPUT_BUFFER = "inputBuffer";
 const std::string_view OUTPUT_BUFFER = "outputBuffer";
 const std::string_view ASYNC_HANDLE_INPUT = "AsyncHandleInput";
 const std::string_view ASYNC_DECODE_FRAME = "AsyncDecodeFrame";
 
-AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioFFMpegBaseCodec> &codec,
+AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioBaseCodec> &codec,
                                    const std::shared_ptr<AVCodecCallback> &callback)
     : isFirFrame_(true),
       isRunning(true),
@@ -275,7 +275,7 @@ void AudioCodecWorker::produceInputBuffer()
     }
 
     std::unique_lock lock(inputMuxt_);
-    inputCondition_.wait_for(lock, std::chrono::milliseconds(timeoutMs),
+    inputCondition_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_MS),
                              [this] { return (isProduceInput.load() || !isRunning); });
     AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Worker produceInputBuffer exit");
 }
@@ -340,7 +340,7 @@ void AudioCodecWorker::consumerOutputBuffer()
         }
     }
     std::unique_lock lock(outputMuxt_);
-    outputCondition_.wait_for(lock, std::chrono::milliseconds(timeoutMs),
+    outputCondition_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_MS),
                               [this] { return (inBufIndexQue_.size() > 0 || !isRunning); });
     AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Work consumerOutputBuffer exit");
 }

@@ -38,7 +38,7 @@ namespace Plugin {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "Source"};
 
-    inline bool FileIsExists (const char* name)
+    inline bool FileIsExists(const char* name)
     {
         struct stat buffer;
         return (stat(name, &buffer) == 0);
@@ -565,10 +565,10 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
                          customIOContext->offset, customIOContext->fileSize);
             return AVCS_ERR_SEEK_FAILED;
         }
-        if (static_cast<size_t>(customIOContext->offset+bufSize) > customIOContext->fileSize) {
+        if (static_cast<size_t>(customIOContext->offset + bufSize) > customIOContext->fileSize) {
             readSize = customIOContext->fileSize - customIOContext->offset;
         }
-        if (buf!=nullptr && bufferVector->GetMemory()!=nullptr) {
+        if (buf != nullptr && bufferVector->GetMemory() != nullptr) {
             auto memSize = static_cast<int>(bufferVector->GetMemory()->GetCapacity());
             readSize = (readSize > memSize) ? memSize : readSize;
         }
@@ -589,7 +589,7 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
             customIOContext->offset += rtv;
             customIOContext->position += rtv;
         } else if (static_cast<int>(result) == 1) {
-            customIOContext->eof=true;
+            customIOContext->eof = true;
             rtv = AVERROR_EOF;
         } else {
             AVCODEC_LOGE("AVReadPacket failed with rtv = %{public}d", static_cast<int>(result));
@@ -605,6 +605,7 @@ int32_t Source::InitAVFormatContext()
         AVCODEC_LOGE("InitAVFormatContext failed, because  alloc AVFormatContext failed.");
         return AVCS_ERR_INVALID_OPERATION;
     }
+
     InitAVIOContext(AVIO_FLAG_READ);
     if (avioContext_ == nullptr) {
         AVCODEC_LOGE("InitAVFormatContext failed, because  init AVIOContext failed.");
@@ -612,22 +613,29 @@ int32_t Source::InitAVFormatContext()
     }
     formatContext->pb = avioContext_;
     formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
-    int32_t ret = -1;
-    ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
-    if (ret == 0) {
-        formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
-            if (ptr) {
-                auto ctx = ptr->pb;
-                if (ctx) {
-                    av_freep(&ctx->buffer);
-                    av_free(ctx);
-                }
-            }
-        });
-    } else {
+
+    int32_t ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
+    if (ret != 0) {
         AVCODEC_LOGE("avformat_open_input failed by %{public}s", inputFormat_->name);
         return AVCS_ERR_INVALID_OPERATION;
     }
+
+    ret = avformat_find_stream_info(formatContext, NULL);
+    if (ret < 0) {
+        AVCODEC_LOGE("avformat_find_stream_info failed by %{public}s", inputFormat_->name);
+        return AVCS_ERR_INVALID_OPERATION;
+    }
+
+    formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
+        if (ptr) {
+            auto ctx = ptr->pb;
+            if (ctx) {
+                av_freep(&ctx->buffer);
+                av_free(ctx);
+            }
+        }
+    });
+
     return AVCS_ERR_OK;
 }
 

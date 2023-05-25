@@ -52,11 +52,11 @@ public:
     };
 
 private:
-    int32_t StartThread(std::string name);
+    int32_t StartThread(const std::string &name);
     int32_t StopThread() noexcept;
     void ThreadProcessor();
-    bool CanAddTrack(std::string &mimeType);
-    bool CheckKeys(std::string &mimeType, const MediaDescription &trackDesc);
+    bool CanAddTrack(const std::string &mimeType);
+    bool CheckKeys(const std::string &mimeType, const MediaDescription &trackDesc);
     std::string ConvertStateToString(State state);
     int32_t TranslatePluginStatus(Plugin::Status error);
     TrackMimeType GetTrackMimeType(const std::string &mime);

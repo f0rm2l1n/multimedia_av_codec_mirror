@@ -17,7 +17,7 @@
 #define AV_CODEC_ADIO_CODEC_WORKER_H
 
 #include "audio_buffers_manager.h"
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
 #include "nocopyable.h"
@@ -31,8 +31,7 @@ namespace OHOS {
 namespace Media {
 class AudioCodecWorker : public NoCopyable {
 public:
-    AudioCodecWorker(const std::shared_ptr<AudioFFMpegBaseCodec> &codec,
-                     const std::shared_ptr<AVCodecCallback> &callback);
+    AudioCodecWorker(const std::shared_ptr<AudioBaseCodec> &codec, const std::shared_ptr<AVCodecCallback> &callback);
 
     ~AudioCodecWorker();
 
@@ -69,7 +68,7 @@ private:
     bool isFirFrame_;
     std::atomic<bool> isRunning;
     std::atomic<bool> isProduceInput;
-    std::shared_ptr<AudioFFMpegBaseCodec> codec_;
+    std::shared_ptr<AudioBaseCodec> codec_;
     uint32_t inputBufferSize;
     uint32_t outputBufferSize;
     std::mutex stateMutex_;

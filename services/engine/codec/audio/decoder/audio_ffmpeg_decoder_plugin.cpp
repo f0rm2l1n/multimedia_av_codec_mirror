@@ -18,6 +18,7 @@
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "media_description.h"
+#include "ffmpeg_converter.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFfmpegDecoderPlugin"};
@@ -50,16 +51,12 @@ AudioFfmpegDecoderPlugin::~AudioFfmpegDecoderPlugin()
 
 int32_t AudioFfmpegDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
-    int32_t ret = AVCodecServiceErrCode::AVCS_ERR_OK;
-    {
-        std::unique_lock lock(avMutext_);
-        if (avCodecContext_ == nullptr) {
-            AVCODEC_LOGE("avCodecContext_ is nullptr");
-            return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
-        }
-        ret = SendBuffer(inputBuffer);
+    if (avCodecContext_ == nullptr) {
+        AVCODEC_LOGE("avCodecContext_ is nullptr");
+        return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
     }
-    return ret;
+    std::unique_lock lock(avMutext_);
+    return SendBuffer(inputBuffer);
 }
 
 static std::string AVStrError(int errnum)
@@ -102,13 +99,13 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
     if (ret == 0) {
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     } else if (ret == AVERROR(EAGAIN)) {
-        AVCODEC_LOGE("ret=%{public}d", ret);
+        AVCODEC_LOGW("skip this frame because data not enough: %{public}d", ret);
         return AVCodecServiceErrCode::AVCS_ERR_AGAIN;
     } else if (ret == AVERROR_EOF) {
-        AVCODEC_LOGE("ret=%{public}d", ret);
+        AVCODEC_LOGW("eos send frame:%{public}d", ret);
         return AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM;
     } else {
-        AVCODEC_LOGE("ret=%{public}d", ret);
+        AVCODEC_LOGE("ffmpeg error message:%{public}s", AVStrError(ret).data());
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
 }
@@ -164,10 +161,10 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveBuffer(std::shared_ptr<AudioBufferInfo>
         avcodec_flush_buffers(avCodecContext_.get());
         status = AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM;
     } else if (ret == AVERROR(EAGAIN)) {
-        AVCODEC_LOGE("audio decoder not enough data");
+        AVCODEC_LOGW("audio decoder not enough data");
         status = AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA;
     } else {
-        AVCODEC_LOGE("audio decoder receive unknow error");
+        AVCODEC_LOGE("audio decoder receive unknow error,ffmpeg error message:%{public}s", AVStrError(ret).data());
         status = AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
     av_frame_unref(cachedFrame_.get());
@@ -183,7 +180,7 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveFrameSucc(std::shared_ptr<AudioBufferIn
     int32_t outputSize = samples * bytePerSample * channels;
     auto ioInfoMem = outBuffer->GetBuffer();
     if (ioInfoMem->GetSize() < outputSize) {
-        AVCODEC_LOGW("output buffer size is not enough");
+        AVCODEC_LOGE("output buffer size is not enough,output size:%{public}d", outputSize);
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
     }
     if (av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
@@ -194,6 +191,14 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveFrameSucc(std::shared_ptr<AudioBufferIn
         }
     } else {
         ioInfoMem->Write(cachedFrame_->data[0], outputSize);
+    }
+    if (outBuffer->CheckIsFirstFrame()) {
+        format_.PutIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE,
+                            FFMpegConverter::ConvertFFMpegToOHAudioFormat(avCodecContext_->sample_fmt));
+        auto layout = FFMpegConverter::ConvertFFToOHAudioChannelLayout(avCodecContext_->channel_layout);
+        AVCODEC_LOGI("recode output description,layout:%{public}s",
+                     FFMpegConverter::ConvertOHAudioChannelLayoutToString(layout).data());
+        format_.PutLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, static_cast<uint64_t>(layout));
     }
     auto attr = outBuffer->GetBufferAttr();
     attr.presentationTimeUs = static_cast<uint64_t>(cachedFrame_->pts);

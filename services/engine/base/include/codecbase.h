@@ -45,6 +45,7 @@ public:
     virtual int32_t SetOutputSurface(sptr<Surface> surface);
     virtual int32_t RenderOutputBuffer(uint32_t index);
     virtual int32_t SignalRequestIDRFrame();
+    virtual int32_t GetInputFormat(Format& format);
 };
 } // namespace Media
 } // namespace OHOS
