@@ -26,14 +26,14 @@
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceStub"};
 
-    const std::map<int32_t, std::string> CODECLIST_FUNC_NAME = {
-        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_DECODER,
+    const std::map<uint32_t, std::string> CODECLIST_FUNC_NAME = {
+        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_DECODER),
             "CodecListServiceStub DoFindDecoder" },
-        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_ENCODER,
+        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_ENCODER),
             "CodecListServiceStub DoFindEncoder" },
-        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::CREATE_CAPABILITY,
-            "CodecListServiceStub DoCreateCapability" },
-        { OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::DESTROY,
+        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::GET_CAPABILITY),
+            "CodecListServiceStub DoGetCapability" },
+        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::DESTROY),
             "CodecListServiceStub DoDestroyStub" },
     };
 }
