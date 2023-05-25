@@ -19,6 +19,7 @@
 #include "avcodec_errors.h"
 #include "media_description.h"
 #include "securec.h"
+#include "avcodec_mime_type.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegVorbisEncoderPlugin"};
@@ -155,7 +156,9 @@ int32_t AudioFFMpegVorbisDecoderPlugin::GetOutputBufferSize() const
 
 Format AudioFFMpegVorbisDecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_VORBIS);
+    return format;
 }
 } // namespace Media
 } // namespace OHOS

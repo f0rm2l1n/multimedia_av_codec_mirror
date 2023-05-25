@@ -50,7 +50,7 @@ constexpr struct {
     const char *ffmpegCodec;
     const bool isEncoder;
 } SupportCodec[] = {
-    {AVCodecCodecName::VIDEO_DECODER_AVC_NAME_KEY, CodecMimeType::VIDEO_AVC, "h264", false},
+    {AVCodecCodecName::VIDEO_DECODER_AVC_NAME, CodecMimeType::VIDEO_AVC, "h264", false},
 };
 constexpr uint32_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
 }

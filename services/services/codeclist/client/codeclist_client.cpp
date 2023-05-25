@@ -64,7 +64,7 @@ std::string CodecListClient::FindEncoder(const Format &format)
     return codecListProxy_->FindEncoder(format);
 }
 
-CapabilityData CodecListClient::GetCapability(std::string mime, bool isEncoder, AVCodecCategory category)
+CapabilityData CodecListClient::GetCapability(const std::string &mime, bool isEncoder, AVCodecCategory category)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CapabilityData capData;

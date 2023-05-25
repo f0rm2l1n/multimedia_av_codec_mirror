@@ -17,6 +17,7 @@
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "media_description.h"
+#include "avcodec_mime_type.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
@@ -107,7 +108,9 @@ int32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
 
 Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG);
+    return format;
 }
 
 int32_t AudioFFMpegMp3DecoderPlugin::Checkinit(const Format &format)

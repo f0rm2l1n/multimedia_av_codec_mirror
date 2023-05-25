@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef CODEC_UTILS_H
-#define CODEC_UTILS_H
+#ifndef FFMPEG_CONVERTER_H
+#define FFMPEG_CONVERTER_H
+
+#include <string_view>
 #include "avcodec_audio_common.h"
 #include "avcodec_audio_channel_layout.h"
 #ifdef __cplusplus
@@ -30,6 +32,7 @@ class FFMpegConverter {
 public:
     static AudioSampleFormat ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleformate);
     static AudioChannelLayout ConvertFFToOHAudioChannelLayout(uint64_t ffChannelLayout);
+    static std::string_view ConvertOHAudioChannelLayoutToString(AudioChannelLayout layout);
 
 private:
     FFMpegConverter() = delete;

@@ -67,7 +67,7 @@ void AEnInnerDemo::RunCase()
 
 int32_t AEnInnerDemo::CreateDec()
 {
-    audioEn_ = AudioEncoderFactory::CreateByName((AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY).data());
+    audioEn_ = AudioEncoderFactory::CreateByName((AVCodecCodecName::AUDIO_ENCODER_AAC_NAME).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEn_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = make_shared<AEnSignal>();

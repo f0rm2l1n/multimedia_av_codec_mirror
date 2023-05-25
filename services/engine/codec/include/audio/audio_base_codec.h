@@ -25,11 +25,11 @@
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegBaseCodec : public AVCodecBaseFactory<AudioFFMpegBaseCodec, std::string>, public NoCopyable {
+class AudioBaseCodec : public AVCodecBaseFactory<AudioBaseCodec, std::string>, public NoCopyable {
 public:
-    AudioFFMpegBaseCodec() = default;
+    AudioBaseCodec() = default;
 
-    virtual ~AudioFFMpegBaseCodec() = default;
+    virtual ~AudioBaseCodec() = default;
 
     virtual int32_t Init(const Format &format) = 0;
 

@@ -133,7 +133,7 @@ std::string ErrorMessageOk(const std::string& param1, const std::string& param2)
 
 std::string ErrorMessageNoPermission(const std::string& param1, const std::string& param2)
 {
-    std::string message = "Try to do " + param1 + " failed. User should request permission " + param2 +" first.";
+    std::string message = "Try to do " + param1 + " failed. User should request permission " + param2 + " first.";
     return message;
 }
 

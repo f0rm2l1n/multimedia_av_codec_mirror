@@ -18,6 +18,7 @@
 #include "avcodec_errors.h"
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
+#include "avcodec_mime_type.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
@@ -35,8 +36,7 @@ static const uint32_t flacEncoderBitsSampleTable[] = {16, 24, 32};
 
 namespace OHOS {
 namespace Media {
-AudioFFMpegFlacEncoderPlugin::AudioFFMpegFlacEncoderPlugin()
-    : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>())
+AudioFFMpegFlacEncoderPlugin::AudioFFMpegFlacEncoderPlugin() : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>())
 {
 }
 
@@ -169,7 +169,9 @@ int32_t AudioFFMpegFlacEncoderPlugin::GetOutputBufferSize() const
 
 Format AudioFFMpegFlacEncoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC);
+    return format;
 }
 } // namespace Media
 } // namespace OHOS

@@ -16,13 +16,13 @@
 #ifndef AUDIO_FFMPEG_FLAC_ENCODER_PLUGIN_H
 #define AUDIO_FFMPEG_FLAC_ENCODER_PLUGIN_H
 
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "audio_ffmpeg_encoder_plugin.h"
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegFlacEncoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegFlacEncoderPlugin> {
+class AudioFFMpegFlacEncoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegFlacEncoderPlugin> {
 public:
     AudioFFMpegFlacEncoderPlugin();
     ~AudioFFMpegFlacEncoderPlugin() override;
@@ -39,7 +39,7 @@ public:
 
     const static std::string Identify()
     {
-        return std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY);
+        return std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME);
     }
 
 private:

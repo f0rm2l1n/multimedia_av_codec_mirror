@@ -17,18 +17,18 @@
 #define CODEC_EENGIN_AUDIO_FFMPEG_ADAPTER_H
 
 #include "audio_codec_worker.h"
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "avcodec_common.h"
 #include "codecbase.h"
 #include "nocopyable.h"
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegAdapter : public CodecBase, public NoCopyable {
+class AudioCodecAdapter : public CodecBase, public NoCopyable {
 public:
-    explicit AudioFFMpegAdapter(const std::string &name);
+    explicit AudioCodecAdapter(const std::string &name);
 
-    ~AudioFFMpegAdapter() override;
+    ~AudioCodecAdapter() override;
 
     int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) override;
 
@@ -62,7 +62,7 @@ private:
     std::atomic<CodecState> state_;
     const std::string name_;
     std::shared_ptr<AVCodecCallback> callback_;
-    std::shared_ptr<AudioFFMpegBaseCodec> audioCodec;
+    std::shared_ptr<AudioBaseCodec> audioCodec;
     std::shared_ptr<AudioCodecWorker> worker_;
 
 private:

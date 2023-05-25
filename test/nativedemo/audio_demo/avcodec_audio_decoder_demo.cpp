@@ -174,13 +174,13 @@ ADecDemo::~ADecDemo()
 int32_t ADecDemo::CreateDec()
 {
     if (audioType_ == TYPE_AAC) {
-        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY).data());
+        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_AAC_NAME).data());
     } else if (audioType_ == TYPE_FLAC) {
-        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY).data());
+        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_FLAC_NAME).data());
     } else if (audioType_ == TYPE_MP3) {
-        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY).data());
+        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
     } else if (audioType_ == TYPE_VORBIS) {
-        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY).data());
+        audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME).data());
     } else {
         return AVCS_ERR_INVALID_VAL;
     }
