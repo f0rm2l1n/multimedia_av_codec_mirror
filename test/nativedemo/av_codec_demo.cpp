@@ -59,9 +59,7 @@ static int RunAudioDecoder()
         return 0;
     }
     auto audioDec = std::make_unique<ADecDemo>();
-    if (audioDec) {
-        audioDec->RunCase(audioFormatType);
-    }
+    audioDec->RunCase(audioFormatType);
     cout << "demo audio decoder end" << endl;
     return 0;
 }
@@ -76,15 +74,11 @@ static int RunAudioEncoder()
     (void)getline(cin, mode);
     if (mode == "" || mode == "0") {
         auto audioEnc = std::make_unique<AEncAacDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
+        audioEnc->RunCase();
     } else if (mode == "1") {
         auto audioEnc = std::make_unique<AEncFlacDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
-    } else {
+        audioEnc->RunCase();
+    }  else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -103,25 +97,17 @@ static int RunAudioInnerDecoder()
     (void)getline(cin, mode);
     if (mode == "" || mode == "0") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioDec->RunCase();
     } else if (mode == "1") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioDec->RunCase();
     } else if (mode == "2") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioDec->RunCase();
     } else if (mode == "3") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
-    } else {
+        audioDec->RunCase();
+    }  else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -138,15 +124,11 @@ static int RunAudioInnerEncoder()
     (void)getline(cin, mode);
     if (mode == "" || mode == "0") {
         auto audioEnc = std::make_unique<AEnInnerDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
+        audioEnc->RunCase();
     } else if (mode == "1") {
         auto audioEnc = std::make_unique<AEnInnerDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
-    } else {
+        audioEnc->RunCase();
+    }  else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -205,13 +187,8 @@ static void OptionPrint()
     cout << "10:Video Inner Decoder (surface mode)" << endl;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-    constexpr int minRequiredArgCount = 2;
-    string path;
-    if (argc >= minRequiredArgCount && argv[1] != nullptr) {
-        path = argv[1];
-    }
     OptionPrint();
     string mode;
     (void)getline(cin, mode);

@@ -62,13 +62,13 @@ public:
 
     int32_t CloseCtxLocked();
 
-    int64_t GetMaxInputSize() const noexcept;
+    int32_t GetMaxInputSize() const noexcept;
 
-    bool hasExtraData() const noexcept;
+    bool HasExtraData() const noexcept;
 
 private:
     bool hasExtra_;
-    int64_t maxInputSize_;
+    int32_t maxInputSize_;
     int32_t bufferNum_;
     int32_t bufferIndex_;
     int64_t preBufferGroupPts_;
