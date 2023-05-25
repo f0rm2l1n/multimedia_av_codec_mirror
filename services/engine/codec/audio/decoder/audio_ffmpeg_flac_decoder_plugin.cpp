@@ -25,10 +25,10 @@ constexpr int32_t GET_INPUT_BUFFER_SIZE = 65536;
 constexpr int32_t GET_OUTPUT_BUFFER_SIZE = 65536;
 constexpr int32_t MIN_CHANNELS = 1;
 constexpr int32_t MAX_CHANNELS = 8;
-static const uint32_t flac_encoder_sample_rate_table[] = {
+static const uint32_t flacEncoderSampleRateTable[] = {
     0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
-static const uint32_t flac_encoder_bits_sample_table[] = {16, 24, 32};
+static const uint32_t flacEncoderBitsSampleTable[] = {16, 24, 32};
 }
 
 namespace OHOS {
@@ -44,20 +44,20 @@ AudioFFMpegFlacDecoderPlugin::~AudioFFMpegFlacDecoderPlugin()
     basePlugin = nullptr;
 }
 
-static bool CheckSampleRate(uint32_t sample_rate)
+static bool CheckSampleRate(uint32_t sampleRate)
 {
-    for (auto i : flac_encoder_sample_rate_table) {
-        if (i == sample_rate) {
+    for (auto i : flacEncoderSampleRateTable) {
+        if (i == sampleRate) {
             return true;
         }
     }
     return false;
 }
 
-static bool CheckBitsPerSample(uint32_t bits_per_coded_sample)
+static bool CheckBitsPerSample(uint32_t bitsPerCodedSample)
 {
-    for (auto i : flac_encoder_bits_sample_table) {
-        if (i == bits_per_coded_sample) {
+    for (auto i : flacEncoderBitsSampleTable) {
+        if (i == bitsPerCodedSample) {
             return true;
         }
     }
@@ -67,19 +67,19 @@ static bool CheckBitsPerSample(uint32_t bits_per_coded_sample)
 int32_t AudioFFMpegFlacDecoderPlugin::CheckFormat(const Format &format) const
 {
     int32_t channels;
-    int32_t sample_rate;
-    int32_t bits_per_coded_sample;
+    int32_t sampleRate;
+    int32_t bitsPerCodedSample;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bits_per_coded_sample);
-    if (!CheckSampleRate(sample_rate)) {
-        AVCODEC_LOGE("init failed, because sample rate=%{public}d not in table.", sample_rate);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
+    if (!CheckSampleRate(sampleRate)) {
+        AVCODEC_LOGE("init failed, because sampleRate=%{public}d not in table.", sampleRate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
     } else if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
         AVCODEC_LOGE("init failed, because channels=%{public}d not support.", channels);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
-    } else if (!CheckBitsPerSample(bits_per_coded_sample)) {
-        AVCODEC_LOGE("init failed, because bits_per_coded_sample=%{public}d not support.", bits_per_coded_sample);
+    } else if (!CheckBitsPerSample(bitsPerCodedSample)) {
+        AVCODEC_LOGE("init failed, because bitsPerCodedSample=%{public}d not support.", bitsPerCodedSample);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
     }
     return AVCodecServiceErrCode::AVCS_ERR_OK;

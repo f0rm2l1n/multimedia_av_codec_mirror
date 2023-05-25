@@ -34,8 +34,8 @@ namespace Media {
 AudioFFMpegMp3DecoderPlugin::AudioFFMpegMp3DecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
     channels = 0;
-    sample_rate = 0;
-    bit_rate = 0;
+    sampleRate = 0;
+    bitRate = 0;
 }
 
 AudioFFMpegMp3DecoderPlugin::~AudioFFMpegMp3DecoderPlugin()
@@ -91,7 +91,7 @@ int32_t AudioFFMpegMp3DecoderPlugin::Flush()
 
 int32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 {
-    auto size = bit_rate / BIT_RATE_RATIO;
+    auto size = bitRate / BIT_RATE_RATIO;
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > size) {
         maxSize = size;
@@ -101,7 +101,7 @@ int32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 
 int32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
 {
-    int32_t size = (sample_rate / SAMPLE_RATE_RATIO + BUFFER_DIFF) * channels * sizeof(short);
+    int32_t size = (sampleRate / SAMPLE_RATE_RATIO + BUFFER_DIFF) * channels * sizeof(short);
     return size;
 }
 
@@ -112,20 +112,20 @@ Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
 
 int32_t AudioFFMpegMp3DecoderPlugin::Checkinit(const Format &format)
 {
-    int sample_rate_pick[SUPPORT_SAMPLE_RATE] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
+    int sampleRatePick[SUPPORT_SAMPLE_RATE] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bit_rate);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
+    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bitRate);
     if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
-    if (bit_rate > MAX_BIT_RATE) {
+    if (bitRate > MAX_BIT_RATE) {
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
     for (int i = 0; i < SUPPORT_SAMPLE_RATE; i++) {
-        if (sample_rate == sample_rate_pick[i]) {
+        if (sampleRate == sampleRatePick[i]) {
             break;
         } else if (i == SUPPORT_SAMPLE_RATE - 1) {
             return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;

@@ -45,8 +45,8 @@ public:
 private:
     int32_t Checkinit(const Format &format);
     int channels;
-    int sample_rate;
-    int64_t bit_rate;
+    int sampleRate;
+    int64_t bitRate;
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
 } // namespace Media
