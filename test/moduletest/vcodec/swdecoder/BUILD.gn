@@ -19,8 +19,8 @@ module_output_path = "av_codec/moduletest"
 
 swdecoder_moduletest_native_include_dirs = [
   "./include",
-  "//graphic/graphic_2d/interfaces/innerkits/surface",
-  "//foundation//window/window_manager/interfaces/innerkits/wm",
+  "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/interfaces/innerkits/surface",
+  "$MEDIA_ROOT_DIR/../../window/window_manager/interfaces/innerkits/wm",
   "$MEDIA_ROOT_DIR/interfaces/inner_api/native",
   "$MEDIA_ROOT_DIR/interfaces/kits/c",
 ]
@@ -70,14 +70,14 @@ ohos_unittest("swdecoder_native_module_test") {
   }
 
   deps = [
-    "//foundation/graphic/graphic_2d:libsurface",
-    "//foundation/graphic/graphic_2d/frameworks/surface:surface",
-    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
-    "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
-    "//foundation/multimedia/av_codec/interfaces/kits/c:native_av_codec_core",
-    "//foundation/multimedia/av_codec/interfaces/kits/c:native_av_codec_codec",
-    "//foundation/window/window_manager/wm:libwm",
+    "$MEDIA_ROOT_DIR/../../graphic/graphic_2d:libsurface",
+    "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/frameworks/surface:surface",
+    "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
+    "$MEDIA_ROOT_DIR/interfaces/inner_api/native:av_codec_client",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_core",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_codec",
+    "$MEDIA_ROOT_DIR/../../window/window_manager/wm:libwm",
   ]
 
-  resource_config_file = "//foundation/multimedia/av_codec/test/moduletest/resources/ohos_test.xml"
+  resource_config_file = "$MEDIA_ROOT_DIR/test/moduletest/resources/ohos_test.xml"
 }
