@@ -140,7 +140,7 @@ public:
     /**
      * Key for video maxtrix coefficients, value type is int32_t, see {link @MaxtrixCoefficient}
      */
-    static constexpr std::string_view MD_KEY_MAXTRIX_COEFFICIENTS = "matrix_coefficients";
+    static constexpr std::string_view MD_KEY_MATRIX_COEFFICIENTS = "matrix_coefficients";
 
     /**
      * Key for video encode bitrate mode, the value type is int32_t, see {link @VideoEncodeBitrateMode}
