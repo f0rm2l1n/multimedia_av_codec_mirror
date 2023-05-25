@@ -24,7 +24,6 @@ constexpr int32_t FRAME_RATE_30 = 30;
 constexpr int32_t BLOCK_SIZE_MIN = 2;
 constexpr int32_t BASE_BLOCK_PER_FRAME = 99;
 constexpr int32_t BASE_BLOCK_PER_SECOND = 1485;
-constexpr double EPSLON = 1e-6;
 } // namespace
 namespace OHOS {
 namespace Media {
@@ -343,7 +342,7 @@ void VideoCaps::InitParams()
     if (data_.height.minVal == 0 || data_.height.maxVal == 0) {
         data_.height = Range(1, INT32_MAX);
     }
-    if (data_.frameRate.minVal == 0 || data_.frameRate.maxVal == 0) {
+    if (data_.frameRate.maxVal == 0) {
         data_.frameRate = Range(1, FRAME_RATE_30);
     }
     if (data_.blockSize.width == 0 || data_.blockSize.height == 0) {
@@ -427,7 +426,7 @@ bool VideoCaps::IsSizeAndRateSupported(int32_t width, int32_t height, double fra
                      height);
         return false;
     }
-    if (fabs(data_.frameRate.minVal - frameRate) > EPSLON || fabs(frameRate - data_.frameRate.maxVal) > EPSLON) {
+    if (data_.frameRate.minVal >= frameRate || frameRate > data_.frameRate.maxVal) {
         AVCODEC_LOGD("The %{public}s can not support frameRate:%{public}lf", data_.codecName.c_str(), frameRate);
         return false;
     }

@@ -34,7 +34,7 @@ AudioCodecAdapter::~AudioCodecAdapter()
 {
     callback_ = nullptr;
     if (audioCodec) {
-        audioCodec->release();
+        audioCodec->Release();
     }
     state_ = CodecState::RELEASED;
     audioCodec = nullptr;
@@ -170,7 +170,7 @@ int32_t AudioCodecAdapter::Reset()
     if (worker_) {
         worker_->Release();
     }
-    int32_t status = audioCodec->reset();
+    int32_t status = audioCodec->Reset();
     state_ = CodecState::INITLIZED;
     AVCODEC_LOGI("adapter Reset, state from %{public}s to INITLIZED", stateToString(state_).data());
     return status;
@@ -373,7 +373,7 @@ int32_t AudioCodecAdapter::doConfigure(const Format &format)
         AVCODEC_LOGE("state_=%{public}s", stateToString(state_).data());
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE;
     }
-    int32_t ret = audioCodec->init(format);
+    int32_t ret = audioCodec->Init(format);
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         AVCODEC_LOGE("configure failed, because codec init failed,error:%{public}d.", static_cast<int>(ret));
         state_ = CodecState::RELEASED;
@@ -434,7 +434,7 @@ int32_t AudioCodecAdapter::doFlush()
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE;
     }
 
-    int32_t status = audioCodec->flush();
+    int32_t status = audioCodec->Flush();
 
     worker_->Pause();
 
@@ -454,7 +454,7 @@ int32_t AudioCodecAdapter::doRelease()
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     }
     if (audioCodec != nullptr) {
-        audioCodec->release();
+        audioCodec->Release();
     }
     if (worker_ != nullptr) {
         worker_->Release();
