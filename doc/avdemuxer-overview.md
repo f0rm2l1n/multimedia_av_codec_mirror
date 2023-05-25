@@ -148,14 +148,14 @@
       if(OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, info)) {
          // 处理 buffer 数据
       }
-      if (attr.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
+      if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
          isEnd = true;
       }
       // 获取视频帧数据
       if(OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, info)) {
          // 处理 buffer 数据
       }
-      if (attr.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
+      if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
          isEnd = true;
       }
    }
