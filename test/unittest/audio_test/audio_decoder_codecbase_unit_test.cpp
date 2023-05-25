@@ -18,7 +18,7 @@
 #include <mutex>
 #include <gtest/gtest.h>
 #include "native_avcodec_audiodecoder.h"
-#include "audio_ffmpeg_adapter.h"
+#include "audio_codec_adapter.h"
 #include "format.h"
 #include "avcodec_codec_name.h"
 #include "avcodec_common.h"
@@ -30,9 +30,9 @@ using namespace testing::ext;
 using namespace OHOS::Media;
 
 namespace {
-const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY);
-const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY);
-const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY);
+const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME);
+const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME);
+const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME);
 constexpr uint32_t MAX_CHANNEL_COUNT = 2;
 constexpr uint32_t INVALID_CHANNEL_COUNT = 3;
 constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
@@ -147,7 +147,7 @@ void AudioCodeDecoderUnitTest::TearDown(void)
 
 int32_t AudioCodeDecoderUnitTest::CreateMp3CodecFunc(void)
 {
-    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(CODEC_MP3_NAME);
+    adec_ = std::make_shared<OHOS::Media::AudioCodecAdapter>(CODEC_MP3_NAME);
 
     signal_ = new ADecSignal();
     adec_->SetCallback(
@@ -158,7 +158,7 @@ int32_t AudioCodeDecoderUnitTest::CreateMp3CodecFunc(void)
 
 int32_t AudioCodeDecoderUnitTest::CreateFlacCodecFunc(void)
 {
-    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(CODEC_FLAC_NAME);
+    adec_ = std::make_shared<OHOS::Media::AudioCodecAdapter>(CODEC_FLAC_NAME);
 
     signal_ = new ADecSignal();
     adec_->SetCallback(
@@ -169,7 +169,7 @@ int32_t AudioCodeDecoderUnitTest::CreateFlacCodecFunc(void)
 
 int32_t AudioCodeDecoderUnitTest::CreateAacCodecFunc(void)
 {
-    adec_ = std::make_shared<OHOS::Media::AudioFFMpegAdapter>(CODEC_AAC_NAME);
+    adec_ = std::make_shared<OHOS::Media::AudioCodecAdapter>(CODEC_AAC_NAME);
 
     signal_ = new ADecSignal();
     adec_->SetCallback(

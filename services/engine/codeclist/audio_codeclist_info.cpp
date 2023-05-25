@@ -43,7 +43,7 @@ constexpr int MAX_BIT_RATE_AAC_ENCODER = 448000;
 CapabilityData GetMP3DecoderCapability()
 {
     CapabilityData audioMp3Capability;
-    audioMp3Capability.codecName = AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY;
+    audioMp3Capability.codecName = AVCodecCodecName::AUDIO_DECODER_MP3_NAME;
     audioMp3Capability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
     audioMp3Capability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG;
     audioMp3Capability.isVendor = false;
@@ -57,7 +57,7 @@ CapabilityData GetMP3DecoderCapability()
 CapabilityData GetAacDecoderCapability()
 {
     CapabilityData audioAacCapability;
-    audioAacCapability.codecName = AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY;
+    audioAacCapability.codecName = AVCodecCodecName::AUDIO_DECODER_AAC_NAME;
     audioAacCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
     audioAacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC;
     audioAacCapability.isVendor = false;
@@ -71,7 +71,7 @@ CapabilityData GetAacDecoderCapability()
 CapabilityData GetFlacDecoderCapability()
 {
     CapabilityData audioFlacCapability;
-    audioFlacCapability.codecName = AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY;
+    audioFlacCapability.codecName = AVCodecCodecName::AUDIO_DECODER_FLAC_NAME;
     audioFlacCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
     audioFlacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
     audioFlacCapability.isVendor = false;
@@ -85,7 +85,7 @@ CapabilityData GetFlacDecoderCapability()
 CapabilityData GetVorbisDecoderCapability()
 {
     CapabilityData audioVorbisCapability;
-    audioVorbisCapability.codecName = AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY;
+    audioVorbisCapability.codecName = AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME;
     audioVorbisCapability.codecType = AVCODEC_TYPE_AUDIO_DECODER;
     audioVorbisCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_VORBIS;
     audioVorbisCapability.isVendor = false;
@@ -99,7 +99,7 @@ CapabilityData GetVorbisDecoderCapability()
 CapabilityData GetAacEncoderCapability()
 {
     CapabilityData audioAacCapability;
-    audioAacCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_AAC_NAME_KEY;
+    audioAacCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_AAC_NAME;
     audioAacCapability.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
     audioAacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC;
     audioAacCapability.isVendor = false;
@@ -113,7 +113,7 @@ CapabilityData GetAacEncoderCapability()
 CapabilityData GetFlacEncoderCapability()
 {
     CapabilityData audioFlacCapability;
-    audioFlacCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY;
+    audioFlacCapability.codecName = AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME;
     audioFlacCapability.codecType = AVCODEC_TYPE_AUDIO_ENCODER;
     audioFlacCapability.mimeType = AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC;
     audioFlacCapability.isVendor = false;

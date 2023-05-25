@@ -18,7 +18,7 @@
 
 #include <mutex>
 #include <fstream>
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "nocopyable.h"
 #ifdef __cplusplus
 extern "C" {
