@@ -119,7 +119,8 @@ namespace OHOS {
 namespace Media {
 namespace Plugin {
 namespace Ffmpeg {
-FFmpegMuxerPlugin::FFmpegMuxerPlugin(std::string name, int32_t fd) : MuxerPlugin(std::move(name)), fd_(dup(fd))
+FFmpegMuxerPlugin::FFmpegMuxerPlugin(std::string name, int32_t fd)
+    : MuxerPlugin(std::move(name)), fd_(dup(fd)), isWriteHeader_(false)
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
     if ((fcntl(fd_, F_GETFL, 0) & O_RDWR) != O_RDWR) {
@@ -163,40 +164,10 @@ Status FFmpegMuxerPlugin::SetRotation(int32_t rotation)
 
 Status FFmpegMuxerPlugin::SetCodecParameterOfTrack(AVStream *stream, const MediaDescription &trackDesc)
 {
-    constexpr int32_t mimeTypeLen = 5;
-    bool ret = false;
     uint8_t *extraData = nullptr;
     size_t extraDataSize = 0;
-    std::string mimeType = {};
-    AVCodecID codeID = AV_CODEC_ID_NONE;
-
-    CHECK_AND_RETURN_RET_LOG(trackDesc.GetStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, mimeType),
-        Status::ERROR_MISMATCHED_TYPE, "get mimeType failed!"); // mime
-    AVCODEC_LOGD("mimeType is %{public}s", mimeType.c_str());
-    CHECK_AND_RETURN_RET_LOG(Mime2CodecId(mimeType, codeID), Status::ERROR_INVALID_DATA,
-        "this mimeType do not support! mimeType:%{public}s", mimeType.c_str());
 
     AVCodecParameters *par = stream->codecpar;
-    par->codec_id = codeID;
-    if (!mimeType.compare(0, mimeTypeLen, "audio")) {
-        par->codec_type = AVMEDIA_TYPE_AUDIO; // type
-        ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, par->sample_rate); // sample rate
-        CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get audio sample_rate failed!");
-        ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, par->channels); // channels
-        CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get audio channels failed!");
-    } else if (!mimeType.compare(0, mimeTypeLen, "video") || !mimeType.compare(0, mimeTypeLen, "image")) {
-        if (!mimeType.compare(0, mimeTypeLen, "image")) { // pic
-            stream->disposition = AV_DISPOSITION_ATTACHED_PIC;
-        }
-        par->codec_type = AVMEDIA_TYPE_VIDEO; // type
-        ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_WIDTH, par->width); // width
-        CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get video width failed!");
-        ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, par->height); // height
-        CHECK_AND_RETURN_RET_LOG(ret, Status::ERROR_MISMATCHED_TYPE, "get video height failed!");
-    } else {
-        AVCODEC_LOGD("mimeType %{public}s is unsupported", mimeType.c_str());
-    }
-
     if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_BITRATE)) {
         trackDesc.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, par->bit_rate); // bit rate
     }
@@ -212,18 +183,82 @@ Status FFmpegMuxerPlugin::SetCodecParameterOfTrack(AVStream *stream, const Media
     return Status::NO_ERROR;
 }
 
-Status FFmpegMuxerPlugin::AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc)
+Status FFmpegMuxerPlugin::AddAudioTrack(int32_t &trackIndex, const MediaDescription &trackDesc, AVCodecID codeID)
 {
-    CHECK_AND_RETURN_RET_LOG(outputFormat_ != nullptr, Status::ERROR_NULL_POINTER, "AVOutputFormat is nullptr");
+    int sampleRate = 0;
+    int channels = 0;
+    bool ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate); // sample rate
+    CHECK_AND_RETURN_RET_LOG((ret && sampleRate > 0), Status::ERROR_MISMATCHED_TYPE,
+        "get audio sample_rate failed! sampleRate:%{public}d", sampleRate);
+    ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels); // channels
+    CHECK_AND_RETURN_RET_LOG((ret && channels > 0), Status::ERROR_MISMATCHED_TYPE,
+        "get audio channels failed! channels:%{public}d", channels);
+
     auto st = avformat_new_stream(formatContext_.get(), nullptr);
     CHECK_AND_RETURN_RET_LOG(st != nullptr, Status::ERROR_NO_MEMORY, "avformat_new_stream failed!");
-    st->codecpar->codec_type = AVMEDIA_TYPE_UNKNOWN;
-    st->codecpar->codec_id = AV_CODEC_ID_NONE;
-    trackIndex = st->index;
-
-    // 设置track参数
     ResetCodecParameter(st->codecpar);
-    Status ret = SetCodecParameterOfTrack(st, trackDesc);
+    st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
+    st->codecpar->codec_id = codeID;
+    st->codecpar->sample_rate = sampleRate;
+    st->codecpar->channels = channels;
+    trackIndex = st->index;
+    return SetCodecParameterOfTrack(st, trackDesc);
+}
+
+Status FFmpegMuxerPlugin::AddVideoTrack(int32_t &trackIndex, const MediaDescription &trackDesc,
+                                        AVCodecID codeID, bool isCover)
+{
+    constexpr int maxLength = 65535;
+    int width = 0;
+    int height = 0;
+    bool ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_WIDTH, width); // width
+    CHECK_AND_RETURN_RET_LOG((ret && width > 0 && width < maxLength), Status::ERROR_MISMATCHED_TYPE,
+        "get video width failed! width:%{public}d", width);
+    ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height); // height
+    CHECK_AND_RETURN_RET_LOG((ret && height > 0 && height < maxLength), Status::ERROR_MISMATCHED_TYPE,
+        "get video height failed! height:%{public}d", height);
+
+    auto st = avformat_new_stream(formatContext_.get(), nullptr);
+    CHECK_AND_RETURN_RET_LOG(st != nullptr, Status::ERROR_NO_MEMORY, "avformat_new_stream failed!");
+    ResetCodecParameter(st->codecpar);
+    st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+    st->codecpar->codec_id = codeID;
+    st->codecpar->width = width;
+    st->codecpar->height = height;
+    trackIndex = st->index;
+    if (isCover) {
+        st->disposition = AV_DISPOSITION_ATTACHED_PIC;
+    }
+    return SetCodecParameterOfTrack(st, trackDesc);
+}
+
+Status FFmpegMuxerPlugin::AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc)
+{
+    CHECK_AND_RETURN_RET_LOG(!isWriteHeader_, Status::ERROR_WRONG_STATE, "AddTrack failed! muxer has start!");
+    CHECK_AND_RETURN_RET_LOG(outputFormat_ != nullptr, Status::ERROR_NULL_POINTER, "AVOutputFormat is nullptr");
+    constexpr int32_t mimeTypeLen = 5;
+    Status ret = Status::NO_ERROR;
+    std::string mimeType = {};
+    AVCodecID codeID = AV_CODEC_ID_NONE;
+    CHECK_AND_RETURN_RET_LOG(trackDesc.GetStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, mimeType),
+        Status::ERROR_MISMATCHED_TYPE, "get mimeType failed!"); // mime
+    AVCODEC_LOGD("mimeType is %{public}s", mimeType.c_str());
+    CHECK_AND_RETURN_RET_LOG(Mime2CodecId(mimeType, codeID), Status::ERROR_INVALID_DATA,
+        "this mimeType do not support! mimeType:%{public}s", mimeType.c_str());
+    if (!mimeType.compare(0, mimeTypeLen, "audio")) {
+        ret = AddAudioTrack(trackIndex, trackDesc, codeID);
+        CHECK_AND_RETURN_RET_LOG(ret == Status::NO_ERROR, ret, "AddAudioTrack failed!");
+    } else if (!mimeType.compare(0, mimeTypeLen, "video")) {
+        ret = AddVideoTrack(trackIndex, trackDesc, codeID, false);
+        CHECK_AND_RETURN_RET_LOG(ret == Status::NO_ERROR, ret, "AddVideoTrack failed!");
+    } else if (!mimeType.compare(0, mimeTypeLen, "image")) {
+        ret = AddVideoTrack(trackIndex, trackDesc, codeID, true);
+        CHECK_AND_RETURN_RET_LOG(ret == Status::NO_ERROR, ret, "AddCoverTrack failed!");
+    } else {
+        AVCODEC_LOGD("mimeType %{public}s is unsupported", mimeType.c_str());
+        return Status::ERROR_UNSUPPORTED_FORMAT;
+    }
+
     CHECK_AND_RETURN_RET_LOG(ret == Status::NO_ERROR, ret, "SetCodecParameter failed!");
     formatContext_->flags |= AVFMT_TS_NONSTRICT;
     return Status::NO_ERROR;
@@ -231,6 +266,7 @@ Status FFmpegMuxerPlugin::AddTrack(int32_t &trackIndex, const MediaDescription &
 
 Status FFmpegMuxerPlugin::Start()
 {
+    CHECK_AND_RETURN_RET_LOG(!isWriteHeader_, Status::ERROR_WRONG_STATE, "Start failed! muxer has start!");
     if (rotation_ != 0) {
         std::string rotate = std::to_string(rotation_);
         for (uint32_t i = 0; i < formatContext_->nb_streams; i++) {
@@ -246,11 +282,13 @@ Status FFmpegMuxerPlugin::Start()
         AVCODEC_LOGE("write header failed, %{public}s", AVStrError(ret).c_str());
         return Status::ERROR_UNKNOWN;
     }
+    isWriteHeader_ = true;
     return Status::NO_ERROR;
 }
 
 Status FFmpegMuxerPlugin::Stop()
 {
+    CHECK_AND_RETURN_RET_LOG(isWriteHeader_, Status::ERROR_WRONG_STATE, "Stop failed! Did not write header!");
     int ret = av_write_frame(formatContext_.get(), nullptr); // flush out cache data
     if (ret < 0) {
         AVCODEC_LOGE("write trailer failed, %{public}s", AVStrError(ret).c_str());
@@ -265,14 +303,15 @@ Status FFmpegMuxerPlugin::Stop()
     return Status::NO_ERROR;
 }
 
-Status FFmpegMuxerPlugin::WriteSample(uint8_t *sample, const TrackSampleInfo &info)
+Status FFmpegMuxerPlugin::WriteSample(const uint8_t *sample, const TrackSampleInfo &info)
 {
+    CHECK_AND_RETURN_RET_LOG(isWriteHeader_, Status::ERROR_WRONG_STATE, "WriteSample failed! Did not write header!");
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, Status::ERROR_NULL_POINTER,
         "av_write_frame sample is null!");
     CHECK_AND_RETURN_RET_LOG(info.trackIndex < formatContext_->nb_streams,
         Status::ERROR_INVALID_PARAMETER, "track index is invalid!");
     (void)memset_s(cachePacket_.get(), sizeof(AVPacket), 0, sizeof(AVPacket));
-    cachePacket_->data = sample;
+    cachePacket_->data = const_cast<uint8_t *>(sample);
     cachePacket_->size = info.size;
     cachePacket_->stream_index = static_cast<int>(info.trackIndex);
     cachePacket_->pts = ConvertTimeToFFmpeg(info.timeUs, formatContext_->streams[info.trackIndex]->time_base);
