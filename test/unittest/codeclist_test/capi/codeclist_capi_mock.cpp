@@ -14,29 +14,352 @@
  */
 
 #include "codeclist_capi_mock.h"
-#include "native_avcodec_list.h"
 
 namespace OHOS {
 namespace Media {
-std::string CodecListCapiMock::FindDecoder(std::shared_ptr<FormatMock> &format)
+bool CodecListCapiMock::IsHardware()
 {
-    auto formatMock = std::static_pointer_cast<AVFormatCapiMock>(format);
-    std::string codecName = OH_AVCodec_FindDecoder(formatMock->GetFormat());
-    return codecName;
+    if (codeclist_ != nullptr) {
+        return OH_AVCapability_IsHardware(codeclist_);
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return false;
 }
 
-std::string CodecListCapiMock::FindEncoder(std::shared_ptr<FormatMock> &format)
+std::string CodecListCapiMock::GetName()
 {
-    auto formatMock = std::static_pointer_cast<AVFormatCapiMock>(format);
-    std::string codecName = OH_AVCodec_FindEncoder(formatMock->GetFormat());
-    return codecName;
+    if (codeclist_ != nullptr) {
+        return OH_AVCapability_GetName(codeclist_);
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return "";
 }
 
-CapabilityData CodecListCapiMock::CreateCapability(const std::string codecName)
+int32_t CodecListCapiMock::GetMaxSupportedInstances()
 {
-    // 接口还在评审: *OH_AVCodec_CreateCapability(codecName.c_str());
-    CapabilityData capability;
-    return capability;
+    if (codeclist_ != nullptr) {
+        return OH_AVCapability_GetMaxSupportedInstances(codeclist_);
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return 0;
+}
+
+Range CodecListCapiMock::GetEncoderBitrateRange()
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetEncoderBitrateRange(codeclist_, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetEncoderBitrateRange returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+bool CodecListCapiMock::IsEncoderBitrateModeSupported(OH_BitrateMode bitrateMode)
+{
+    if (codeclist_ != nullptr) {
+        return OH_AVCapability_IsEncoderBitrateModeSupported(codeclist_, bitrateMode);
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return false;
+}
+
+Range CodecListCapiMock::GetEncoderQualityRange()
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetEncoderQualityRange(codeclist_, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetEncoderQualityRange returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+Range CodecListCapiMock::GetEncoderComplexityRange()
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetEncoderComplexityRange(codeclist_, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetEncoderComplexityRange returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+std::vector<int32_t> CodecListCapiMock::GetAudioSupportedSampleRates()
+{
+    if (codeclist_ != nullptr) {
+        const int32_t *sampleRates = nullptr;
+        uint32_t sampleRateNum = 0;
+        int32_t ret = OH_AVCapability_GetAudioSupportedSampleRates(codeclist_, &sampleRates, &sampleRateNum);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetAudioSupportedSampleRates returns error: " << ret << std::endl;
+            return std::vector<int32_t>();
+        }
+        std::vector<int32_t> retVector = std::vector<int32_t>(sampleRates, sampleRates + sampleRateNum);
+        std::sort(retVector.begin(), retVector.end());
+        return retVector;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return std::vector<int32_t>();
+}
+
+Range CodecListCapiMock::GetAudioChannelsRange()
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetAudioChannelCountRange(codeclist_, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetAudioChannelCountRange returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+int32_t CodecListCapiMock::GetVideoWidthAlignment()
+{
+    if (codeclist_ != nullptr) {
+        int32_t widthAlignment = 0;
+        int32_t ret = OH_AVCapability_GetVideoWidthAlignment(codeclist_, &widthAlignment);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoWidthAlignment returns error: " << ret << std::endl;
+            return 0;
+        }
+        return widthAlignment;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return 0;
+}
+
+int32_t CodecListCapiMock::GetVideoHeightAlignment()
+{
+    if (codeclist_ != nullptr) {
+        int32_t heightAlignment = 0;
+        int32_t ret = OH_AVCapability_GetVideoHeightAlignment(codeclist_, &heightAlignment);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoHeightAlignment returns error: " << ret << std::endl;
+            return 0;
+        }
+        return heightAlignment;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return 0;
+}
+
+Range CodecListCapiMock::GetVideoWidthRangeForHeight(int32_t height)
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetVideoWidthRangeForHeight(codeclist_, height, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoWidthRangeForHeight returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+Range CodecListCapiMock::GetVideoHeightRangeForWidth(int32_t width)
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetVideoHeightRangeForWidth(codeclist_, width, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoHeightRangeForWidth returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+Range CodecListCapiMock::GetVideoWidthRange()
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetVideoWidthRange(codeclist_, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoWidthRange returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+Range CodecListCapiMock::GetVideoHeightRange()
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetVideoHeightRange(codeclist_, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoHeightRange returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+bool CodecListCapiMock::IsVideoSizeSupported(int32_t width, int32_t height)
+{
+    if (codeclist_ != nullptr) {
+        return OH_AVCapability_IsVideoSizeSupported(codeclist_, width, height);
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return false;
+}
+
+Range CodecListCapiMock::GetVideoFrameRateRange()
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetVideoFrameRateRange(codeclist_, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoFrameRateRange returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+Range CodecListCapiMock::GetVideoFrameRateRangeForSize(int32_t width, int32_t height)
+{
+    Range retRange(0, 0);
+    if (codeclist_ != nullptr) {
+        OH_AVRange range;
+        int32_t ret = OH_AVCapability_GetVideoFrameRateRangeForSize(codeclist_, width, height, &range);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoFrameRateRangeForSize returns error: " << ret << std::endl;
+            return retRange;
+        }
+        retRange.minVal = range.minVal;
+        retRange.maxVal = range.maxVal;
+        return retRange;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return retRange;
+}
+
+bool CodecListCapiMock::AreVideoSizeAndFrameRateSupported(int32_t width, int32_t height, int32_t frameRate)
+{
+    if (codeclist_ != nullptr) {
+        return OH_AVCapability_AreVideoSizeAndFrameRateSupported(codeclist_, width, height, frameRate);
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return false;
+}
+
+std::vector<int32_t> CodecListCapiMock::GetVideoSupportedPixelFormats()
+{
+    if (codeclist_ != nullptr) {
+        const int32_t *pixFormats = nullptr;
+        uint32_t pixFormatNum = 0;
+        int32_t ret = OH_AVCapability_GetVideoSupportedPixelFormats(codeclist_, &pixFormats, &pixFormatNum);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetVideoSupportedPixelFormats returns error: " << ret << std::endl;
+            return std::vector<int32_t>();
+        }
+        std::vector<int32_t> retVector = std::vector<int32_t>(pixFormats, pixFormats + pixFormatNum);
+        std::sort(retVector.begin(), retVector.end());
+        return retVector;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return std::vector<int32_t>();
+}
+
+std::vector<int32_t> CodecListCapiMock::GetSupportedProfiles()
+{
+    if (codeclist_ != nullptr) {
+        const int32_t *profiles = nullptr;
+        uint32_t profileNum = 0;
+        int32_t ret = OH_AVCapability_GetSupportedProfiles(codeclist_, &profiles, &profileNum);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetSupportedProfiles returns error: " << ret << std::endl;
+            return std::vector<int32_t>();
+        }
+        std::vector<int32_t> retVector = std::vector<int32_t>(profiles, profiles + profileNum);
+        std::sort(retVector.begin(), retVector.end());
+        return retVector;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return std::vector<int32_t>();
+}
+
+std::vector<int32_t> CodecListCapiMock::GetSupportedLevelsForProfile(int32_t profile)
+{
+    if (codeclist_ != nullptr) {
+        const int32_t *levels = nullptr;
+        uint32_t levelNum = 0;
+        int32_t ret = OH_AVCapability_GetSupportedLevelsForProfile(codeclist_, profile, &levels, &levelNum);
+        if (ret != AV_ERR_OK) {
+            std::cout << "OH_AVCapability_GetSupportedLevelsForProfile returns error: " << ret << std::endl;
+            return std::vector<int32_t>();
+        }
+        std::vector<int32_t> retVector = std::vector<int32_t>(levels, levels + levelNum);
+        std::sort(retVector.begin(), retVector.end());
+        return retVector;
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return std::vector<int32_t>();
+}
+
+bool CodecListCapiMock::AreProfileAndLevelSupported(int32_t profile, int32_t level)
+{
+    if (codeclist_ != nullptr) {
+        return OH_AVCapability_AreProfileAndLevelSupported(codeclist_, profile, level);
+    }
+    std::cout << "codeclist_ is nullptr" << std::endl;
+    return false;
 }
 } // namespace Media
 } // namespace OHOS
