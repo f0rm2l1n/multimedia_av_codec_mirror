@@ -64,7 +64,7 @@ public:
 
     int64_t GetMaxInputSize() const noexcept;
 
-    bool hasExtraData() const noexcept;
+    bool HasExtraData() const noexcept;
 
 private:
     bool hasExtra_;

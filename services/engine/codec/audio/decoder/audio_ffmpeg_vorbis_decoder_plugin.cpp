@@ -90,7 +90,7 @@ int32_t AudioFFMpegVorbisDecoderPlugin::AssignExtradata(std::shared_ptr<AVCodecC
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::init(const Format &format)
+int32_t AudioFFMpegVorbisDecoderPlugin::Init(const Format &format)
 {
     int32_t ret = basePlugin->AllocateContext("vorbis");
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
@@ -114,32 +114,32 @@ int32_t AudioFFMpegVorbisDecoderPlugin::init(const Format &format)
     return basePlugin->OpenContext();
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegVorbisDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegVorbisDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::reset()
+int32_t AudioFFMpegVorbisDecoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::release()
+int32_t AudioFFMpegVorbisDecoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::flush()
+int32_t AudioFFMpegVorbisDecoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegVorbisDecoderPlugin::getInputBufferSize() const
+uint32_t AudioFFMpegVorbisDecoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
@@ -148,7 +148,7 @@ uint32_t AudioFFMpegVorbisDecoderPlugin::getInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegVorbisDecoderPlugin::getOutputBufferSize() const
+uint32_t AudioFFMpegVorbisDecoderPlugin::GetOutputBufferSize() const
 {
     return OUTPUT_BUFFER_SIZE_DEFAULT;
 }

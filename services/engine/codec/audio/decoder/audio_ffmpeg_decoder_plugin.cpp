@@ -70,7 +70,7 @@ int64_t AudioFfmpegDecoderPlugin::GetMaxInputSize() const noexcept
     return maxInputSize_;
 }
 
-bool AudioFfmpegDecoderPlugin::hasExtraData() const noexcept
+bool AudioFfmpegDecoderPlugin::HasExtraData() const noexcept
 {
     return hasExtra_;
 }

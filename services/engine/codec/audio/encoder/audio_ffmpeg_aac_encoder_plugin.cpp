@@ -139,7 +139,7 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
     return true;
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::init(const Format &format)
+int32_t AudioFFMpegAacEncoderPlugin::Init(const Format &format)
 {
     int32_t ret = basePlugin->AllocateContext("aac");
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
@@ -172,32 +172,32 @@ int32_t AudioFFMpegAacEncoderPlugin::init(const Format &format)
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegAacEncoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegAacEncoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::reset()
+int32_t AudioFFMpegAacEncoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::release()
+int32_t AudioFFMpegAacEncoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegAacEncoderPlugin::flush()
+int32_t AudioFFMpegAacEncoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegAacEncoderPlugin::getInputBufferSize() const
+uint32_t AudioFFMpegAacEncoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
@@ -206,7 +206,7 @@ uint32_t AudioFFMpegAacEncoderPlugin::getInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegAacEncoderPlugin::getOutputBufferSize() const
+uint32_t AudioFFMpegAacEncoderPlugin::GetOutputBufferSize() const
 {
     return OUTPUT_BUFFER_SIZE_DEFAULT;
 }

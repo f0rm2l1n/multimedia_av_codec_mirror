@@ -45,7 +45,7 @@ AudioFFMpegMp3DecoderPlugin::~AudioFFMpegMp3DecoderPlugin()
     basePlugin = nullptr;
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::init(const Format &format)
+int32_t AudioFFMpegMp3DecoderPlugin::Init(const Format &format)
 {
     int32_t ret = basePlugin->AllocateContext("mp3");
     int32_t checkresult = AudioFFMpegMp3DecoderPlugin::checkinit(format);
@@ -64,32 +64,32 @@ int32_t AudioFFMpegMp3DecoderPlugin::init(const Format &format)
     return basePlugin->OpenContext();
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegMp3DecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegMp3DecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::reset()
+int32_t AudioFFMpegMp3DecoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::release()
+int32_t AudioFFMpegMp3DecoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::flush()
+int32_t AudioFFMpegMp3DecoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
+uint32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 {
     auto size = int(bit_rate / BIT_RATE_RATIO);
     int32_t maxSize = basePlugin->GetMaxInputSize();
@@ -99,7 +99,7 @@ uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegMp3DecoderPlugin::getOutputBufferSize() const
+uint32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
 {
     uint32_t size = (int(sample_rate / SAMPLE_RATE_RATIO) + BUFFER_DIFF) * channels * sizeof(short);
     return size;
@@ -110,7 +110,7 @@ Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
     return basePlugin->GetFormat();
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::checkinit(const Format &format)
+int32_t AudioFFMpegMp3DecoderPlugin::Checkinit(const Format &format)
 {
     int sample_rate_pick[SUPPORT_SAMPLE_RATE] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
