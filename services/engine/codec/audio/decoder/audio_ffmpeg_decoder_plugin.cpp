@@ -50,16 +50,12 @@ AudioFfmpegDecoderPlugin::~AudioFfmpegDecoderPlugin()
 
 int32_t AudioFfmpegDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
-    int32_t ret = AVCodecServiceErrCode::AVCS_ERR_OK;
-    {
-        std::unique_lock lock(avMutext_);
-        if (avCodecContext_ == nullptr) {
-            AVCODEC_LOGE("avCodecContext_ is nullptr");
-            return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
-        }
-        ret = SendBuffer(inputBuffer);
+    if (avCodecContext_ == nullptr) {
+        AVCODEC_LOGE("avCodecContext_ is nullptr");
+        return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
     }
-    return ret;
+    std::unique_lock lock(avMutext_);
+    return SendBuffer(inputBuffer);
 }
 
 static std::string AVStrError(int errnum)

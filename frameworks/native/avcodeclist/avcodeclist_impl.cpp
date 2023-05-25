@@ -26,9 +26,8 @@ namespace Media {
 std::shared_ptr<AVCodecList> AVCodecListFactory::CreateAVCodecList()
 {
     std::shared_ptr<AVCodecListImpl> impl = std::make_shared<AVCodecListImpl>();
-
     int32_t ret = impl->Init();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "failed to init AVCodecListImpl");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "Init AVCodecListImpl failed");
 
     return impl;
 }
@@ -36,13 +35,13 @@ std::shared_ptr<AVCodecList> AVCodecListFactory::CreateAVCodecList()
 int32_t AVCodecListImpl::Init()
 {
     codecListService_ = AVCodecServiceFactory::GetInstance().CreateCodecListService();
-    CHECK_AND_RETURN_RET_LOG(codecListService_ != nullptr, AVCS_ERR_UNKNOWN, "failed to create AVCodecList service");
+    CHECK_AND_RETURN_RET_LOG(codecListService_ != nullptr, AVCS_ERR_UNKNOWN, "Create AVCodecList service failed");
     return AVCS_ERR_OK;
 }
 
 AVCodecListImpl::AVCodecListImpl()
 {
-    AVCODEC_LOGD("AVCodecListImpl:0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
+    AVCODEC_LOGD("Create AVCodecList instances successful");
 }
 
 AVCodecListImpl::~AVCodecListImpl()
@@ -51,7 +50,7 @@ AVCodecListImpl::~AVCodecListImpl()
         (void)AVCodecServiceFactory::GetInstance().DestroyCodecListService(codecListService_);
         codecListService_ = nullptr;
     }
-    AVCODEC_LOGD("AVCodecListImpl:0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+    AVCODEC_LOGD("Destroy AVCodecList instances successful");
 }
 
 std::string AVCodecListImpl::FindDecoder(const Format &format)
@@ -64,9 +63,10 @@ std::string AVCodecListImpl::FindEncoder(const Format &format)
     return codecListService_->FindEncoder(format);
 }
 
-CapabilityData AVCodecListImpl::CreateCapability(std::string codecName)
+CapabilityData AVCodecListImpl::GetCapability(const std::string mime, const bool isEncoder,
+                                              const AVCodecCategory category)
 {
-    return codecListService_->CreateCapability(codecName);
+    return codecListService_->GetCapability(mime, isEncoder, category);
 }
 } // namespace Media
 } // namespace OHOS

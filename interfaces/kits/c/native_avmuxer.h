@@ -31,13 +31,12 @@ extern "C" {
 typedef struct OH_AVMuxer OH_AVMuxer;
 
 /**
- * @brief Create an OH_AVMuxer instance by output file handler and format.
+ * @brief Create an OH_AVMuxer instance by output file description and format.
  * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param fd Must be opened with read and write permission. Caller is responsible for closing fd.
  * @param format The output format is {@link OH_AVOutputFormat} .
  * @return Returns a pointer to an OH_AVMuxer instance, needs to be freed by OH_AVMuxer_Destroy.
  * @since 10
- * @version 1.0
  */
 OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format);
 
@@ -50,7 +49,6 @@ OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
  */
 OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation);
 
@@ -66,7 +64,6 @@ OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
  */
 OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFormat *trackFormat);
 
@@ -78,7 +75,6 @@ OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFo
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
  */
 OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer);
 
@@ -95,7 +91,6 @@ OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
  */
 OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer *muxer,
                                     uint32_t trackIndex,
@@ -110,7 +105,6 @@ OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer *muxer,
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
  */
 OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer);
 
@@ -121,7 +115,6 @@ OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
  */
 OH_AVErrCode OH_AVMuxer_Destroy(OH_AVMuxer *muxer);
 

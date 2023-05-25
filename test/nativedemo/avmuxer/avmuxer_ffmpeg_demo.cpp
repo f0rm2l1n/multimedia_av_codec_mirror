@@ -32,26 +32,25 @@ Status AVMuxerFFmpegDemo::FfmpegRegister::AddPlugin(const PluginDefBase& def)
 {
     auto& tempDef = (MuxerPluginDef&)def;
     std::cout<<"find plugin apiVersion:"<<tempDef.apiVersion;
-    std::cout<<" |pluginType:"<<(int32_t)tempDef.pluginType;
+    std::cout<<" |pluginType:"<<static_cast<int32_t>(tempDef.pluginType);
     std::cout<<" |name:"<<tempDef.name;
     std::cout<<" |description:"<<tempDef.description;
     std::cout<<" |rank:"<<tempDef.rank;
-    std::cout<<" |sniffer:"<<(void*)tempDef.sniffer;
-    std::cout<<" |creator:"<<(void*)tempDef.creator;
+    std::cout<<" |sniffer:"<<tempDef.sniffer;
+    std::cout<<" |creator:"<<tempDef.creator;
     std::cout<<std::endl;
     plugins.push_back(tempDef);
     return Status::NO_ERROR;
 }
 
-AVMuxerFFmpegDemo::AVMuxerFFmpegDemo()
+AVMuxerFFmpegDemo::AVMuxerFFmpegDemo() : register_(std::make_shared<FfmpegRegister>())
 {
-    register_ = std::make_shared<FfmpegRegister>();
 }
 
-int AVMuxerFFmpegDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &param)
+int AVMuxerFFmpegDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &trackDesc)
 {
     int32_t tempTrackId = 0;
-    ffmpegMuxer_->AddTrack(tempTrackId, param);
+    ffmpegMuxer_->AddTrack(tempTrackId, trackDesc);
     if (tempTrackId < 0) {
         std::cout<<"AVMuxerFFmpegDemo::DoAddTrack failed! trackId:"<<tempTrackId<<std::endl;
         return -1;
@@ -63,7 +62,7 @@ int AVMuxerFFmpegDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &param)
 void AVMuxerFFmpegDemo::DoRunMuxer()
 {
     GetFfmpegRegister();
-    if (register_->plugins.size() <= 0) {
+    if (register_->plugins.size() == 0) {
         std::cout<<"regist muxers failed!"<<std::endl;
         return;
     }
@@ -141,7 +140,7 @@ int AVMuxerFFmpegDemo::GetFfmpegRegister()
         return -1;
     }
 
-    if ((int32_t)registerFunc_(register_) != 0) {
+    if (registerFunc_(register_) != Status::NO_ERROR) {
         std::cout<<"ffmpeg register failed!"<<std::endl;
         return -1;
     }

@@ -147,7 +147,7 @@ int32_t AVSourceImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
     AVCodecTrace trace("AVSource::GetTrackFormat");
 
-    AVCODEC_LOGI("get source track format: trackIndex=%{public}d, format=%{public}s",
+    AVCODEC_LOGI("get source track format: trackIndex=%{public}u, format=%{public}s",
         trackIndex, format.Stringify().c_str());
 
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,

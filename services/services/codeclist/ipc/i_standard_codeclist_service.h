@@ -29,13 +29,14 @@ public:
     virtual ~IStandardCodecListService() = default;
     virtual std::string FindDecoder(const Format &format) = 0;
     virtual std::string FindEncoder(const Format &format) = 0;
-    virtual CapabilityData CreateCapability(std::string codecName) = 0;
+    virtual CapabilityData GetCapability(const std::string mime, const bool isEncoder,
+                                         const AVCodecCategory category) = 0;
     virtual int32_t DestroyStub() = 0;
 
     /**
      * IPC code ID
      */
-    enum AVCodecListServiceMsg { FIND_DECODER = 0, FIND_ENCODER, CREATE_CAPABILITY, DESTROY };
+    enum class AVCodecListServiceMsg : uint32_t { FIND_DECODER = 0, FIND_ENCODER, GET_CAPABILITY, DESTROY };
 
     DECLARE_INTERFACE_DESCRIPTOR(u"IStandardCodecListService");
 };

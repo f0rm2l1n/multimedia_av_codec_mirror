@@ -14,7 +14,7 @@
  */
 #ifndef CODECLIST_DEMO_H
 #define CODECLIST_DEMO_H
-#include "native_avcodec_list.h"
+#include "native_avcapability.h"
 
 namespace OHOS {
 namespace Media {

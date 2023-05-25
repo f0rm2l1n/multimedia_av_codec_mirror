@@ -53,5 +53,12 @@ int32_t CodecBase::SignalRequestIDRFrame()
     AVCODEC_LOGW("SignalRequestIDRFrame is not supported");
     return 0;
 }
+
+int32_t CodecBase::GetInputFormat(Format& format)
+{
+    (void)format;
+    AVCODEC_LOGW("GetInputFormat is not supported");
+    return 0;
+}
 } // namespace Media
 } // namespace OHOS

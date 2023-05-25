@@ -17,7 +17,7 @@
 #include "avcodec_log.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServer"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServer"};
 }
 
 namespace OHOS {
@@ -58,9 +58,10 @@ std::string CodecListServer::FindEncoder(const Format &format)
     return codecListCore_->FindEncoder(format);
 }
 
-CapabilityData CodecListServer::CreateCapability(const std::string codecName)
+CapabilityData CodecListServer::GetCapability(const std::string mime, const bool isEncoder,
+                                              const AVCodecCategory category)
 {
-    return codecListCore_->CreateCapability(codecName);
+    return codecListCore_->GetCapability(mime, isEncoder, category);
 }
 } // namespace Media
 } // namespace OHOS

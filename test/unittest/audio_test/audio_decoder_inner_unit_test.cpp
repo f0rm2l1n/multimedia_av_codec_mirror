@@ -64,10 +64,10 @@ public:
     explicit BufferCallback(ADecSignal *userData) : userData_(userData) {}
     virtual ~BufferCallback() = default;
     ADecSignal *userData_;
-    virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
-    virtual void OnOutputFormatChanged(const Format &format) override;
-    virtual void OnInputBufferAvailable(size_t index) override;
-    virtual void OnOutputBufferAvailable(size_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+    void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    void OnOutputFormatChanged(const Format &format) override;
+    void OnInputBufferAvailable(uint32_t index) override;
+    void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 };
 
 void BufferCallback::OnError(AVCodecErrorType errorType, int32_t errorCode)
@@ -82,14 +82,14 @@ void BufferCallback::OnOutputFormatChanged(const Format &format)
     cout << "Format Changed" << endl;
 }
 
-void BufferCallback::OnInputBufferAvailable(size_t index)
+void BufferCallback::OnInputBufferAvailable(uint32_t index)
 {
     unique_lock<mutex> lock(userData_->inMutex_);
     userData_->inIdxQueue_.push(index);
     userData_->inCond_.notify_all();
 }
 
-void BufferCallback::OnOutputBufferAvailable(size_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag)
+void BufferCallback::OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     unique_lock<mutex> lock(userData_->outMutex_);
     userData_->outIdxQueue_.push(index);
@@ -719,7 +719,6 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_QueueInputBuffer_01, T
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateFlacCodecFunc());
     AVCodecBufferInfo info;
     AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
-    ;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     sleep(1);
@@ -1086,12 +1085,6 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_ReleaseOutputBuffer_01,
     // case2 传参正常
     index_ = 0;
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->ReleaseOutputBuffer(index_));
-}
-
-int main(int argc, char *argv[])
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
 } // namespace Media
 } // namespace OHOS

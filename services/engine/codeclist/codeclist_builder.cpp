@@ -15,6 +15,7 @@
 
 #include "avcodec_log.h"
 #include "fcodec.h"
+#include "audio_codeclist_info.h"
 #include "codeclist_builder.h"
 
 namespace {
@@ -33,8 +34,11 @@ int32_t VideoCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
 
 int32_t AudioCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
 {
-    (void)caps;
-    return 0;
+    auto audioCapabilities = AudioCodeclistInfo::GetInstance().GetAudioCapabilities();
+    for (const auto &v : audioCapabilities) {
+        caps.emplace_back(v);
+    }
+    return AVCS_ERR_OK;
 }
 } // namespace Media
 } // namespace OHOS

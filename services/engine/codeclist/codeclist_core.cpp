@@ -228,21 +228,37 @@ CodecType CodecListCore::FindCodecType(std::string codecName)
     return CodecType::AVCODEC_INVALID;
 }
 
-CapabilityData CodecListCore::CreateCapability(std::string codecName)
+CapabilityData CodecListCore::GetCapability(std::string mime, bool isEncoder, AVCodecCategory category)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CapabilityData capData;
-    if (codecName.empty()) {
+    if (mime.empty()) {
         return capData;
     }
-    std::vector<CapabilityData> capabilityDataArray = CodecAbilitySingleton::GetInstance().GetCapabilityArray();
-    auto iter = capabilityDataArray.begin();
-    while (iter != capabilityDataArray.end()) {
-        if (codecName == ((*iter).codecName)) {
-            capData = (*iter);
+    AVCodecType codecType = AVCODEC_TYPE_NONE;
+    bool isVideo = mime.find("video") != std::string::npos;
+    if (isVideo) {
+        codecType = isEncoder ? AVCODEC_TYPE_VIDEO_ENCODER : AVCODEC_TYPE_VIDEO_DECODER;
+    } else {
+        codecType = isEncoder ? AVCODEC_TYPE_AUDIO_ENCODER : AVCODEC_TYPE_AUDIO_DECODER;
+    }
+    bool isVendor = (category == AVCodecCategory::AVCODEC_HARDWARE) ? true: false;
+    std::vector<CapabilityData> capsDataArray = CodecAbilitySingleton::GetInstance().GetCapabilityArray();
+    std::unordered_map<std::string, std::vector<size_t>> mimeCapIdxMap =
+        CodecAbilitySingleton::GetInstance().GetMimeCapIdxMap();
+    if (mimeCapIdxMap.find(mime) == mimeCapIdxMap.end()) {
+        return capData;
+    }
+    std::vector<size_t> capsIdx = mimeCapIdxMap.at(mime);
+    for (auto iter = capsIdx.begin(); iter != capsIdx.end(); iter++) {
+        if (capsDataArray[*iter].codecType == codecType || capsDataArray[*iter].mimeType == mime) {
+            if (category != AVCodecCategory::AVCODEC_NONE && capsDataArray[*iter].isVendor != isVendor) {
+                continue;
+            }
+            capData = capsDataArray[*iter];
+            AVCODEC_LOGI("Get capability of codec successful: %{public}s", mime.c_str());
             break;
         }
-        ++iter;
     }
     return capData;
 }
