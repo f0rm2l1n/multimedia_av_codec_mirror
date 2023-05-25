@@ -4,8 +4,8 @@
 
 目前系统API支持的数据输入类型如下：
 
-- 远程连接(Uniform Resource Identifier, URI)
-- 文件描述符(File Descriptor, FD)
+- 远程连接
+- 文件描述符
 
 目前系统API支持的解封装格式如下：
 
@@ -66,14 +66,14 @@
 1. 创建解封装器实例对象
 
    ``` c
-   // 以只读方式创建文件 fd
+   // 以只读方式创建文件操作符 fd
    int32_t fd = open("test.mp4", O_RDONLY);
    // 为 fd 资源文件创建 source 资源对象
    OH_AVSource *source = OH_AVSource_CreateWithFD(fd, 0, 0);
    // 为 uri 资源文件创建 source 资源对象
    // OH_AVSource *source = OH_AVSource_CreateWithURI(uri);
    // 为资源对象创建对应的解封装器
-   OH_AVDemuxer *demuxer = *OH_AVDemuxer_CreateWithSource(OH_AVSource *source);
+   OH_AVDemuxer *demuxer = *OH_AVDemuxer_CreateWithSource(source);
    ```
 
 
@@ -82,7 +82,7 @@
 
    ``` c
    // 获取文件 source 信息
-   OH_AVFormat *sourceFormat = OH_AVSource_GetSourceFormat(OH_AVSource *source);
+   OH_AVFormat *sourceFormat = OH_AVSource_GetSourceFormat(source);
    uint32_t trackCount = 0;
    OH_AVFormat_GetIntValue(sourceFormat, OH_MD_KEY_TRACK_COUNT, &trackCount);
    OH_AVFormat_Destroy(sourceFormat);
@@ -98,19 +98,18 @@
    uint32_t w = 0;
    uint32_t h = 0;
    OH_MediaType trackType;
-   OH_AVFormat *trackFormat = OH_AVFormat_Create();
    for (uint32_t index=0; index<trackCount; index++) {
       // 获取轨道信息
-      trackFormat = OH_AVSource_GetTrackFormat(source, index);
+      OH_AVFormat *trackFormat = OH_AVSource_GetTrackFormat(source, index);
       OH_AVFormat_GetIntValue(trackFormat, &trackType);
-      trackType == MEDIA_TYPE_AUD ? audioTrackIndex = index : videoTrackIndex = index;
+      trackType == MEDIA_TYPE_AUD ? audioTrackIndex=index : videoTrackIndex=index;
       // 获取视频轨宽高
       if (trackType == MEDIA_TYPE_VID) {
          OH_AVFormat_GetIntValue(trackFormat, OH_MD_KEY_WIDTH, &w);
          OH_AVFormat_GetIntValue(trackFormat, OH_MD_KEY_HEIGHT, &h);
       }
+      OH_AVFormat_Destroy(trackFormat);
    }
-   OH_AVFormat_Destroy(trackFormat);
    ```
 
    
@@ -145,21 +144,24 @@
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
    OH_AVCodecBufferAttr info; // 参考OH_AVCodecBufferFlags
    // 选择读取轨
-   uint32_t trackIndex = audioTrackIndex; 
    bool isEnd = false;
-   // 调整轨道到指定时间点，后续从该时间点进行解封装
-   // OH_AVDemuxer_UnselectTrackByID(audioTrackIndex);
    while (!isEnd) {
-      // 获取帧数据
-      if(OH_AVDemuxer_ReadSample(demuxer, trackIndex, buffer, info)) {
+      // 获取音频帧数据
+      if(OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, info)) {
          // 处理 buffer 数据
       }
       if (attr.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
          isEnd = true;
       }
-      // 切换下次读取另一轨道数据
-      trackIndex == videoTrackIndex ? trackIndex = audioTrackIndex : trackIndex = videoTrackIndex;
-   }   
+      // 获取视频帧数据
+      if(OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, info)) {
+         // 处理 buffer 数据
+      }
+      if (attr.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
+         isEnd = true;
+      }
+   }
+   OH_AVMemory_Destroy(buffer);
    ```
 
    
