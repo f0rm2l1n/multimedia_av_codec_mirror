@@ -34,9 +34,9 @@ public:
 
     static std::shared_ptr<PluginLoader> Create(const std::string &name, const std::string &path);
 
-    RegisterFunc FetchRegisterFunction();
+    RegisterFunc FetchRegisterFunction() const;
 
-    UnregisterFunc FetchUnregisterFunction();
+    UnregisterFunc FetchUnregisterFunction() const;
 
 private:
     static void* LoadPluginFile(const std::string &path);

@@ -28,19 +28,20 @@ public:
     AVCodecEvent() = default;
     ~AVCodecEvent() = default;
     bool CreateMsg(const char *format, ...) __attribute__((__format__(printf, 2, 3)));
-    void StatisticEventWrite(std::string eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module);
-    void BehaviorEventWrite(std::string eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module);
-    void FaultEventWrite(std::string eventName, int32_t errorCode, OHOS::HiviewDFX::HiSysEvent::EventType type,
-        std::string module);
+    void StatisticEventWrite(const std::string &eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
+        const std::string &module);
+    void BehaviorEventWrite(const std::string &eventName, OHOS::HiviewDFX::HiSysEvent::EventType type,
+        const std::string &module);
+    void FaultEventWrite(const std::string &eventName, int32_t errorCode, OHOS::HiviewDFX::HiSysEvent::EventType type,
+        const std::string &module);
 private:
     std::string msg_;
 };
 
-__attribute__((visibility("default"))) void BehaviorEventWrite(std::string status, std::string moudle);
-__attribute__((visibility("default"))) void FaultEventWrite(int32_t errorCode, std::string msg, std::string moudle);
-__attribute__((visibility("default"))) void StatisticEventWrite(std::string msg, std::string moudle);
+__attribute__((visibility("default"))) void BehaviorEventWrite(const std::string &status, const std::string &moudle);
+__attribute__((visibility("default"))) void FaultEventWrite(int32_t errorCode,
+                                                            const std::string &msg, const std::string &moudle);
+__attribute__((visibility("default"))) void StatisticEventWrite(const std::string &msg, const std::string &moudle);
 
 #define AVCODEC_SYNC_TRACE AVCodecTrace trace(std::string(__FUNCTION__))
 
