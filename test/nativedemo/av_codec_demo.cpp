@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "avmuxer_demo_runner.h"
+#include "avdemuxer_demo_runner.h"
 #include "avcodec_audio_decoder_inner_demo.h"
 #include "avcodec_audio_encoder_inner_demo.h"
 #include "avcodec_audio_decoder_demo.h"
@@ -59,9 +60,7 @@ static int RunAudioDecoder()
         return 0;
     }
     auto audioDec = std::make_unique<ADecDemo>();
-    if (audioDec) {
-        audioDec->RunCase(audioFormatType);
-    }
+    audioDec->RunCase(audioFormatType);
     cout << "demo audio decoder end" << endl;
     return 0;
 }
@@ -76,15 +75,11 @@ static int RunAudioEncoder()
     (void)getline(cin, mode);
     if (mode == "" || mode == "0") {
         auto audioEnc = std::make_unique<AEncAacDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
+        audioEnc->RunCase();
     } else if (mode == "1") {
         auto audioEnc = std::make_unique<AEncFlacDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
-    } else {
+        audioEnc->RunCase();
+    }  else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -103,25 +98,17 @@ static int RunAudioInnerDecoder()
     (void)getline(cin, mode);
     if (mode == "" || mode == "0") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioDec->RunCase();
     } else if (mode == "1") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioDec->RunCase();
     } else if (mode == "2") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
+        audioDec->RunCase();
     } else if (mode == "3") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
-        if (audioDec) {
-            audioDec->RunCase();
-        }
-    } else {
+        audioDec->RunCase();
+    }  else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -138,15 +125,11 @@ static int RunAudioInnerEncoder()
     (void)getline(cin, mode);
     if (mode == "" || mode == "0") {
         auto audioEnc = std::make_unique<AEnInnerDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
+        audioEnc->RunCase();
     } else if (mode == "1") {
         auto audioEnc = std::make_unique<AEnInnerDemo>();
-        if (audioEnc) {
-            audioEnc->RunCase();
-        }
-    } else {
+        audioEnc->RunCase();
+    }  else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -203,15 +186,11 @@ static void OptionPrint()
     cout << "8:Video Decoder (surface mode)" << endl;
     cout << "9:Video Inner Decoder (buffer mode)" << endl;
     cout << "10:Video Inner Decoder (surface mode)" << endl;
+    cout << "11:demuxer demo" << endl;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-    constexpr int minRequiredArgCount = 2;
-    string path;
-    if (argc >= minRequiredArgCount && argv[1] != nullptr) {
-        path = argv[1];
-    }
     OptionPrint();
     string mode;
     (void)getline(cin, mode);
@@ -235,6 +214,8 @@ int main(int argc, char *argv[])
         (void)RunVideoInnerDecoder(false);
     } else if (mode == "10") {
         (void)RunVideoInnerDecoder(true);
+    } else if (mode == "11") {
+        (void)AVSourceDemuxerDemoCase();
     } else {
         cout << "no that selection" << endl;
     }

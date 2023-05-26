@@ -20,6 +20,7 @@
 #include "plugin_tags.h"
 #include "plugin_buffer.h"
 #include "plugin_definition.h"
+#include "plugin_event.h"
 
 namespace OHOS {
 namespace Media {
@@ -38,6 +39,7 @@ enum class ErrorType {
  */
 struct Callback {
     virtual ~Callback() = default;
+    virtual void OnEvent(const PluginEvent &event) = 0;
 };
 
 /**

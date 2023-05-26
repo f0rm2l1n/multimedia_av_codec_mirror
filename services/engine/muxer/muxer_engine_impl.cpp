@@ -113,7 +113,7 @@ MuxerEngineImpl::MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, Out
         BehaviorEventWrite(ConvertStateToString(state_), "Muxer");
     } else {
         AVCODEC_LOGE("state_ is UNINITIALIZED");
-        FaultEventWrite(AVCS_ERR_INVALID_STATE, AVCSErrorToString(AVCS_ERR_INVALID_STATE), "Muxer");
+        FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, AVCSErrorToString(AVCS_ERR_INVALID_STATE), "Muxer");
     }
 }
 
@@ -231,7 +231,7 @@ int32_t MuxerEngineImpl::Stop()
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ == State::STOPPED) {
         AVCODEC_LOGW("current state is STOPPED!");
-        return AVCS_ERR_OK;
+        return AVCS_ERR_INVALID_OPERATION;
     }
     CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED. The current state is %{public}s", ConvertStateToString(state_).c_str());

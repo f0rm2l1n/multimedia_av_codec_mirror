@@ -17,16 +17,17 @@
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "media_description.h"
+#include "avcodec_mime_type.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
-    constexpr int minChannels = 1;
-    constexpr int maxChannels = 2;
-    constexpr int bitrate_ratio = 150;
-    constexpr int samplerate_ratio = 31;
-    constexpr int bitrate_max = 320000;
-    constexpr int support_sample_rate = 9;
-    constexpr int bufferDiff = 128;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
+constexpr int MIN_CHANNELS = 1;
+constexpr int MAX_CHANNELS = 2;
+constexpr int BIT_RATE_RATIO = 150;
+constexpr int SAMPLE_RATE_RATIO = 31;
+constexpr int MAX_BIT_RATE = 320000;
+constexpr int SUPPORT_SAMPLE_RATE = 9;
+constexpr int BUFFER_DIFF = 128;
 }
 
 namespace OHOS {
@@ -34,8 +35,8 @@ namespace Media {
 AudioFFMpegMp3DecoderPlugin::AudioFFMpegMp3DecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
     channels = 0;
-    sample_rate = 0;
-    bit_rate = 0;
+    sampleRate = 0;
+    bitRate = 0;
 }
 
 AudioFFMpegMp3DecoderPlugin::~AudioFFMpegMp3DecoderPlugin()
@@ -45,10 +46,10 @@ AudioFFMpegMp3DecoderPlugin::~AudioFFMpegMp3DecoderPlugin()
     basePlugin = nullptr;
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::init(const Format &format)
+int32_t AudioFFMpegMp3DecoderPlugin::Init(const Format &format)
 {
     int32_t ret = basePlugin->AllocateContext("mp3");
-    int32_t checkresult = AudioFFMpegMp3DecoderPlugin::checkinit(format);
+    int32_t checkresult = AudioFFMpegMp3DecoderPlugin::Checkinit(format);
     if (checkresult != AVCodecServiceErrCode::AVCS_ERR_OK) {
         return checkresult;
     }
@@ -64,34 +65,34 @@ int32_t AudioFFMpegMp3DecoderPlugin::init(const Format &format)
     return basePlugin->OpenContext();
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegMp3DecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegMp3DecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::reset()
+int32_t AudioFFMpegMp3DecoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::release()
+int32_t AudioFFMpegMp3DecoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::flush()
+int32_t AudioFFMpegMp3DecoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
+int32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 {
-    auto size = int(bit_rate / bitrate_ratio);
+    auto size = bitRate / BIT_RATE_RATIO;
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > size) {
         maxSize = size;
@@ -99,35 +100,37 @@ uint32_t AudioFFMpegMp3DecoderPlugin::getInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegMp3DecoderPlugin::getOutputBufferSize() const
+int32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
 {
-    uint32_t size = (int(sample_rate / samplerate_ratio) + bufferDiff) * channels * sizeof(short);
+    int32_t size = (sampleRate / SAMPLE_RATE_RATIO + BUFFER_DIFF) * channels * sizeof(short);
     return size;
 }
 
 Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG);
+    return format;
 }
 
-int32_t AudioFFMpegMp3DecoderPlugin::checkinit(const Format &format)
+int32_t AudioFFMpegMp3DecoderPlugin::Checkinit(const Format &format)
 {
-    int sample_rate_pick[support_sample_rate] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
+    int sampleRatePick[SUPPORT_SAMPLE_RATE] = {8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000};
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bit_rate);
-    if (channels < minChannels || channels > maxChannels) {
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
+    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bitRate);
+    if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
-    if (bit_rate > bitrate_max) {
+    if (bitRate > MAX_BIT_RATE) {
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
-    for (int i = 0; i < support_sample_rate; i++) {
-        if (sample_rate == sample_rate_pick[i]) {
+    for (int i = 0; i < SUPPORT_SAMPLE_RATE; i++) {
+        if (sampleRate == sampleRatePick[i]) {
             break;
-        } else if (i == support_sample_rate - 1) {
+        } else if (i == SUPPORT_SAMPLE_RATE - 1) {
             return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
         }
     }

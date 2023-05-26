@@ -16,17 +16,21 @@
 #include "audio_ffmpeg_flac_decoder_plugin.h"
 #include "avcodec_errors.h"
 #include "media_description.h"
+#include "avcodec_dfx.h"
+#include "avcodec_log.h"
+#include "avcodec_mime_type.h"
 
 namespace {
-constexpr int getInputBufferSize_ = 65536;
-constexpr int getOutputBufferSize_ = 65536;
-constexpr int minChannels = 1;
-constexpr int maxChannels = 8;
-static const int flac_encoder_sample_rate_table[] = {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacDecoderPlugin"};
+constexpr int32_t GET_INPUT_BUFFER_SIZE = 65536;
+constexpr int32_t GET_OUTPUT_BUFFER_SIZE = 65536;
+constexpr int32_t MIN_CHANNELS = 1;
+constexpr int32_t MAX_CHANNELS = 8;
+static const uint32_t FLAC_DECODER_SAMPLE_RATE_TABLE[] = {
     0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
-static const int flac_encoder_bits_sample_table[] = {16, 24, 32};
-} // namespace
+static const uint32_t FLAC_DECODER_BITS_SAMPLE_TABLE[] = {16, 24, 32};
+}
 
 namespace OHOS {
 namespace Media {
@@ -41,101 +45,120 @@ AudioFFMpegFlacDecoderPlugin::~AudioFFMpegFlacDecoderPlugin()
     basePlugin = nullptr;
 }
 
-static bool isTrueSampleRate(int sample)
+static bool CheckSampleRate(uint32_t sampleRate)
 {
-    for (auto i : flac_encoder_sample_rate_table) {
-        if (i == sample) {
+    for (auto i : FLAC_DECODER_SAMPLE_RATE_TABLE) {
+        if (i == sampleRate) {
             return true;
         }
     }
     return false;
 }
 
-static bool isTrueBitsPerSample(int bits_per_coded_sample)
+static bool CheckBitsPerSample(uint32_t bitsPerCodedSample)
 {
-    for (auto i : flac_encoder_bits_sample_table) {
-        if (i == bits_per_coded_sample) {
+    for (auto i : FLAC_DECODER_BITS_SAMPLE_TABLE) {
+        if (i == bitsPerCodedSample) {
             return true;
         }
     }
     return false;
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::init(const Format &format)
+int32_t AudioFFMpegFlacDecoderPlugin::CheckFormat(const Format &format) const
 {
-    int channels, sample_rate, bits_per_coded_sample;
-    int64_t bit_rate;
+    int32_t channels;
+    int32_t sampleRate;
+    int32_t bitsPerCodedSample;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sample_rate);
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bit_rate);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bits_per_coded_sample);
-    if (!isTrueSampleRate(sample_rate)) {
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
+    if (!CheckSampleRate(sampleRate)) {
+        AVCODEC_LOGE("init failed, because sampleRate=%{public}d not in table.", sampleRate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
-    } else if (channels < minChannels || channels > maxChannels) {
+    } else if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
+        AVCODEC_LOGE("init failed, because channels=%{public}d not support.", channels);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
-    } else if (!isTrueBitsPerSample(bits_per_coded_sample)) {
+    } else if (!CheckBitsPerSample(bitsPerCodedSample)) {
+        AVCODEC_LOGE("init failed, because bitsPerCodedSample=%{public}d not support.", bitsPerCodedSample);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
     }
+    return AVCodecServiceErrCode::AVCS_ERR_OK;
+}
 
+int32_t AudioFFMpegFlacDecoderPlugin::Init(const Format &format)
+{
     int32_t ret = basePlugin->AllocateContext("flac");
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because AllocateContext failed. ret=%{public}d", ret);
+        return ret;
+    }
+    
+    ret = CheckFormat(format);
+    if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because CheckFormat failed. ret=%{public}d", ret);
         return ret;
     }
 
     ret = basePlugin->InitContext(format);
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because InitContext failed. ret=%{public}d", ret);
         return ret;
     }
 
     ret = basePlugin->OpenContext();
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because OpenContext failed. ret=%{public}d", ret);
         return ret;
     }
+    
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegFlacDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegFlacDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::reset()
+int32_t AudioFFMpegFlacDecoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::release()
+int32_t AudioFFMpegFlacDecoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::flush()
+int32_t AudioFFMpegFlacDecoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegFlacDecoderPlugin::getInputBufferSize() const
+int32_t AudioFFMpegFlacDecoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
-    if (maxSize < 0 || maxSize > getInputBufferSize_) {
-        maxSize = getInputBufferSize_;
+    if (maxSize < 0 || maxSize > GET_INPUT_BUFFER_SIZE) {
+        maxSize = GET_INPUT_BUFFER_SIZE;
     }
     return maxSize;
 }
 
-uint32_t AudioFFMpegFlacDecoderPlugin::getOutputBufferSize() const
+int32_t AudioFFMpegFlacDecoderPlugin::GetOutputBufferSize() const
 {
-    return getOutputBufferSize_;
+    return GET_OUTPUT_BUFFER_SIZE;
 }
 
 Format AudioFFMpegFlacDecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC);
+    return format;
 }
 } // namespace Media
 } // namespace OHOS

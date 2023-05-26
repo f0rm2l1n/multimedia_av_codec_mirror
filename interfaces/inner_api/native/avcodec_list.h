@@ -51,8 +51,8 @@ public:
      * @since 10
      * @version 1.0
      */
-    virtual CapabilityData GetCapability(const std::string mime, const bool isEncoder,
-                                         const AVCodecCategory category) = 0;
+    virtual CapabilityData GetCapability(const std::string &mime, const bool isEncoder,
+                                         const AVCodecCategory &category) = 0;
 };
 
 class __attribute__((visibility("default"))) AVCodecListFactory {

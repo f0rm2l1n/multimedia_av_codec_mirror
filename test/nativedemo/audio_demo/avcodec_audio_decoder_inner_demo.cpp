@@ -33,14 +33,14 @@ constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 112000;
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
-constexpr string_view inputFilePath = "/data/media/vorbis_2c_44100hz_112k.dat";
-constexpr string_view outputFilePath = "/data/media/decode_ogg.pcm";
+constexpr string_view INPUT_FILE_PATH = "/data/media/vorbis_2c_44100hz_112k.dat";
+constexpr string_view OUTPUT_FILE_PATH = "/data/media/decode_ogg.pcm";
 constexpr uint32_t TMP_BUFFER_SIZE = 4096;
 } // namespace
 
 void ADecInnerDemo::RunCase()
 {
-    inputFile_.open(inputFilePath, std::ios::binary);
+    inputFile_.open(INPUT_FILE_PATH, std::ios::binary);
     DEMO_CHECK_AND_RETURN_LOG(inputFile_.is_open(), "Fatal: open file failed");
 
     DEMO_CHECK_AND_RETURN_LOG(CreateDec() == AVCS_ERR_OK, "Fatal: CreateDec fail");
@@ -74,7 +74,7 @@ void ADecInnerDemo::RunCase()
 
 int32_t ADecInnerDemo::CreateDec()
 {
-    audioDec_ = AudioDecoderFactory::CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME_KEY).data());
+    audioDec_ = AudioDecoderFactory::CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = make_shared<ADecSignal>();
@@ -217,7 +217,7 @@ void ADecInnerDemo::InputFunc()
 
 void ADecInnerDemo::OutputFunc()
 {
-    std::ofstream outputFile(outputFilePath.data(), std::ios::binary);
+    std::ofstream outputFile(OUTPUT_FILE_PATH.data(), std::ios::binary);
     while (true) {
         if (!isRunning_.load()) {
             break;
@@ -243,7 +243,7 @@ void ADecInnerDemo::OutputFunc()
             cout << "decode eos" << endl;
             isRunning_.store(false);
         }
-        outputFile.write((char *)buffer->GetBase(), attr.size);
+        outputFile.write(reinterpret_cast<char *>(buffer->GetBase()), attr.size);
         if (audioDec_->ReleaseOutputBuffer(index) != AVCS_ERR_OK) {
             cout << "Fatal: ReleaseOutputBuffer fail" << endl;
             break;
