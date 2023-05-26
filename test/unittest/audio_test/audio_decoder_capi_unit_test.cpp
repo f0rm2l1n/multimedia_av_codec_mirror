@@ -300,7 +300,7 @@ int32_t AudioCodeCapiDecoderUnitTest::ProceFunc(void)
     pkt.data = NULL;
     pkt.size = 0;
 
-    audioDec_ = OH_AudioDecoder_CreateByName("avdec_mp3");
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
     signal_ = new ADecSignal();
 
     cb_ = {&OnError, &OnOutputFormatChanged, &OnInputBufferAvailable, &OnOutputBufferAvailable};
@@ -312,7 +312,7 @@ int32_t AudioCodeCapiDecoderUnitTest::ProceFunc(void)
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_CreateByName_01, TestSize.Level1)
 {
-    audioDec_ = OH_AudioDecoder_CreateByName("avdec_mp3");
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
 }
 
 
