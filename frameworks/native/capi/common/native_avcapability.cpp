@@ -48,12 +48,11 @@ OH_AVCapability *OH_AVCodec_GetCapabilityByCategory(const char *mime, bool isEnc
 
 const char *OH_AVCapability_GetName(OH_AVCapability *capability)
 {
-    std::string name;
     if (capability == nullptr) {
-        return name.data();
+        return "";
     }
     std::shared_ptr<AVCodecInfo> codecInfo = std::make_shared<AVCodecInfo>(capability->capabilityData_);
-    name = codecInfo->GetName();
+    const auto &name = codecInfo->GetName();
     return name.data();
 }
 
@@ -78,16 +77,15 @@ int32_t OH_AVCapability_GetMaxSupportedInstances(OH_AVCapability *capability)
 OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability, const int32_t **profiles,
                                                   uint32_t *profileNum)
 {
-    std::vector<int32_t> ret;
     if (capability == nullptr) {
-        *profiles = ret.data();
-        *profileNum = ret.size();
+        *profiles = nullptr;
+        *profileNum = 0;
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<AudioCaps> codecInfo = std::make_shared<AudioCaps>(capability->capabilityData_);
-    ret = codecInfo->GetSupportedProfiles();
-    *profiles = ret.data();
-    *profileNum = ret.size();
+    const auto &profile = codecInfo->GetSupportedProfiles();
+    *profiles = profile.data();
+    *profileNum = profile.size();
     return AV_ERR_OK;
 }
 
@@ -216,9 +214,9 @@ OH_AVErrCode OH_AVCapability_GetVideoSupportedPixelFormats(OH_AVCapability *capa
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
-    const auto &vec = codecInfo->GetSupportedFormats();
-    *pixFormats = vec.data();
-    *pixFormatNum = vec.size();
+    const auto &pixFmt = codecInfo->GetSupportedFormats();
+    *pixFormats = pixFmt.data();
+    *pixFormatNum = pixFmt.size();
     return AV_ERR_OK;
 }
 

@@ -343,7 +343,7 @@ void VideoCaps::InitParams()
         data_.height = Range(1, INT32_MAX);
     }
     if (data_.frameRate.maxVal == 0) {
-        data_.frameRate = Range(1, FRAME_RATE_30);
+        data_.frameRate = Range(0, FRAME_RATE_30);
     }
     if (data_.blockSize.width == 0 || data_.blockSize.height == 0) {
         data_.blockSize.width = BLOCK_SIZE_MIN;
@@ -426,7 +426,8 @@ bool VideoCaps::IsSizeAndRateSupported(int32_t width, int32_t height, double fra
                      height);
         return false;
     }
-    if (data_.frameRate.minVal >= frameRate || frameRate > data_.frameRate.maxVal) {
+    const auto &frameRateRange = GetSupportedFrameRatesFor(width, height);
+    if (frameRateRange.minVal >= frameRate || frameRate > frameRateRange.maxVal) {
         AVCODEC_LOGD("The %{public}s can not support frameRate:%{public}lf", data_.codecName.c_str(), frameRate);
         return false;
     }
