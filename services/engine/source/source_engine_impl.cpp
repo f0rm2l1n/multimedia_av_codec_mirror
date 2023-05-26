@@ -40,12 +40,9 @@ std::shared_ptr<ISourceEngine> ISourceEngineFactory::CreateSourceEngine(int32_t 
 
 int32_t SourceEngineImpl::Create()
 {
-    AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
-    if (source_ != nullptr) {
-        AVCODEC_LOGI("state_ is INITIALIZED");
-    } else {
-        AVCODEC_LOGE("state_ is UNINITIALIZED");
-    }
+    AVCodecTrace trace("SourceEngineImpl::Create");
+    AVCODEC_LOGI("Create");
+    std::unique_lock<std::mutex> lock(mutex_);
     return source_->Create(uri_);
 }
 
