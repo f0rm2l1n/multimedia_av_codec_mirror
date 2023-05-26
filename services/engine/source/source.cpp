@@ -245,7 +245,7 @@ int32_t Source::GetSourceFormat(Format &format)
     int64_t duration = formatContext_->duration;
     AVRational timeBase = AV_TIME_BASE_Q;
     if (duration == AV_NOPTS_VALUE) {
-        for (uint32_t i = 0; i < formatContext_->nb_streams;i++) {
+        for (uint32_t i = 0; i < formatContext_->nb_streams; ++i) {
             auto streamDuration = formatContext_->streams[i]->duration;
             if (streamDuration > duration) {
                 duration = streamDuration;
@@ -450,7 +450,7 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
         return AVCS_ERR_INVALID_OPERATION;
     }
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
-    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); iter++) {
+    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
         std::shared_ptr<AVInputFormat> inputFormat = iter->second;
         int32_t ret = av_match_name(uriSuffix.c_str(), inputFormat->extensions);
         if (ret == 1) {
@@ -482,8 +482,7 @@ int32_t Source::SniffInputFormat(const std::string& uri)
     constexpr int probThresh = 50;
     int maxProb = 0;
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
-    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); iter++) {
-        std::string vtype = iter->first;
+    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
         std::shared_ptr<AVInputFormat> inputFormat = iter -> second;
         if (inputFormat->read_probe) {
             auto prob = inputFormat->read_probe(&probeData);
