@@ -89,7 +89,7 @@ const std::string DEFAULT_VIDEO_MIME = std::string(CodecMimeType::VIDEO_AVC);
 constexpr int32_t MAX_SURPPORT_ACODEC = 16;
 constexpr int32_t MAX_SURPPORT_VCODEC = 16;
 
-constexpr OH_AVRange DEFAULT_BITRATE_RANGE = {8000, 960000};
+constexpr OH_AVRange DEFAULT_BITRATE_RANGE = {8000, 448000};
 constexpr OH_AVRange DEFAULT_QUALITY_RANGE = {0, 0};
 constexpr OH_AVRange DEFAULT_COMPLEXITY_RANGE = {0, 0};
 constexpr OH_AVRange DEFAULT_CHANNELCOUNT_RANGE = {1, 8};
@@ -114,7 +114,7 @@ constexpr int32_t DEFAULT_FRAMERATE = 1;
 constexpr int32_t DEFAULT_WIDTH = 1920;
 constexpr int32_t DEFAULT_HEIGHT = 1080;
 constexpr int32_t DEFAULT_VIDEO_AVC_PROFILE = AVC_PROFILE_HIGH;
-constexpr int32_t DEFAULT_LEVEL = 1;
+constexpr int32_t DEFAULT_LEVEL = AVC_LEVEL_1;
 constexpr int32_t ERROR_FRAMERATE = 121;
 constexpr int32_t ERROR_WIDTH = 95;
 constexpr int32_t ERROR_HEIGHT = 95;

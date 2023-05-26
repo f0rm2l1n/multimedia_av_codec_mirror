@@ -543,12 +543,12 @@ void CapsUnitTest::CheckAVEncOpus(const std::shared_ptr<AudioCaps> &audioCaps) c
 }
 
 /**
- * @tc.name: AVCdecList_GetVideoDecoderCaps_001
+ * @tc.name: AVCaps_GetVideoDecoderCaps_001
  * @tc.desc: AVCdecList GetVideoDecoderCaps
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetVideoDecoderCaps_001, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetVideoDecoderCaps_001, TestSize.Level1)
 {
     std::vector<std::shared_ptr<VideoCaps>> videoDecoderArray;
     videoDecoderArray = GetVideoDecoderCaps();
@@ -556,12 +556,12 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetVideoDecoderCaps_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: AVCdecList_GetVideoEncoderCaps_001
+ * @tc.name: AVCaps_GetVideoEncoderCaps_001
  * @tc.desc: AVCdecList GetVideoEncoderCaps
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetVideoEncoderCaps_001, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetVideoEncoderCaps_001, TestSize.Level1)
 {
     std::vector<std::shared_ptr<VideoCaps>> videoEncoderArray;
     videoEncoderArray = GetVideoEncoderCaps();
@@ -569,12 +569,12 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetVideoEncoderCaps_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: AVCdecList_GetAudioDecoderCaps_001
+ * @tc.name: AVCaps_GetAudioDecoderCaps_001
  * @tc.desc: AVCdecList GetAudioDecoderCaps
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetAudioDecoderCaps_001, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetAudioDecoderCaps_001, TestSize.Level1)
 {
     std::vector<std::shared_ptr<AudioCaps>> audioDecoderArray;
     audioDecoderArray = GetAudioDecoderCaps();
@@ -582,12 +582,12 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetAudioDecoderCaps_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: AVCdecList_GetAudioEncoderCaps_001
+ * @tc.name: AVCaps_GetAudioEncoderCaps_001
  * @tc.desc: AVCdecList GetAudioEncoderCaps
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetAudioEncoderCaps_001, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetAudioEncoderCaps_001, TestSize.Level1)
 {
     std::vector<std::shared_ptr<AudioCaps>> audioEncoderArray;
     audioEncoderArray = GetAudioEncoderCaps();
@@ -595,12 +595,12 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetAudioEncoderCaps_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: AVCdecList_GetSupportedFrameRatesFor_001
+ * @tc.name: AVCaps_GetSupportedFrameRatesFor_001
  * @tc.desc: AVCdecList GetSupportedFrameRatesFor
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetSupportedFrameRatesFor_001, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetSupportedFrameRatesFor_001, TestSize.Level1)
 {
     Range ret;
     std::vector<std::shared_ptr<VideoCaps>> videoDecoderArray = GetVideoDecoderCaps();
@@ -619,12 +619,12 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetSupportedFrameRatesFor_001, TestSize.Level1
 }
 
 /**
- * @tc.name: AVCdecList_GetSupportedFrameRatesFor_002
+ * @tc.name: AVCaps_GetSupportedFrameRatesFor_002
  * @tc.desc: AVCdecList GetSupportedFrameRatesFor not supported size
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetSupportedFrameRatesFor_002, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetSupportedFrameRatesFor_002, TestSize.Level1)
 {
     Range ret;
     std::vector<std::shared_ptr<VideoCaps>> videoDecoderArray = GetVideoDecoderCaps();
@@ -643,12 +643,12 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetSupportedFrameRatesFor_002, TestSize.Level1
 }
 
 /**
- * @tc.name: AVCdecList_GetPreferredFrameRate_001
+ * @tc.name: AVCaps_GetPreferredFrameRate_001
  * @tc.desc: AVCdecList GetPreferredFrameRate
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetPreferredFrameRate_001, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetPreferredFrameRate_001, TestSize.Level1)
 {
     Range ret;
     std::vector<std::shared_ptr<VideoCaps>> videoEncoderArray = GetVideoEncoderCaps();
@@ -664,12 +664,12 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetPreferredFrameRate_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: AVCdecList_GetPreferredFrameRate_002
+ * @tc.name: AVCaps_GetPreferredFrameRate_002
  * @tc.desc: AVCdecList GetPreferredFrameRate for not supported size
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CapsUnitTest, AVCdecList_GetPreferredFrameRate_002, TestSize.Level1)
+HWTEST_F(CapsUnitTest, AVCaps_GetPreferredFrameRate_002, TestSize.Level1)
 {
     Range ret;
     std::vector<std::shared_ptr<VideoCaps>> videoEncoderArray = GetVideoEncoderCaps();
@@ -683,5 +683,116 @@ HWTEST_F(CapsUnitTest, AVCdecList_GetPreferredFrameRate_002, TestSize.Level1)
         EXPECT_GE(ret.minVal, 0);
     }
 }
+
+#ifdef CODECLIST_CAPI_UNIT_TEST
+
+/**
+ * @tc.name: AVCaps_NullvalToCapi_001
+ * @tc.desc: AVCdecList GetCapi for not null val
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CapsUnitTest, AVCaps_NullvalToCapi_001, TestSize.Level1)
+{
+    EXPECT_EQ(OH_AVCapability_IsHardware(nullptr), false);
+
+    EXPECT_STREQ(OH_AVCapability_GetName(nullptr), "");
+
+    EXPECT_EQ(OH_AVCapability_GetMaxSupportedInstances(nullptr), 0);
+
+    const int32_t *sampleRates = nullptr;
+    uint32_t sampleRateNum = 0;
+    EXPECT_EQ(OH_AVCapability_GetAudioSupportedSampleRates(nullptr, &sampleRates, &sampleRateNum), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(sampleRates, nullptr);
+    EXPECT_EQ(sampleRateNum, 0);
+
+    EXPECT_EQ(OH_AVCapability_IsVideoSizeSupported(nullptr, DEFAULT_WIDTH, DEFAULT_HEIGHT), false);
+
+    EXPECT_EQ(
+        OH_AVCapability_AreVideoSizeAndFrameRateSupported(nullptr, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_FRAMERATE),
+        false);
+
+    const int32_t *pixFormats = nullptr;
+    uint32_t pixFormatNum = -1;
+    EXPECT_EQ(OH_AVCapability_GetVideoSupportedPixelFormats(nullptr, &pixFormats, &pixFormatNum), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(pixFormats, nullptr);
+    EXPECT_EQ(pixFormatNum, 0);
+
+    const int32_t *profiles = nullptr;
+    uint32_t profileNum = -1;
+    EXPECT_EQ(OH_AVCapability_GetSupportedProfiles(nullptr, &profiles, &profileNum), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(profiles, nullptr);
+    EXPECT_EQ(profileNum, 0);
+
+    const int32_t *levels = nullptr;
+    uint32_t levelNum = -1;
+    EXPECT_EQ(OH_AVCapability_GetSupportedLevelsForProfile(nullptr, DEFAULT_VIDEO_AVC_PROFILE, &levels, &levelNum),
+              AV_ERR_INVALID_VAL);
+    EXPECT_EQ(levels, nullptr);
+    EXPECT_EQ(levelNum, 0);
+
+    EXPECT_EQ(OH_AVCapability_AreProfileAndLevelSupported(nullptr, DEFAULT_VIDEO_AVC_PROFILE, AVC_LEVEL_1), false);
+}
+
+/**
+ * @tc.name: AVCaps_NullvalToCapi_002
+ * @tc.desc: AVCdecList GetCapi for not null val
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CapsUnitTest, AVCaps_NullvalToCapi_002, TestSize.Level1)
+{
+    OH_AVRange range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetEncoderBitrateRange(nullptr, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetEncoderQualityRange(nullptr, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetEncoderComplexityRange(nullptr, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetAudioChannelCountRange(nullptr, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetVideoWidthRangeForHeight(nullptr, DEFAULT_HEIGHT, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetVideoHeightRangeForWidth(nullptr, DEFAULT_WIDTH, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetVideoWidthRange(nullptr, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetVideoHeightRange(nullptr, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetVideoFrameRateRange(nullptr, &range), AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+
+    range = {-1, -1};
+    EXPECT_EQ(OH_AVCapability_GetVideoFrameRateRangeForSize(nullptr, DEFAULT_WIDTH, DEFAULT_HEIGHT, &range),
+              AV_ERR_INVALID_VAL);
+    EXPECT_EQ(range.minVal, 0);
+    EXPECT_EQ(range.maxVal, 0);
+}
+#endif
 } // namespace Media
 } // namespace OHOS
