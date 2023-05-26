@@ -58,19 +58,19 @@ public:
     std::shared_ptr<AudioBufferInfo> GetInputBufferInfo(const uint32_t &index) const noexcept;
 
 private:
-    void produceInputBuffer();
-    void consumerOutputBuffer();
-    void dispose();
-    bool begin();
-    bool handInputBuffer(int32_t &ret);
+    void ProduceInputBuffer();
+    void ConsumerOutputBuffer();
+    void Dispose();
+    bool Begin();
+    bool HandInputBuffer(int32_t &ret);
 
 private:
     bool isFirFrame_;
     std::atomic<bool> isRunning;
     std::atomic<bool> isProduceInput;
     std::shared_ptr<AudioBaseCodec> codec_;
-    uint32_t inputBufferSize;
-    uint32_t outputBufferSize;
+    int32_t inputBufferSize;
+    int32_t outputBufferSize;
     std::mutex stateMutex_;
     std::mutex inputMuxt_;
     std::mutex outputMuxt_;

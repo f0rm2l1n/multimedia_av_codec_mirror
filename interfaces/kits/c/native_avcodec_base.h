@@ -252,10 +252,8 @@ extern const char *OH_MD_KEY_LANGUAGE;
 extern const char *OH_MD_KEY_DESCRIPTION;
 /* source format Key for lyrics, value type is string */
 extern const char *OH_MD_KEY_LYRICS;
-/* source format Key for track count, value type is string */
+/* source format Key for track count, value type is uint32_t */
 extern const char *OH_MD_KEY_TRACK_COUNT;
-/* source format Key for type, value type is string */
-extern const char *OH_MD_KEY_MEDIA_TYPE;
 
 /**
  * @brief Media type.

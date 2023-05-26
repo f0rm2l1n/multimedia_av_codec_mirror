@@ -28,6 +28,14 @@
 #include "media_source.h"
 #include "format.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "libavutil/avstring.h"
+#ifdef __cplusplus
+}
+#endif
+
 static std::string g_libFileHead = "libhistreamer_plugin_";
 static std::string g_fileSeparator = "/";
 static std::string g_libFileTail = ".z.so";
@@ -234,7 +242,19 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("description", AVSourceFormat::SOURCE_DESCRIPTION, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
     
-    bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, formatContext_->duration);
+    int64_t duration = formatContext_->duration;
+    AVRational timeBase = AV_TIME_BASE_Q;
+    if (duration == AV_NOPTS_VALUE) {
+        for (uint32_t i = 0; i < formatContext_->nb_streams;i++) {
+            auto streamDuration = formatContext_->streams[i]->duration;
+            if (streamDuration > duration) {
+                duration = streamDuration;
+                timeBase = {formatContext_->streams[i]->time_base.num, formatContext_->streams[i]->time_base.den};
+            }
+        }
+    }
+    double newDuration = duration * av_q2d(timeBase);
+    bool ret = format.PutDoubleValue(MediaDescriptionKey::MD_KEY_DURATION, newDuration);
     if (!ret) {
         AVCODEC_LOGW("Put track info failed: miss duration info in file");
     }
@@ -343,6 +363,8 @@ int32_t Source::Create(std::string& uri)
         AVCODEC_LOGE("load sourcePlugin_ fail !");
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
+    SourceCallback cb;
+    sourcePlugin_->SetCallback(&cb);
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
 
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
@@ -430,7 +452,8 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
     for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); iter++) {
         std::shared_ptr<AVInputFormat> inputFormat = iter->second;
-        if (uriSuffix == inputFormat->name) {
+        int32_t ret = av_match_name(uriSuffix.c_str(), inputFormat->extensions);
+        if (ret == 1) {
             bestInputFormat = inputFormat;
             AVCODEC_LOGD("find input fromat successful: %{public}s", inputFormat->name);
             break;
@@ -495,8 +518,8 @@ void Source::InitAVIOContext(int flags)
         AVCODEC_LOGE("seek to 0 failed when set data source for plugin!");
         return;
     }
-    customIOContext_.offset=0;
-    customIOContext_.eof=false;
+    customIOContext_.offset = 0;
+    customIOContext_.eof = false;
     auto buffer = static_cast<unsigned char*>(av_malloc(bufferSize));
     auto bufferVector = std::make_shared<Buffer>();
     customIOContext_.bufMemory = bufferVector;
@@ -605,6 +628,7 @@ int32_t Source::InitAVFormatContext()
         AVCODEC_LOGE("InitAVFormatContext failed, because  alloc AVFormatContext failed.");
         return AVCS_ERR_INVALID_OPERATION;
     }
+
     InitAVIOContext(AVIO_FLAG_READ);
     if (avioContext_ == nullptr) {
         AVCODEC_LOGE("InitAVFormatContext failed, because  init AVIOContext failed.");
@@ -612,22 +636,29 @@ int32_t Source::InitAVFormatContext()
     }
     formatContext->pb = avioContext_;
     formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
-    int32_t ret = -1;
-    ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
-    if (ret == 0) {
-        formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
-            if (ptr) {
-                auto ctx = ptr->pb;
-                if (ctx) {
-                    av_freep(&ctx->buffer);
-                    av_free(ctx);
-                }
-            }
-        });
-    } else {
+
+    int32_t ret = static_cast<int32_t>(avformat_open_input(&formatContext, nullptr, inputFormat_.get(), nullptr));
+    if (ret != 0) {
         AVCODEC_LOGE("avformat_open_input failed by %{public}s", inputFormat_->name);
         return AVCS_ERR_INVALID_OPERATION;
     }
+
+    ret = avformat_find_stream_info(formatContext, NULL);
+    if (ret < 0) {
+        AVCODEC_LOGE("avformat_find_stream_info failed by %{public}s", inputFormat_->name);
+        return AVCS_ERR_INVALID_OPERATION;
+    }
+
+    formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
+        if (ptr) {
+            auto ctx = ptr->pb;
+            if (ctx) {
+                av_freep(&ctx->buffer);
+                av_free(ctx);
+            }
+        }
+    });
+
     return AVCS_ERR_OK;
 }
 
