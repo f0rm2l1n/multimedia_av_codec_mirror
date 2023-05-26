@@ -41,7 +41,7 @@
 | OH_AVErrCode OH_AudioEncoder_Stop(OH_AVCodec \*codec);       | 停止编码器                                                   |
 | OH_AVErrCode OH_AudioEncoder_Flush(OH_AVCodec \*codec);      | 刷新编码器的输入输出                                         |
 | OH_AVErrCode OH_AudioEncoder_Reset(OH_AVCodec \*codec);      | 重置编码器                                                   |
-| OH_AVFormat *OH_AudioEncoder_GetOutputDescription(OH_AVCodec \*codec); | 返回编码器输出的格式信息                                     |
+| OH_AVFormat \*OH_AudioEncoder_GetOutputDescription(OH_AVCodec \*codec); | 返回编码器输出的格式信息                                     |
 | OH_AVErrCode OH_AudioEncoder_SetParameter(OH_AVCodec \*codec, OH_AVFormat \*format); | 对编码器实例进行动态配置                                     |
 | OH_AVErrCode OH_AudioEncoder_PushInputData(OH_AVCodec \*codec, uint32_t index, OH_AVCodecBufferAttr attr); | 发送特定的buffer给编码器处理                                 |
 | OH_AVErrCode OH_AudioEncoder_FreeOutputData(OH_AVCodec \*codec, uint32_t index); | 返回已完成解码的编码器输出数据                               |
@@ -55,13 +55,13 @@
 
 1. 创建编码器实例对象
 
-``` c++
-//通过 codecname 创建编码器
-OH_AVCodec *audioEnc = OH_AudioEncoder_CreateByName("OH.Media.Codec.Encoder.Audio.AAC");
+    ``` c++
+    //通过 codecname 创建编码器
+    OH_AVCodec *audioEnc = OH_AudioEncoder_CreateByName("OH.Media.Codec.Encoder.Audio.AAC");
 
-//通过 codecname 创建编码器
-OH_AVCodec *audioEnc = OH_AudioEncoder_CreateByMime("audio/mp4a-lamt");
-```
+    //通过 codecname 创建编码器
+    OH_AVCodec *audioEnc = OH_AudioEncoder_CreateByMime("audio/mp4a-lamt");
+    ```
 
 2. 设置回调函数(必须)
 
@@ -101,129 +101,131 @@ OH_AVCodec *audioEnc = OH_AudioEncoder_CreateByMime("audio/mp4a-lamt");
 
 3. 设置采样率，码率，以及声道数（必须）、最大输入长度（可选）
 
-           // 设置解码分辨率
-           int32_t ret;
-           // 配置音频采样率（必须）
-           constexpr uint32_t DEFAULT_SMAPLERATE = 44100; 
-           // 配置音频码率（必须）
-           constexpr uint32_t DEFAULT_BITRATE = 32000;
-           // 配置音频声道数（必须）
-           constexpr uint32_t DEFAULT_CHANNEL_COUNT = 2;
-           // 配置最大输入长度（可选）
-           constexpr uint32_t DEFAULT_MAX_INPUT_SIZE = 1152*2;
-           OH_AVFormat *format = OH_AVFormat_Create();
-           // 写入format
-           OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SMAPLERATE);
-           OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
-           OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), DEFAULT_CHANNEL_COUNT);
-           OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE.data(), DEFAULT_MAX_INPUT_SIZE);
-           // 配置编码器
-           ret = OH_AudioEncoder_Configure(audioEnc, format);
-           if (ret != AV_ERR_OK) {
-                   // 异常处理
-           }
+    ``` c++
+        // 设置解码分辨率
+        int32_t ret;
+        // 配置音频采样率（必须）
+        constexpr uint32_t DEFAULT_SMAPLERATE = 44100; 
+        // 配置音频码率（必须）
+        constexpr uint32_t DEFAULT_BITRATE = 32000;
+        // 配置音频声道数（必须）
+        constexpr uint32_t DEFAULT_CHANNEL_COUNT = 2;
+        // 配置最大输入长度（可选）
+        constexpr uint32_t DEFAULT_MAX_INPUT_SIZE = 1152*2;
+        OH_AVFormat *format = OH_AVFormat_Create();
+        // 写入format
+        OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SMAPLERATE);
+        OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
+        OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), DEFAULT_CHANNEL_COUNT);
+        OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE.data(), DEFAULT_MAX_INPUT_SIZE);
+        // 配置编码器
+        ret = OH_AudioEncoder_Configure(audioEnc, format);
+        if (ret != AV_ERR_OK) {
+                // 异常处理
+        }
+    ```
 
-　４.　prepare通知编码器已经就绪
+4. prepare通知编码器已经就绪
 
-``` c++
-    OH_AudioEncoder_Prepare(audioEnc);
-```
+    ``` c++
+        OH_AudioEncoder_Prepare(audioEnc);
+    ```
 
-​    5.　启动编码器
+5. 启动编码器
 
-``` c++
-    inputFile_ = std::make_unique<std::ifstream>();
-    // 打开待解码二进制文件路径
-    inputFile_->open(inputFilePath.data(), std::ios::in | std::ios::binary); 
-    //配置解码文件输出路径
-    outFile_ = std::make_unique<std::ofstream>();
-    outFile_->open(outputFilePath.data(), std::ios::out | std::ios::binary);
+    ``` c++
+        inputFile_ = std::make_unique<std::ifstream>();
+        // 打开待解码二进制文件路径
+        inputFile_->open(inputFilePath.data(), std::ios::in | std::ios::binary); 
+        //配置解码文件输出路径
+        outFile_ = std::make_unique<std::ofstream>();
+        outFile_->open(outputFilePath.data(), std::ios::out | std::ios::binary);
+    
+        // 开始解码
+        ret = OH_AudioEncoder_Start(audioEnc);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+    ```
 
-    // 开始解码
-    ret = OH_AudioEncoder_Start(audioEnc);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-```
+6. 写入PCM码流
 
-​    6.　写入PCM码流
+    ``` c++
+        // 配置buffer info信息
+        OH_AVCodecBufferAttr info;
+        // 设置输入pkt尺寸、偏移量、时间戳等信息
+        info.size = pkt_->size;
+        info.offset = 0;
+        info.pts = pkt_->pts;
+        info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
+        // 送入解码输入队列进行解码, index为对应队列下标
+        int32_t ret = OH_AudioEncoder_PushInputData(audioEnc, index, info);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+    ```
 
-``` c++
-    // 配置buffer info信息
-    OH_AVCodecBufferAttr info;
-    // 设置输入pkt尺寸、偏移量、时间戳等信息
-    info.size = pkt_->size;
-    info.offset = 0;
-    info.pts = pkt_->pts;
-    info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
-    // 送入解码输入队列进行解码, index为对应队列下标
-    int32_t ret = OH_AudioEncoder_PushInputData(audioEnc, index, info);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-```
+7. 输出编码格式码流
 
-      7.　输出编码格式码流
+    ``` c++
+        // 将解码完成数据data写入到对应输出文件中
+        outFile_->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
+        // buffer 模式, 释放已完成写入的数据
+        ret = OH_AudioEncoder_FreeOutputData(audioEnc, index);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+    ```
 
-``` c++
-    // 将解码完成数据data写入到对应输出文件中
-    outFile_->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
-    // buffer 模式, 释放已完成写入的数据
-    ret = OH_AudioEncoder_FreeOutputData(audioEnc, index);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-```
+8. 刷新编码器
 
-      8.　刷新编码器
+    ``` c++
+        // 刷新编码器 audioEnc
+        ret = OH_AudioEncoder_Flush(audioEnc);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+        // 重新开始解码
+        ret = OH_AudioEncoder_Start(audioEnc);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+    ```
 
-``` c++
-    // 刷新编码器 audioEnc
-    ret = OH_AudioEncoder_Flush(audioEnc);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-    // 重新开始解码
-    ret = OH_AudioEncoder_Start(audioEnc);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-```
+9. 重置编码器
 
-      9.　重置编码器
+    ``` c++
+        // 重置编码器 audioEnc
+        ret = OH_AudioEncoder_Reset(audioEnc);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+        // 重新配置编码器参数
+        ret = OH_AudioEncoder_Configure(audioEnc, format);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+    ```
 
-``` c++
-    // 重置编码器 audioEnc
-    ret = OH_AudioEncoder_Reset(audioEnc);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-    // 重新配置编码器参数
-    ret = OH_AudioEncoder_Configure(audioEnc, format);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-```
+10. 停止编码器
 
-      10.　停止编码器
+    ``` c++
+        // 终止编码器 audioEnc
+        ret = OH_AudioEncoder_Stop(audioEnc);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+        return ret;
+    ```
 
-``` c++
-    // 终止编码器 audioEnc
-    ret = OH_AudioEncoder_Stop(audioEnc);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-    return ret;
-```
+11. 注销编码器实例
 
-      11.　注销编码器实例
-
-``` c++
-   // 调用OH_AudioEncoder_Destroy, 注销编码器
-    ret = OH_AudioEncoder_Destroy(audioEnc);
-    if (ret != AV_ERR_OK) {
-        // 异常处理
-    }
-    return ret;
-```
+    ``` c++
+       // 调用OH_AudioEncoder_Destroy, 注销编码器
+        ret = OH_AudioEncoder_Destroy(audioEnc);
+        if (ret != AV_ERR_OK) {
+            // 异常处理
+        }
+        return ret;
+    ```
 
