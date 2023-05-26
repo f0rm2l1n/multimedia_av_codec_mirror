@@ -365,7 +365,6 @@ int32_t ACodecMock::PushInputDataDecInner(uint32_t index, uint32_t bufferSize)
     }
     struct AVCodecBufferAttrMock attr;
     attr.offset = 0;
-    attr.flags = AVCODEC_BUFFER_FLAG_NONE;
     if (decInCnt_ == ES_LENGTH) {
         cout << "DEC input: set EOS" << endl;
         attr.flags = AVCODEC_BUFFER_FLAG_EOS;

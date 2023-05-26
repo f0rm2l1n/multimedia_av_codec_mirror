@@ -25,27 +25,27 @@
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegBaseCodec : public AVCodecBaseFactory<AudioFFMpegBaseCodec, std::string>, public NoCopyable {
+class AudioBaseCodec : public AVCodecBaseFactory<AudioBaseCodec, std::string>, public NoCopyable {
 public:
-    AudioFFMpegBaseCodec() = default;
+    AudioBaseCodec() = default;
 
-    virtual ~AudioFFMpegBaseCodec() = default;
+    virtual ~AudioBaseCodec() = default;
 
-    virtual int32_t init(const Format &format) = 0;
+    virtual int32_t Init(const Format &format) = 0;
 
-    virtual int32_t processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) = 0;
+    virtual int32_t ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) = 0;
 
-    virtual int32_t processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer) = 0;
+    virtual int32_t ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer) = 0;
 
-    virtual int32_t reset() = 0;
+    virtual int32_t Reset() = 0;
 
-    virtual int32_t release() = 0;
+    virtual int32_t Release() = 0;
 
-    virtual int32_t flush() = 0;
+    virtual int32_t Flush() = 0;
 
-    virtual uint32_t getInputBufferSize() const = 0;
+    virtual int32_t GetInputBufferSize() const = 0;
 
-    virtual uint32_t getOutputBufferSize() const = 0;
+    virtual int32_t GetOutputBufferSize() const = 0;
 
     virtual Format GetFormat() const noexcept = 0;
 };

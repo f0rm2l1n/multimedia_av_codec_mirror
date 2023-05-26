@@ -18,6 +18,7 @@
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "media_description.h"
+#include "avcodec_mime_type.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegAacDecoderPlugin"};
@@ -37,7 +38,7 @@ AudioFFMpegAacDecoderPlugin::~AudioFFMpegAacDecoderPlugin()
     basePlugin = nullptr;
 }
 
-int32_t AudioFFMpegAacDecoderPlugin::init(const Format &format)
+int32_t AudioFFMpegAacDecoderPlugin::Init(const Format &format)
 {
     int type;
     if (!format.GetIntValue(MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, type)) {
@@ -62,32 +63,32 @@ int32_t AudioFFMpegAacDecoderPlugin::init(const Format &format)
     return basePlugin->OpenContext();
 }
 
-int32_t AudioFFMpegAacDecoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegAacDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegAacDecoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegAacDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegAacDecoderPlugin::reset()
+int32_t AudioFFMpegAacDecoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegAacDecoderPlugin::release()
+int32_t AudioFFMpegAacDecoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegAacDecoderPlugin::flush()
+int32_t AudioFFMpegAacDecoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegAacDecoderPlugin::getInputBufferSize() const
+int32_t AudioFFMpegAacDecoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
@@ -96,14 +97,16 @@ uint32_t AudioFFMpegAacDecoderPlugin::getInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegAacDecoderPlugin::getOutputBufferSize() const
+int32_t AudioFFMpegAacDecoderPlugin::GetOutputBufferSize() const
 {
     return OUTPUT_BUFFER_SIZE_DEFAULT;
 }
 
 Format AudioFFMpegAacDecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC);
+    return format;
 }
 } // namespace Media
 } // namespace OHOS

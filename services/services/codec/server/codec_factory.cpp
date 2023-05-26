@@ -19,7 +19,7 @@
 #include <dlfcn.h>
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
-#include "audio_ffmpeg_adapter.h"
+#include "audio_codec_adapter.h"
 #include "fcodec.h"
 #include "codeclist_core.h"
 #include "codeclist_utils.h"
@@ -72,7 +72,7 @@ std::shared_ptr<CodecBase> CodecFactory::CreateCodecByName(const std::string &na
             codec = std::make_shared<Codec::FCodec>(name);
             break;
         case CodecType::AVCODEC_AUDIO_CODEC:
-            codec = std::make_shared<AudioFFMpegAdapter>(name);
+            codec = std::make_shared<AudioCodecAdapter>(name);
             break;
         default:
             AVCODEC_LOGE("Create codec %{public}s failed", name.c_str());

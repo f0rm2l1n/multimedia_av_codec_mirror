@@ -34,7 +34,8 @@ public:
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     std::string FindDecoder(const Format &format) override;
     std::string FindEncoder(const Format &format) override;
-    CapabilityData GetCapability(const std::string mime, const bool isEncoder, const AVCodecCategory category) override;
+    CapabilityData GetCapability(const std::string &mime, const bool isEncoder,
+                                 const AVCodecCategory &category) override;
     int32_t DestroyStub() override;
 
 private:
@@ -45,7 +46,7 @@ private:
     int32_t DoGetCapability(MessageParcel &data, MessageParcel &reply);
     int32_t DoDestroyStub(MessageParcel &data, MessageParcel &reply);
     std::shared_ptr<ICodecListService> codecListServer_ = nullptr;
-    using CodecListStubFunc = int32_t(CodecListServiceStub::*)(MessageParcel &data, MessageParcel &reply);
+    using CodecListStubFunc = int32_t (CodecListServiceStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CodecListStubFunc> codecListFuncs_;
     std::mutex mutex_;
 };

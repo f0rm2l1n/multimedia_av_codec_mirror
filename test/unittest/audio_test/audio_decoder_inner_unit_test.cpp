@@ -18,7 +18,7 @@
 #include <mutex>
 #include <gtest/gtest.h>
 #include "native_avcodec_audiodecoder.h"
-#include "audio_ffmpeg_adapter.h"
+#include "audio_codec_adapter.h"
 #include "format.h"
 #include "avcodec_audio_decoder.h"
 #include "avcodec_codec_name.h"
@@ -31,9 +31,9 @@ using namespace testing::ext;
 using namespace OHOS::Media;
 
 namespace {
-const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME_KEY);
-const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY);
-const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME_KEY);
+const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME);
+const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME);
+const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME);
 constexpr uint32_t MAX_CHANNEL_COUNT = 2;
 constexpr uint32_t INVALID_CHANNEL_COUNT = 3;
 constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
@@ -64,10 +64,10 @@ public:
     explicit BufferCallback(ADecSignal *userData) : userData_(userData) {}
     virtual ~BufferCallback() = default;
     ADecSignal *userData_;
-    virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
-    virtual void OnOutputFormatChanged(const Format &format) override;
-    virtual void OnInputBufferAvailable(uint32_t index) override;
-    virtual void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+    void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    void OnOutputFormatChanged(const Format &format) override;
+    void OnInputBufferAvailable(uint32_t index) override;
+    void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 };
 
 void BufferCallback::OnError(AVCodecErrorType errorType, int32_t errorCode)
@@ -719,7 +719,6 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_QueueInputBuffer_01, T
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateFlacCodecFunc());
     AVCodecBufferInfo info;
     AVCodecBufferFlag flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
-    ;
 
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     sleep(1);
@@ -1086,12 +1085,6 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_ReleaseOutputBuffer_01,
     // case2 传参正常
     index_ = 0;
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->ReleaseOutputBuffer(index_));
-}
-
-int main(int argc, char *argv[])
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
 } // namespace Media
 } // namespace OHOS

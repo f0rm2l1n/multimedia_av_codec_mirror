@@ -30,9 +30,9 @@ ohos_shared_library("av_codec_service_dfx") {
 
   sources = [
     "avcodec_dfx.cpp",
+    "avcodec_dump_utils.cpp",
     "avcodec_log_dump.cpp",
     "avcodec_xcollie.cpp",
-    "avcodec_dump_utils.cpp",
     "avcodec_bitstream_dump.cpp",
   ]
 
@@ -70,13 +70,12 @@ ohos_shared_library("av_codec_service_dfx") {
     "-Wunused-parameter",
   ]
 
-  deps = [
-    "$av_codec_root_dir/services/utils:av_codec_format",
-  ]
+  deps = [ "$av_codec_root_dir/services/utils:av_codec_format" ]
 
   external_deps = [
     "c_utils:utils",
     "hicollie_native:libhicollie",
+    "hidumper:lib_dump_usage",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",

@@ -111,7 +111,7 @@ HWTEST_F(AVFormatUnitTest, Format_Buffer_001, TestSize.Level0)
     uint8_t *getBuffer;
     size_t getSize;
     EXPECT_TRUE(format_->GetBuffer(key, &getBuffer, getSize));
-    EXPECT_TRUE(size == getSize);
+    EXPECT_TRUE(getSize == size);
     for (int32_t i = 0; i < size; i++) {
         EXPECT_TRUE(buffer[i] == getBuffer[i]);
     }

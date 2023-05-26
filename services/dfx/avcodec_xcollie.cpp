@@ -19,6 +19,7 @@
 #include "param_wrapper.h"
 #include "avcodec_dump_utils.h"
 #include "avcodec_log.h"
+#include "avcodec_dfx.h"
 #ifdef HICOLLIE_ENABLE
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
@@ -44,8 +45,11 @@ void AVCodecXCollie::TimerCallback(void *data)
     threadDeadlockCount_++;
     std::string name = data != nullptr ? (char *)data : "";
     AVCODEC_LOGE("Task %{public}s timeout", name.c_str());
+    FaultEventWrite(FaultType::FAULT_TYPE_FREEZE, std::string("Task") + name + "timeout", "AVCodecXCollie");
     static constexpr uint32_t threshold = 5; // >5 Restart service
     if (threadDeadlockCount_ >= threshold) {
+        FaultEventWrite(FaultType::FAULT_TYPE_FREEZE,
+            "Process timeout, av_codec service process exit.", "AVCodecXCollie");
         AVCODEC_LOGF("Process timeout, av_codec service process exit.");
         _exit(-1);
     }

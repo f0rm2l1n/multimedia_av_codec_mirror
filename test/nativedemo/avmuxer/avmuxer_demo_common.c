@@ -15,49 +15,49 @@
 
 #include "avmuxer_demo_common.h"
 
-const struct AudioTrackParam g_audioMpegPar = {
+struct AudioTrackParam g_audioMpegPar = {
     .fileName = "mpeg_44100_2.dat",
     .mimeType = "audio/mpeg",
     .sampleRate = 44100,
     .channels = 2,
 };
 
-const struct AudioTrackParam g_audioAacPar = {
+struct AudioTrackParam g_audioAacPar = {
     .fileName = "aac_44100_2.dat",
     .mimeType = "audio/mp4a-latm",
     .sampleRate = 44100,
     .channels = 2,
 };
 
-const struct VideoTrackParam g_videoH264Par = {
+struct VideoTrackParam g_videoH264Par = {
     .fileName = "h264_720_480.dat",
     .mimeType = "video/avc",
     .width = 720,
     .height = 480,
 };
 
-const struct VideoTrackParam g_videoMpeg4Par = {
+struct VideoTrackParam g_videoMpeg4Par = {
     .fileName = "mpeg4_720_480.dat",
     .mimeType = "video/mp4v-es",
     .width = 720,
     .height = 480,
 };
 
-const struct VideoTrackParam g_jpegCoverPar = {
+struct VideoTrackParam g_jpegCoverPar = {
     .fileName = "greatwall.jpg",
     .mimeType = "image/jpeg",
     .width = 352,
     .height = 288,
 };
 
-const struct VideoTrackParam g_pngCoverPar = {
+struct VideoTrackParam g_pngCoverPar = {
     .fileName = "greatwall.png",
     .mimeType = "image/png",
     .width = 352,
     .height = 288,
 };
 
-const struct VideoTrackParam g_bmpCoverPar = {
+struct VideoTrackParam g_bmpCoverPar = {
     .fileName = "greatwall.bmp",
     .mimeType = "image/bmp",
     .width = 352,

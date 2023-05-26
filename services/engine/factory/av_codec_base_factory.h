@@ -40,7 +40,7 @@ public:
         friend T;
         static bool avRegister()
         {
-            const auto r = T::identify();
+            const auto r = T::Identify();
             AVCodecBaseFactory::builders()[r] = [](Args &&...args) -> std::shared_ptr<I> {
                 return std::make_shared<T>(std::forward<Args>(args)...);
             };

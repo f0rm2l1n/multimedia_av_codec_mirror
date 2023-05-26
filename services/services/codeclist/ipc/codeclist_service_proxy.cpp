@@ -64,7 +64,8 @@ std::string CodecListServiceProxy::FindEncoder(const Format &format)
     return reply.ReadString();
 }
 
-CapabilityData CodecListServiceProxy::GetCapability(std::string mime, bool isEncoder, AVCodecCategory category)
+CapabilityData CodecListServiceProxy::GetCapability(const std::string &mime, const bool isEncoder,
+                                                    const AVCodecCategory &category)
 {
     MessageParcel data;
     MessageParcel reply;

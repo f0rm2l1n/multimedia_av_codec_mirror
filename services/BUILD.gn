@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/multimedia/av_codec/config.gni")
 
 group("av_codec_services_package") {
   deps = [
@@ -19,4 +20,7 @@ group("av_codec_services_package") {
     "services:av_codec_service",
     "utils:av_codec_service_utils",
   ]
+  if (multimedia_av_codec_support_hcodec) {
+    deps += [ "engine/codec/video/hcodec:hcodec" ]
+  }
 }

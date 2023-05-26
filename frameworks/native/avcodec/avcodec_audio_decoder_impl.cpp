@@ -20,7 +20,7 @@
 #include "avcodec_dfx.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecAudioDecoderImpl"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecAudioDecoderImpl"};
 }
 
 namespace OHOS {

@@ -19,6 +19,7 @@
 #include "avcodec_errors.h"
 #include "media_description.h"
 #include "securec.h"
+#include "avcodec_mime_type.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegVorbisEncoderPlugin"};
@@ -26,8 +27,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-static constexpr uint32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
-static constexpr uint32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
+static constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
+static constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
 
 AudioFFMpegVorbisDecoderPlugin::AudioFFMpegVorbisDecoderPlugin()
     : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
@@ -53,10 +54,6 @@ std::shared_ptr<AVCodecContext> AudioFFMpegVorbisDecoderPlugin::GenEncodeContext
     }
     auto encodeContext =
         std::shared_ptr<AVCodecContext>(context, [](AVCodecContext *ptr) { avcodec_free_context(&ptr); });
-    if (encodeContext == nullptr) {
-        AVCODEC_LOGE("AVCodecContext null pointer.");
-        return nullptr;
-    }
     encodeContext->sample_fmt = AV_SAMPLE_FMT_FLTP;
 
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, encodeContext->channels); // todo: 统一KEY定义
@@ -94,7 +91,7 @@ int32_t AudioFFMpegVorbisDecoderPlugin::AssignExtradata(std::shared_ptr<AVCodecC
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::init(const Format &format)
+int32_t AudioFFMpegVorbisDecoderPlugin::Init(const Format &format)
 {
     int32_t ret = basePlugin->AllocateContext("vorbis");
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
@@ -107,39 +104,43 @@ int32_t AudioFFMpegVorbisDecoderPlugin::init(const Format &format)
         return ret;
     }
     auto codecCtx = basePlugin->GetCodecContext();
-    if (!basePlugin->hasExtraData()) {
+    if (!basePlugin->HasExtraData()) {
         ret = AssignExtradata(codecCtx, format);
+    }
+    if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("AssignExtradata failed, ret=%{public}d", ret);
+        return ret;
     }
 
     return basePlugin->OpenContext();
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegVorbisDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegVorbisDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::reset()
+int32_t AudioFFMpegVorbisDecoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::release()
+int32_t AudioFFMpegVorbisDecoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegVorbisDecoderPlugin::flush()
+int32_t AudioFFMpegVorbisDecoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-uint32_t AudioFFMpegVorbisDecoderPlugin::getInputBufferSize() const
+int32_t AudioFFMpegVorbisDecoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
@@ -148,14 +149,16 @@ uint32_t AudioFFMpegVorbisDecoderPlugin::getInputBufferSize() const
     return maxSize;
 }
 
-uint32_t AudioFFMpegVorbisDecoderPlugin::getOutputBufferSize() const
+int32_t AudioFFMpegVorbisDecoderPlugin::GetOutputBufferSize() const
 {
     return OUTPUT_BUFFER_SIZE_DEFAULT;
 }
 
 Format AudioFFMpegVorbisDecoderPlugin::GetFormat() const noexcept
 {
-    return basePlugin->GetFormat();
+    auto format = basePlugin->GetFormat();
+    format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_VORBIS);
+    return format;
 }
 } // namespace Media
 } // namespace OHOS

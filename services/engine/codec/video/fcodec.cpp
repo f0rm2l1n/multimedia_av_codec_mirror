@@ -31,37 +31,39 @@ constexpr uint32_t INDEX_INPUT = 0;
 constexpr uint32_t INDEX_OUTPUT = 1;
 constexpr int32_t DEFAULT_IN_BUFFER_CNT = 8;
 constexpr int32_t DEFAULT_OUT_BUFFER_CNT = 8;
-constexpr int32_t DEFAULT_MIN_BUFFER_CNT = 1;
+constexpr int32_t DEFAULT_MIN_BUFFER_CNT = 2;
 constexpr uint32_t VIDEO_PIX_DEPTH_YUV = 3;
 constexpr uint32_t VIDEO_PIX_DEPTH_RGBA = 4;
-constexpr int32_t VIDEO_MIN_SIZE = 2;
-constexpr int32_t VIDEO_MAX_SIZE = 3840;
+constexpr int32_t VIDEO_MIN_SIZE = 96;
+constexpr int32_t VIDEO_ALIGNMENT_SIZE = 2;
+constexpr int32_t VIDEO_MAX_WIDTH_SIZE = 4096;
+constexpr int32_t VIDEO_MAX_HEIGHT_SIZE = 2304;
 constexpr int32_t DEFAULT_VIDEO_WIDTH = 1920;
 constexpr int32_t DEFAULT_VIDEO_HEIGHT = 1080;
 constexpr uint32_t DEFAULT_TRY_DECODE_TIME = 10;
 constexpr int32_t VIDEO_INSTANCE_SIZE = 16;
-constexpr int32_t VIDEO_BITRATE_MAX_SIZE = 3000000;
-constexpr int32_t VIDEO_FRAMERATE_MAX_SIZE = 30;
-constexpr int32_t VIDEO_BLOCKPERFRAME_SIZE = 32768;
-constexpr int32_t VIDEO_BLOCKPERSEC_SIZE = 244800;
+constexpr int32_t VIDEO_BITRATE_MAX_SIZE = 300000000;
+constexpr int32_t VIDEO_FRAMERATE_MAX_SIZE = 120;
+constexpr int32_t VIDEO_BLOCKPERFRAME_SIZE = 36864;
+constexpr int32_t VIDEO_BLOCKPERSEC_SIZE = 983040;
 constexpr struct {
     const std::string_view codecName;
     const std::string_view mimeType;
     const char *ffmpegCodec;
     const bool isEncoder;
-} SupportCodec[] = {
-    {AVCodecCodecName::VIDEO_DECODER_AVC_NAME_KEY, CodecMimeType::VIDEO_AVC, "h264", false},
+} SUPPORTCODEC[] = {
+    {AVCodecCodecName::VIDEO_DECODER_AVC_NAME, CodecMimeType::VIDEO_AVC, "h264", false},
 };
-constexpr uint32_t numSupportCodec = sizeof(SupportCodec) / sizeof(SupportCodec[0]);
-}
+constexpr uint32_t NUMSUPPORTCODEC = sizeof(SUPPORTCODEC) / sizeof(SUPPORTCODEC[0]);
+} // namespace
 FCodec::FCodec(const std::string &name)
 {
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_LOG(!name.empty(), "Create codec failed:  empty name");
     std::string fcodecName;
-    for (uint32_t i = 0; i < numSupportCodec; ++i) {
-        if (SupportCodec[i].codecName == name) {
-            fcodecName = SupportCodec[i].ffmpegCodec;
+    for (uint32_t i = 0; i < NUMSUPPORTCODEC; ++i) {
+        if (SUPPORTCODEC[i].codecName == name) {
+            fcodecName = SUPPORTCODEC[i].ffmpegCodec;
             break;
         }
     }
@@ -100,11 +102,12 @@ void FCodec::ConfigureDefaultVal(const Format &format, const std::string_view &f
                                  int32_t maxVal)
 {
     int32_t val32 = 0;
-    if (format.GetIntValue(formatKey, val32) && val32 > minVal && val32 < maxVal) {
+    if (format.GetIntValue(formatKey, val32) && val32 >= minVal && val32 <= maxVal) {
         format_.PutIntValue(formatKey, val32);
     } else {
         AVCODEC_LOGW("Set parameter failed: %{public}s, which minimum threshold=%{public}d, "
-                     "maximum threshold=%{public}d", formatKey.data(), minVal, maxVal);
+                     "maximum threshold=%{public}d",
+                     formatKey.data(), minVal, maxVal);
     }
 }
 
@@ -135,8 +138,8 @@ void FCodec::ConfigureSufrace(const Format &format, const std::string_view &form
             }
         }
     } else {
-        AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, please check your value",
-            formatKey.size(), formatKey.data());
+        AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, please check your value", formatKey.size(),
+                     formatKey.data());
     }
 }
 
@@ -155,16 +158,16 @@ int32_t FCodec::Configure(const Format &format)
         } else if (it.first == MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT) {
             ConfigureDefaultVal(format, it.first, DEFAULT_MIN_BUFFER_CNT);
         } else if (it.first == MediaDescriptionKey::MD_KEY_WIDTH) {
-            ConfigureDefaultVal(format, it.first, 0, VIDEO_MAX_SIZE);
+            ConfigureDefaultVal(format, it.first, VIDEO_MIN_SIZE, VIDEO_MAX_WIDTH_SIZE);
         } else if (it.first == MediaDescriptionKey::MD_KEY_HEIGHT) {
-            ConfigureDefaultVal(format, it.first, 0, VIDEO_MAX_SIZE);
+            ConfigureDefaultVal(format, it.first, VIDEO_MIN_SIZE, VIDEO_MAX_HEIGHT_SIZE);
         } else if (it.first == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT ||
                    it.first == MediaDescriptionKey::MD_KEY_ROTATION_ANGLE ||
                    it.first == MediaDescriptionKey::MD_KEY_SCALE_TYPE) {
             ConfigureSufrace(format, it.first, it.second.type);
         } else {
-            AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, unsupport name",
-                it.first.size(), it.first.data());
+            AVCODEC_LOGW("Set parameter failed: size: %{public}zu  %{public}s, unsupport name", it.first.size(),
+                         it.first.data());
         }
     }
     avCodecContext_ = std::shared_ptr<AVCodecContext>(avcodec_alloc_context3(avCodec_.get()), [](AVCodecContext *p) {
@@ -349,9 +352,8 @@ int32_t FCodec::Release()
     ResetContext();
     sLock.unlock();
     format_ = Format();
-    if (surface_ != nullptr) {
-        surface_ = nullptr;
-    }
+    surface_ = nullptr;
+
     CHECK_AND_RETURN_RET_LOG(ReleaseBuffers() == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
                              "Release codec failed: cannot release buffers");
 
@@ -452,7 +454,7 @@ int32_t FCodec::AllocateInputBuffer(int32_t bufferCnt, int32_t inBufferSize)
         callback_->OnInputBufferAvailable(valBufferCnt);
         valBufferCnt++;
     }
-    if (valBufferCnt < DEFAULT_MIN_BUFFER_CNT + 1) {
+    if (valBufferCnt < DEFAULT_MIN_BUFFER_CNT) {
         AVCODEC_LOGE("Allocate input buffer failed: only %{public}d buffer is allocated, no memory", valBufferCnt);
         buffers_[INDEX_INPUT].clear();
         return AVCS_ERR_NO_MEMORY;
@@ -496,7 +498,7 @@ int32_t FCodec::AllocateOutputBuffer(int32_t bufferCnt, int32_t outBufferSize)
         codecAvailBuffers_.emplace_back(valBufferCnt);
         valBufferCnt++;
     }
-    if (valBufferCnt < DEFAULT_MIN_BUFFER_CNT + 1) {
+    if (valBufferCnt < DEFAULT_MIN_BUFFER_CNT) {
         AVCODEC_LOGE("Allocate output buffer failed: only %{public}d buffer is allocated, no memory", valBufferCnt);
         buffers_[INDEX_INPUT].clear();
         buffers_[INDEX_OUTPUT].clear();
@@ -836,7 +838,7 @@ void FCodec::ReceiveFrame()
         int32_t f_ret = CheckFormatChange(index, cachedFrame_->width, cachedFrame_->height);
         if (f_ret == AVCS_ERR_OK) {
             frameBuffer = buffers_[INDEX_OUTPUT][codecAvailBuffers_.front()];
-        status = FillFrameBuffer(frameBuffer);
+            status = FillFrameBuffer(frameBuffer);
         } else {
             callback_->OnError(AVCODEC_ERROR_EXTEND_START, f_ret);
             return;
@@ -1003,41 +1005,48 @@ int32_t FCodec::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
 
 int32_t FCodec::GetCodecCapability(std::vector<CapabilityData> &capaArray)
 {
-    for (uint32_t i = 0; i < numSupportCodec; ++i) {
+    for (uint32_t i = 0; i < NUMSUPPORTCODEC; ++i) {
         CapabilityData capsData;
-        capsData.codecName = static_cast<std::string>(SupportCodec[i].codecName);
-        capsData.mimeType = static_cast<std::string>(SupportCodec[i].mimeType);
-        capsData.codecType = SupportCodec[i].isEncoder ? AVCODEC_TYPE_VIDEO_ENCODER : AVCODEC_TYPE_VIDEO_DECODER;
+        capsData.codecName = static_cast<std::string>(SUPPORTCODEC[i].codecName);
+        capsData.mimeType = static_cast<std::string>(SUPPORTCODEC[i].mimeType);
+        capsData.codecType = SUPPORTCODEC[i].isEncoder ? AVCODEC_TYPE_VIDEO_ENCODER : AVCODEC_TYPE_VIDEO_DECODER;
         capsData.isVendor = false;
         capsData.maxInstance = VIDEO_INSTANCE_SIZE;
-        capsData.alignment.width = 0;
-        capsData.alignment.height = 0;
+        capsData.alignment.width = VIDEO_ALIGNMENT_SIZE;
+        capsData.alignment.height = VIDEO_ALIGNMENT_SIZE;
         capsData.width.minVal = VIDEO_MIN_SIZE;
-        capsData.width.maxVal = VIDEO_MAX_SIZE;
+        capsData.width.maxVal = VIDEO_MAX_WIDTH_SIZE;
         capsData.height.minVal = VIDEO_MIN_SIZE;
-        capsData.height.maxVal = VIDEO_MAX_SIZE;
-        capsData.frameRate.minVal = 1;
+        capsData.height.maxVal = VIDEO_MAX_HEIGHT_SIZE;
+        capsData.frameRate.minVal = 0;
         capsData.frameRate.maxVal = VIDEO_FRAMERATE_MAX_SIZE;
-        if (SupportCodec[i].isEncoder) {
-            capsData.bitrate.minVal = 1;
-            capsData.bitrate.maxVal = VIDEO_BITRATE_MAX_SIZE;
+        capsData.bitrate.minVal = 1;
+        capsData.bitrate.maxVal = VIDEO_BITRATE_MAX_SIZE;
+        capsData.blockPerFrame.minVal = 1;
+        capsData.blockPerFrame.maxVal = VIDEO_BLOCKPERFRAME_SIZE;
+        capsData.blockPerSecond.minVal = 1;
+        capsData.blockPerSecond.maxVal = VIDEO_BLOCKPERSEC_SIZE;
+        capsData.blockSize.width = VIDEO_ALIGN_SIZE;
+        capsData.blockSize.height = VIDEO_ALIGN_SIZE;
+        if (SUPPORTCODEC[i].isEncoder) {
             capsData.complexity.minVal = 0;
             capsData.complexity.maxVal = 0;
             capsData.encodeQuality.minVal = 0;
             capsData.encodeQuality.maxVal = 0;
-            capsData.blockPerFrame.minVal = 1;
-            capsData.blockPerFrame.maxVal = VIDEO_BLOCKPERFRAME_SIZE;
-            capsData.blockPerSecond.minVal = 1;
-            capsData.blockPerSecond.maxVal = VIDEO_BLOCKPERSEC_SIZE;
-            capsData.blockSize.width = VIDEO_ALIGN_SIZE;
-            capsData.blockSize.height = VIDEO_ALIGN_SIZE;
         }
-        for (int32_t i = 0; i < static_cast<int32_t>(VideoPixelFormat::BGRA); ++i) {
-            capsData.pixFormat.emplace_back(i);
+        capsData.pixFormat = {
+            static_cast<int32_t>(VideoPixelFormat::YUV420P), static_cast<int32_t>(VideoPixelFormat::NV12),
+            static_cast<int32_t>(VideoPixelFormat::NV21), static_cast<int32_t>(VideoPixelFormat::RGBA),
+            static_cast<int32_t>(VideoPixelFormat::BGRA)};
+        capsData.profiles = {static_cast<int32_t>(AVC_PROFILE_BASELINE), static_cast<int32_t>(AVC_PROFILE_MAIN),
+                             static_cast<int32_t>(AVC_PROFILE_HIGH)};
+        std::vector<int32_t> levels;
+        for (int32_t i = 0; i <= static_cast<int32_t>(AVCLevel::AVC_LEVEL_51); ++i) {
+            levels.emplace_back(i);
         }
-        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_BASELINE));
-        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_MAIN));
-        capsData.profiles.emplace_back(static_cast<int32_t>(AVC_PROFILE_HIGH));
+        capsData.profileLevelsMap.insert(std::make_pair(static_cast<int32_t>(AVC_PROFILE_MAIN), levels));
+        capsData.profileLevelsMap.insert(std::make_pair(static_cast<int32_t>(AVC_PROFILE_HIGH), levels));
+        capsData.profileLevelsMap.insert(std::make_pair(static_cast<int32_t>(AVC_PROFILE_BASELINE), levels));
         capaArray.emplace_back(capsData);
     }
     return AVCS_ERR_OK;

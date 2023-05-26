@@ -25,6 +25,8 @@ using namespace OHOS::Media;
 using namespace testing::ext;
 using namespace OHOS::Media::FormatTestParam;
 
+namespace OHOS {
+namespace Media {
 void AVFormatUnitTest::SetUpTestCase(void) {}
 
 void AVFormatUnitTest::TearDownTestCase(void) {}
@@ -128,3 +130,5 @@ HWTEST_F(AVFormatUnitTest, format_dump_info_0100, TestSize.Level0)
     ASSERT_TRUE(info != nullptr);
     std::cout << info << std::endl;
 }
+} // namespace Media
+} // namespace OHOS

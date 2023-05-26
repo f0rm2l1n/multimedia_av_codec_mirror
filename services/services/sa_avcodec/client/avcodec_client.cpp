@@ -17,6 +17,7 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "avcodec_dfx.h"
 
 #ifdef SUPPORT_DEMUXER
 #include "i_standard_demuxer_service.h"
@@ -41,10 +42,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecCli
 
 namespace OHOS {
 namespace Media {
-static AVCodecClient avCodecClientInstance;
+static AVCodecClient g_avCodecClientInstance;
 IAVCodecService &AVCodecServiceFactory::GetInstance()
 {
-    return avCodecClientInstance;
+    return g_avCodecClientInstance;
 }
 
 AVCodecClient::AVCodecClient() noexcept
@@ -259,7 +260,8 @@ sptr<IStandardAVCodecService> AVCodecClient::GetAVCodecProxy()
 void AVCodecClient::AVCodecServerDied(pid_t pid)
 {
     AVCODEC_LOGE("av_codec server is died, pid:%{public}d!", pid);
-    avCodecClientInstance.DoAVCodecServerDied();
+    g_avCodecClientInstance.DoAVCodecServerDied();
+    FaultEventWrite(FaultType::FAULT_TYPE_CRASH, "AV_CODEC server is died", "AV_CODEC client");
 }
 
 void AVCodecClient::DoAVCodecServerDied()
