@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "avmuxer_demo_runner.h"
+#include "avdemuxer_demo_runner.h"
 #include "avcodec_audio_decoder_inner_demo.h"
 #include "avcodec_audio_encoder_inner_demo.h"
 #include "avcodec_audio_decoder_demo.h"
@@ -185,6 +186,7 @@ static void OptionPrint()
     cout << "8:Video Decoder (surface mode)" << endl;
     cout << "9:Video Inner Decoder (buffer mode)" << endl;
     cout << "10:Video Inner Decoder (surface mode)" << endl;
+    cout << "11:demuxer demo" << endl;
 }
 
 int main()
@@ -212,6 +214,8 @@ int main()
         (void)RunVideoInnerDecoder(false);
     } else if (mode == "10") {
         (void)RunVideoInnerDecoder(true);
+    } else if (mode == "11") {
+        (void)AVSourceDemuxerDemoCase();
     } else {
         cout << "no that selection" << endl;
     }

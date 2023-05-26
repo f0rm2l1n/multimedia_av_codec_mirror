@@ -26,7 +26,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 
 namespace OHOS {
 namespace Media {
-AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin() {}
+AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin()
+    : maxInputSize_(-1),
+      avCodec_(nullptr),
+      avCodecContext_(nullptr),
+      cachedFrame_(nullptr),
+      avPacket_(nullptr)
+{
+}
 
 AudioFfmpegEncoderPlugin::~AudioFfmpegEncoderPlugin()
 {
