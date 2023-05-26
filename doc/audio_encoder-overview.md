@@ -225,6 +225,8 @@
         ret = OH_AudioEncoder_Destroy(audioEnc);
         if (ret != AV_ERR_OK) {
             // 异常处理
+        } else {
+            audioEnc = NULL; //不可重复destroy
         }
         return ret;
     ```
