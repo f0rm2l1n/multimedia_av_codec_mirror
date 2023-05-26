@@ -47,7 +47,7 @@
 
 详细的API说明请参考avcodec native API
 ### 同步模式
-1. 创建编解码器实例对象
+#### 1. 创建编解码器实例对象
    ``` c++
     // 通过 codecname 创建解码器
     OH_AVCodec *videoDec = OH_VideoDecoder_CreateByName("video_decoder.avc");
@@ -56,28 +56,28 @@
     OH_AVCodec *videoDec = OH_VideoDecoder_CreateByMime("video/avc", false);
    ``` 
 
-2. 设置解码分辨率（必须）
-
+#### 2. 设置解码分辨率（必须）
    ``` c++
-    // 设置解码分辨率
-    int32_t ret;
-    constexpr uint32_t DEFAULT_WIDTH = 320;
+    // 配置视频帧宽度（必须）
+    constexpr uint32_t DEFAULT_WIDTH = 320; 
+    // 配置视频帧高度（必须）
     constexpr uint32_t DEFAULT_HEIGHT = 240;
     OH_AVFormat *format = OH_AVFormat_Create();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
-    ret = OH_VideoDecoder_Configure(videoDec, format);
+    int32_t ret = OH_VideoDecoder_Configure(videoDec, format);
    ```
 
-3. 设置surface (surface模式下必须)
+#### 3. 设置surface (surface模式下必须)
    ``` c++
     // 配置surface显示窗口信息
     OHNativeWindow *nativeWindow;
-    ret = OH_VideoDecoder_SetSurface(nativeWindow);
-    ```  
+    int32_t ret = OH_VideoDecoder_SetSurface(nativeWindow);
+   ```  
 
-4. 额外配置解码器实例
-    ``` c++
+#### 4. 额外配置解码器实例
+   ``` c++
+    Format format;
     // 配置PixelFormat模式
     VideoPixelFormat pixelFormat = VideoPixelFormat::RGBA;
     // 配置显示旋转角度
@@ -87,26 +87,28 @@
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, pixelFormat);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, rotation);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SCALE_TYPE, scaleMode);
-    ret = OH_VideoDecoder_SetParameter(videoDec, format);
+    int32_t ret = OH_VideoDecoder_SetParameter(videoDec, format);
+   ``` 
 
-5. 启动解码器
+#### 5. 启动解码器
    ``` c++
     // 配置待解码文件路径
-    inputFile = std::make_unique<std::ifstream>();
+    string_view outputFilePath = "/*yourpath*.yuv";
+    std::unique_ptr<std::ifstream> inputFile = std::make_unique<std::ifstream>();
     inputFile->open(inputFilePath.data(), std::ios::in | std::ios::binary);
-    
-    if(!isSurfaceMode_) {
+    if(!isSurfaceMode) {
         // buffer 模式: 配置解码文件输出路径
-        outFile = std::make_unique<std::ofstream>();
+        std::unique_ptr<std::ofstream> outFile = std::make_unique<std::ofstream>();
         outFile->open(outputFilePath.data(), std::ios::out | std::ios::binary);
     }
     // 启动解码器, 开始解码
-    ret = OH_VideoDecoder_Start(videoDec);
-    ```  
+    int32_t ret = OH_VideoDecoder_Start(videoDec);
+   ```  
 
-6. 写入解码码流
+#### 6. 写入解码码流
    ``` c++
     // 配置buffer info信息
+    OH_AVCodecBufferAttr info;
     // 调用 Ffmpeg 接口av_packet_alloc 进行初始化并返回一个容器pkt
     AVPacket pkt = av_packet_alloc();
     // 配置info的输入尺寸、偏移量、时间戳等字段信息
@@ -116,25 +118,27 @@
     info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
     // 送入解码输入队列进行解码, index为对应队列下标
     int32_t ret = OH_VideoDecoder_PushInputData(videoDec, index, info);
-    ```
+   ```
 
-7. 输出解码帧
+#### 7. 输出解码帧
    ``` c++
+    int32_t ret;
     // 将解码完成数据data写入到对应输出文件中
-    outFile_->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
-    // buffer 模式, 释放已完成写入的数据
+    outFile->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), data.size);
+    // buffer 模式, 释放已完成写入的数据, index为对应surface/buffer队列下标
     if (isSurfaceMode) {
-    ret = OH_VideoDecoder_RenderOutputData(videoDec, index);
+        ret = OH_VideoDecoder_RenderOutputData(videoDec, index);
     } else {
-    ret = OH_VideoDecoder_FreeOutputData(videoDec, index);
+        ret = OH_VideoDecoder_FreeOutputData(videoDec, index);
     }
     if (ret != AV_ERR_OK) {
-    // 异常处理
+        // 异常处理
     }
-    ```
+   ```
 
-8. 刷新解码器
+#### 8. 刷新解码器
    ``` c++
+    int32_t ret;
     // 刷新解码器 videoDec
     ret = OH_VideoDecoder_Flush(videoDec);
     if (ret != AV_ERR_OK) {
@@ -142,10 +146,11 @@
     }
     // 重新开始解码
     ret = OH_VideoDecoder_Start(videoDec);
-    ```
+   ```
 
-9. 重置解码器
+#### 9. 重置解码器
    ``` c++
+    int32_t ret;
     // 重置解码器 videoDec
     ret = OH_VideoDecoder_Reset(videoDec);
     if (ret != AV_ERR_OK) {
@@ -153,31 +158,32 @@
     }
     // 重新配置解码器参数
     ret = OH_VideoDecoder_Configure(videoDec, format);
-    ```
+   ```
 
-9. 停止解码器
+#### 10. 停止解码器
    ``` c++
+    int32_t ret;
     // 终止解码器 videoDec
     ret = OH_VideoDecoder_Stop(videoDec);
     if (ret != AV_ERR_OK) {
         // 异常处理
     }
     return AV_ERR_OK;
-    ```
+   ```
     
-9. 注销解码器实例
+#### 11. 注销解码器实例
    ``` c++
+    int32_t ret;
     // 调用OH_VideoDecoder_Destroy, 注销解码器
     ret = OH_VideoDecoder_Destroy(videoDec);
     if (ret != AV_ERR_OK) {
         // 异常处理
     }
     return AV_ERR_OK;
-    ```
+   ```
     
 ### 异步模式
-1. 创建编解码器实例对象
-
+#### 1. 创建编解码器实例对象
    ``` c++
     // 通过 codecname 创建解码器
     OH_AVCodec *videoDec = OH_VideoDecoder_CreateByName("video_decoder.avc");
@@ -186,7 +192,7 @@
     OH_AVCodec *videoDec = OH_VideoDecoder_CreateByMime("video/avc", false);
    ``` 
 
-2. 设置回调函数（必须）
+#### 2. 设置回调函数（必须）
    ``` c++
     // 设置 OnError 回调函数
     static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -221,10 +227,8 @@
     int32_t ret = OH_VideoDecoder_SetCallback(videoDec, cb, userData);
    ```
 
-3. 设置解码分辨率 (必须)
+#### 3. 设置解码分辨率 (必须)
    ``` c++
-    // 设置解码分辨率
-    int32_t ret;
     // 配置视频帧宽度（必须）
     constexpr uint32_t DEFAULT_WIDTH = 320; 
     // 配置视频帧高度（必须）
@@ -234,18 +238,20 @@
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
     // 配置解码器
-    ret = OH_VideoDecoder_Configure(videoDec, format);
+    int32_t ret = OH_VideoDecoder_Configure(videoDec, format);
    ```
 
-4. 设置surface (surface模式下必须)
+#### 4. 设置surface (surface模式下必须)
    ``` c++
     // 配置送显窗口参数
     OHNativeWindow *window;
-    ret = OH_VideoDecoder_SetSurface(videoDec, window);
-    ```  
+    int32_t ret = OH_VideoDecoder_SetSurface(videoDec, window);
+   ```  
 
-5. 额外配置解码器实例 (仅支持surface模式)
-    ``` c++
+#### 5. 额外配置解码器实例 (仅支持surface模式)
+   ``` c++
+
+    Format format;
     // 配置PixelFormat模式
     VideoPixelFormat pixelFormat = VideoPixelFormat::RGBA;
     // 配置显示旋转角度
@@ -255,24 +261,26 @@
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, pixelFormat);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, rotation);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SCALE_TYPE, scaleMode);
-    ret = OH_VideoDecoder_SetParameter(videoDec, format);
+    int32_t ret = OH_VideoDecoder_SetParameter(videoDec, format);
+   ``` 
 
-6. 启动解码器
+#### 6. 启动解码器
    ``` c++
-    inputFile = std::make_unique<std::ifstream>();
+    string_view outputFilePath = "/*yourpath*.yuv";
+    std::unique_ptr<std::ifstream> inputFile = std::make_unique<std::ifstream>();
     // 打开待解码二进制文件路径
     inputFile->open(inputFilePath.data(), std::ios::in | std::ios::binary); 
     // buffer模式下需要配置
     if(!isSurfaceMode) {
         // buffer 模式: 配置解码文件输出路径
-        outFile = std::make_unique<std::ofstream>();
+        std::unique_ptr<std::ofstream> outFile = std::make_unique<std::ofstream>();
         outFile->open(outputFilePath.data(), std::ios::out | std::ios::binary);
     }
     // 开始解码
-    ret = OH_VideoDecoder_Start(videoDec);
-    ```
+    int32_t ret = OH_VideoDecoder_Start(videoDec);
+   ```
 
-7. 写入解码码流
+#### 7. 写入解码码流
    ``` c++
     // 配置buffer info信息
     OH_AVCodecBufferAttr info;
@@ -285,24 +293,27 @@
     info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
     // 送入解码输入队列进行解码, index为对应队列下标
     int32_t ret = OH_VideoDecoder_PushInputData(videoDec, index, info);
-    ```
+   ```
 
-8. 输出解码帧
+#### 8. 输出解码帧
    ``` c++
+    int32_t ret;
     // 将解码完成数据data写入到对应输出文件中
-    outFile->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
-    // buffer 模式, 释放已完成写入的数据
-    if (!isSurfaceMode && OH_VideoDecoder_FreeOutputData(videoDec, index) != AV_ERR_OK) {
+    outFile->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), data.size);
+    // buffer 模式, 释放已完成写入的数据, index为对应surface/buffer队列下标
+    if (isSurfaceMode) {
+        ret = OH_VideoDecoder_RenderOutputData(videoDec, index);
+    } else {
+        ret = OH_VideoDecoder_FreeOutputData(videoDec, index);
+    }
+    if (ret != AV_ERR_OK) {
         // 异常处理
     }
-    // surface 模式, 对解码完成的数据进行送显
-    if (isSurfaceMode && OH_VideoDecoder_RenderOutputData(videoDec, index) != AV_ERR_OK) {
-        // 异常处理
-    }
-    ```
+   ```
 
-9. 刷新解码器
+#### 9. 刷新解码器
    ``` c++
+    int32_t ret;
     // 刷新解码器 videoDec
     ret = OH_VideoDecoder_Flush(videoDec);
     if (ret != AV_ERR_OK) {
@@ -310,10 +321,11 @@
     }
     // 重新开始解码
     ret = OH_VideoDecoder_Start(videoDec);
-    ```
+   ```
 
-9. 重置解码器
+#### 10. 重置解码器
    ``` c++
+    int32_t ret;
     // 重置解码器 videoDec
     ret = OH_VideoDecoder_Reset(videoDec);
     if (ret != AV_ERR_OK) {
@@ -321,27 +333,29 @@
     }
     // 重新配置解码器参数
     ret = OH_VideoDecoder_Configure(videoDec, format);
-    ```
+   ```
 
-9. 停止解码器
+#### 11. 停止解码器
    ``` c++
+    int32_t ret;
     // 终止解码器 videoDec
     ret = OH_VideoDecoder_Stop(videoDec);
     if (ret != AV_ERR_OK) {
         // 异常处理
     }
     return AV_ERR_OK;
-    ```
+   ```
 
-9. 注销解码器实例
+#### 12. 注销解码器实例
    ``` c++
+    int32_t ret;
     // 调用OH_VideoDecoder_Destroy, 注销解码器
     ret = OH_VideoDecoder_Destroy(videoDec);
     if (ret != AV_ERR_OK) {
         // 异常处理
     }
     return AV_ERR_OK;
-    ```
+   ```
 
 
 
