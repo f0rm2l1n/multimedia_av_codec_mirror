@@ -248,7 +248,6 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
     if (!pcmFile.is_open()) {
         std::cout << "open " << outputFilePath << " failed!" << std::endl;
     }
-
     while (true) {
         if (!isRunning_.load()) {
             cout << "stop, exit" << endl;
@@ -279,22 +278,27 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
         signal_->outQueue_.pop();
         EXPECT_EQ(AV_ERR_OK, OH_AudioDecoder_FreeOutputData(audioDec_, index));
     }
+
     pcmFile.close();
 }
 
 int32_t AudioCodeCapiDecoderUnitTest::ProceFunc(void)
 {
     int32_t ret = 0;
+    sleep(1);
+    fmpt_ctx = avformat_alloc_context();
     ret = avformat_open_input(&fmpt_ctx, inputFilePath.data(), NULL, NULL);
     if (ret < 0) {
         std::cout << "open file failed" << ret << "\n";
         exit(1);
     }
+
     if (avformat_find_stream_info(fmpt_ctx, NULL) < 0) {
         std::cout << "get file stream failed"
                   << "\n";
         exit(1);
     }
+
     frame = av_frame_alloc();
     av_init_packet(&pkt);
     pkt.data = NULL;
