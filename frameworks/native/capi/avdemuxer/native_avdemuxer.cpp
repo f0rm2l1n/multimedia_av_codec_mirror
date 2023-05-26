@@ -124,18 +124,19 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t mSeconds, OH_AVSeekMode mode)
+OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t millisecond, OH_AVSeekMode mode)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL, "Seek failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
 
-    CHECK_AND_RETURN_RET_LOG(mSeconds >= 0, AV_ERR_INVALID_VAL, "Seek failed because input mSeconds is negative!");
+    CHECK_AND_RETURN_RET_LOG(millisecond >= 0, AV_ERR_INVALID_VAL,
+        "Seek failed because input millisecond is negative!");
 
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
     CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
         "New DemuxerObject failed when seek!");
 
-    int32_t ret = demuxerObj->demuxer_->SeekToTime(mSeconds, static_cast<AVSeekMode>(mode));
+    int32_t ret = demuxerObj->demuxer_->SeekToTime(millisecond, static_cast<AVSeekMode>(mode));
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SeekToTime failed!");
 
     return AV_ERR_OK;

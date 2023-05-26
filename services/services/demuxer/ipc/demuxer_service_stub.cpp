@@ -119,10 +119,10 @@ int32_t DemuxerServiceStub::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSh
     return demuxerServer_->ReadSample(trackIndex, sample, info, flag);
 }
 
-int32_t DemuxerServiceStub::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
+int32_t DemuxerServiceStub::SeekToTime(int64_t millisecond, const AVSeekMode mode)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->SeekToTime(mSeconds, mode);
+    return demuxerServer_->SeekToTime(millisecond, mode);
 }
 
 int32_t DemuxerServiceStub::DumpInfo(int32_t fd)
@@ -187,10 +187,10 @@ int32_t DemuxerServiceStub::ReadSample(MessageParcel &data, MessageParcel &reply
 
 int32_t DemuxerServiceStub::SeekToTime(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t mSeconds = data.ReadInt64();
+    int64_t millisecond = data.ReadInt64();
     AVSeekMode seekMode = static_cast<AVSeekMode>(data.ReadInt32());
 
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(mSeconds, seekMode)),
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(millisecond, seekMode)),
         AVCS_ERR_UNKNOWN, "Reply SeekToTime failed!");
     return AVCS_ERR_OK;
 }

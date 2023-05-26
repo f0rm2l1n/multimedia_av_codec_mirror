@@ -32,7 +32,7 @@ public:
     int32_t UnselectTrackByID(uint32_t trackIndex);
     int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag);
-    int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode);
+    int32_t SeekToTime(int64_t millisecond, AVSeekMode mode);
 
 private:
     friend class DemuxerFactory;

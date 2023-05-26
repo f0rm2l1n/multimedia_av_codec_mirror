@@ -76,10 +76,10 @@ int32_t DemuxerServer::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
     return AVCS_ERR_OK;
 }
 
-int32_t DemuxerServer::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
+int32_t DemuxerServer::SeekToTime(int64_t millisecond, const AVSeekMode mode)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
-    int32_t ret = demuxerEngine_->SeekToTime(mSeconds, mode);
+    int32_t ret = demuxerEngine_->SeekToTime(millisecond, mode);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SeekToTime");
     return AVCS_ERR_OK;
 }

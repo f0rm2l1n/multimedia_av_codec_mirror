@@ -111,9 +111,9 @@ int32_t InnerDemuxerDemo::ReadSample(uint32_t trackIndex, std::shared_ptr<AVShar
     return ret;
 }
 
-int32_t InnerDemuxerDemo::SeekToTime(int64_t mSeconds, AVSeekMode mode)
+int32_t InnerDemuxerDemo::SeekToTime(int64_t millisecond, AVSeekMode mode)
 {
-    int32_t ret = demuxer_->SeekToTime(mSeconds, mode);
+    int32_t ret = demuxer_->SeekToTime(millisecond, mode);
     if (ret != 0) {
         printf("SeekToTime is failed\n");
     }
