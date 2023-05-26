@@ -25,11 +25,6 @@
 #include "avcodec_dfx.h"
 #include "ffmpeg_demuxer_plugin.h"
 
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 78, 0) and LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 64, 100)
-#if LIBAVFORMAT_VERSION_INT != AV_VERSION_INT(58, 76, 100)
-
-#endif
-#endif
 #define AV_CODEC_TIME_BASE (static_cast<int64_t>(1))
 #define AV_CODEC_NSECOND AV_CODEC_TIME_BASE
 #define AV_CODEC_USECOND (static_cast<int64_t>(1000) * AV_CODEC_NSECOND)
@@ -53,6 +48,8 @@ static const std::map<AVSeekMode, int32_t>  g_seekModeToFFmpegSeekFlags = {
     { AVSeekMode::SEEK_MODE_CLOSEST_SYNC, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_ANY }
 };
 
+constexpr int32_t TIME_INTERNAL = 100;
+
 int32_t Sniff(const std::string& pluginName)
 {
     return 100;
@@ -61,10 +58,10 @@ int32_t Sniff(const std::string& pluginName)
 Status RegisterDemuxerPlugins(const std::shared_ptr<Register>& reg)
 {
     DemuxerPluginDef def;
-    constexpr int32_t RankScore = 100;
+    constexpr int32_t rankScore = 100;
     def.name = "ffmpegDemuxer";
     def.description = "ffmpeg demuxer";
-    def.rank = RankScore;
+    def.rank = rankScore;
     def.creator = []() -> std::shared_ptr<DemuxerPlugin> {
         return std::make_shared<FFmpegDemuxerPlugin>();
     };
@@ -409,7 +406,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
                              ffTime, avStream->duration);
                 return AVCS_ERR_SEEK_FAILED;
             }
-            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - mSeconds) <= 100
+            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - mSeconds) <= TIME_INTERNAL
                 && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
                 flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
             }
