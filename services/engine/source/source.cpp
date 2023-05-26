@@ -210,7 +210,7 @@ int32_t Source::GetTrackCount(uint32_t &trackCount)
     return AVCS_ERR_OK;
 }
 
-void Source::GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format)
+void Source::GetStringFormatFromMetadata(const std::string key, std::string_view formatName, Format &format)
 {
     AVDictionaryEntry *valPtr = nullptr;
     valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_MATCH_CASE);

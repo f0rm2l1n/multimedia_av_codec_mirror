@@ -94,7 +94,7 @@ private:
     static int64_t AVSeek(void* opaque, int64_t offset, int whence);
     void InitAVIOContext(int flags);
     int32_t InitAVFormatContext();
-    void GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format);
+    void GetStringFormatFromMetadata(const std::string key, std::string_view formatName, Format &format);
 
     void GetPublicTrackFormat(Format &format, AVStream *avStream);
     void GetVideoTrackFormat(Format &format, AVStream *avStream);
