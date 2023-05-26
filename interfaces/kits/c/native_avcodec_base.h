@@ -158,6 +158,7 @@ typedef struct OH_AVCodecAsyncCallback {
  */
 extern const char *OH_AVCODEC_MIMETYPE_VIDEO_AVC;
 extern const char *OH_AVCODEC_MIMETYPE_VIDEO_MPEG4;
+extern const char *OH_AVCODEC_MIMETYPE_VIDEO_HEVC;
 extern const char *OH_AVCODEC_MIMETYPE_AUDIO_AAC;
 extern const char *OH_AVCODEC_MIMETYPE_AUDIO_MPEG;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_JPG;

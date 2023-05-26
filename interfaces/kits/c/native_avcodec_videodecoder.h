@@ -234,7 +234,7 @@ OH_AVErrCode OH_VideoDecoder_FreeOutputData(OH_AVCodec *codec, uint32_t index);
  * switchback from the background
  * @syscap SystemCapability.Multimedia.Media.VideoDecoder
  * @param codec Pointer to an OH_AVCodec instance
- * @param isVaild Pointer to an bool instance, true: the codec instance is vaild, false: the codec
+ * @param isVaild Pointer to an bool instance, true: the codec instance is valid, false: the codec
  * instance is invalid
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
