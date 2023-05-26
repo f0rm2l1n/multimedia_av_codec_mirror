@@ -99,7 +99,7 @@ int32_t SourceServer::InitWithFD(int32_t fd, int64_t offset, int64_t size)
 
 int32_t SourceServer::GetTrackCount(uint32_t &trackCount)
 {
-    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
+    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Source engine does not exist");
     int32_t ret = sourceEngine_->GetTrackCount(trackCount);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call GetTrackCount");
     return AVCS_ERR_OK;
@@ -107,7 +107,7 @@ int32_t SourceServer::GetTrackCount(uint32_t &trackCount)
 
 int32_t SourceServer::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
-    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
+    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Source engine does not exist");
     int32_t ret = sourceEngine_->GetTrackFormat(format, trackIndex);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call GetTrackFormat");
     return AVCS_ERR_OK;
@@ -115,7 +115,7 @@ int32_t SourceServer::GetTrackFormat(Format &format, uint32_t trackIndex)
 
 int32_t SourceServer::GetSourceFormat(Format &format)
 {
-    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
+    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Source engine does not exist");
     int32_t ret = sourceEngine_->GetSourceFormat(format);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call GetSourceFormat");
     return AVCS_ERR_OK;
@@ -123,7 +123,7 @@ int32_t SourceServer::GetSourceFormat(Format &format)
 
 int32_t SourceServer::GetSourceAddr(uintptr_t &addr)
 {
-    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Demuxer engine does not exist");
+    CHECK_AND_RETURN_RET_LOG(sourceEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "Source engine does not exist");
     addr = sourceEngine_->GetSourceAddr();
     CHECK_AND_RETURN_RET_LOG(addr != 0, AVCS_ERR_INVALID_VAL, "Failed to call GetSourceAddr");
     return AVCS_ERR_OK;

@@ -52,7 +52,7 @@ SourceEngineImpl::SourceEngineImpl(int32_t appUid, int32_t appPid, const std::st
     AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
     source_ = std::make_shared<Plugin::Source>();
     if (source_ == nullptr) {
-        AVCODEC_LOGE("create demuxer engine failed");
+        AVCODEC_LOGE("create source engine failed");
     }
 }
 
