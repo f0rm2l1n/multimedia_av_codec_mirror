@@ -47,11 +47,7 @@ AVCodecBitStreamDumper &AVCodecBitStreamDumper::GetInstance()
     return avcodecBitStreamDumper;
 }
 
-AVCodecBitStreamDumper::AVCodecBitStreamDumper()
-{
-    CHECK_AND_RETURN_LOG(thread_ == nullptr, "TaskProcessor is existed");
-    thread_ = std::make_unique<std::thread>(&AVCodecBitStreamDumper::TaskProcessor, this);
-}
+AVCodecBitStreamDumper::AVCodecBitStreamDumper() {}
 
 AVCodecBitStreamDumper::~AVCodecBitStreamDumper()
 {
@@ -97,7 +93,16 @@ void AVCodecBitStreamDumper::SaveBitStream(BitStreamDumpType type, const std::st
 {
     std::unique_lock<std::mutex> lock(mutex_);
     if (!isEnable_) {
+        if (thread_ != nullptr) {
+            AVCODEC_LOGI("Bitstream dumper shutdown.");
+            thread_.reset();
+        }
         return;
+    }
+
+    if (thread_ == nullptr) {
+        AVCODEC_LOGI("Bitstream dumper init");
+        thread_ = std::make_unique<std::thread>(&AVCodecBitStreamDumper::TaskProcessor, this);
     }
 
     std::stringstream outStream;
@@ -119,9 +124,12 @@ void AVCodecBitStreamDumper::SaveBitStream(BitStreamDumpType type, const std::st
     }
 }
 
-void AVCodecBitStreamDumper::UpdateCheckEnable(bool isEnable)
+bool AVCodecBitStreamDumper::SwitchEnable()
 {
-    isEnable_ = isEnable;
+    isEnable_ = !isEnable_;
+    std::string status = isEnable_ ? "Enable" : "Disable";
+    AVCODEC_LOGI("Bitstream dumper on status: %{public}s", status.c_str());
+    return isEnable_;
 }
 
 void AVCodecBitStreamDumper::TaskProcessor()
@@ -148,7 +156,7 @@ void AVCodecBitStreamDumper::TaskProcessor()
             swap(bitstreamString_, temp);
         }
 
-        std::string file = "/data/media/123.log";
+        std::string file = "/data/media/av_codec/bitstream_dump/";
         file += std::to_string(getpid());
         file += "_bitstream_dump_";
         file += std::to_string(fileCount_) + ".log";
@@ -160,15 +168,17 @@ void AVCodecBitStreamDumper::TaskProcessor()
             ofStream.open(file, std::ios::out | std::ios::app);
         }
         if (!ofStream.is_open()) {
+            AVCODEC_LOGE("Open bitstream dump file failed");
             continue;
         }
-        AVCODEC_LOGF("Get here 2 !");
         isNewFile_ = false;
         if (lineCount >= FILE_BIT_STREAM_MAX) {
             isNewFile_ = true;
             fileCount_++;
             fileCount_ = fileCount_ > FILE_MAX ? 0 : fileCount_;
         }
+
+        AVCODEC_LOGI("Save bitstream");
         ofStream.write(temp.c_str(), temp.size());
         ofStream.close();
     }

@@ -37,7 +37,7 @@ public:
     static AVCodecBitStreamDumper &GetInstance();
     void SaveBitStream(BitStreamDumpType type, const std::string &name,
         const uint32_t index, const uint8_t* buffer, const uint32_t size);
-    void UpdateCheckEnable(bool isEnable);
+    bool SwitchEnable();
 
 private:
     AVCodecBitStreamDumper();
@@ -57,10 +57,10 @@ private:
 
 // AVCodec bitstream dump macro interface
 #ifdef  BITSTREAM_DUMP_ENABLE
-#define AVCODEC_BITSTREAM_DUMP(type, name, index, buffer, size)                                   \
+#define AVCODEC_BITSTREAM_DUMP(type, name, index, buffer, size)                     \
     do {                                                                            \
-        (void)OHOS::Media::AVCodecBitStreamDumper::GetInstance().SaveBitStream(       \
-            type, name, index, buffer, size);                      \
+        (void)OHOS::Media::AVCodecBitStreamDumper::GetInstance().SaveBitStream(     \
+            type, name, index, buffer, size);                                       \
     } while (0)
 #else
 #define AVCODEC_BITSTREAM_DUMP(type, name, index, buffer, size)

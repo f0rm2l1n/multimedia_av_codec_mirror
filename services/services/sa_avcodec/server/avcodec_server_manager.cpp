@@ -23,6 +23,7 @@
 #include "avcodec_log_dump.h"
 #include "avcodec_xcollie.h"
 #include "avcodec_dump_utils.h"
+#include "avcodec_bitstream_dump.h"
 #ifdef SUPPORT_CODEC
 #include "codec_service_stub.h"
 #endif
@@ -53,6 +54,8 @@ namespace {
         "muxer",
         "demuxer",
         "source",
+        " ",
+        "switch_bitstream_dump"
     };
 }
 
@@ -143,6 +146,19 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
         argSets.find(u"h") != argSets.end() ||
         argSets.find(u"help") != argSets.end()) {
         PrintDumpMenu(fd);
+    }
+
+    if (argSets.find(u"switch_bitstream_dump") != argSets.end()) {
+        dumpString += "[Bitstream_Dump]\n";
+        bool isEnable = AVCodecBitStreamDumper::GetInstance().SwitchEnable();
+        dumpString += "    status - ";
+        dumpString += isEnable ? "Enable" : "Disable";
+        dumpString += "\n";
+
+        if (fd != -1) {
+            write(fd, dumpString.c_str(), dumpString.size());
+        }
+        dumpString.clear();
     }
 
     return OHOS::NO_ERROR;
