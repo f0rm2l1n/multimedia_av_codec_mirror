@@ -53,6 +53,8 @@ static const std::map<AVSeekMode, int32_t>  g_seekModeToFFmpegSeekFlags = {
     { AVSeekMode::SEEK_MODE_CLOSEST_SYNC, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_ANY }
 };
 
+constexpr int32_t TIME_INTERNAL = 100;
+
 int32_t Sniff(const std::string& pluginName)
 {
     return 100;
@@ -418,7 +420,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
                              ffTime, avStream->duration);
                 return AVCS_ERR_SEEK_FAILED;
             }
-            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - millisecond) <= 100
+            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - millisecond) <= TIME_INTERNAL
                 && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
                 flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
             }
