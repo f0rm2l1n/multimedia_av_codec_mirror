@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <map>
 #include "source_service_stub.h"
+#include <map>
 #include "avcodec_server_manager.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"

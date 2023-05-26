@@ -89,7 +89,7 @@ static void AddNewBitStream(BitStreamDumpType type, const std::string &name,
 }
 
 void AVCodecBitStreamDumper::SaveBitStream(BitStreamDumpType type, const std::string &name,
-                                         const uint32_t index, const uint8_t* buffer, const uint32_t size)
+                                           const uint32_t index, const uint8_t* buffer, const uint32_t size)
 {
     std::unique_lock<std::mutex> lock(mutex_);
     if (!isEnable_) {

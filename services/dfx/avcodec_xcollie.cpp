@@ -90,8 +90,8 @@ uint64_t AVCodecXCollie::SetTimer(const std::string &name, bool recovery, uint32
     }
     uint64_t tempIndex = dumperIndex_++;
     dfxDumper_.emplace(tempIndex, std::pair<int32_t, std::string>(HiviewDFX::INVALID_ID, name));
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(
-            name, timeout, func, (void *)dfxDumper_[tempIndex].second.c_str(), flag);
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(name,
+        timeout, func, (void *)dfxDumper_[tempIndex].second.c_str(), flag);
     if (id == HiviewDFX::INVALID_ID) {
         std::lock_guard<std::mutex> lock(mutex_);
         auto it = dfxDumper_.find(id);
