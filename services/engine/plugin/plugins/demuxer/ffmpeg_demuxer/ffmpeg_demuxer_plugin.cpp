@@ -149,11 +149,19 @@ FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin");
     selectedTrackIds_.clear();
-    for (auto it:sampleCache_) {
+    for (auto& it : sampleCache_) {
+        if (it.second == nullptr) {
+            continue;
+        }
+        if (!it.second->Empty()) {
+            for (auto ele = it.second->Pop(); ele != nullptr;) {
+                av_packet_free(&(ele->pkt_));
+                ele = nullptr;
+            }
+        }
         it.second->Clear();
-        sampleCache_.erase(it.first);
+        it.second = nullptr;
     }
-    formatContext_ = nullptr;
 }
 
 int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
@@ -216,12 +224,19 @@ int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
         selectedTrackIds_.erase(index);
         
         if (sampleCache_.count(trackIndex) != 0) {
+
+            if (!sampleCache_[trackIndex]->Empty()) {
+                for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr;) {
+                    av_packet_free(&(ele->pkt_));
+                    ele = nullptr;
+                }
+            }
             sampleCache_[trackIndex]->Clear();
+            sampleCache_[trackIndex] = nullptr;
             sampleCache_.erase(trackIndex);
         }
     } else {
         AVCODEC_LOGW("Unselect track failed, track %{public}u is not in selected list!", trackIndex);
-        return AVCS_ERR_INVALID_VAL;
     }
     return AVCS_ERR_OK;
 }
@@ -430,6 +445,12 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
         }
     }
     for (auto it:sampleCache_) {
+        if (!it.second->Empty()) {
+            for (auto ele = it.second->Pop(); ele != nullptr;) {
+                av_packet_free(&(ele->pkt_));
+                ele = nullptr;
+            }
+        }
         it.second->Clear();
     }
     return AVCS_ERR_OK;
