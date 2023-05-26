@@ -292,13 +292,11 @@ int32_t AudioCodeCapiDecoderUnitTest::ProceFunc(void)
         std::cout << "open file failed" << ret << "\n";
         exit(1);
     }
-
     if (avformat_find_stream_info(fmpt_ctx, NULL) < 0) {
         std::cout << "get file stream failed"
                   << "\n";
         exit(1);
     }
-
     frame = av_frame_alloc();
     av_init_packet(&pkt);
     pkt.data = NULL;
