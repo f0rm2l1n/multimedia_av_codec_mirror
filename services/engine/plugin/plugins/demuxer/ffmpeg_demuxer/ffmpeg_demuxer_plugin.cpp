@@ -25,11 +25,14 @@
 #include "avcodec_dfx.h"
 #include "ffmpeg_demuxer_plugin.h"
 
+#if defined(LIBAVFORMAT_VERSION_INT) && defined(LIBAVFORMAT_VERSION_INT)
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 78, 0) and LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 64, 100)
 #if LIBAVFORMAT_VERSION_INT != AV_VERSION_INT(58, 76, 100)
 #include "libavformat/internal.h"
 #endif
 #endif
+#endif
+
 #define AV_CODEC_TIME_BASE (static_cast<int64_t>(1))
 #define AV_CODEC_NSECOND AV_CODEC_TIME_BASE
 #define AV_CODEC_USECOND (static_cast<int64_t>(1000) * AV_CODEC_NSECOND)
@@ -387,6 +390,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
 
 int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int keyFrameIdx)
 {
+#if defined(LIBAVFORMAT_VERSION_INT) && defined(LIBAVFORMAT_VERSION_INT)
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 78, 0)
     return avformat_index_get_entry(avStream, keyFrameIdx)->timestamp;
 #elif LIBAVFORMAT_VERSION_INT == AV_VERSION_INT(58, 76, 100)
@@ -395,6 +399,9 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
     return avStream->internal->index_entries[keyFrameIdx].timestamp;
 #else
     return avStream->index_entries[keyFrameIdx].timestamp;
+#endif
+#else
+    return avStream->index_entries[keyFrameIdx].timestamp
 #endif
 }
 
