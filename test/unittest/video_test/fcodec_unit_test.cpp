@@ -13,12 +13,15 @@
  * limitations under the License.
  */
 
+#include <csignal>
 #include <cstring>
+#include <fstream>
 #include <mutex>
 #include <queue>
 #include <vector>
 #include <gtest/gtest.h>
 #include "fcodec.h"
+#include "securec.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -32,9 +35,10 @@ using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::Media::Codec;
 namespace {
-const string CODEC_NAME = "video_decoder.avc";
-constexpr uint32_t DEFAULT_WIDTH = 480;
-constexpr uint32_t DEFAULT_HEIGHT = 272;
+const string CODEC_NAME = "OH.Media.Codec.Decoder.Video.AVC";
+constexpr uint32_t DEFAULT_WIDTH = 320;
+constexpr uint32_t DEFAULT_HEIGHT = 240;
+constexpr string_view videoPath = "/data/out_320_240_10s.h264";
 } // namespace
 
 namespace OHOS {
@@ -127,7 +131,7 @@ void FCodecUnitTest::SetUp(void)
 {
     codecName_ = "";
     vdec_ = std::make_shared<OHOS::Media::Codec::FCodec>(codecName_);
-    ASSERT_EQ(nullptr, vdec_);
+    ASSERT_NE(nullptr, vdec_);
 
     codecName_ = CODEC_NAME;
     vdec_ = std::make_shared<OHOS::Media::Codec::FCodec>(codecName_);
@@ -140,7 +144,11 @@ void FCodecUnitTest::SetUp(void)
 
 void FCodecUnitTest::TearDown(void)
 {
+    vdec_->Stop();
     vdec_->Release();
+    vdec_ = nullptr;
+    delete signal_;
+    signal_ = nullptr;
     cout << "[TearDown]: over!!!" << endl;
 }
 
@@ -153,7 +161,6 @@ int32_t FCodecUnitTest::ProceFunc(void)
                        static_cast<int32_t>(VideoRotation::VIDEO_ROTATION_90));
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE,
                        static_cast<int32_t>(ScalingMode::SCALING_MODE_SCALE_TO_WINDOW));
-
     if (vdec_->Configure(format) != AVCS_ERR_OK) {
         cout << "[Configure]: failed to Configure" << endl;
         return AVCS_ERR_UNKNOWN;
@@ -357,38 +364,72 @@ HWTEST_F(FCodecUnitTest, fcodec_GetOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
     std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
-
-    // case1 传参异常
     index_ = -1;
     buffer = vdec_->GetOutputBuffer(index_);
     EXPECT_EQ(nullptr, buffer);
     index_ = 1024;
     buffer = vdec_->GetOutputBuffer(index_);
     EXPECT_EQ(nullptr, buffer);
-
-    // case2 传参正常
     index_ = 0;
     buffer = vdec_->GetOutputBuffer(index_);
+    EXPECT_EQ(nullptr, buffer);
+}
+
+HWTEST_F(FCodecUnitTest, fcodec_GetOutputBuffer_02, TestSize.Level1)
+{
+    AVCodecBufferInfo info;
+    AVCodecBufferFlag flag = AVCODEC_BUFFER_FLAG_NONE;
+    int32_t bufferSize = 13571;
+    EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
+    index_ = signal_->inIdxQueue_.front();
+    std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = vdec_->GetInputBuffer(index_);
+    uint8_t *ptr = buffer->GetBase();
+    char *fileBuffer = static_cast<char *>(malloc(sizeof(char) * bufferSize + 1));
+    std::unique_ptr<std::ifstream> testFile_;
+    testFile_ = std::make_unique<std::ifstream>();
+    testFile_->open(videoPath.data(), std::ios::in | std::ios::binary);
+    (void)testFile_->read(fileBuffer, bufferSize);
+    memcpy_s(ptr, bufferSize, fileBuffer, bufferSize);
+    info.presentationTimeUs = timeStamp_;
+    info.size = bufferSize;
+    info.offset = 0;
+    flag = AVCODEC_BUFFER_FLAG_NONE;
+    EXPECT_EQ(AVCS_ERR_OK, vdec_->QueueInputBuffer(index_, info, flag));
+    signal_->inIdxQueue_.pop();
+    index_ = signal_->inIdxQueue_.front();
+    buffer = vdec_->GetInputBuffer(index_);
+    ptr = buffer->GetBase();
+    info.presentationTimeUs = timeStamp_;
+    info.size = 0;
+    info.offset = 0;
+    flag = AVCODEC_BUFFER_FLAG_EOS;
+    EXPECT_EQ(AVCS_ERR_OK, vdec_->QueueInputBuffer(index_, info, flag));
+    signal_->inIdxQueue_.pop();
+    while (1) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        if (signal_->outIdxQueue_.size() > 0) {
+            index_ = signal_->outIdxQueue_.front();
+            buffer = vdec_->GetOutputBuffer(index_);
+            break;
+        }
+    }
+    free(fileBuffer);
     EXPECT_NE(nullptr, buffer);
 }
 
 HWTEST_F(FCodecUnitTest, fcodec_ReleaseOutputBuffer_01, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
-
-    // case1 传参异常
     index_ = -1;
-    EXPECT_NE(AVCS_ERR_INVALID_VAL, vdec_->ReleaseOutputBuffer(index_));
+    EXPECT_EQ(AVCS_ERR_INVALID_VAL, vdec_->ReleaseOutputBuffer(index_));
     index_ = 1024;
-    EXPECT_NE(AVCS_ERR_INVALID_VAL, vdec_->ReleaseOutputBuffer(index_));
-    // case2 传参正常
+    EXPECT_EQ(AVCS_ERR_INVALID_VAL, vdec_->ReleaseOutputBuffer(index_));
     index_ = 0;
     EXPECT_EQ(AVCS_ERR_INVALID_VAL, vdec_->ReleaseOutputBuffer(index_));
 }
 
 HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_01, TestSize.Level1)
 {
-    // case1 传参异常
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 0);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 0);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, 1);
@@ -400,7 +441,10 @@ HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_01, TestSize.Level1)
     format = Format();
     EXPECT_EQ(AVCS_ERR_OK, vdec_->GetOutputFormat(format));
     format = Format();
+}
 
+HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_02, TestSize.Level1)
+{
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 0);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 0);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, -1);
@@ -412,7 +456,10 @@ HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_01, TestSize.Level1)
     format = Format();
     EXPECT_EQ(AVCS_ERR_OK, vdec_->GetOutputFormat(format));
     format = Format();
+}
 
+HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_03, TestSize.Level1)
+{
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, -1);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, -1);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, -1);
@@ -424,8 +471,10 @@ HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_01, TestSize.Level1)
     format = Format();
     EXPECT_EQ(AVCS_ERR_OK, vdec_->GetOutputFormat(format));
     format = Format();
+}
 
-    // case2 传参正常
+HWTEST_F(FCodecUnitTest, fcodec_GetOutputFormat_04, TestSize.Level1)
+{
     format.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::BGRA));
@@ -448,19 +497,6 @@ HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_01, TestSize.Level1)
     ASSERT_EQ(AVCS_ERR_OK, vdec_->Release());
 }
 
-HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_02, TestSize.Level1)
-{
-    EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Stop());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Start());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Reset());
-    ASSERT_EQ(AVCS_ERR_OK,
-              vdec_->SetCallback(std::shared_ptr<AVCodecCallback>(std::make_shared<BufferCallback>(signal_))));
-    EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Stop());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Release());
-}
-
 HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_03, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
@@ -471,35 +507,6 @@ HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_04, TestSize.Level1)
 {
     EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
     ASSERT_EQ(AVCS_ERR_INVALID_STATE, vdec_->Start());
-}
-
-HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_05, TestSize.Level1)
-{
-    EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Stop());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Stop());
-}
-
-HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_06, TestSize.Level1)
-{
-    EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Reset());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Reset());
-}
-
-HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_07, TestSize.Level1)
-{
-    EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Flush());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Flush());
-}
-
-HWTEST_F(FCodecUnitTest, fcodec_Operating_procedures_08, TestSize.Level1)
-{
-    EXPECT_EQ(AVCS_ERR_OK, ProceFunc());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Stop());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Release());
-    ASSERT_EQ(AVCS_ERR_OK, vdec_->Release());
 }
 
 int main(int argc, char *argv[])

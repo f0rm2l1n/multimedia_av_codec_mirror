@@ -55,32 +55,34 @@ public:
     int32_t SetOutputSurface(sptr<Surface> surface) override;
     int32_t RenderOutputBuffer(uint32_t index) override;
     static int32_t GetCodecCapability(std::vector<CapabilityData> &capaArray);
+
+private:
     struct AVBuffer {
     public:
         AVBuffer() = default;
         ~AVBuffer() = default;
 
-        enum class status {
+        enum class Owner {
             OWNED_BY_CODEC,
             OWNED_BY_USER,
             OWNED_BY_SURFACE,
         };
 
         std::shared_ptr<AVSharedMemory> memory_;
-        std::atomic<status> owner_;
+        std::atomic<Owner> owner_;
         AVCodecBufferInfo bufferInfo_;
         AVCodecBufferFlag bufferFlag_;
     };
-
-private:
-    int32_t Init(const std::string &name);
+    int32_t Init();
 
     enum struct State : int32_t {
         Uninitialized,
         Initialized,
         Configured,
+        Stopping,
         Running,
         Flushed,
+        Flushing,
         EOS,
         Error,
     };
@@ -88,6 +90,7 @@ private:
     void ResetContext(bool isFlush = false);
     std::tuple<int32_t, int32_t> CalculateBufferSize();
     int32_t AllocateBuffers();
+    int32_t ResetBuffers();
     int32_t ReleaseBuffers(bool isFlush = false);
     int32_t UpdateBuffers(uint32_t index);
     void SendFrame();
@@ -142,6 +145,7 @@ private:
     std::shared_ptr<AVCodecCallback> callback_;
     std::atomic<bool> isSendWait_ = false;
     std::atomic<bool> isSendEos_ = false;
+    std::atomic<bool> isBufferAllocated_ = false; 
 };
 } // namespace Codec
 } // namespace Media
