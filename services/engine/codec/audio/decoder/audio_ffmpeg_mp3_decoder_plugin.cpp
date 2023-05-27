@@ -125,7 +125,7 @@ int32_t AudioFFMpegMp3DecoderPlugin::Checkinit(const Format &format)
     }
 
     if (bitRate > MAX_BIT_RATE || bitRate < MIN_BIT_RATE) {
-        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+        return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
     }
 
     for (int i = 0; i < SUPPORT_SAMPLE_RATE; i++) {
