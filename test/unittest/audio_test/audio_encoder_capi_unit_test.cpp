@@ -573,6 +573,5 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_abnormalcase_01, TestSize.Le
 
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
 }
-
 } // namespace Media
 } // namespace OHOS
