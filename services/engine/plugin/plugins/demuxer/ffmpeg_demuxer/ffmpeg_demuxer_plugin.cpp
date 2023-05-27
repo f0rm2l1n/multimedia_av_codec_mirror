@@ -444,7 +444,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
     return AVCS_ERR_OK;
 }
 
-void FFmpegDemuxerPlugin::FreeCachePacket(cosnt uint32_t trackIndex) {
+void FFmpegDemuxerPlugin::FreeCachePacket(const uint32_t trackIndex) {
     if (!sampleCache_[trackIndex]->Empty()) {
         for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr) {
             av_packet_free(&(ele->pkt_));
