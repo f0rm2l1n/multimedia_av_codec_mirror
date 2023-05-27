@@ -185,21 +185,6 @@ namespace FormatTestParam {
     constexpr float EPSINON_FLOAT = 0.0001;
     constexpr double EPSINON_DOUBLE = 0.0001;
 } // namespace FormatTestParam
-
-namespace CodecListTestParam {
-    constexpr uint32_t DEFAULT_WIDTH = 1920;
-    constexpr uint32_t DEFAULT_HEIGHT = 1080;
-    constexpr uint32_t MIN_WIDTH = 2;
-    constexpr uint32_t MIN_HEIGHT = 2;
-    constexpr uint32_t MAX_WIDTH = 3840;
-    constexpr uint32_t MAX_HEIGHT = 2160;
-    constexpr uint32_t MAX_FRAME_RATE = 30;
-    constexpr uint32_t MAX_VIDEO_BITRATE = 3000000;
-    constexpr uint32_t MAX_AUDIO_BITRATE = 384000;
-    constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
-    constexpr uint32_t MAX_CHANNEL_COUNT = 2;
-    constexpr uint32_t MAX_CHANNEL_COUNT_VORBIS = 7;
-} // namespace CodecListTestParam
 } // namespace Media
 } // namespace OHOS
 
