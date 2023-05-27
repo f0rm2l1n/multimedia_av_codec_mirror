@@ -25,6 +25,11 @@
 #include "avcodec_dfx.h"
 #include "ffmpeg_demuxer_plugin.h"
 
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 78, 0) and LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 64, 100)
+#if LIBAVFORMAT_VERSION_INT != AV_VERSION_INT(58, 76, 100)
+#include "libavformat/internal.h"
+#endif
+#endif
 #define AV_CODEC_TIME_BASE (static_cast<int64_t>(1))
 #define AV_CODEC_NSECOND AV_CODEC_TIME_BASE
 #define AV_CODEC_USECOND (static_cast<int64_t>(1000) * AV_CODEC_NSECOND)
@@ -368,7 +373,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
             sampleCache_[stream_index]->Push(cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
-    if (ffmpegRet<0) {
+    if (ffmpegRet < 0) {
         AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ffmpegRet);
         av_packet_free(&(samplePacket->pkt_));
         return AVCS_ERR_DEMUXER_FAILED;
