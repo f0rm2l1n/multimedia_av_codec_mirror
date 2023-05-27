@@ -428,9 +428,13 @@ OH_AVErrCode OH_AudioEncoder_SetCallback(struct OH_AVCodec *codec, struct OH_AVC
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec *codec, bool *isVaild)
+OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec *codec, bool *isValid)
 {
-    return AV_ERR_UNSUPPORT;
+    CHECK_AND_RETURN_RET_LOG(codec != nullptr, AV_ERR_INVALID_VAL, "Input codec is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(codec->magic_ == AVMagic::AVCODEC_MAGIC_AUDIO_ENCODER, AV_ERR_INVALID_VAL, "Magic error!");
+    CHECK_AND_RETURN_RET_LOG(isValid != nullptr, AV_ERR_INVALID_VAL, "Input isValid is nullptr!");
+    *isValid = true;
+    return AV_ERR_OK;
 }
 
 #ifdef __cplusplus

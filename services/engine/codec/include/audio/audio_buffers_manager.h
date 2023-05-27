@@ -36,7 +36,7 @@ public:
 
     std::shared_ptr<AudioBufferInfo> getMemory(const uint32_t &index) const noexcept;
 
-    bool RelaseBuffer(const uint32_t &index);
+    bool ReleaseBuffer(const uint32_t &index);
 
     bool SetBufferBusy(const uint32_t &index);
 

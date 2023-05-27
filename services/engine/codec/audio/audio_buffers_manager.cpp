@@ -115,7 +115,7 @@ void AudioBuffersManager::SetRunning()
     isRunning_ = true;
 }
 
-bool AudioBuffersManager::RelaseBuffer(const uint32_t &index)
+bool AudioBuffersManager::ReleaseBuffer(const uint32_t &index)
 {
     if (index < bufferInfo_.size()) {
         std::unique_lock lock(avilableMuxt_);

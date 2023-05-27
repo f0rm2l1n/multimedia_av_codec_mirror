@@ -248,7 +248,6 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
     if (!pcmFile.is_open()) {
         std::cout << "open " << outputFilePath << " failed!" << std::endl;
     }
-
     while (true) {
         if (!isRunning_.load()) {
             cout << "stop, exit" << endl;
@@ -279,12 +278,15 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
         signal_->outQueue_.pop();
         EXPECT_EQ(AV_ERR_OK, OH_AudioDecoder_FreeOutputData(audioDec_, index));
     }
+
     pcmFile.close();
 }
 
 int32_t AudioCodeCapiDecoderUnitTest::ProceFunc(void)
 {
     int32_t ret = 0;
+    sleep(1);
+    fmpt_ctx = avformat_alloc_context();
     ret = avformat_open_input(&fmpt_ctx, inputFilePath.data(), NULL, NULL);
     if (ret < 0) {
         std::cout << "open file failed" << ret << "\n";
@@ -300,7 +302,7 @@ int32_t AudioCodeCapiDecoderUnitTest::ProceFunc(void)
     pkt.data = NULL;
     pkt.size = 0;
 
-    audioDec_ = OH_AudioDecoder_CreateByName("avdec_mp3");
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
     signal_ = new ADecSignal();
 
     cb_ = {&OnError, &OnOutputFormatChanged, &OnInputBufferAvailable, &OnOutputBufferAvailable};
@@ -312,7 +314,7 @@ int32_t AudioCodeCapiDecoderUnitTest::ProceFunc(void)
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_CreateByName_01, TestSize.Level1)
 {
-    audioDec_ = OH_AudioDecoder_CreateByName("avdec_mp3");
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
 }
 
 
