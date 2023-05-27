@@ -581,7 +581,7 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
     auto readSize = bufSize;
     auto customIOContext = static_cast<CustomIOContext*>(opaque);
     auto bufferVector = customIOContext->bufMemory;
-    if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize!=0)) {
+    if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize != 0)) {
         if (customIOContext->offset > customIOContext->fileSize) {
             AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}zu",
                          customIOContext->offset, customIOContext->fileSize);

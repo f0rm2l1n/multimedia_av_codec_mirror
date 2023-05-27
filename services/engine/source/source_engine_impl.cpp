@@ -43,7 +43,7 @@ int32_t SourceEngineImpl::Create()
     AVCodecTrace trace("SourceEngineImpl::Create");
     AVCODEC_LOGI("Create");
     std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_INVALID_OPERATION, "source_ is nullptr");
+    CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED, "source_ is nullptr");
     return source_->Create(uri_);
 }
 

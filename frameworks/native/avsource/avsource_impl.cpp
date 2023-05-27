@@ -150,7 +150,7 @@ int32_t AVSourceImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
     AVCODEC_LOGI("get track format: trackIndex=%{public}u, format=%{public}s", trackIndex, format.Stringify().c_str());
 
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-                            "source service died when get track format!");
+                             "source service died when get track format!");
 
     bool isValid = (trackIndex < trackCount_);
     CHECK_AND_RETURN_RET_LOG(isValid, AVCS_ERR_INVALID_VAL, "track index is invalid!");
