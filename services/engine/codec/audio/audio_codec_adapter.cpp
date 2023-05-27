@@ -287,7 +287,21 @@ int32_t AudioCodecAdapter::QueueInputBuffer(uint32_t index, const AVCodecBufferI
         AVCODEC_LOGE("adapter queue input buffer error, call back not initialized .");
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
+    if (info.presentationTimeUs < 0) {
+        AVCODEC_LOGE("presentationTimeUs could not less than 0,presentationTimeUs value:%{public}" PRId64,
+                     info.presentationTimeUs);
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+    }
 
+    if (info.size < 0) {
+        AVCODEC_LOGE("size could not less than 0,size value:%{public}d.", info.size);
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+    }
+
+    if (info.offset < 0) {
+        AVCODEC_LOGE("offset could not less than 0,offset value:%{public}d.", info.offset);
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+    }
     auto result = worker_->GetInputBufferInfo(index);
     if (result == nullptr) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
