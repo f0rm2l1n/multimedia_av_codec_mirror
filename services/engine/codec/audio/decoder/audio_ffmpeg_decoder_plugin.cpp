@@ -265,8 +265,17 @@ int32_t AudioFfmpegDecoderPlugin::InitContext(const Format &format)
 {
     format_ = format;
     format_.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avCodecContext_->channels);
+    if (avCodecContext_->channels <= 0) {
+        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
+    }
     format_.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avCodecContext_->sample_rate);
+    if (avCodecContext_->sample_rate <= 0) {
+        return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
+    }
     format_.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
+    if (avCodecContext_->bit_rate <= 0) {
+        return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
+    }
     format_.GetIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize_);
 
     size_t extraSize;
