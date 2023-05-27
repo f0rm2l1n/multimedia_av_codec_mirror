@@ -154,7 +154,7 @@ FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
             continue;
         }
         if (!it.second->Empty()) {
-            for (auto ele = it.second->Pop(); ele != nullptr) {
+            for (auto ele = it.second->Pop(); ele != nullptr;) {
                 av_packet_free(&(ele->pkt_));
                 ele = nullptr;
             }
@@ -444,9 +444,10 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
     return AVCS_ERR_OK;
 }
 
-void FFmpegDemuxerPlugin::FreeCachePacket(const uint32_t trackIndex) {
+void FFmpegDemuxerPlugin::FreeCachePacket(const uint32_t trackIndex)
+{
     if (!sampleCache_[trackIndex]->Empty()) {
-        for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr) {
+        for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr;) {
             av_packet_free(&(ele->pkt_));
             ele = nullptr;
         }
