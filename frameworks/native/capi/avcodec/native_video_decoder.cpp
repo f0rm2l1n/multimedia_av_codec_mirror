@@ -476,8 +476,12 @@ OH_AVErrCode OH_VideoDecoder_SetCallback(struct OH_AVCodec *codec, struct OH_AVC
     return AV_ERR_OK;
 }
 
-OH_AVErrCode OH_VideoDecoder_IsValid(OH_AVCodec *codec, bool *isVaild)
+OH_AVErrCode OH_VideoDecoder_IsValid(OH_AVCodec *codec, bool *isValid)
 {
-    (void)codec;
-    return AV_ERR_UNSUPPORT;
+    CHECK_AND_RETURN_RET_LOG(codec != nullptr, AV_ERR_INVALID_VAL, "Codec is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(codec->magic_ == AVMagic::AVCODEC_MAGIC_VIDEO_DECODER, AV_ERR_INVALID_VAL,
+                             "Codec magic error!");
+    CHECK_AND_RETURN_RET_LOG(isValid != nullptr, AV_ERR_INVALID_VAL, "Input isValid is nullptr!");
+    *isValid = true;
+    return AV_ERR_OK;
 }

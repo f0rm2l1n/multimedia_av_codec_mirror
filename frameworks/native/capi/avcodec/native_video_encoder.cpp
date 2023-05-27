@@ -497,7 +497,12 @@ OH_AVFormat *OH_VideoEncoder_GetInputDescription(OH_AVCodec *codec)
     return reinterpret_cast<OH_AVFormat *>(videoEncObj->inputputFormat_.GetRefPtr());
 }
 
-OH_AVErrCode OH_VideoEncoder_IsValid(OH_AVCodec *codec, bool *isVaild)
+OH_AVErrCode OH_VideoEncoder_IsValid(OH_AVCodec *codec, bool *isValid)
 {
-    return AV_ERR_UNSUPPORT;
+    CHECK_AND_RETURN_RET_LOG(codec != nullptr, AV_ERR_INVALID_VAL, "Codec is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(codec->magic_ == AVMagic::AVCODEC_MAGIC_VIDEO_ENCODER, AV_ERR_INVALID_VAL,
+        "Codec magic error!");
+    CHECK_AND_RETURN_RET_LOG(isValid != nullptr, AV_ERR_INVALID_VAL, "Input isValid is nullptr!");
+    *isValid = true;
+    return AV_ERR_OK;
 }
