@@ -45,7 +45,7 @@ OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format);
  * Note: This interface can only be called before OH_AVMuxer_Start.
  * @syscap SystemCapability.Multimedia.Media.Muxer
  * @param muxer Pointer to an OH_AVMuxer instance.
- * @param rotation The supported angles are 0, 90, 180, and 270 degrees.  {@link OH_VideoRotation}
+ * @param rotation The supported angles are 0, 90, 180, and 270 degrees.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10

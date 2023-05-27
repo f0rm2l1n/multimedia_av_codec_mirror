@@ -61,8 +61,8 @@
    // 旋转角度
    OH_AVMuxer_SetRotation(muxer, 0);
    ```
-   
-   
+
+
 
 3. 添加音频轨
 
@@ -71,9 +71,6 @@
    ``` c++
    int audioTrackId = -1;
    OH_AVFormat *formatAudio = OH_AVFormat_Create();
-   if (formatAudio == NULL) {
-       // format创建失败
-   }
    OH_AVFormat_SetStringValue(formatAudio, OH_MD_KEY_CODEC_MIME, OH_AVCODEC_MIMETYPE_AUDIO_AAC); // 必填
    OH_AVFormat_SetIntValue(formatAudio, OH_MD_KEY_AUD_SAMPLE_RATE, 44100); // 必填
    OH_AVFormat_SetIntValue(formatAudio, OH_MD_KEY_AUD_CHANNEL_COUNT, 2); // 必填
@@ -84,15 +81,11 @@
    }
    OH_AVFormat_Destroy(formatAudio); // 销毁
    ```
-
+   
    - **方法二:**
-
+   
    ``` cpp
    int audioTrackId = -1;
-   OH_AVFormat *formatAudio = OH_AVFormat_Create();
-   if (formatAudio == NULL) {
-       // format创建失败
-   }
    OH_AVFormat *formatAudio = OH_AVFormat_CreateAudioFormat(OH_AVCODEC_MIMETYPE_AUDIO_AAC, 44100, 2);
    
    int ret = OH_AVMuxer_AddTrack(muxer, &audioTrackId, formatAudio);
@@ -101,9 +94,9 @@
    }
    OH_AVFormat_Destroy(formatAudio); // 销毁
    ```
-
    
-
+   
+   
 4. 添加视频轨
 
    - **方法一**
@@ -113,9 +106,6 @@
    char *buffer = ...; // 编码config data，如果没有可以不传
    size_t size = ...;  // 编码config data的长度，根据实际情况配置
    OH_AVFormat *formatVideo = OH_AVFormat_Create();
-   if (formatVideo == NULL) {
-       // format创建失败
-   }
    OH_AVFormat_SetStringValue(formatVideo, OH_MD_KEY_CODEC_MIME, OH_AVCODEC_MIMETYPE_VIDEO_MPEG4); // 必填
    OH_AVFormat_SetIntValue(formatVideo, OH_MD_KEY_WIDTH, 1280); // 必填
    OH_AVFormat_SetIntValue(formatVideo, OH_MD_KEY_HEIGHT, 720); // 必填
@@ -127,9 +117,9 @@
    }
    OH_AVFormat_Destroy(formatVideo); // 销毁
    ```
-
+   
    - **方法二**
-
+   
    ``` cpp
    int videoTrackId = -1;
    char *buffer = ...; // 编码config data，如果没有可以不传
@@ -143,9 +133,9 @@
    }
    OH_AVFormat_Destroy(formatVideo); // 销毁
    ```
-
    
-
+   
+   
 5. 添加封面轨
 
    - **方法一**
@@ -153,36 +143,32 @@
    ``` cpp
    int coverTrackId = -1;
    OH_AVFormat *formatCover = OH_AVFormat_Create();
-   if (formatCover == NULL) {
-       // format创建失败
-   }
    OH_AVFormat_SetStringValue(formatCover, OH_MD_KEY_CODEC_MIME, OH_AVCODEC_MIMETYPE_IMAGE_JPG);
    OH_AVFormat_SetIntValue(formatCover, OH_MD_KEY_WIDTH, 1280);
    OH_AVFormat_SetIntValue(formatCover, OH_MD_KEY_HEIGHT, 720);
+   
    int ret = OH_AVMuxer_AddTrack(muxer, &coverTrackId, formatCover);
    if (ret != AV_ERR_OK || coverTrackId < 0) {
        // 添加封面失败
    }
    OH_AVFormat_Destroy(formatCover); // 销毁
    ```
-
+   
    - **方法二**
 
    ``` cpp
    int coverTrackId = -1;
    OH_AVFormat *formatCover = OH_AVFormat_CreateVideoFormat(OH_AVCODEC_MIMETYPE_IMAGE_JPG, 1280, 720);
-   if (formatCover == NULL) {
-       // format创建失败
-   }
+   
    int ret = OH_AVMuxer_AddTrack(muxer, &coverTrackId, formatCover);
    if (ret != AV_ERR_OK || coverTrackId < 0) {
        // 添加封面失败
    }
    OH_AVFormat_Destroy(formatCover); // 销毁
    ```
-
    
-
+   
+   
 5. 封装开始
 
    ``` c++

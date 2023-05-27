@@ -29,7 +29,7 @@ public:
     /**
      * @brief Set the rotation for output video playback.
      * Note: This interface can only be called before Start.
-     * @param rotation The supported angles are 0, 90, 180, and 270 degrees.  {@link VideoRotation}
+     * @param rotation The supported angles are 0, 90, 180, and 270 degrees.
      * @return Returns AVCS_ERR_OK if the execution is successful,
      * otherwise returns a specific error code, refer to {@link AVCodecServiceErrCode}
      * @since 10
