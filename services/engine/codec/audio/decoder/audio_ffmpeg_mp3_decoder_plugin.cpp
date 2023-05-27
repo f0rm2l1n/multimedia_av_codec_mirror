@@ -26,6 +26,7 @@ constexpr int MAX_CHANNELS = 2;
 constexpr int BIT_RATE_RATIO = 150;
 constexpr int SAMPLE_RATE_RATIO = 31;
 constexpr int MAX_BIT_RATE = 320000;
+constexpr int MIN_BIT_RATE = 32000;
 constexpr int SUPPORT_SAMPLE_RATE = 9;
 constexpr int BUFFER_DIFF = 128;
 }
@@ -123,8 +124,8 @@ int32_t AudioFFMpegMp3DecoderPlugin::Checkinit(const Format &format)
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
 
-    if (bitRate > MAX_BIT_RATE) {
-        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+    if (bitRate > MAX_BIT_RATE || bitRate < MIN_BIT_RATE) {
+        return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
     }
 
     for (int i = 0; i < SUPPORT_SAMPLE_RATE; i++) {

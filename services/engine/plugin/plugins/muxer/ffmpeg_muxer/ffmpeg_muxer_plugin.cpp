@@ -212,10 +212,10 @@ Status FFmpegMuxerPlugin::AddVideoTrack(int32_t &trackIndex, const MediaDescript
     int width = 0;
     int height = 0;
     bool ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_WIDTH, width); // width
-    CHECK_AND_RETURN_RET_LOG((ret && width > 0 && width < maxLength), Status::ERROR_MISMATCHED_TYPE,
+    CHECK_AND_RETURN_RET_LOG((ret && width > 0 && width <= maxLength), Status::ERROR_MISMATCHED_TYPE,
         "get video width failed! width:%{public}d", width);
     ret = trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height); // height
-    CHECK_AND_RETURN_RET_LOG((ret && height > 0 && height < maxLength), Status::ERROR_MISMATCHED_TYPE,
+    CHECK_AND_RETURN_RET_LOG((ret && height > 0 && height <= maxLength), Status::ERROR_MISMATCHED_TYPE,
         "get video height failed! height:%{public}d", height);
 
     auto st = avformat_new_stream(formatContext_.get(), nullptr);
@@ -258,8 +258,6 @@ Status FFmpegMuxerPlugin::AddTrack(int32_t &trackIndex, const MediaDescription &
         AVCODEC_LOGD("mimeType %{public}s is unsupported", mimeType.c_str());
         return Status::ERROR_UNSUPPORTED_FORMAT;
     }
-
-    CHECK_AND_RETURN_RET_LOG(ret == Status::NO_ERROR, ret, "SetCodecParameter failed!");
     formatContext_->flags |= AVFMT_TS_NONSTRICT;
     return Status::NO_ERROR;
 }
