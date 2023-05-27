@@ -117,11 +117,11 @@ void AEncFlacDemo::RunCase()
 }
 
 AEncFlacDemo::AEncFlacDemo()
+    : isRunning_(false),
+      audioEnc_(nullptr),
+      signal_(nullptr),
+      frameCount_(0)
 {
-    signal_ = nullptr;
-    audioEnc_ = nullptr;
-    frameCount_ = 0;
-    isRunning_ = false;
     inputFile_ = std::make_unique<std::ifstream>(INPUT_FILE_PATH, std::ios::binary);
 }
 

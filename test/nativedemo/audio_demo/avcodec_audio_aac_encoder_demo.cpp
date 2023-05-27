@@ -39,8 +39,8 @@ constexpr uint32_t CHANNEL_LAYOUT = 3;
 constexpr int32_t SAMPLE_FORMAT = 8;
 constexpr int32_t INPUT_FRAME_BYTES = 2 * 1024 * 4;
 
-constexpr string_view inputFilePath = "/data/media/test_fltp.pcm";
-constexpr string_view outputFilePath = "/data/media/encode2.aac";
+constexpr string_view INPUT_FILE_PATH = "/data/media/test_fltp.pcm";
+constexpr string_view OUTPUT_FILE_PATH = "/data/media/encode2.aac";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -115,12 +115,12 @@ void AEncAacDemo::RunCase()
 }
 
 AEncAacDemo::AEncAacDemo()
+    : isRunning_(false),
+      audioEnc_(nullptr),
+      signal_(nullptr),
+      frameCount_(0)
 {
-    signal_ = nullptr;
-    audioEnc_ = nullptr;
-    frameCount_ = 0;
-    isRunning_ = false;
-    inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
+    inputFile_ = std::make_unique<std::ifstream>(INPUT_FILE_PATH, std::ios::binary);
 }
 
 AEncAacDemo::~AEncAacDemo()
@@ -265,9 +265,9 @@ void AEncAacDemo::InputFunc()
 void AEncAacDemo::OutputFunc()
 {
     std::ofstream outputFile;
-    outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
+    outputFile.open(OUTPUT_FILE_PATH.data(), std::ios::out | std::ios::binary);
     if (!outputFile.is_open()) {
-        std::cout << "open " << outputFilePath << " failed!" << std::endl;
+        std::cout << "open " << OUTPUT_FILE_PATH << " failed!" << std::endl;
     }
 
     while (true) {
