@@ -116,6 +116,8 @@ void AEncAacDemo::RunCase()
 
 AEncAacDemo::AEncAacDemo()
 {
+    signal_ = nullptr;
+    audioEnc_ = nullptr;
     frameCount_ = 0;
     isRunning_ = false;
     inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
