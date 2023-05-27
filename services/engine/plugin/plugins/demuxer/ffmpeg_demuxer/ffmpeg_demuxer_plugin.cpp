@@ -154,7 +154,7 @@ FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
             continue;
         }
         if (!it.second->Empty()) {
-            for (auto ele = it.second->Pop(); ele != nullptr;) {
+            for (auto ele = it.second->Pop(); ele != nullptr) {
                 av_packet_free(&(ele->pkt_));
                 ele = nullptr;
             }
@@ -222,15 +222,8 @@ int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
                               [trackIndex](uint32_t selectedId) {return trackIndex == selectedId; });
     if (index != selectedTrackIds_.end()) {
         selectedTrackIds_.erase(index);
-        
         if (sampleCache_.count(trackIndex) != 0) {
-
-            if (!sampleCache_[trackIndex]->Empty()) {
-                for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr;) {
-                    av_packet_free(&(ele->pkt_));
-                    ele = nullptr;
-                }
-            }
+            FreeCachePacket(trackIndex);
             sampleCache_[trackIndex]->Clear();
             sampleCache_[trackIndex] = nullptr;
             sampleCache_.erase(trackIndex);
@@ -445,15 +438,19 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
         }
     }
     for (auto it:sampleCache_) {
-        if (!it.second->Empty()) {
-            for (auto ele = it.second->Pop(); ele != nullptr;) {
-                av_packet_free(&(ele->pkt_));
-                ele = nullptr;
-            }
-        }
+        FreeCachePacket(it.first);
         it.second->Clear();
     }
     return AVCS_ERR_OK;
+}
+
+void FFmpegDemuxerPlugin::FreeCachePacket(cosnt uint32_t trackIndex) {
+    if (!sampleCache_[trackIndex]->Empty()) {
+        for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr) {
+            av_packet_free(&(ele->pkt_));
+            ele = nullptr;
+        }
+    }
 }
 } // FFmpeg
 } // Plugin

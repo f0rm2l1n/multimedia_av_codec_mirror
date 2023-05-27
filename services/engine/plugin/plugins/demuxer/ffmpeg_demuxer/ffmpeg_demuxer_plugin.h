@@ -73,6 +73,8 @@ private:
     std::shared_ptr<AVBSFContext> avbsfContext_ {nullptr};
     std::map<uint32_t, uint64_t> sampleIndex_;
     std::map<uint32_t, std::shared_ptr<BlockQueue<std::shared_ptr<SamplePacket>>>> sampleCache_;
+
+    void FreeCachePacket(cosnt uint32_t trackIndex);
 };
 } // namespace FFmpeg
 } // namespace Plugin
