@@ -16,303 +16,640 @@
 #include "codeclist_unit_test.h"
 #include <fcntl.h>
 #include <fstream>
-#include <gtest/gtest.h>
 #include <iostream>
 #include <string>
 #include <vector>
-#include "test_params_config.h"
-
+#include "gtest/gtest.h"
 
 using namespace testing::ext;
 using namespace OHOS::Media;
 using namespace OHOS::Media::CodecListTestParam;
 
-template <typename TCodecMock>
-void ReleaseCodec(vector<TCodecMock> &codecLst)
-{
-    uint32_t ret;
-    for (auto &codec : codecLst) {
-        if (codec != nullptr) {
-            ret = codec->Destroy();
-            EXPECT_EQ(AV_ERR_OK, ret);
-            codec = nullptr;
-        }
-    }
-    codecLst.swap(vector<TCodecMock>());
-}
-
 void CodecListUnitTest::SetUpTestCase() {}
 
 void CodecListUnitTest::TearDownTestCase() {}
 
-void CodecListUnitTest::SetUp()
-{
-    codeclist_ = CodecListMockFactory::CreateCodecList();
-    EXPECT_NE(codeclist_, nullptr);
-}
+void CodecListUnitTest::SetUp() {}
 
 void CodecListUnitTest::TearDown() {}
 
-/**
- * @tc.name: CodecList_FindVideoDecoder_001
- * @tc.desc: CodecList FindVideoDecoder
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CodecListUnitTest, CodecList_FindVideoDecoder_001, TestSize.Level0)
+string VectorToString(const std::vector<int32_t> list, const std::string listName)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    ASSERT_NE(nullptr, format);
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::VIDEO_AVC);
-    (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
-    (void)format->PutIntValue(widthKey_, DEFAULT_WIDTH);
-    (void)format->PutIntValue(heightKey_, DEFAULT_HEIGHT);
-    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::NV12);
-    (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("video_decoder.avc", codecName);
+    std::string ret = listName;
+    ret += "={";
+    for (auto it = list.begin(); it != list.end(); ++it) {
+        ret += std::to_string(*it) + ", ";
+    }
+    ret += "}";
+    return ret;
 }
 
 /**
- * @tc.name: CodecList_FindVideoDecoder_002
- * @tc.desc: CodecList FindVideoDecoder, Negative PixelFormat
+ * @tc.name: CodecList_GetCapabilityByCategory_001
+ * @tc.desc: CodecList GetCapabilityByCategory
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindVideoDecoder_002, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetCapabilityByCategory_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    ASSERT_NE(nullptr, format);
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::VIDEO_AVC);
-    (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
-    (void)format->PutIntValue(widthKey_, DEFAULT_WIDTH);
-    (void)format->PutIntValue(heightKey_, DEFAULT_HEIGHT);
-    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT); // Negative parameters
-    (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("", codecName);
+    AVCodecCategory category = AVCodecCategory::AVCODEC_HARDWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, false, category);
+    EXPECT_NE(nullptr, capability_);
+    category = AVCodecCategory::AVCODEC_SOFTWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, false, category);
+    EXPECT_NE(nullptr, capability_);
+
+    category = AVCodecCategory::AVCODEC_HARDWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, true, category);
+    EXPECT_NE(nullptr, capability_);
+    category = AVCodecCategory::AVCODEC_SOFTWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, true, category);
+    EXPECT_NE(nullptr, capability_);
 }
 
 /**
- * @tc.name: CodecList_FindVideoDecoder_003
- * @tc.desc: CodecList FindVideoDecoder, Negative Width
+ * @tc.name: CodecList_GetCapability_001
+ * @tc.desc: CodecList GetCapability
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindVideoDecoder_003, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetCapability_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    ASSERT_NE(nullptr, format);
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::VIDEO_AVC);
-    (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
-    (void)format->PutIntValue(widthKey_, 15361);
-    (void)format->PutIntValue(heightKey_, DEFAULT_HEIGHT);
-    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT); // Negative parameters
-    (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("", codecName);
+    for (auto it = CAPABILITY_DECODER_NAME.begin(); it != CAPABILITY_DECODER_NAME.end(); ++it) {
+        std::string mime = it->first;
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, false);
+        EXPECT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
+    }
+    for (auto it = CAPABILITY_ENCODER_NAME.begin(); it != CAPABILITY_ENCODER_NAME.end(); ++it) {
+        std::string mime = it->first;
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, true);
+        EXPECT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
+    }
 }
 
 /**
- * @tc.name: CodecList_FindVideoDecoder_004
- * @tc.desc: CodecList FindVideoDecoder, Negative Height
+ * @tc.name: CodecList_IsHardware_001
+ * @tc.desc: CodecList IsHardware
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindVideoDecoder_004, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_IsHardware_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    ASSERT_NE(nullptr, format);
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::VIDEO_AVC);
-    (void)format->PutIntValue(bitrateKey_, MAX_VIDEO_BITRATE);
-    (void)format->PutIntValue(widthKey_, DEFAULT_WIDTH);
-    (void)format->PutIntValue(heightKey_, 31);
-    (void)format->PutIntValue(pixelFormatKey_, VideoPixelFormat::SURFACE_FORMAT); // Negative parameters
-    (void)format->PutIntValue(frameRateKey_, MAX_FRAME_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("", codecName);
+    // audio decoder
+    AVCodecCategory category = AVCodecCategory::AVCODEC_SOFTWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, false, category);
+    ASSERT_NE(nullptr, capability_);
+    EXPECT_FALSE(capability_->IsHardware());
+
+    category = AVCodecCategory::AVCODEC_HARDWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, false, category);
+    EXPECT_NE(nullptr, capability_);
+    EXPECT_FALSE(capability_->IsHardware());
+
+    // audio encoder
+    category = AVCodecCategory::AVCODEC_SOFTWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, false, category);
+    ASSERT_NE(nullptr, capability_);
+    EXPECT_FALSE(capability_->IsHardware());
+
+    category = AVCodecCategory::AVCODEC_HARDWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_AUDIO_MIME, false, category);
+    EXPECT_NE(nullptr, capability_);
+    EXPECT_FALSE(capability_->IsHardware());
+
+    // video decoder
+    category = AVCodecCategory::AVCODEC_SOFTWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_VIDEO_MIME, false, category);
+    ASSERT_NE(nullptr, capability_);
+    EXPECT_FALSE(capability_->IsHardware());
+
+    category = AVCodecCategory::AVCODEC_HARDWARE;
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(DEFAULT_VIDEO_MIME, false, category);
+    EXPECT_NE(nullptr, capability_);
+    EXPECT_FALSE(capability_->IsHardware());
 }
 
 /**
- * @tc.name: CodecList_FindAudioDecoder_001
- * @tc.desc: CodecList FindAudioDecoder
+ * @tc.name: CodecList_GetName_001
+ * @tc.desc: CodecList GetName
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioDecoder_001, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetName_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_MPEG);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("avdec_mp3", codecName);
+    for (auto it = CAPABILITY_DECODER_NAME.begin(); it != CAPABILITY_DECODER_NAME.end(); ++it) {
+        std::string mime = it->first;
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, false);
+        ASSERT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
+        std::string codecName = capability_->GetName();
+        EXPECT_EQ(nameOfMime, codecName) << mime << " get error name: " << codecName << std::endl;
+    }
+    for (auto it = CAPABILITY_ENCODER_NAME.begin(); it != CAPABILITY_ENCODER_NAME.end(); ++it) {
+        std::string mime = it->first;
+        std::string nameOfMime = it->second;
+        capability_ = CodecListMockFactory::GetCapability(mime, true);
+        ASSERT_NE(nullptr, capability_) << mime << " can not found!" << std::endl;
+        std::string codecName = capability_->GetName();
+        EXPECT_EQ(nameOfMime, codecName) << mime << " get error name: " << codecName << std::endl;
+    }
 }
 
 /**
- * @tc.name: CodecList_FindAudioDecoder_002
- * @tc.desc: CodecList FindAudioDecoder
+ * @tc.name: CodecList_GetMaxSupportedInstances_001
+ * @tc.desc: CodecList GetMaxSupportedInstances
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioDecoder_002, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetMaxSupportedInstances_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_AAC);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("avdec_aac", codecName);
+    // audio decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "audio decoder codeclist create fail!" << std::endl;
+    EXPECT_EQ(MAX_SURPPORT_ACODEC, capability_->GetMaxSupportedInstances());
+
+    // audio encoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, true);
+    ASSERT_NE(nullptr, capability_) << "audio encoder codeclist create fail!" << std::endl;
+    EXPECT_EQ(MAX_SURPPORT_ACODEC, capability_->GetMaxSupportedInstances());
+
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+    EXPECT_EQ(MAX_SURPPORT_VCODEC, capability_->GetMaxSupportedInstances());
 }
 
 /**
- * @tc.name: CodecList_FindAudioDecoder_003
- * @tc.desc: CodecList FindAudioDecoder
+ * @tc.name: CodecList_GetEncoderBitrateRange_001
+ * @tc.desc: CodecList GetEncoderBitrateRange
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioDecoder_003, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetEncoderBitrateRange_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_VORBIS);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("avdec_vorbis", codecName);
+    // audio encoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, true);
+    ASSERT_NE(nullptr, capability_) << "audio encoder codeclist create fail!" << std::endl;
+    Range bitrateRange = capability_->GetEncoderBitrateRange();
+    EXPECT_EQ(DEFAULT_BITRATE_RANGE.minVal, bitrateRange.minVal);
+    EXPECT_EQ(DEFAULT_BITRATE_RANGE.maxVal, bitrateRange.maxVal);
 }
 
 /**
- * @tc.name: CodecList_FindAudioDecoder_004
- * @tc.desc: CodecList FindAudioDecoder
+ * @tc.name: CodecList_IsEncoderBitrateModeSupported_001
+ * @tc.desc: CodecList IsEncoderBitrateModeSupported
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioDecoder_004, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_IsEncoderBitrateModeSupported_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_FLAC);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("avdec_flac", codecName);
+    // audio encoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, true);
+    ASSERT_NE(nullptr, capability_) << "audio encoder codeclist create fail!" << std::endl;
+
+    // positive case
+    OH_BitrateMode bitrateMode = OH_BitrateMode::CBR;
+    EXPECT_FALSE(capability_->IsEncoderBitrateModeSupported(bitrateMode));
+
+    // negative case
+    bitrateMode = OH_BitrateMode::ABR;
+    EXPECT_FALSE(capability_->IsEncoderBitrateModeSupported(bitrateMode));
 }
 
 /**
- * @tc.name: CodecList_FindAudioDecoder_005
- * @tc.desc: CodecList FindAudioDecoder
+ * @tc.name: CodecList_GetEncoderQualityRange_001
+ * @tc.desc: CodecList GetEncoderQualityRange
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioDecoder_005, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetEncoderQualityRange_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_OPUS);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, 48000);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("avdec_opus", codecName);
+    // audio encoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, true);
+    ASSERT_NE(nullptr, capability_) << "audio encoder codeclist create fail!" << std::endl;
+
+    Range qualityRange = capability_->GetEncoderQualityRange();
+    EXPECT_EQ(DEFAULT_QUALITY_RANGE.minVal, qualityRange.minVal);
+    EXPECT_EQ(DEFAULT_QUALITY_RANGE.maxVal, qualityRange.maxVal);
 }
 
 /**
- * @tc.name: CodecList_FindAudioDecoder_006
- * @tc.desc: CodecList FindAudioDecoder, Negative ChannelCount
+ * @tc.name: CodecList_GetEncoderComplexityRange_001
+ * @tc.desc: CodecList GetEncoderComplexityRange
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioDecoder_006, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetEncoderComplexityRange_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_OPUS);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT + 1); // Negative parameters
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);
-    codecName = codeclist_->FindDecoder(format);
-    EXPECT_EQ("", codecName);
+    // audio encoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, true);
+    ASSERT_NE(nullptr, capability_) << "audio encoder codeclist create fail!" << std::endl;
+
+    Range complexityRange = capability_->GetEncoderComplexityRange();
+    EXPECT_EQ(DEFAULT_COMPLEXITY_RANGE.minVal, complexityRange.minVal);
+    EXPECT_EQ(DEFAULT_COMPLEXITY_RANGE.maxVal, complexityRange.maxVal);
 }
 
 /**
- * @tc.name: CodecList_FindAudioEncoder_001
- * @tc.desc: CodecList FindAudioEncoder
+ * @tc.name: CodecList_GetAudioSupportedSampleRates_001
+ * @tc.desc: CodecList GetAudioSupportedSampleRates
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioEncoder_001, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetAudioSupportedSampleRates_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_AAC);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE);
-    codecName = codeclist_->FindEncoder(format);
-    EXPECT_EQ("avenc_aac", codecName);
+    // audio encoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, true);
+    ASSERT_NE(nullptr, capability_) << "audio encoder codeclist create fail!" << std::endl;
+    std::vector<int32_t> sampleRates = capability_->GetAudioSupportedSampleRates();
+    EXPECT_EQ(DEFAULT_AUDIO_ACC_SAMPLES, sampleRates);
 }
 
 /**
- * @tc.name: CodecList_FindAudioEncoder_002
- * @tc.desc: CodecList FindAudioEncoder
+ * @tc.name: CodecList_GetAudioChannelsRange_001
+ * @tc.desc: CodecList GetAudioChannelsRange
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioEncoder_002, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetAudioChannelsRange_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_OPUS);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, 48000);
-    codecName = codeclist_->FindEncoder(format);
-    EXPECT_EQ("avenc_opus", codecName);
+    // audio encoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_AUDIO_MIME, true);
+    ASSERT_NE(nullptr, capability_) << "audio encoder codeclist create fail!" << std::endl;
+
+    Range channelCountRange = capability_->GetAudioChannelsRange();
+    EXPECT_EQ(DEFAULT_CHANNELCOUNT_RANGE.minVal, channelCountRange.minVal);
+    EXPECT_EQ(DEFAULT_CHANNELCOUNT_RANGE.maxVal, channelCountRange.maxVal);
 }
 
 /**
- * @tc.name: CodecList_FindAudioEncoder_003
- * @tc.desc: CodecList FindAudioEncoder, Negative SampleRate
+ * @tc.name: CodecList_GetVideoWidthAlignment_001
+ * @tc.desc: CodecList GetVideoWidthAlignment
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioEncoder_003, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoWidthAlignment_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_OPUS);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE);
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, DEFAULT_SAMPLE_RATE); // Negative parameters
-    codecName = codeclist_->FindEncoder(format);
-    EXPECT_EQ("", codecName);
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    int32_t widthAlignment = capability_->GetVideoWidthAlignment();
+    EXPECT_EQ(DEFAULT_WIDTH_ALIGNMENT, widthAlignment);
 }
 
 /**
- * @tc.name: CodecList_FindAudioEncoder_004
- * @tc.desc: CodecList FindAudioEncoder, Negative Bitrate
+ * @tc.name: CodecList_GetVideoHeightAlignment_001
+ * @tc.desc: CodecList GetVideoHeightAlignment
  * @tc.type: FUNC
- * @tc.require:
  */
-HWTEST_F(CodecListUnitTest, CodecList_FindAudioEncoder_004, TestSize.Level0)
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoHeightAlignment_001, TestSize.Level1)
 {
-    std::string codecName;
-    std::shared_ptr<FormatMock> format = FormatMockFactory::CreateFormat();
-    (void)format->PutStringValue(codecMimeKey_, CodecMimeType::AUDIO_OPUS);
-    (void)format->PutIntValue(bitrateKey_, MAX_AUDIO_BITRATE + 1); // Negative parameters
-    (void)format->PutIntValue(channelCountKey_, MAX_CHANNEL_COUNT);
-    (void)format->PutIntValue(sampleRateKey_, 48000);
-    codecName = codeclist_->FindEncoder(format);
-    EXPECT_EQ("", codecName);
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    int32_t heightAlignment = capability_->GetVideoHeightAlignment();
+    EXPECT_EQ(DEFAULT_HEIGHT_ALIGNMENT, heightAlignment);
+}
+
+/**
+ * @tc.name: CodecList_GetVideoHeightRangeForWidth_001
+ * @tc.desc: CodecList GetVideoHeightRangeForWidth
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoHeightRangeForWidth_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    Range widthRange = capability_->GetVideoHeightRangeForWidth(DEFAULT_WIDTH);
+    EXPECT_EQ(DEFAULT_WIDTH_RANGE_OF_HEIGHT.minVal, widthRange.minVal);
+    EXPECT_EQ(DEFAULT_WIDTH_RANGE_OF_HEIGHT.maxVal, widthRange.maxVal);
+}
+
+/**
+ * @tc.name: CodecList_GetVideoWidthRangeForHeight_001
+ * @tc.desc: CodecList GetVideoWidthRangeForHeight
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoWidthRangeForHeight_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    Range heightRange = capability_->GetVideoWidthRangeForHeight(DEFAULT_HEIGHT);
+    EXPECT_EQ(DEFAULT_HEIGHT_RANGE_OF_WIDTH.minVal, heightRange.minVal);
+    EXPECT_EQ(DEFAULT_HEIGHT_RANGE_OF_WIDTH.maxVal, heightRange.maxVal);
+}
+
+/**
+ * @tc.name: CodecList_GetVideoWidthRange_001
+ * @tc.desc: CodecList GetVideoWidthRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoWidthRange_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    Range widthRange = capability_->GetVideoWidthRange();
+    EXPECT_EQ(DEFAULT_WIDTH_RANGE.minVal, widthRange.minVal);
+    EXPECT_EQ(DEFAULT_WIDTH_RANGE.maxVal, widthRange.maxVal);
+}
+
+/**
+ * @tc.name: CodecList_GetVideoHeightRange_001
+ * @tc.desc: CodecList GetVideoHeightRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoHeightRange_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    Range heightRange = capability_->GetVideoHeightRange();
+    EXPECT_EQ(DEFAULT_HEIGHT_RANGE.minVal, heightRange.minVal);
+    EXPECT_EQ(DEFAULT_HEIGHT_RANGE.maxVal, heightRange.maxVal);
+}
+
+/**
+ * @tc.name: CodecList_IsVideoSizeSupported_001
+ * @tc.desc: CodecList IsVideoSizeSupported
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_IsVideoSizeSupported_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    int32_t wmin = DEFAULT_WIDTH_RANGE.minVal;
+    int32_t wmax = DEFAULT_WIDTH_RANGE.maxVal;
+    int32_t hmin = DEFAULT_HEIGHT_RANGE.minVal;
+    int32_t hmax = DEFAULT_HEIGHT_RANGE.maxVal;
+    // case 1 - 13, postive param
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmin, DEFAULT_HEIGHT))
+        << "width:" << wmin << "height:" << DEFAULT_HEIGHT << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmin + 2, DEFAULT_HEIGHT))
+        << "width:" << wmin + 2 << "height:" << DEFAULT_HEIGHT << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmin + 2, hmax))
+        << "width:" << wmin + 2 << "height:" << hmax << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmin + 2, hmax - 2))
+        << "width:" << wmin + 2 << "height:" << hmax - 2 << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(DEFAULT_WIDTH, hmax))
+        << "width:" << DEFAULT_WIDTH << "height:" << hmax << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(DEFAULT_WIDTH, hmax - 2))
+        << "width:" << DEFAULT_WIDTH << "height:" << hmax - 2 << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmax, DEFAULT_HEIGHT))
+        << "width:" << wmax << "height:" << DEFAULT_HEIGHT << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmax - 2, DEFAULT_HEIGHT))
+        << "width:" << wmax - 2 << "height:" << DEFAULT_HEIGHT << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmax - 2, hmin))
+        << "width:" << wmax - 2 << "height:" << DEFAULT_HEIGHT << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(wmax - 2, hmin + 2))
+        << "width:" << wmax - 2 << "height:" << hmin + 2 << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(DEFAULT_WIDTH, hmin))
+        << "width:" << DEFAULT_WIDTH << "height:" << hmin << std::endl;
+    EXPECT_TRUE(capability_->IsVideoSizeSupported(DEFAULT_WIDTH, hmin + 2))
+        << "width:" << DEFAULT_WIDTH << "height:" << hmin + 2 << std::endl;
+}
+
+/**
+ * @tc.name: CodecList_IsVideoSizeSupported_002
+ * @tc.desc: CodecList IsVideoSizeSupported
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_IsVideoSizeSupported_002, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    int32_t wmin = DEFAULT_WIDTH_RANGE.minVal;
+    int32_t wmax = DEFAULT_WIDTH_RANGE.maxVal;
+    int32_t hmin = DEFAULT_HEIGHT_RANGE.minVal;
+    int32_t hmax = DEFAULT_HEIGHT_RANGE.maxVal;
+    // case 1 - 10, negative param
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmax + 2, hmin))
+        << "width:" << wmin + 2 << "height:" << hmin << std::endl;
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmin - 2, hmin))
+        << "width:" << wmin - 2 << "height:" << hmin << std::endl;
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmax + 2, hmax))
+        << "width:" << wmin + 2 << "height:" << hmax << std::endl;
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmin - 2, hmax))
+        << "width:" << wmin - 2 << "height:" << hmax << std::endl;
+
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmin, hmin - 2))
+        << "width:" << wmin << "height:" << hmin - 2 << std::endl;
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmin, hmax + 2))
+        << "width:" << wmin << "height:" << hmax + 2 << std::endl;
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmax, hmin - 2))
+        << "width:" << wmax << "height:" << hmin - 2 << std::endl;
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(wmax, hmax + 2))
+        << "width:" << wmax << "height:" << hmax + 2 << std::endl;
+
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(DEFAULT_WIDTH + 1, DEFAULT_HEIGHT))
+        << "width:" << DEFAULT_WIDTH + 1 << "height:" << DEFAULT_HEIGHT << std::endl;
+    EXPECT_FALSE(capability_->IsVideoSizeSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT + 1))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT + 1 << std::endl;
+}
+
+/**
+ * @tc.name: CodecList_GetVideoFrameRateRange_001
+ * @tc.desc: CodecList GetVideoFrameRateRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoFrameRateRange_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    Range framerateRange = capability_->GetVideoFrameRateRange();
+    EXPECT_EQ(DEFAULT_FRAMERATE_RANGE.minVal, framerateRange.minVal);
+    EXPECT_EQ(DEFAULT_FRAMERATE_RANGE.maxVal, framerateRange.maxVal);
+}
+
+/**
+ * @tc.name: CodecList_AreVideoSizeAndFrameRateSupported_001
+ * @tc.desc: CodecList AreVideoSizeAndFrameRateSupported
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_AreVideoSizeAndFrameRateSupported_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+    int32_t minVal = DEFAULT_FRAMERATE_RANGE.minVal;
+    int32_t maxVal = DEFAULT_FRAMERATE_RANGE.maxVal;
+    // case 1 - 4, positive param
+    EXPECT_TRUE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_FRAMERATE))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << DEFAULT_FRAMERATE << std::endl;
+    EXPECT_TRUE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT, minVal + 1))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << minVal + 1 << std::endl;
+    EXPECT_TRUE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT, maxVal))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << maxVal << std::endl;
+    EXPECT_TRUE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT, maxVal - 1))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << maxVal - 1 << std::endl;
+}
+
+/**
+ * @tc.name: CodecList_AreVideoSizeAndFrameRateSupported_002
+ * @tc.desc: CodecList AreVideoSizeAndFrameRateSupported
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_AreVideoSizeAndFrameRateSupported_002, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+    int32_t minVal = DEFAULT_FRAMERATE_RANGE.minVal;
+    int32_t maxVal = DEFAULT_FRAMERATE_RANGE.maxVal;
+    // case 1 - 9, negative param
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT, minVal - 1))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << minVal - 1 << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT, maxVal + 1))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << minVal + 1 << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, DEFAULT_HEIGHT, ERROR_FRAMERATE))
+        << "width:" << DEFAULT_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << ERROR_FRAMERATE << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, ERROR_HEIGHT, DEFAULT_FRAMERATE))
+        << "width:" << DEFAULT_WIDTH << "height:" << ERROR_HEIGHT << "framerate: " << DEFAULT_FRAMERATE << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(DEFAULT_WIDTH, ERROR_HEIGHT, ERROR_FRAMERATE))
+        << "width:" << DEFAULT_WIDTH << "height:" << ERROR_HEIGHT << "framerate: " << ERROR_FRAMERATE << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(ERROR_WIDTH, DEFAULT_HEIGHT, DEFAULT_FRAMERATE))
+        << "width:" << ERROR_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << DEFAULT_FRAMERATE << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(ERROR_WIDTH, DEFAULT_HEIGHT, ERROR_FRAMERATE))
+        << "width:" << ERROR_WIDTH << "height:" << DEFAULT_HEIGHT << "framerate: " << ERROR_FRAMERATE << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(ERROR_WIDTH, ERROR_HEIGHT, DEFAULT_FRAMERATE))
+        << "width:" << ERROR_WIDTH << "height:" << ERROR_HEIGHT << "framerate: " << DEFAULT_FRAMERATE << std::endl;
+    EXPECT_FALSE(capability_->AreVideoSizeAndFrameRateSupported(ERROR_WIDTH, ERROR_HEIGHT, ERROR_FRAMERATE))
+        << "width:" << ERROR_WIDTH << "height:" << ERROR_HEIGHT << "framerate: " << ERROR_FRAMERATE << std::endl;
+}
+
+/**
+ * @tc.name: CodecList_GetVideoFrameRateRangeForSize_001
+ * @tc.desc: CodecList GetVideoFrameRateRangeForSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoFrameRateRangeForSize_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    int32_t wmax = DEFAULT_WIDTH_RANGE.maxVal;
+    int32_t hmax = DEFAULT_HEIGHT_RANGE.maxVal;
+    Range framerateRange = capability_->GetVideoFrameRateRangeForSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    EXPECT_EQ(DEFAULT_FRAMERATE_RANGE.minVal, framerateRange.minVal);
+    EXPECT_EQ(DEFAULT_FRAMERATE_RANGE.maxVal, framerateRange.maxVal);
+
+    framerateRange = capability_->GetVideoFrameRateRangeForSize(wmax, hmax);
+    EXPECT_EQ(0, framerateRange.minVal);
+    EXPECT_EQ(26, framerateRange.maxVal); // 26: The return values after (2304, 4096) are passed in
+}
+
+/**
+ * @tc.name: CodecList_GetVideoFrameRateRangeForSize_002
+ * @tc.desc: CodecList GetVideoFrameRateRangeForSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoFrameRateRangeForSize_002, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    int32_t wmax = DEFAULT_WIDTH_RANGE.maxVal;
+    int32_t hmax = DEFAULT_HEIGHT_RANGE.maxVal;
+    Range framerateRange = capability_->GetVideoFrameRateRangeForSize(0, 0);
+    EXPECT_EQ(0, framerateRange.minVal);
+    EXPECT_EQ(0, framerateRange.maxVal);
+
+    framerateRange = capability_->GetVideoFrameRateRangeForSize(wmax + 2, hmax + 2);
+    EXPECT_EQ(0, framerateRange.minVal);
+    EXPECT_EQ(0, framerateRange.maxVal);
+
+    framerateRange = capability_->GetVideoFrameRateRangeForSize(wmax - 1, hmax - 1);
+    EXPECT_EQ(0, framerateRange.minVal);
+    EXPECT_EQ(0, framerateRange.maxVal);
+
+    framerateRange = capability_->GetVideoFrameRateRangeForSize(-2, -2);
+    EXPECT_EQ(0, framerateRange.minVal);
+    EXPECT_EQ(0, framerateRange.maxVal);
+}
+
+/**
+ * @tc.name: CodecList_GetVideoSupportedPixelFormats_001
+ * @tc.desc: CodecList GetVideoSupportedPixelFormats
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetVideoSupportedPixelFormats_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    std::vector<int32_t> pixFormats = capability_->GetVideoSupportedPixelFormats();
+    EXPECT_EQ(DEFAULT_VIDEO_AVC_PIXFORMATS, pixFormats);
+}
+
+/**
+ * @tc.name: CodecList_GetSupportedProfiles_001
+ * @tc.desc: CodecList GetSupportedProfiles
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetSupportedProfiles_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    std::vector<int32_t> profiles = capability_->GetSupportedProfiles();
+    EXPECT_EQ(DEFAULT_VIDEO_AVC_PROFILES, profiles);
+}
+
+/**
+ * @tc.name: CodecList_GetSupportedLevelsForProfile_001
+ * @tc.desc: CodecList GetSupportedLevelsForProfile
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_GetSupportedLevelsForProfile_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+
+    std::vector<int32_t> levels = capability_->GetSupportedLevelsForProfile(DEFAULT_VIDEO_AVC_PROFILE);
+    EXPECT_EQ(DEFAULT_VIDEO_AVC_LEVELS, levels);
+}
+
+/**
+ * @tc.name: CodecList_AreProfileAndLevelSupported_001
+ * @tc.desc: CodecList AreProfileAndLevelSupported
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_AreProfileAndLevelSupported_001, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+    // case 1 - 16, postive param
+    for (auto it : DEFAULT_VIDEO_AVC_LEVELS) {
+        EXPECT_TRUE(capability_->AreProfileAndLevelSupported(DEFAULT_VIDEO_AVC_PROFILE, it));
+    }
+}
+
+/**
+ * @tc.name: CodecList_AreProfileAndLevelSupported_002
+ * @tc.desc: CodecList AreProfileAndLevelSupported
+ * @tc.type: FUNC
+ */
+HWTEST_F(CodecListUnitTest, CodecList_AreProfileAndLevelSupported_002, TestSize.Level1)
+{
+    // video decoder
+    capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
+    ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
+    // case 1, negative param
+    EXPECT_FALSE(capability_->AreProfileAndLevelSupported(DEFAULT_VIDEO_AVC_PROFILE, ERROR_LEVEL));
+    // case 2, negative param
+    EXPECT_FALSE(capability_->AreProfileAndLevelSupported(ERROR_VIDEO_AVC_PROFILE, DEFAULT_LEVEL));
+    // case 3, negative param
+    EXPECT_FALSE(capability_->AreProfileAndLevelSupported(ERROR_VIDEO_AVC_PROFILE, ERROR_LEVEL));
 }

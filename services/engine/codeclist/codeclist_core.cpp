@@ -252,7 +252,7 @@ CapabilityData CodecListCore::GetCapability(const std::string &mime, const bool 
     }
     std::vector<size_t> capsIdx = mimeCapIdxMap.at(mime);
     for (auto iter = capsIdx.begin(); iter != capsIdx.end(); iter++) {
-        if (capsDataArray[*iter].codecType == codecType || capsDataArray[*iter].mimeType == mime) {
+        if (capsDataArray[*iter].codecType == codecType && capsDataArray[*iter].mimeType == mime) {
             if (category != AVCodecCategory::AVCODEC_NONE && capsDataArray[*iter].isVendor != isVendor) {
                 continue;
             }
