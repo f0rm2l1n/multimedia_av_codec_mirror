@@ -38,9 +38,10 @@ constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr uint32_t CHANNEL_LAYOUT = 3;
 constexpr int32_t SAMPLE_FORMAT = 1;
 constexpr uint32_t FRAME_BYTES = 18432;
+constexpr int32_t COMPLIANCE_LEVEL = -2;
 
-constexpr string_view inputFilePath = "/data/flac_test.pcm";
-constexpr string_view outputFilePath = "/data/flac_encoder_test.flac";
+constexpr string_view INPUT_FILE_PATH = "/data/flac_test.pcm";
+constexpr string_view OUTPUT_FILE_PATH = "/data/flac_encoder_test.flac";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -62,31 +63,31 @@ static void OnOutputFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *
 static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
 {
     (void)codec;
-    AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
+    AEncSignal *signal = static_cast<AEncSignal *>(userData);
     cout << "OnInputBufferAvailable received, index:" << index << endl;
-    unique_lock<mutex> lock(signal_->inMutex_);
-    signal_->inQueue_.push(index);
-    signal_->inBufferQueue_.push(data);
-    signal_->inCond_.notify_all();
+    unique_lock<mutex> lock(signal->inMutex_);
+    signal->inQueue_.push(index);
+    signal->inBufferQueue_.push(data);
+    signal->inCond_.notify_all();
 }
 
 static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
                                     void *userData)
 {
     (void)codec;
-    AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
+    AEncSignal *signal = static_cast<AEncSignal *>(userData);
     cout << "OnOutputBufferAvailable received, index:" << index << endl;
-    unique_lock<mutex> lock(signal_->outMutex_);
-    signal_->outQueue_.push(index);
-    signal_->outBufferQueue_.push(data);
+    unique_lock<mutex> lock(signal->outMutex_);
+    signal->outQueue_.push(index);
+    signal->outBufferQueue_.push(data);
     if (attr) {
         cout << "OnOutputBufferAvailable received, index:" << index << ", attr->size:" << attr->size
              << ", attr->flags:" << attr->flags << endl;
-        signal_->attrQueue_.push(*attr);
+        signal->attrQueue_.push(*attr);
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
     }
-    signal_->outCond_.notify_all();
+    signal->outCond_.notify_all();
 }
 
 void AEncFlacDemo::RunCase()
@@ -101,6 +102,7 @@ void AEncFlacDemo::RunCase()
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
 
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
@@ -118,7 +120,7 @@ AEncFlacDemo::AEncFlacDemo()
 {
     frameCount_ = 0;
     isRunning_ = false;
-    inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
+    inputFile_ = std::make_unique<std::ifstream>(INPUT_FILE_PATH, std::ios::binary);
 }
 
 AEncFlacDemo::~AEncFlacDemo()
@@ -131,7 +133,7 @@ AEncFlacDemo::~AEncFlacDemo()
 
 int32_t AEncFlacDemo::CreateEnc()
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME_KEY).data());
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME).data());
     DEMO_CHECK_AND_RETURN_RET_LOG(audioEnc_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = new AEncSignal();
@@ -228,14 +230,7 @@ void AEncFlacDemo::InputFunc()
         if (!inputFile_->eof()) {
             inputFile_->read((char *)OH_AVMemory_GetAddr(buffer), FRAME_BYTES);
         } else {
-            OH_AVCodecBufferAttr info;
-            info.size = 0;
-            info.offset = 0;
-            info.pts = 0;
-            info.flags = AVCODEC_BUFFER_FLAGS_EOS;
-            OH_AudioEncoder_PushInputData(audioEnc_, index, info);
-            signal_->inQueue_.pop();
-            signal_->inBufferQueue_.pop();
+            HandleEOS(index);
             break;
         }
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
@@ -269,9 +264,9 @@ void AEncFlacDemo::InputFunc()
 void AEncFlacDemo::OutputFunc()
 {
     std::ofstream outputFile;
-    outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
+    outputFile.open(OUTPUT_FILE_PATH.data(), std::ios::out | std::ios::binary);
     if (!outputFile.is_open()) {
-        std::cout << "open " << outputFilePath << " failed!" << std::endl;
+        std::cout << "open " << OUTPUT_FILE_PATH << " failed!" << std::endl;
     }
 
     while (true) {

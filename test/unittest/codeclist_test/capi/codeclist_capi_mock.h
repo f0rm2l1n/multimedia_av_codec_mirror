@@ -16,20 +16,44 @@
 #ifndef CODECLIST_CAPI_MOCK_H
 #define CODECLIST_CAPI_MOCK_H
 
-#include "codeclist_mock.h"
-#include "avformat_capi_mock.h"
+#include <algorithm>
 #include "avcodec_common.h"
-#include "avcodec_list.h"
+#include "avformat_capi_mock.h"
+#include "codeclist_mock.h"
 
 namespace OHOS {
 namespace Media {
 class CodecListCapiMock : public CodecListMock {
 public:
-    explicit CodecListCapiMock() = default;
+    explicit CodecListCapiMock(OH_AVCapability *codeclist) : codeclist_(codeclist) {};
     ~CodecListCapiMock() = default;
-    std::string FindDecoder(std::shared_ptr<FormatMock> &format) override;
-    std::string FindEncoder(std::shared_ptr<FormatMock> &format) override;
-    CapabilityData CreateCapability(const std::string codecName) override;
+    bool IsHardware() override;
+    std::string GetName() override;
+    int32_t GetMaxSupportedInstances() override; // return is not errcode
+    Range GetEncoderBitrateRange() override;
+    bool IsEncoderBitrateModeSupported(OH_BitrateMode bitrateMode) override;
+    Range GetEncoderQualityRange() override;
+    Range GetEncoderComplexityRange() override;
+    std::vector<int32_t> GetAudioSupportedSampleRates() override;
+    Range GetAudioChannelsRange() override;
+    int32_t GetVideoWidthAlignment() override;
+    int32_t GetVideoHeightAlignment() override;
+    Range GetVideoWidthRangeForHeight(int32_t height) override;
+    Range GetVideoHeightRangeForWidth(int32_t width) override;
+    Range GetVideoWidthRange() override;
+    Range GetVideoHeightRange() override;
+    bool IsVideoSizeSupported(int32_t width, int32_t height) override;
+    Range GetVideoFrameRateRange() override;
+    Range GetVideoFrameRateRangeForSize(int32_t width, int32_t height) override;
+    bool AreVideoSizeAndFrameRateSupported(int32_t width, int32_t height, int32_t frameRate) override;
+    std::vector<int32_t> GetVideoSupportedPixelFormats() override;
+    std::vector<int32_t> GetSupportedProfiles() override;
+    std::vector<int32_t> GetSupportedLevelsForProfile(int32_t profile) override;
+    bool AreProfileAndLevelSupported(int32_t profile, int32_t level) override;
+
+private:
+    OH_AVCapability *codeclist_ = nullptr;
+    CapabilityData capabilityData_;
 };
 } // namespace Media
 } // namespace OHOS

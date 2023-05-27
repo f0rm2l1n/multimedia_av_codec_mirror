@@ -17,11 +17,23 @@
 
 namespace OHOS {
 namespace Media {
-std::shared_ptr<CodecListMock> CodecListMockFactory::CreateCodecList()
+std::shared_ptr<CodecListMock> CodecListMockFactory::GetCapability(const std::string &mime, bool isEncoder)
 {
     auto codeclist = AVCodecListFactory::CreateAVCodecList();
     if (codeclist != nullptr) {
-        return std::make_shared<CodecListInnerMock>(codeclist);
+        CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, AVCodecCategory::AVCODEC_NONE);
+        return std::make_shared<CodecListInnerMock>(codeclist, capabilityData);
+    }
+    return nullptr;
+}
+
+std::shared_ptr<CodecListMock> CodecListMockFactory::GetCapabilityByCategory(const std::string &mime, bool isEncoder,
+                                                                             AVCodecCategory category)
+{
+    auto codeclist = AVCodecListFactory::CreateAVCodecList();
+    if (codeclist != nullptr) {
+        CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, category);
+        return std::make_shared<CodecListInnerMock>(codeclist, capabilityData);
     }
     return nullptr;
 }

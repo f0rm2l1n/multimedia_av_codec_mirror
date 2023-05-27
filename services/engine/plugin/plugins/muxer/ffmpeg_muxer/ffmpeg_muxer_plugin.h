@@ -39,11 +39,13 @@ public:
     Status SetRotation(int32_t rotation) override;
     Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     Status Start() override;
-    Status WriteSample(uint8_t *sample, const TrackSampleInfo &info) override;
+    Status WriteSample(const uint8_t *sample, const TrackSampleInfo &info) override;
     Status Stop() override;
 
 private:
     Status SetCodecParameterOfTrack(AVStream *stream, const MediaDescription &trackDesc);
+    Status AddAudioTrack(int32_t &trackIndex, const MediaDescription &trackDesc, AVCodecID codeID);
+    Status AddVideoTrack(int32_t &trackIndex, const MediaDescription &trackDesc, AVCodecID codeID, bool isCover);
     static int32_t IoRead(void *opaque, uint8_t *buf, int bufSize);
     static int32_t IoWrite(void *opaque, uint8_t *buf, int bufSize);
     static int64_t IoSeek(void *opaque, int64_t offset, int whence);
@@ -64,6 +66,7 @@ private:
     std::shared_ptr<AVOutputFormat> outputFormat_ {};
     std::shared_ptr<AVFormatContext> formatContext_ {};
     int32_t rotation_ { 0 };
+    bool isWriteHeader_ {false};
 };
 } // Ffmpeg
 } // Plugin

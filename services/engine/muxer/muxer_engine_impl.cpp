@@ -110,10 +110,11 @@ MuxerEngineImpl::MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, Out
     if (muxer_ != nullptr && fd_ >= 0) {
         state_ = State::INITIALIZED;
         AVCODEC_LOGI("state_ is INITIALIZED");
+        BehaviorEventWrite(ConvertStateToString(state_), "Muxer");
     } else {
         AVCODEC_LOGE("state_ is UNINITIALIZED");
+        FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, AVCSErrorToString(AVCS_ERR_INVALID_STATE), "Muxer");
     }
-    BehaviorEventWrite(ConvertStateToString(state_), "Muxer");
 }
 
 MuxerEngineImpl::~MuxerEngineImpl()
@@ -230,7 +231,7 @@ int32_t MuxerEngineImpl::Stop()
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ == State::STOPPED) {
         AVCODEC_LOGW("current state is STOPPED!");
-        return AVCS_ERR_OK;
+        return AVCS_ERR_INVALID_OPERATION;
     }
     CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED. The current state is %{public}s", ConvertStateToString(state_).c_str());
@@ -281,7 +282,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
     return AVCS_ERR_OK;
 }
 
-int32_t MuxerEngineImpl::StartThread(std::string name)
+int32_t MuxerEngineImpl::StartThread(const std::string &name)
 {
     threadName_ = name;
     if (thread_ != nullptr) {
@@ -340,7 +341,7 @@ void MuxerEngineImpl::ThreadProcessor()
     }
 }
 
-bool MuxerEngineImpl::CanAddTrack(std::string &mimeType)
+bool MuxerEngineImpl::CanAddTrack(const std::string &mimeType)
 {
     auto it = MUX_FORMAT_INFO.find(format_);
     if (it == MUX_FORMAT_INFO.end()) {
@@ -349,7 +350,7 @@ bool MuxerEngineImpl::CanAddTrack(std::string &mimeType)
     return it->second.find(mimeType) != it->second.end();
 }
 
-bool MuxerEngineImpl::CheckKeys(std::string &mimeType, const MediaDescription &trackDesc)
+bool MuxerEngineImpl::CheckKeys(const std::string &mimeType, const MediaDescription &trackDesc)
 {
     bool ret = true;
     auto it = MUX_MIME_INFO.find(mimeType);

@@ -30,6 +30,7 @@ extern "C" {
 #include "source_plugin.h"
 #include "plugin_types.h"
 #include "plugin_buffer.h"
+#include "plugin_event.h"
 #include "plugin_definition.h"
 #include "sourcebase.h"
 
@@ -44,6 +45,15 @@ public:
     std::shared_ptr<SourcePlugin> sourcePlugin {nullptr};
 private:
     std::shared_ptr<PackageDef> packageDef;
+};
+
+struct SourceCallback : Callback {
+    SourceCallback() = default;
+    ~SourceCallback() = default;
+    void OnEvent(const PluginEvent &event)
+    {
+        (void)event;
+    }
 };
 
 class Source : public SourceBase {

@@ -16,32 +16,33 @@
 #ifndef AUDIO_FFMPEG_FLAC_DECODER_PLUGIN_H
 #define AUDIO_FFMPEG_FLAC_DECODER_PLUGIN_H
 
-#include "audio_ffmpeg_base_codec.h"
+#include "audio_base_codec.h"
 #include "audio_ffmpeg_decoder_plugin.h"
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
 namespace Media {
-class AudioFFMpegFlacDecoderPlugin : public AudioFFMpegBaseCodec::CodecRegister<AudioFFMpegFlacDecoderPlugin> {
+class AudioFFMpegFlacDecoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegFlacDecoderPlugin> {
 public:
     AudioFFMpegFlacDecoderPlugin();
     ~AudioFFMpegFlacDecoderPlugin() override;
 
-    int32_t init(const Format &format) override;
-    int32_t processSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) override;
-    int32_t processRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer) override;
-    int32_t reset() override;
-    int32_t release() override;
-    int32_t flush() override;
-    uint32_t getInputBufferSize() const override;
-    uint32_t getOutputBufferSize() const override;
+    int32_t Init(const Format &format) override;
+    int32_t ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) override;
+    int32_t ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer) override;
+    int32_t Reset() override;
+    int32_t Release() override;
+    int32_t Flush() override;
+    int32_t GetInputBufferSize() const override;
+    int32_t GetOutputBufferSize() const override;
     Format GetFormat() const noexcept override;
-    const static std::string identify()
+    const static std::string Identify()
     {
-        return std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME_KEY);
+        return std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME);
     }
 
 private:
+    int32_t CheckFormat(const Format &format) const;
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
 } // namespace Media

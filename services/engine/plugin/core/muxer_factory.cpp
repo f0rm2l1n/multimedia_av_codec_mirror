@@ -86,7 +86,7 @@ void MuxerFactory::RegisterDynamicPlugins(const char* libDirPath)
             }
             std::string libName = lib->d_name;
             AVCODEC_LOGD("libName %{public}s", libName.c_str());
-            if (libName.find(g_libFileHead) ||
+            if (libName.find(g_libFileHead) != 0 ||
                 libName.find(g_fileMark) == std::string::npos ||
                 libName.compare(libName.size() - g_libFileTail.size(), g_libFileTail.size(), g_libFileTail)) {
                 continue;

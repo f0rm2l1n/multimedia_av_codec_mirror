@@ -45,7 +45,7 @@ private:
 
 class AudioEncCallbackMock : public AVCodecCallback {
 public:
-    AudioEncCallbackMock(std::shared_ptr<AVCodecCallbackMock> cb, std::weak_ptr<AVCodecAudioEncoder> ae);
+    AudioEncCallbackMock(std::shared_ptr<AVCodecCallbackMock> cb, std::weak_ptr<AVCodecAudioEncoder> ad);
     ~AudioEncCallbackMock() = default;
     void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
     void OnOutputFormatChanged(const Format &format) override;

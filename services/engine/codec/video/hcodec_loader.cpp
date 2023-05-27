@@ -23,7 +23,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "codecLoader"};
 const char *HCODEC_CREATE_FUNC_NAME = "CreateHCodecByName";
 const char *HCODEC_GETCAPS_FUNC_NAME = "GetHCodecCapabilityList";
-const char *HCODEC_LIB_PATH = "libhcoder.z.so";
+const char *HCODEC_LIB_PATH = "libhcodec.z.so";
 } // namespace
 std::shared_ptr<CodecBase> HCodecLoader::CreateByName(const std::string &name)
 {
