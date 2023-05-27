@@ -465,9 +465,9 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
 int32_t Source::SniffInputFormat(const std::string& uri)
 {
     size_t bufferSize = DEFAULT_READ_SIZE;
-    size_t fileSize = 0;
+    uint64_t fileSize = 0;
     if (!static_cast<int>(sourcePlugin_->GetSize(fileSize))) {
-        bufferSize = (bufferSize < fileSize) ? bufferSize : fileSize;
+        bufferSize = (static_cast<uint64_t>(bufferSize) < fileSize) ? bufferSize : fileSize;
     }
     std::vector<uint8_t> buff(bufferSize);
     auto bufferInfo = std::make_shared<Buffer>();
@@ -559,7 +559,7 @@ int64_t Source::AVSeek(void *opaque, int64_t offset, int whence)
             break;
         case SEEK_END:
         case AVSEEK_SIZE: {
-            size_t mediaDataSize = 0;
+            uint64_t mediaDataSize = 0;
             customIOContext->sourcePlugin->GetSize(mediaDataSize);
             if (mediaDataSize > 0) {
                 newPos = mediaDataSize + offset;
@@ -584,7 +584,7 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
     auto bufferVector = customIOContext->bufMemory;
     if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize!=0)) {
         if (customIOContext->offset > customIOContext->fileSize) {
-            AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}zu",
+            AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}" PRIu64,
                          customIOContext->offset, customIOContext->fileSize);
             return AVCS_ERR_SEEK_FAILED;
         }
