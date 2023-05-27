@@ -48,7 +48,7 @@ OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source);
 OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
 
 /**
- * @brief Select a track to the demuxer. only retrieve information for the subset
+ * @brief Add a track to the demuxer. only retrieve information for the subset
  * of tracks selected. One track can only be added once, and add the same track
  * multiple times has no effect.
  * @syscap SystemCapability.Multimedia.Media.Spliter
@@ -61,7 +61,7 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
 OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);
 
 /**
- * @brief Unselect a track from the demuxer. only retrieve information for the subset
+ * @brief Remove a track from the demuxer. only retrieve information for the subset
  * of tracks selected. remove the same track multiple times has no effect.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
