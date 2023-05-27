@@ -44,8 +44,8 @@ struct OH_AVSource *OH_AVSource_CreateWithFD(int32_t fd, int64_t offset, int64_t
 {
     // 0-err, 1-in, 2-out
     CHECK_AND_RETURN_RET_LOG(fd > 2, nullptr,
-        "Create source with uri failed because input fd is illegal, fd must be greater than 2!");
-    CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with uri failed because input size is negative");
+        "Create source with fd failed because input fd is illegal, fd must be greater than 2!");
+    CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with fd failed because input size is negative");
 
     std::shared_ptr<AVSource> source = AVSourceFactory::CreateWithFD(fd, offset, size);
     CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "New source with fd failed by AVSourceFactory!");
@@ -87,7 +87,7 @@ OH_AVFormat *OH_AVSource_GetSourceFormat(OH_AVSource *source)
 
 OH_AVFormat *OH_AVSource_GetTrackFormat(OH_AVSource *source, uint32_t trackIndex)
 {
-    CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "Set format failed because input source is nullptr!");
+    CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "Get format failed because input source is nullptr!");
     CHECK_AND_RETURN_RET_LOG(source->magic_ == AVMagic::AVCODEC_MAGIC_AVSOURCE, nullptr, "magic error!");
 
     struct AVSourceObject *sourceObj = reinterpret_cast<AVSourceObject *>(source);
