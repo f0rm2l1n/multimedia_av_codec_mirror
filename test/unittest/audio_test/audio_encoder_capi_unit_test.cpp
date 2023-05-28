@@ -49,8 +49,8 @@ constexpr int32_t SAMPLE_FORMAT = 1;
 constexpr uint32_t FRAME_BYTES = 18432;
 constexpr int32_t COMPLIANCE_LEVEL = -2;
 
-constexpr string_view inputFilePath = "/data/encoderTest.pcm";
-constexpr string_view outputFilePath = "/data/encoderTest.flac";
+constexpr string_view INPUT_FILE_PATH = "/data/encoderTest.pcm";
+constexpr string_view OUTPUT_FILE_PATH = "/data/encoderTest.flac";
 } // namespace
 
 namespace OHOS {
@@ -133,7 +133,7 @@ public:
 
 protected:
     std::atomic<bool> isRunning_ = false;
-    std::unique_ptr<std::ifstream> inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
+    std::unique_ptr<std::ifstream> inputFile_ = std::make_unique<std::ifstream>(INPUT_FILE_PATH, std::ios::binary);
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
     int32_t index_;
@@ -222,7 +222,7 @@ void AudioCodeCapiEncoderUnitTest::InputFunc()
 void AudioCodeCapiEncoderUnitTest::OutputFunc()
 {
     std::ofstream outputFile;
-    outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
+    outputFile.open(OUTPUT_FILE_PATH.data(), std::ios::out | std::ios::binary);
 
     while (true) {
         if (!isRunning_.load()) {
