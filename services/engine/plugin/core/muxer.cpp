@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-Muxer::Muxer (uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<MuxerPlugin> plugin)
+Muxer::Muxer(uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<MuxerPlugin> plugin)
     : pkgVersion_(pkgVer), apiVersion_(apiVer), muxer_(std::move(plugin)) {}
 
 Status Muxer::SetRotation(int32_t rotation)
