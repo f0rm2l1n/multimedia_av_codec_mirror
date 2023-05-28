@@ -73,7 +73,7 @@ private:
         size_t offset = 0;
         size_t position = 0;
         bool eof = false;
-        size_t fileSize = 0;
+        uint64_t fileSize = 0;
         AVIOContext* avioContext = nullptr;
         std::shared_ptr<Buffer> bufMemory;
     };
