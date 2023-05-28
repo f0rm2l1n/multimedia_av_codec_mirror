@@ -120,6 +120,8 @@ enum struct Tag : uint32_t {
     AUDIO_RENDER_INFO,                ///< AudioRenderInfo, audio render info
     AUDIO_INTERRUPT_MODE,             ///< AudioInterruptMode, audio interrupt mode
     VIDEO_SCALE_TYPE,                 ///< VideoScaleType, video scale type
+    INPUT_MEMORY_TYPE,                ///< @see MemoryType
+    OUTPUT_MEMORY_TYPE,                ///< @see MemoryType
 
     /* -------------------- media tag -------------------- */
     MEDIA_TITLE = SECTION_MEDIA_START + 1, ///< string
@@ -144,6 +146,7 @@ enum struct Tag : uint32_t {
     MEDIA_SEEKABLE,                        ///< enum Seekable: Seekable status of the media
     MEDIA_PLAYBACK_SPEED,                  ///< double, playback speed
     MEDIA_TYPE,                            ///< enum MediaType: Auido Video Subtitle...
+    MEDIA_FRAME_NUMBER,                    ///< uint32_t : The frame number
 
     /* -------------------- audio universal tag -------------------- */
     AUDIO_CHANNELS = SECTION_AUDIO_UNIVERSAL_START + 1, ///< uint32_t, stream channel num

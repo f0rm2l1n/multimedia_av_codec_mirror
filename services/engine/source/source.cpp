@@ -210,7 +210,7 @@ int32_t Source::GetTrackCount(uint32_t &trackCount)
     return AVCS_ERR_OK;
 }
 
-void Source::GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format)
+void Source::GetStringFormatFromMetadata(const std::string key, std::string_view formatName, Format &format)
 {
     AVDictionaryEntry *valPtr = nullptr;
     valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_MATCH_CASE);
@@ -245,7 +245,7 @@ int32_t Source::GetSourceFormat(Format &format)
     int64_t duration = formatContext_->duration;
     AVRational timeBase = AV_TIME_BASE_Q;
     if (duration == AV_NOPTS_VALUE) {
-        for (uint32_t i = 0; i < formatContext_->nb_streams;i++) {
+        for (uint32_t i = 0; i < formatContext_->nb_streams; ++i) {
             auto streamDuration = formatContext_->streams[i]->duration;
             if (streamDuration > duration) {
                 duration = streamDuration;
@@ -450,7 +450,7 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
         return AVCS_ERR_INVALID_OPERATION;
     }
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
-    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); iter++) {
+    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
         std::shared_ptr<AVInputFormat> inputFormat = iter->second;
         int32_t ret = av_match_name(uriSuffix.c_str(), inputFormat->extensions);
         if (ret == 1) {
@@ -465,9 +465,9 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
 int32_t Source::SniffInputFormat(const std::string& uri)
 {
     size_t bufferSize = DEFAULT_READ_SIZE;
-    size_t fileSize = 0;
+    uint64_t fileSize = 0;
     if (!static_cast<int>(sourcePlugin_->GetSize(fileSize))) {
-        bufferSize = (bufferSize < fileSize) ? bufferSize : fileSize;
+        bufferSize = (static_cast<uint64_t>(bufferSize) < fileSize) ? bufferSize : fileSize;
     }
     std::vector<uint8_t> buff(bufferSize);
     auto bufferInfo = std::make_shared<Buffer>();
@@ -482,8 +482,7 @@ int32_t Source::SniffInputFormat(const std::string& uri)
     constexpr int probThresh = 50;
     int maxProb = 0;
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
-    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); iter++) {
-        std::string vtype = iter->first;
+    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
         std::shared_ptr<AVInputFormat> inputFormat = iter -> second;
         if (inputFormat->read_probe) {
             auto prob = inputFormat->read_probe(&probeData);
@@ -559,7 +558,7 @@ int64_t Source::AVSeek(void *opaque, int64_t offset, int whence)
             break;
         case SEEK_END:
         case AVSEEK_SIZE: {
-            size_t mediaDataSize = 0;
+            uint64_t mediaDataSize = 0;
             customIOContext->sourcePlugin->GetSize(mediaDataSize);
             if (mediaDataSize > 0) {
                 newPos = mediaDataSize + offset;
@@ -582,9 +581,9 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
     auto readSize = bufSize;
     auto customIOContext = static_cast<CustomIOContext*>(opaque);
     auto bufferVector = customIOContext->bufMemory;
-    if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize!=0)) {
+    if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize != 0)) {
         if (customIOContext->offset > customIOContext->fileSize) {
-            AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}zu",
+            AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}" PRIu64,
                          customIOContext->offset, customIOContext->fileSize);
             return AVCS_ERR_SEEK_FAILED;
         }

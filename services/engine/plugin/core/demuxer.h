@@ -40,7 +40,6 @@ private:
     const uint32_t pkgVersion_;
     const uint32_t apiVersion_;
     std::shared_ptr<DemuxerPlugin> demuxer_;
-    uint16_t trackLogCount = 0;
 };
 } // namespace Plugin
 } // namespace Media

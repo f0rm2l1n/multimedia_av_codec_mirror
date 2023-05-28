@@ -25,8 +25,6 @@
 #include "i_avcodec_service.h"
 #include "avcodec_errors.h"
 
-static int LOOP_LOG_MAX_COUNT = 1000;
-
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVDemuxerImpl"};
 }
@@ -109,7 +107,7 @@ int32_t AVDemuxerImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
 {
     AVCodecTrace trace("AVDemuxer::ReadSample");
 
-    AVCODEC_LOGI("ReadSample: trackIndex=%{public}u", trackIndex);
+    AVCODEC_LOGD("ReadSample: trackIndex=%{public}u", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "demuxer service died when read sample!");
@@ -117,20 +115,7 @@ int32_t AVDemuxerImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_INVALID_VAL,
         "Copy sample failed because sample buffer is nullptr!");
 
-    if (trackLogCount < LOOP_LOG_MAX_COUNT) {
-        if (trackLogCount==0) {
-            AVCodecTrace::TraceBegin(std::string(__FUNCTION__), FAKE_POINTER(this));
-        }
-        trackLogCount++;
-    }
-
-    int32_t ret = demuxerClient_->ReadSample(trackIndex, sample, info, flag);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "Read sample failed by demuxerService!");
-
-    if (trackLogCount == LOOP_LOG_MAX_COUNT) {
-        AVCodecTrace::TraceEnd(std::string(__FUNCTION__), FAKE_POINTER(this));
-    }
-    return AVCS_ERR_OK;
+    return demuxerClient_->ReadSample(trackIndex, sample, info, flag);
 }
 
 int32_t AVDemuxerImpl::SeekToTime(int64_t millisecond, AVSeekMode mode)
