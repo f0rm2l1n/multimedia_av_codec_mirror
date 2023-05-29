@@ -229,6 +229,20 @@ extern const char *OH_MD_KEY_REQUEST_I_FRAME;
 /* Key for the desired encoding quality. value type is uint32_t, this key is only supported for encoders that
  * are configured in constant quality mode */
 extern const char *OH_MD_KEY_QUALITY;
+/* Key for the desired encoding channel layout. value type is int64_t, this key is only supported for encoders. */
+extern const char *OH_MD_KEY_CHANNEL_LAYOUT;
+/* Key for bits per coded sample, value type is uint32_t, supported for flac encoder when do configure. */
+extern const char *OH_MD_KEY_BITS_PER_CODED_SAMPLE;
+/* Key for the aac format, value type is uint32_t, supported for aac decoder. */
+extern const char *OH_MD_KEY_AAC_IS_ADTS;
+/* Key for aac sbr mode, value type is uint32_t, supported for aac encoder. */
+extern const char *OH_MD_KEY_SBR;
+/* Key for flac compliance level, value type is int32_t. */
+extern const char *OH_MD_KEY_COMPLIANCE_LEVEL;
+/* Key for vorbis identification header, value type is uint8_t*, supported only for vorbis decoder. */
+extern const char *OH_MD_KEY_IDENTIFICATION_HEADER;
+/* Key for vorbis setup header, value type is uint8_t*, supported only for vorbis decoder. */
+extern const char *OH_MD_KEY_SETUP_HEADER;
 
 /* source format Key for title, value type is string */
 extern const char *OH_MD_KEY_TITLE;

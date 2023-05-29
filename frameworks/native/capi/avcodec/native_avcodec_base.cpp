@@ -52,6 +52,13 @@ const char *OH_MD_KEY_COLOR_PRIMARIES = "color_primaries";
 const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS = "transfer_characteristics";
 const char *OH_MD_KEY_MATRIX_COEFFICIENTS = "matrix_coefficients";
 const char *OH_MD_KEY_QUALITY = "quality";
+const char *OH_MD_KEY_CHANNEL_LAYOUT = "channel_layout";
+const char *OH_MD_KEY_BITS_PER_CODED_SAMPLE = "bits_per_coded_sample";
+const char *OH_MD_KEY_AAC_IS_ADTS = "aac_is_adts";
+const char *OH_MD_KEY_SBR = "sbr";
+const char *OH_MD_KEY_COMPLIANCE_LEVEL = "compliance_level";
+const char *OH_MD_KEY_IDENTIFICATION_HEADER = "identification_header";
+const char *OH_MD_KEY_SETUP_HEADER = "setup_header";
 
 
 const char *OH_MD_KEY_TITLE = "title";
