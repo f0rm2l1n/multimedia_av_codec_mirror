@@ -188,7 +188,8 @@
    // start后，才能开始写入数据
    int size = ...;
    OH_AVMemory *sample = OH_AVMemory_Create(size); // 创建AVMemory
-   // 往sampleBuffer里写入数据参考OH_AVMemory的使用方法
+   // 获取AVMemory内buffer地址，往里面写入封装的数据，写入数据长度不大于size
+   uint8_t *buffer = OH_AVMemory_GetAddr(sample);
    // 封装封面，必须一次写完一张图片
    
    // 创建buffer info
@@ -203,6 +204,7 @@
    if (ret != AV_ERR_OK) {
        // 异常处理
    }
+   OH_AVMemory_Destroy(sample); // 销毁
    ```
 
    
