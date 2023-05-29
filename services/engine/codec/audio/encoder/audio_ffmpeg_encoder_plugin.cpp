@@ -255,7 +255,7 @@ int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
     avCodecContext_->channel_layout = layout;
 
     int32_t sampleFormat;
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, sampleFormat);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, sampleFormat);
     avCodecContext_->sample_fmt = (AVSampleFormat)sampleFormat;
 
     AVCODEC_LOGI("avcodec name: %{public}s", avCodec_->name);
