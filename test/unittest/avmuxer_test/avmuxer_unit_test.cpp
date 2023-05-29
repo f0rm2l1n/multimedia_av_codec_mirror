@@ -376,25 +376,45 @@ HWTEST_F(AVMuxerUnitTest, Muxer_AddTrack_006, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> avParam = FormatMockFactory::CreateFormat();
-    avParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::AUDIO_MPEG);
-    avParam->PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, -1);
-    avParam->PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, -1);
-    avParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, -1);
-    avParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, -1);
+    std::shared_ptr<FormatMock> audioParam = FormatMockFactory::CreateFormat();
+    audioParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::AUDIO_MPEG);
+    audioParam->PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, 44100);
+    audioParam->PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, -1);
+    int ret = avmuxer_->AddTrack(trackId, audioParam);
+    ASSERT_NE(ret, 0);
 
-    int ret = avmuxer_->AddTrack(trackId, avParam);
+    audioParam->PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, -1);
+    audioParam->PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, 2);
+    ret = avmuxer_->AddTrack(trackId, audioParam);
     ASSERT_NE(ret, 0);
 
     // test add video track
-    avParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    ret = avmuxer_->AddTrack(trackId, avParam);
+    std::shared_ptr<FormatMock> videoParam = FormatMockFactory::CreateFormat();
+    videoParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 480);
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, -1);
+    ret = avmuxer_->AddTrack(trackId, videoParam);
     ASSERT_NE(ret, 0);
 
-    avParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 0xFFFF + 1);
-    avParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 0xFFFF + 1);
-    ret = avmuxer_->AddTrack(trackId, avParam);
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, -1);
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 720);
+    ret = avmuxer_->AddTrack(trackId, videoParam);
     ASSERT_NE(ret, 0);
+
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 480);
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 0xFFFF + 1);
+    ret = avmuxer_->AddTrack(trackId, videoParam);
+    ASSERT_NE(ret, 0);
+
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 0xFFFF + 1);
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 720);
+    ret = avmuxer_->AddTrack(trackId, videoParam);
+    ASSERT_NE(ret, 0);
+
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 0xFFFF);
+    videoParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 0xFFFF);
+    ret = avmuxer_->AddTrack(trackId, videoParam);
+    ASSERT_EQ(ret, 0);
 }
 
 /**

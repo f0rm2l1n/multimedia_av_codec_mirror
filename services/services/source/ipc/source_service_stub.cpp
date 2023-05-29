@@ -14,6 +14,7 @@
  */
 
 #include "source_service_stub.h"
+#include <map>
 #include "avcodec_server_manager.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -24,6 +25,17 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "SourceAVServiceStub"};
+
+    const std::map<int32_t, std::string> SOURCE_FUNC_NAME = {
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::INIT_WITH_URI, "SourceServiceStub InitWithURI" },
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::INIT_WITH_FD, "SourceServiceStub InitWithFD" },
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_TRACK_COUNT, "SourceServiceStub GetTrackCount" },
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::DESTROY, "SourceServiceStub Destroy" },
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_TRACK_FORMAT, "SourceServiceStub GetTrackFormat" },
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_SOURCE_FORMAT, "SourceServiceStub GetSourceFormat" },
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_SOURCE_ADDR, "SourceServiceStub GetSourceAddr" },
+        { OHOS::Media::SourceServiceStub::SourceServiceMsg::DESTROY_STUB, "SourceServiceStub DestroyStub" },
+    };
 }
 
 namespace OHOS {
@@ -78,8 +90,10 @@ int SourceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             int32_t ret = -1;
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply),
-                "SourceServiceStub::OnRemoteRequest");
+            auto itFuncName = SOURCE_FUNC_NAME.find(code);
+            std::string funcName =
+                itFuncName != SOURCE_FUNC_NAME.end() ? itFuncName->second : "SourceServiceStub OnRemoteRequest";
+            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
             CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call memberFunc");
             return AVCS_ERR_OK;
         }

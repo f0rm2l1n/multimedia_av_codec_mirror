@@ -90,14 +90,13 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
  * @brief All selected tracks seek near to the requested time according to the seek mode.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
- * @param mSeconde The millisecond for seeking, the timestamp is the position of
- * the file relative to the start of the file.
+ * @param millisecond The timestamp for seeking which is the position relative to the beginning of the file.
  * @param mode The mode for seeking. See {@link OH_AVSeekMode}.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
 */
-OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t mSeconds, OH_AVSeekMode mode);
+OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t millisecond, OH_AVSeekMode mode);
 
 #ifdef __cplusplus
 }

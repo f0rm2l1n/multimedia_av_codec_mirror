@@ -33,7 +33,7 @@ public:
     int32_t UnselectTrackByID(uint32_t trackIndex) override;
     int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
-    int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) override;
+    int32_t SeekToTime(int64_t millisecond, AVSeekMode mode) override;
 private:
     int32_t appUid_ = -1;
     int32_t appPid_ = -1;

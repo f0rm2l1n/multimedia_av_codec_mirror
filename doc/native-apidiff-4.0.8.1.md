@@ -7,11 +7,10 @@ OpenHarmony 4.0.8.1 版本相较于OpenHarmony 之前的版本的API变更如下
 | 模块名称 | 接口名称                                                     | 变更类型 | 变更说明             |
 | -------- | ------------------------------------------------------------ | -------- | -------------------- |
 | avmuxer  | OH_AVMuxer \*OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format); | 新增     | 创建OH_AVMuxer       |
-| avmuxer  | OH_AVErrCode OH_AVMuxer_SetLocation(OH_AVMuxer \*muxer, float latitude, float longitude); | 新增     | 设置输出文件的经纬度 |
 | avmuxer  | OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer \*muxer, int32_t rotation); | 新增     | 设置视频旋转角度     |
 | avmuxer  | OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer \*muxer, int32_t \*trackIndex, OH_AVFormat \*trackFormat); | 新增     | 添加媒体轨           |
 | avmuxer  | OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer \*muxer);           | 新增     | 开始封装             |
-| avmuxer  | OH_AVErrCode OH_AVMuxer_WriteSampleBuffer(OH_AVMuxer \*muxer, uint32_t trackIndex, uint8_t \*sampleBuffer, OH_AVCodecBufferAttr info); | 新增     | 将数据写入封装器     |
+| avmuxer  | OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer \*muxer, uint32_t trackIndex, OH_AVMemory \*sample, OH_AVCodecBufferAttr info); | 新增     | 将数据写入封装器     |
 | avmuxer  | OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer \*muxer);            | 新增     | 停止封装             |
 | avmuxer  | OH_AVErrCode OH_AVMuxer_Destroy(OH_AVMuxer \*muxer);         | 新增     | 销毁OH_AVMuxer       |
 | avcodec  | OH_AVErrCode OH_VideoDecoder_IsValid(OH_AVCodec \*codec, bool \*isValid);         | 新增     | 查询当前codec实例是否有效      |
@@ -25,7 +24,7 @@ OpenHarmony 4.0.8.1 版本相较于OpenHarmony 之前的版本的API变更如下
 | avdemuxer  | OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);         | 新增     | 选择需要解封装的轨道      |
 | avdemuxer  | OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);         | 新增     | 取消选择需要解封装的轨道       |
 | avdemuxer  | OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex, OH_AVMemory *sample, OH_AVCodecBufferAttr *info);         | 新增     | 读取 trackIndex 对应轨道的帧     |
-| avdemuxer  | OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t mSeconds, OH_AVSeekMode mode);         | 新增     | 跳转到指定时间       |
+| avdemuxer  | OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t millisecond, OH_AVSeekMode mode);         | 新增     | 跳转到指定时间       |
 |avcapability|OH_AVCapability *OH_AVCodec_GetCapability(const char *mime, bool isEncoder);|新增|获取系统推荐的能力句柄|
 |avcapability|OH_AVCapability *OH_AVCodec_GetCapabilityByCategory(const char *mime, bool isEncoder, OH_AVCodecCategory category);|新增|获取系统指定软硬件的能力句柄|
 |avcapability|bool OH_AVCapability_IsHardware(OH_AVCapability *capability);|新增|确认是否是硬件编解码器|
@@ -51,5 +50,9 @@ OpenHarmony 4.0.8.1 版本相较于OpenHarmony 之前的版本的API变更如下
 |avcapability|OH_AVErrCode OH_AVCapability_GetSupportedProfiles(OH_AVCapability *capability, const int32_t **profiles, uint32_t *profileNum);|新增|获取支持的模板|
 |avcapability|OH_AVErrCode OH_AVCapability_GetSupportedLevelsForProfile(OH_AVCapability *capability, int32_t profile, const int32_t **levels,uint32_t *levelNum);|新增|获取特定模板情况下的等级范围|
 |avcapability|bool OH_AVCapability_AreProfileAndLevelSupported(OH_AVCapability *capability, int32_t profile, int32_t level);|新增|确认当前模板和等级是否支持|
+|avformat|struct OH_AVFormat \*OH_AVFormat_CreateAudioFormat(const char \*mimeType, int32_t sampleRate, int32_t channelCount);|新增|创建音频轨的OH_AVFormat（用于avmuxer）|
+|avformat|struct OH_AVFormat \*OH_AVFormat_CreateVideoFormat(const char \*mimeType, int32_t width, int32_t height);|新增|创建视频轨的OH_AVFormat（用于avmuxer）|
+|avmemory|OH_AVMemory \*OH_AVMemory_Create(int32_t size);|新增|创建OH_AVMemory|
+|avmemory|OH_AVErrCode OH_AVMemory_Destroy(struct OH_AVMemory \*mem);|新增|销毁OH_AVMemory|
 | avcodec | OH_AVErrCode OH_AudioDecoder_IsValid(OH_AVCodec \*codec, bool \*isValid); | 新增 | 查询当前codec实例是否有效, 可用于故障恢复 |
 | avcodec | OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec \*codec, bool \*isValid); | 新增 | 查询当前codec实例是否有效, 可用于故障恢复 |

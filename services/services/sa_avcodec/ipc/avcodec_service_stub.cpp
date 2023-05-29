@@ -19,7 +19,7 @@
 #include "avcodec_xcollie.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecServiceStub"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecServiceStub"};
 }
 
 namespace OHOS {
@@ -93,7 +93,7 @@ int AVCodecServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
         if (memberFunc != nullptr) {
             int32_t ret = -1;
             COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply),
-                "AVCodecServiceStub::OnRemoteRequest");
+                "AVCodecServiceStub GetSystemAbility");
             if (ret != AVCS_ERR_OK) {
                 AVCODEC_LOGE("Calling memberFunc is failed.");
             }
@@ -141,8 +141,8 @@ int32_t AVCodecServiceStub::GetSystemAbility(MessageParcel &data, MessageParcel 
     AVCodecSystemAbility id = static_cast<AVCodecSystemAbility>(data.ReadInt32());
     sptr<IRemoteObject> listenerObj = data.ReadRemoteObject();
 
-    COLLIE_LISTEN((void)reply.WriteRemoteObject(GetSubSystemAbility(id, listenerObj)),
-        "AVCodecServiceStub::GetSystemAbility");
+    (void)reply.WriteRemoteObject(GetSubSystemAbility(id, listenerObj));
+
     return AVCS_ERR_OK;
 }
 } // namespace Media

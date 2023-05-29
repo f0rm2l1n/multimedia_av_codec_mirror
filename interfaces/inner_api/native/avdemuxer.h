@@ -63,14 +63,13 @@ public:
 
     /**
      * @brief All selected tracks seek near to the requested time according to the seek mode.
-     * @param mSeconds The millisecond for seeking, the timestamp is the position of
-     * the file relative to the start of the file..
+     * @param millisecond The timestamp for seeking which is the position relative to the beginning of the file.
      * @param mode The mode for seeking. Value. For details, see {@link SeekMode}.
      * @return Returns {@link AVCS_ERR_OK} if success; returns an error code otherwise.
      * @since 4.0
      * @version 4.0
      */
-    virtual int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) = 0;
+    virtual int32_t SeekToTime(int64_t millisecond, AVSeekMode mode) = 0;
 };
 
 class __attribute__((visibility("default"))) AVDemuxerFactory {
