@@ -53,7 +53,7 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
 
 /**
  * @brief The specified track is selected and the demuxer will read samples from
- * this track. MUltiple tracks are selected by calling this interface multiple times
+ * this track. Multiple tracks are selected by calling this interface multiple times
  * with different track indexes. Only the selected tracks are valid when calling
  * OH_AVDemuxer_ReadSample to read samples. The interface returns AV_ERR_OK and the
  * track is selected only once if the same track is selected multiple times.
