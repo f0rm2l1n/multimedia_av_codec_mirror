@@ -88,13 +88,12 @@ int32_t DemuxerEngineImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSha
     return demuxer_->ReadSample(trackIndex, sample, info, flag);
 }
 
-int32_t DemuxerEngineImpl::SeekToTime(int64_t mSeconds, AVSeekMode mode)
+int32_t DemuxerEngineImpl::SeekToTime(int64_t millisecond, AVSeekMode mode)
 {
     AVCodecTrace trace("DemuxerEngineImpl::SeekToTime");
     AVCODEC_LOGI("SeekToTime");
     std::unique_lock<std::mutex> lock(mutex_);
-    CHECK_AND_RETURN_RET_LOG(demuxer_ != nullptr, AVCS_ERR_INVALID_OPERATION, "demuxer_ is nullptr");
-    return demuxer_->SeekToTime(mSeconds, mode);
+    return demuxer_->SeekToTime(millisecond, mode);
 }
 } // Media
 } // OHOS

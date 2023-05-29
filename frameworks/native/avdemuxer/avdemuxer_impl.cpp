@@ -118,17 +118,18 @@ int32_t AVDemuxerImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
     return demuxerClient_->ReadSample(trackIndex, sample, info, flag);
 }
 
-int32_t AVDemuxerImpl::SeekToTime(int64_t mSeconds, AVSeekMode mode)
+int32_t AVDemuxerImpl::SeekToTime(int64_t millisecond, AVSeekMode mode)
 {
     AVCodecTrace trace("AVDemuxer::SeekToTime");
 
-    AVCODEC_LOGI("seek to time: mSeconds=%{public}" PRId64 "; mode=%{public}d", mSeconds, mode);
+    AVCODEC_LOGI("seek to time: millisecond=%{public}" PRId64 "; mode=%{public}d", millisecond, mode);
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION, "demuxer service died when seek!");
 
-    CHECK_AND_RETURN_RET_LOG(mSeconds >= 0, AVCS_ERR_INVALID_VAL, "Seek failed because input mSeconds is negative!");
+    CHECK_AND_RETURN_RET_LOG(millisecond >= 0, AVCS_ERR_INVALID_VAL,
+        "Seek failed because input millisecond is negative!");
     
-    return demuxerClient_->SeekToTime(mSeconds, mode);
+    return demuxerClient_->SeekToTime(millisecond, mode);
 }
 } // namespace Media
 } // namespace OHOS

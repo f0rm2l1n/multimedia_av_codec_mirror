@@ -24,7 +24,7 @@ OpenHarmony 4.0.8.1 版本相较于OpenHarmony 之前的版本的API变更如下
 | avdemuxer  | OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);         | 新增     | 选择需要解封装的轨道      |
 | avdemuxer  | OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);         | 新增     | 取消选择需要解封装的轨道       |
 | avdemuxer  | OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex, OH_AVMemory *sample, OH_AVCodecBufferAttr *info);         | 新增     | 读取 trackIndex 对应轨道的帧     |
-| avdemuxer  | OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t mSeconds, OH_AVSeekMode mode);         | 新增     | 跳转到指定时间       |
+| avdemuxer  | OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t millisecond, OH_AVSeekMode mode);         | 新增     | 跳转到指定时间       |
 |avcapability|OH_AVCapability *OH_AVCodec_GetCapability(const char *mime, bool isEncoder);|新增|获取系统推荐的能力句柄|
 |avcapability|OH_AVCapability *OH_AVCodec_GetCapabilityByCategory(const char *mime, bool isEncoder, OH_AVCodecCategory category);|新增|获取系统指定软硬件的能力句柄|
 |avcapability|bool OH_AVCapability_IsHardware(OH_AVCapability *capability);|新增|确认是否是硬件编解码器|

@@ -110,7 +110,7 @@ int32_t DemuxerServiceProxy::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     flag = static_cast<enum AVCodecBufferFlag>(reply.ReadUint32());
     return reply.ReadInt32();
 }
-int32_t DemuxerServiceProxy::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
+int32_t DemuxerServiceProxy::SeekToTime(int64_t millisecond, const AVSeekMode mode)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -118,7 +118,7 @@ int32_t DemuxerServiceProxy::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
     bool token = data.WriteInterfaceToken(DemuxerServiceProxy::GetDescriptor());
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Failed to write descriptor!");
 
-    data.WriteInt64(mSeconds);
+    data.WriteInt64(millisecond);
     data.WriteInt32(static_cast<int32_t>(mode));
     int32_t error = Remote()->SendRequest(SEEK_TO_TIME, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call SeekToTime, error: %{public}d", error);

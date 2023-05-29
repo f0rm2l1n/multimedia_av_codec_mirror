@@ -47,7 +47,7 @@ public:
     int32_t UnselectTrackByID(uint32_t trackIndex);
     int32_t PrintInfo(int32_t tracks);
     int32_t ReadSample(uint32_t trackIndex, OH_AVMemory *sample, OH_AVCodecBufferAttr *bufferAttr);
-    int32_t SeekToTime(int64_t mSeconds, OH_AVSeekMode mode);
+    int32_t SeekToTime(int64_t millisecond, OH_AVSeekMode mode);
     OH_AVCodecBufferAttr bufferInfo;
     std::map<int32_t, int64_t> frames_;
     std::map<int32_t, int64_t> key_frames_;

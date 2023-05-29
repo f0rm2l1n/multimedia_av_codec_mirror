@@ -31,7 +31,7 @@ public:
     virtual int32_t UnselectTrackByID(uint32_t index) = 0;
     virtual int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag) = 0;
-    virtual int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) = 0;
+    virtual int32_t SeekToTime(int64_t millisecond, const AVSeekMode mode) = 0;
 };
 } // namespace Media
 } // namespace OHOS

@@ -405,9 +405,10 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
 #endif
 }
 
-int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
+int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::SeekToTime: mSeconds=%{public}" PRId64 ", mode=%{public}d", mSeconds, mode);
+    AVCODEC_LOGD("FFmpegDemuxerPlugin::SeekToTime: millisecond=%{public}" PRId64 ", mode=%{public}d",
+        millisecond, mode);
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
         return AVCS_ERR_SEEK_FAILED;
@@ -419,14 +420,14 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
     for (size_t i = 0; i < selectedTrackIds_.size(); i++) {
         int trackIndex = selectedTrackIds_[i];
         auto avStream = formatContext_->streams[trackIndex];
-        int64_t ffTime = ConvertTimeToFFmpeg(mSeconds*1000*1000, avStream->time_base);
+        int64_t ffTime = ConvertTimeToFFmpeg(millisecond*1000*1000, avStream->time_base);
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             if (ffTime > avStream->duration) {
                 AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
                              ffTime, avStream->duration);
                 return AVCS_ERR_SEEK_FAILED;
             }
-            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - mSeconds) <= TIME_INTERNAL
+            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - millisecond) <= TIME_INTERNAL
                 && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
                 flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
             }
