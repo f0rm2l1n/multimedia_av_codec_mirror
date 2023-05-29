@@ -94,7 +94,8 @@ private:
     int32_t AllocateBuffers();
     int32_t ResetBuffers();
     int32_t ReleaseBuffers(bool isFlush = false);
-    int32_t UpdateBuffers(uint32_t index);
+    int32_t UpdateBuffers(uint32_t index, int32_t buffer_size, uint32_t buffer_type);
+    int32_t UpdateSurfaceMemory();
     void SendFrame();
     void ReceiveFrame();
     void RenderFrame();
@@ -115,7 +116,8 @@ private:
     Format format_;
     int32_t width_ = 0;
     int32_t height_ = 0;
-    int32_t outBufferSize_ = 0;
+    int32_t inputBufferSize_ = 0;
+    int32_t outputBufferSize_ = 0;
     // INIT
     std::shared_ptr<AVCodec> avCodec_ = nullptr;
     // Config
