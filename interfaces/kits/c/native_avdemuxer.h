@@ -29,7 +29,8 @@ extern "C" {
 typedef struct OH_AVDemuxer OH_AVDemuxer;
 
 /**
- * @brief Creates an OH_AVDemuxer instance for getting sample from source.
+ * @brief Creates an OH_AVDemuxer instance for getting samples from source.
+ * Free the resources of the instance by calling OH_AVDemuxer_Destroy.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param source Pointer to an OH_AVSource instance.
  * @return Returns a pointer to an OH_AVDemuxer instance
@@ -39,6 +40,9 @@ OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source);
 
 /**
  * @brief Destroy the OH_AVDemuxer instance and free the internal resources.
+ * The same instance can only be destroyed once. The destroyed instance
+ * should not be used before it is created again. It is recommended setting
+ * the instance pointer to NULL right after the instance is destroyed successfully.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
  * @return Returns AV_ERR_OK if the execution is successful,
@@ -48,12 +52,14 @@ OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source);
 OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
 
 /**
- * @brief Add a track to the demuxer. only retrieve information for the subset
- * of tracks selected. One track can only be added once, and add the same track
- * multiple times has no effect.
+ * @brief The specified track is selected and the demuxer will read samples from
+ * this track. MUltiple tracks are selected by calling this interface multiple times
+ * with different track indexes. Only the selected tracks are valid when calling
+ * OH_AVDemuxer_ReadSample th read samples. The interface returns AV_ERR_OK and the
+ * track is selected only once if the same track is selected multiple times.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
- * @param trackIndex The track index for being selected.
+ * @param trackIndex The track of the selected track.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
@@ -61,11 +67,14 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
 OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);
 
 /**
- * @brief Remove a track from the demuxer. only retrieve information for the subset
- * of tracks selected. remove the same track multiple times has no effect.
+ * @brief The specified selected track is unselected. The unselected track's sample
+ * can not be read from demuxer. Multiple selected tracks are unselected by calling
+ * this interface multiple times with different track indexes. The interface returns
+ * AV_ERR_OK and the track is unselected only once if the same track is unselected
+ * multiple times.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
- * @param trackIndex The track index for being unselected.
+ * @param trackIndex The index of the unselected track.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
@@ -73,12 +82,14 @@ OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackI
 OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);
 
 /**
- * @brief Retrieve the sample in selected tracks and store it in buffer, and store buffer's info to attr.
+ * @brief Get the current encoded sample and sample-related infermation from the specified
+ * track. The track index must be selected before reading sample. The demuxer will advance
+ * automatically after calling this interface.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
- * @param trackIndex Get the sampleBuffer from this track.
- * @param sample The OH_AVMemory handle pointer to get buffer data.
- * @param info The OH_AVCodecBufferAttr handle pointer to get buffer info.
+ * @param trackIndex The index of the track from which read an encoded sample.
+ * @param sample The OH_AVMemory handle pointer to the buffer storing the sample data.
+ * @param info The OH_AVCodecBufferAttr handle pointer to the buffer storing sample information.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
@@ -90,7 +101,8 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
  * @brief All selected tracks seek near to the requested time according to the seek mode.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
- * @param millisecond The timestamp for seeking which is the position relative to the beginning of the file.
+ * @param millisecond The millisecond for seeking, the timestamp is hte position of
+ * the file relative to the start of the file.
  * @param mode The mode for seeking. See {@link OH_AVSeekMode}.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
