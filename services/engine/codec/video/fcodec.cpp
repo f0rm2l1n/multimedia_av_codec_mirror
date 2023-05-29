@@ -200,6 +200,7 @@ int32_t FCodec::Configure(const Format &format)
     format.GetIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height_);
     avCodecContext_->width = width_;
     avCodecContext_->height = height_;
+    avCodecContext_->flags2 |= AV_CODEC_FLAG2_CHUNKS;
     state_ = State::Configured;
     AVCODEC_LOGI("Configured codec successful: state: Initialized -> Configured");
     return AVCS_ERR_OK;
@@ -730,11 +731,13 @@ void FCodec::SendFrame()
         avPacket_->size = static_cast<int32_t>(inputBuffer->bufferInfo_.size);
         avPacket_->pts = inputBuffer->bufferInfo_.presentationTimeUs;
     } else {
+        AVCODEC_LOGI("Send eos start");
         avPacket_->data = nullptr;
         avPacket_->size = 0;
         std::unique_lock<std::mutex> sendLock(sendMutex_);
         isSendEos_ = true;
         sendCv_.wait(sendLock);
+        AVCODEC_LOGI("Send eos end");
     }
     int ret;
     std::unique_lock<std::mutex> sLock(syncMutex_);
@@ -883,6 +886,7 @@ void FCodec::ReceiveFrame()
             return;
         }
     } else if (ret == AVERROR_EOF) {
+        AVCODEC_LOGI("Receive eos");
         frameBuffer->bufferFlag_ = AVCODEC_BUFFER_FLAG_EOS;
         frameBuffer->bufferInfo_.size = 0;
         state_ = State::EOS;
@@ -945,6 +949,8 @@ int32_t FCodec::ReleaseOutputBuffer(uint32_t index)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((state_ == State::Running || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Release output buffer failed: not in Running/EOS state");
+    CHECK_AND_RETURN_RET_LOG(index < buffers_[INDEX_OUTPUT].size(), AVCS_ERR_INVALID_VAL,
+                             "Failed to release output buffer: invalid index");
     std::lock_guard<std::mutex> oLock(outputMutex_);
     if (std::find(codecAvailBuffers_.begin(), codecAvailBuffers_.end(), index) == codecAvailBuffers_.end() &&
         buffers_[INDEX_OUTPUT][index]->owner_ == AVBuffer::Owner::OWNED_BY_USER) {
@@ -990,6 +996,8 @@ int32_t FCodec::RenderOutputBuffer(uint32_t index)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(((state_ == State::Running || state_ == State::EOS) && surface_ != nullptr),
                              AVCS_ERR_INVALID_STATE, "Failed to render output buffer: invalid state");
+    CHECK_AND_RETURN_RET_LOG(index < buffers_[INDEX_OUTPUT].size(), AVCS_ERR_INVALID_VAL,
+                             "Failed to render output buffer: invalid index");
     if (std::find(codecAvailBuffers_.begin(), codecAvailBuffers_.end(), index) == codecAvailBuffers_.end() &&
         buffers_[INDEX_OUTPUT][index]->owner_ == AVBuffer::Owner::OWNED_BY_USER) {
         std::shared_ptr<AVBuffer> outputBuffer = buffers_[INDEX_OUTPUT][index];
@@ -1028,6 +1036,7 @@ int32_t FCodec::SetOutputSurface(sptr<Surface> surface)
         renderTask_ = std::make_shared<TaskThread>("RenderFrame");
         renderTask_->RegisterHandler([this] { (void)RenderFrame(); });
     }
+    AVCODEC_LOGI("Set surface success");
     return AVCS_ERR_OK;
 }
 
@@ -1038,6 +1047,7 @@ int32_t FCodec::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
                              "Set callback failed: cannot in executing state or error state");
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "Set callback failed: callback is NULL");
     callback_ = callback;
+    AVCODEC_LOGI("Set callback success");
     return AVCS_ERR_OK;
 }
 
