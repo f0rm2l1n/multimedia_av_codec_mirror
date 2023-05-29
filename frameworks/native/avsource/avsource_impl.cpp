@@ -51,7 +51,7 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
     AVCODEC_LOGI("create source with fd: fd=%{private}d, offset=%{public}" PRId64 ", size=%{public}" PRId64,
         fd, offset, size);
 
-    CHECK_AND_RETURN_RET_LOG(fd > 2, nullptr,
+    CHECK_AND_RETURN_RET_LOG(fd > STDERR_FILENO, nullptr,
         "Create source with uri failed because input fd is illegal, fd must be greater than 2!");
     CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with fd failed because input size is negative");
 
