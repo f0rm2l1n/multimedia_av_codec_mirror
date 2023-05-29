@@ -358,32 +358,17 @@ int32_t FCodec::Flush()
 int32_t FCodec::Reset()
 {
     AVCODEC_SYNC_TRACE;
-    CHECK_AND_RETURN_RET_LOG((state_ != State::Initialized || state_ != State::Uninitialized), AVCS_ERR_INVALID_STATE,
-                             "Reset codec failed: cannot reset codec in Initialized or Uninitialized state");
-    State oriState = state_;
-    state_ = State::Resetting;
     int32_t ret = Release();
-    if (ret != AVCS_ERR_OK) {
-        state_ = oriState;
-        AVCODEC_LOGE("Reset codec failed: cannot release codec");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Reset codec failed: cannot release codec");
     ret = Init();
-    if (ret != AVCS_ERR_OK) {
-        state_ = oriState;
-        AVCODEC_LOGE("Reset codec failed: cannot init codec");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Reset codec failed: cannot init codec");
     AVCODEC_LOGI("Reset codec successful, state: Initialized");
-    return ret;
+    return AVCS_ERR_OK;
 }
 
 int32_t FCodec::Release()
 {
     AVCODEC_SYNC_TRACE;
-    CHECK_AND_RETURN_RET_LOG(state_ != State::Uninitialized, AVCS_ERR_INVALID_OPERATION, "Codec is released already");
-    CHECK_AND_RETURN_RET_LOG(!IsActive(), AVCS_ERR_INVALID_STATE,
-                             "Release codec failed: codec is running, please stop codec first");
     if (sendTask_ != nullptr) {
         sendTask_->Stop();
     }
@@ -911,13 +896,14 @@ void FCodec::ReceiveFrame()
 void FCodec::RenderFrame()
 {
     AVCODEC_SYNC_TRACE;
-    if (state_ != State::Running || state_ != State::EOS) {
+    if (state_ != State::Running && state_ != State::EOS) {
         AVCODEC_LOGD("Failed to render frame to codec: not in Running or Flushed state");
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
     std::unique_lock<std::mutex> oLock(outputMutex_);
     if (renderBuffers_.empty()) {
+        oLock.unlock();
         AVCODEC_LOGD("Failed to render frame to codec: empty render buffer");
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
