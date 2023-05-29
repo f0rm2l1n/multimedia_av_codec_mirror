@@ -166,6 +166,29 @@ extern const char *OH_AVCODEC_MIMETYPE_IMAGE_PNG;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_BMP;
 
 /**
+ * @brief Enumerates the MIME types of audio and video codecs
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ * @version 1.0
+ */
+extern const char *OH_AVCODEC_MIMETYPE_AUDIO_FLAC;
+extern const char *OH_AVCODEC_MIMETYPE_AUDIO_VORBIS;
+
+/**
+ * @brief Name of audio and video codecs
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ * @version 1.0
+ */
+extern const char *OH_AVCODEC_DECODER_NAME_MP3;
+extern const char *OH_AVCODEC_DECODER_NAME_AAC;
+extern const char *OH_AVCODEC_DECODER_NAME_VORBIS;
+extern const char *OH_AVCODEC_DECODER_NAME_FLAC;
+extern const char *OH_AVCODEC_DECODER_NAME_AVC;
+extern const char *OH_AVCODEC_ENCODER_NAME_FLAC;
+extern const char *OH_AVCODEC_ENCODER_NAME_AAC;
+
+/**
  * @brief The extra data's key of surface Buffer
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 9

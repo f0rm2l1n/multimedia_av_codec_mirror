@@ -23,10 +23,21 @@ const char *OH_AVCODEC_MIMETYPE_VIDEO_AVC = "video/avc";
 const char *OH_AVCODEC_MIMETYPE_VIDEO_MPEG4 = "video/mp4v-es";
 const char *OH_AVCODEC_MIMETYPE_VIDEO_HEVC = "video/hevc";
 const char *OH_AVCODEC_MIMETYPE_AUDIO_AAC = "audio/mp4a-latm";
+const char *OH_AVCODEC_MIMETYPE_AUDIO_FLAC = "audio/flac";
+const char *OH_AVCODEC_MIMETYPE_AUDIO_VORBIS = "audio/vorbis";
 const char *OH_AVCODEC_MIMETYPE_AUDIO_MPEG = "audio/mpeg";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_JPG = "image/jpeg";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_PNG = "image/png";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_BMP = "image/bmp";
+
+const char *OH_AVCODEC_DECODER_NAME_MP3 = "OH.Media.Codec.Decoder.Audio.Mpeg";
+const char *OH_AVCODEC_DECODER_NAME_AAC = "OH.Media.Codec.Decoder.Audio.AAC";
+const char *OH_AVCODEC_DECODER_NAME_VORBIS = "OH.Media.Codec.Decoder.Audio.Vorbis";
+const char *OH_AVCODEC_DECODER_NAME_FLAC = "OH.Media.Codec.Decoder.Audio.Flac";
+const char *OH_AVCODEC_DECODER_NAME_AVC = "OH.Media.Codec.Decoder.Video.AVC";
+const char *OH_AVCODEC_ENCODER_NAME_FLAC = "OH.Media.Codec.Encoder.Audio.Flac";
+const char *OH_AVCODEC_ENCODER_NAME_AAC = "OH.Media.Codec.Encoder.Audio.AAC";
+
 const char *OH_ED_KEY_TIME_STAMP = "timeStamp";
 const char *OH_ED_KEY_EOS = "endOfStream";
 const char *OH_MD_KEY_TRACK_TYPE = "track_type";
@@ -66,6 +77,8 @@ const char *OH_MD_KEY_LANGUAGE = "language";
 const char *OH_MD_KEY_DESCRIPTION = "description";
 const char *OH_MD_KEY_LYRICS = "lyrics";
 const char *OH_MD_KEY_TRACK_COUNT = "track_count";
+
+
 #ifdef __cplusplus
 }
 #endif
