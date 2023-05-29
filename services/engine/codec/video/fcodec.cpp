@@ -46,6 +46,7 @@ constexpr int32_t VIDEO_BITRATE_MAX_SIZE = 300000000;
 constexpr int32_t VIDEO_FRAMERATE_MAX_SIZE = 120;
 constexpr int32_t VIDEO_BLOCKPERFRAME_SIZE = 36864;
 constexpr int32_t VIDEO_BLOCKPERSEC_SIZE = 983040;
+constexpr int32_t VIDEO_MIN_COMPRESSION = 2;
 constexpr int32_t VIDEO_MIN_INPUT_BUFFER_SIZE = 0;
 constexpr struct {
     const std::string_view codecName;
@@ -469,7 +470,7 @@ std::tuple<int32_t, int32_t> FCodec::CalculateBufferSize()
     int32_t inputBufferSize = 0;
     int32_t outputBufferSize = 0;
     if (!format_.GetIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, inputBufferSize)) {
-        inputBufferSize = static_cast<int32_t>((stride * height_ * VIDEO_PIX_DEPTH_YUV) >> 2);
+        inputBufferSize = static_cast<int32_t>((stride * height_ * VIDEO_PIX_DEPTH_YUV) >> VIDEO_MIN_COMPRESSION);
     }
     if (surface_ != nullptr) {
         outputBufferSize = static_cast<int32_t>(stride * height_ * VIDEO_PIX_DEPTH_RGBA);
@@ -674,7 +675,7 @@ std::shared_ptr<AVSharedMemoryBase> FCodec::GetInputBuffer(uint32_t index)
     CHECK_AND_RETURN_RET_LOG(avBuffers[index]->owner_ == AVBuffer::Owner::OWNED_BY_USER, nullptr,
                              "Get buffer failed with index=%{public}u, buffer is not available", index);
     CHECK_AND_RETURN_RET_LOG(UpdateBuffers(index, inputBufferSize_, INDEX_INPUT) == AVCS_ERR_OK, nullptr,
-                             "Update buffer failed with index=%{public}u, No memory", index);                         
+                             "Update buffer failed with index=%{public}u, No memory", index);
     std::shared_lock<std::shared_mutex> iLock(inputMutex_);
     return std::static_pointer_cast<AVSharedMemoryBase>(avBuffers[index]->memory_);
 }
