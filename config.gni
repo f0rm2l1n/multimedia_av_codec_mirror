@@ -22,6 +22,7 @@ declare_args() {
   multimedia_av_codec_support_ffmpeg_demuxer = true
   multimedia_av_codec_support_test = true
   multimedia_av_codec_support_xcollie = true
+  multimedia_av_codec_support_bitstream_dump = true
 }
 
 av_codec_root_dir = "//foundation/multimedia/av_codec"
@@ -69,4 +70,8 @@ if (multimedia_av_codec_support_ffmpeg_demuxer) {
 
 if (multimedia_av_codec_support_xcollie) {
   av_codec_defines += [ "HICOLLIE_ENABLE" ]
+}
+
+if (multimedia_av_codec_support_bitstream_dump) {
+  av_codec_defines += [ "BITSTREAM_DUMP_ENABLE" ]
 }

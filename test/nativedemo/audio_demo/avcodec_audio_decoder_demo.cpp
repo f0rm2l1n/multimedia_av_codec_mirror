@@ -155,7 +155,7 @@ void ADecDemo::RunCase(AudioFormatType audioType)
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }
 
-ADecDemo::ADecDemo() : audioDec_(nullptr), signal_(nullptr) {}
+ADecDemo::ADecDemo() : audioDec_(nullptr), signal_(nullptr), audioType_(TYPE_AAC) {}
 
 ADecDemo::~ADecDemo()
 {

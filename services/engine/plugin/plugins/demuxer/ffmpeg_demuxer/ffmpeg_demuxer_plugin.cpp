@@ -25,11 +25,14 @@
 #include "avcodec_dfx.h"
 #include "ffmpeg_demuxer_plugin.h"
 
+#if defined(LIBAVFORMAT_VERSION_INT) && defined(LIBAVFORMAT_VERSION_INT)
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 78, 0) and LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 64, 100)
 #if LIBAVFORMAT_VERSION_INT != AV_VERSION_INT(58, 76, 100)
+#include "libavformat/internal.h"
+#endif
+#endif
+#endif
 
-#endif
-#endif
 #define AV_CODEC_TIME_BASE (static_cast<int64_t>(1))
 #define AV_CODEC_NSECOND AV_CODEC_TIME_BASE
 #define AV_CODEC_USECOND (static_cast<int64_t>(1000) * AV_CODEC_NSECOND)
@@ -53,6 +56,8 @@ static const std::map<AVSeekMode, int32_t>  g_seekModeToFFmpegSeekFlags = {
     { AVSeekMode::SEEK_MODE_CLOSEST_SYNC, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_ANY }
 };
 
+constexpr int32_t TIME_INTERNAL = 100;
+
 int32_t Sniff(const std::string& pluginName)
 {
     return 100;
@@ -61,10 +66,10 @@ int32_t Sniff(const std::string& pluginName)
 Status RegisterDemuxerPlugins(const std::shared_ptr<Register>& reg)
 {
     DemuxerPluginDef def;
-    constexpr int32_t RankScore = 100;
+    constexpr int32_t rankScore = 100;
     def.name = "ffmpegDemuxer";
     def.description = "ffmpeg demuxer";
-    def.rank = RankScore;
+    def.rank = rankScore;
     def.creator = []() -> std::shared_ptr<DemuxerPlugin> {
         return std::make_shared<FFmpegDemuxerPlugin>();
     };
@@ -225,14 +230,14 @@ int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
                               [trackIndex](uint32_t selectedId) {return trackIndex == selectedId; });
     if (index != selectedTrackIds_.end()) {
         selectedTrackIds_.erase(index);
-        
         if (sampleCache_.count(trackIndex) != 0) {
+            FreeCachePacket(trackIndex);
             sampleCache_[trackIndex]->Clear();
+            sampleCache_[trackIndex] = nullptr;
             sampleCache_.erase(trackIndex);
         }
     } else {
         AVCODEC_LOGW("Unselect track failed, track %{public}u is not in selected list!", trackIndex);
-        return AVCS_ERR_INVALID_VAL;
     }
     return AVCS_ERR_OK;
 }
@@ -371,7 +376,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
             sampleCache_[stream_index]->Push(cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
-    if (ffmpegRet<0) {
+    if (ffmpegRet < 0) {
         AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ffmpegRet);
         av_packet_free(&(samplePacket->pkt_));
         return AVCS_ERR_DEMUXER_FAILED;
@@ -385,6 +390,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
 
 int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int keyFrameIdx)
 {
+#if defined(LIBAVFORMAT_VERSION_INT) && defined(LIBAVFORMAT_VERSION_INT)
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 78, 0)
     return avformat_index_get_entry(avStream, keyFrameIdx)->timestamp;
 #elif LIBAVFORMAT_VERSION_INT == AV_VERSION_INT(58, 76, 100)
@@ -393,6 +399,9 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
     return avStream->internal->index_entries[keyFrameIdx].timestamp;
 #else
     return avStream->index_entries[keyFrameIdx].timestamp;
+#endif
+#else
+    return avStream->index_entries[keyFrameIdx].timestamp
 #endif
 }
 
@@ -417,7 +426,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
                              ffTime, avStream->duration);
                 return AVCS_ERR_SEEK_FAILED;
             }
-            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - mSeconds) <= 100
+            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - mSeconds) <= TIME_INTERNAL
                 && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
                 flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
             }
@@ -441,9 +450,20 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t mSeconds, AVSeekMode mode)
         }
     }
     for (auto it:sampleCache_) {
+        FreeCachePacket(it.first);
         it.second->Clear();
     }
     return AVCS_ERR_OK;
+}
+
+void FFmpegDemuxerPlugin::FreeCachePacket(const uint32_t trackIndex)
+{
+    if (!sampleCache_[trackIndex]->Empty()) {
+        for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr;) {
+            av_packet_free(&(ele->pkt_));
+            ele = nullptr;
+        }
+    }
 }
 } // FFmpeg
 } // Plugin

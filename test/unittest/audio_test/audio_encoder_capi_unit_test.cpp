@@ -49,8 +49,8 @@ constexpr int32_t SAMPLE_FORMAT = 1;
 constexpr uint32_t FRAME_BYTES = 18432;
 constexpr int32_t COMPLIANCE_LEVEL = -2;
 
-constexpr string_view inputFilePath = "/data/encoderTest.pcm";
-constexpr string_view outputFilePath = "/data/encoderTest.flac";
+constexpr string_view INPUT_FILE_PATH = "/data/encoderTest.pcm";
+constexpr string_view OUTPUT_FILE_PATH = "/data/encoderTest.flac";
 } // namespace
 
 namespace OHOS {
@@ -73,10 +73,10 @@ public:
     explicit BufferCallback(AEncSignal *userData) : userData_(userData) {}
     virtual ~BufferCallback() = default;
     AEncSignal *userData_;
-    virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
-    virtual void OnOutputFormatChanged(const Format &format) override;
-    virtual void OnInputBufferAvailable(uint32_t index) override;
-    virtual void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+    void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    void OnOutputFormatChanged(const Format &format) override;
+    void OnInputBufferAvailable(uint32_t index) override;
+    void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 };
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -98,27 +98,27 @@ static void OnOutputFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *
 static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
 {
     (void)codec;
-    AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
-    unique_lock<mutex> lock(signal_->inMutex_);
-    signal_->inQueue_.push(index);
-    signal_->inBufferQueue_.push(data);
-    signal_->inCond_.notify_all();
+    AEncSignal *signal = static_cast<AEncSignal *>(userData);
+    unique_lock<mutex> lock(signal->inMutex_);
+    signal->inQueue_.push(index);
+    signal->inBufferQueue_.push(data);
+    signal->inCond_.notify_all();
 }
 
 static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
                                     void *userData)
 {
     (void)codec;
-    AEncSignal *signal_ = static_cast<AEncSignal *>(userData);
-    unique_lock<mutex> lock(signal_->outMutex_);
-    signal_->outQueue_.push(index);
-    signal_->outBufferQueue_.push(data);
+    AEncSignal *signal = static_cast<AEncSignal *>(userData);
+    unique_lock<mutex> lock(signal->outMutex_);
+    signal->outQueue_.push(index);
+    signal->outBufferQueue_.push(data);
     if (attr) {
-        signal_->attrQueue_.push(*attr);
+        signal->attrQueue_.push(*attr);
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
     }
-    signal_->outCond_.notify_all();
+    signal->outCond_.notify_all();
 }
 
 class AudioCodeCapiEncoderUnitTest : public testing::Test {
@@ -133,7 +133,7 @@ public:
 
 protected:
     std::atomic<bool> isRunning_ = false;
-    std::unique_ptr<std::ifstream> inputFile_ = std::make_unique<std::ifstream>(inputFilePath, std::ios::binary);
+    std::unique_ptr<std::ifstream> inputFile_ = std::make_unique<std::ifstream>(INPUT_FILE_PATH, std::ios::binary);
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
     int32_t index_;
@@ -222,7 +222,7 @@ void AudioCodeCapiEncoderUnitTest::InputFunc()
 void AudioCodeCapiEncoderUnitTest::OutputFunc()
 {
     std::ofstream outputFile;
-    outputFile.open(outputFilePath.data(), std::ios::out | std::ios::binary);
+    outputFile.open(OUTPUT_FILE_PATH.data(), std::ios::out | std::ios::binary);
 
     while (true) {
         if (!isRunning_.load()) {
@@ -572,12 +572,6 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_abnormalcase_01, TestSize.Le
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
 
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
-}
-
-int main(int argc, char *argv[])
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
 } // namespace Media
 } // namespace OHOS

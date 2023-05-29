@@ -23,6 +23,7 @@
 #include "avcodec_log_dump.h"
 #include "avcodec_xcollie.h"
 #include "avcodec_dump_utils.h"
+#include "avcodec_bitstream_dump.h"
 #ifdef SUPPORT_CODEC
 #include "codec_service_stub.h"
 #endif
@@ -40,16 +41,16 @@
 #endif
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecServerManager"};
-constexpr uint32_t DUMP_MENU_INDEX = 0x01000000;
-constexpr uint32_t DUMP_INSTANCE_INDEX = 0x01010000;
-constexpr uint32_t DUMP_PID_INDEX = 0x01010100;
-constexpr uint32_t DUMP_UID_INDEX = 0x01010200;
-constexpr uint32_t DUMP_OFFSET_16 = 16;
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecServerManager"};
+    constexpr uint32_t DUMP_MENU_INDEX = 0x01000000;
+    constexpr uint32_t DUMP_INSTANCE_INDEX = 0x01010000;
+    constexpr uint32_t DUMP_PID_INDEX = 0x01010100;
+    constexpr uint32_t DUMP_UID_INDEX = 0x01010200;
+    constexpr uint32_t DUMP_OFFSET_16 = 16;
 
-const std::vector<const std::string> SA_DUMP_MENU_DUMP_TABLE = {
-    "all", "codec", "muxer", "demuxer", "source",
-};
+    const std::vector<const std::string> SA_DUMP_MENU_DUMP_TABLE = {
+        "all", "codec", "muxer", "demuxer", "source", " ", "switch_bitstream_dump"
+    };
 } // namespace
 
 namespace OHOS {
@@ -136,6 +137,19 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
 
     if (argSets.empty() || argSets.find(u"h") != argSets.end() || argSets.find(u"help") != argSets.end()) {
         PrintDumpMenu(fd);
+    }
+
+    if (argSets.find(u"switch_bitstream_dump") != argSets.end()) {
+        dumpString += "[Bitstream_Dump]\n";
+        bool isEnable = AVCodecBitStreamDumper::GetInstance().SwitchEnable();
+        dumpString += "    status - ";
+        dumpString += isEnable ? "Enable" : "Disable";
+        dumpString += "\n";
+
+        if (fd != -1) {
+            write(fd, dumpString.c_str(), dumpString.size());
+        }
+        dumpString.clear();
     }
 
     return OHOS::NO_ERROR;

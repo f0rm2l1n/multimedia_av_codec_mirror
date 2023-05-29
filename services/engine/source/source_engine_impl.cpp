@@ -40,12 +40,10 @@ std::shared_ptr<ISourceEngine> ISourceEngineFactory::CreateSourceEngine(int32_t 
 
 int32_t SourceEngineImpl::Create()
 {
-    AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
-    if (source_ != nullptr) {
-        AVCODEC_LOGI("state_ is INITIALIZED");
-    } else {
-        AVCODEC_LOGE("state_ is UNINITIALIZED");
-    }
+    AVCodecTrace trace("SourceEngineImpl::Create");
+    AVCODEC_LOGI("Create");
+    std::unique_lock<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED, "source_ is nullptr");
     return source_->Create(uri_);
 }
 
@@ -55,7 +53,7 @@ SourceEngineImpl::SourceEngineImpl(int32_t appUid, int32_t appPid, const std::st
     AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
     source_ = std::make_shared<Plugin::Source>();
     if (source_ == nullptr) {
-        AVCODEC_LOGE("create demuxer engine failed");
+        AVCODEC_LOGE("create source engine failed");
     }
 }
 
@@ -73,6 +71,7 @@ int32_t SourceEngineImpl::GetTrackCount(uint32_t &trackCount)
     AVCodecTrace trace("SourceEngineImpl::GetTrackCount");
     AVCODEC_LOGI("GetTrackCount");
     std::unique_lock<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_INVALID_OPERATION, "source_ is nullptr");
     return source_->GetTrackCount(trackCount);
 }
 
@@ -81,6 +80,7 @@ int32_t SourceEngineImpl::GetSourceFormat(Format &format)
     AVCodecTrace trace("SourceEngineImpl::GetSourceFormat");
     AVCODEC_LOGI("GetSourceFormat");
     std::unique_lock<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_INVALID_OPERATION, "source_ is nullptr");
     return source_->GetSourceFormat(format);
 }
 
@@ -89,6 +89,7 @@ int32_t SourceEngineImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
     AVCodecTrace trace("SourceEngineImpl::GetTrackFormat");
     AVCODEC_LOGI("GetTrackFormat");
     std::unique_lock<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_INVALID_OPERATION, "source_ is nullptr");
     return source_->GetTrackFormat(format, trackIndex);
 }
 
@@ -97,6 +98,7 @@ uintptr_t SourceEngineImpl::GetSourceAddr()
     AVCodecTrace trace("SourceEngineImpl::GetSourceAddr");
     AVCODEC_LOGI("GetSourceAddr");
     std::unique_lock<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_INVALID_OPERATION, "source_ is nullptr");
     return source_->GetSourceAddr();
 }
 } // Media

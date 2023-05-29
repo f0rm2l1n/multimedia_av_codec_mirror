@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-Demuxer::Demuxer (uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<DemuxerPlugin> plugin)
+Demuxer::Demuxer(uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<DemuxerPlugin> plugin)
     : pkgVersion_(pkgVer), apiVersion_(apiVer), demuxer_(std::move(plugin)) {}
 
 int32_t Demuxer::SelectTrackByID(uint32_t trackIndex)

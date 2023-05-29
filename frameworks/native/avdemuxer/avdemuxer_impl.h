@@ -38,7 +38,6 @@ public:
 
 private:
     std::shared_ptr<IDemuxerService> demuxerClient_ = nullptr;
-    uint16_t trackLogCount = 0;
     std::string sourceUri_;
 };
 } // namespace Media

@@ -56,7 +56,6 @@ public:
     int32_t RenderOutputBuffer(uint32_t index) override;
     static int32_t GetCodecCapability(std::vector<CapabilityData> &capaArray);
 
-private:
     struct AVBuffer {
     public:
         AVBuffer() = default;
@@ -73,6 +72,8 @@ private:
         AVCodecBufferInfo bufferInfo_;
         AVCodecBufferFlag bufferFlag_;
     };
+
+private:
     int32_t Init();
 
     enum struct State : int32_t {
@@ -83,6 +84,7 @@ private:
         Running,
         Flushed,
         Flushing,
+        Resetting,
         EOS,
         Error,
     };
@@ -145,7 +147,7 @@ private:
     std::shared_ptr<AVCodecCallback> callback_;
     std::atomic<bool> isSendWait_ = false;
     std::atomic<bool> isSendEos_ = false;
-    std::atomic<bool> isBufferAllocated_ = false; 
+    std::atomic<bool> isBufferAllocated_ = false;
 };
 } // namespace Codec
 } // namespace Media
