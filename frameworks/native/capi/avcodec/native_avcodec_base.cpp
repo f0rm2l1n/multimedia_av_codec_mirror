@@ -30,14 +30,6 @@ const char *OH_AVCODEC_MIMETYPE_IMAGE_JPG = "image/jpeg";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_PNG = "image/png";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_BMP = "image/bmp";
 
-const char *OH_AVCODEC_DECODER_AUDIO_NAME_MP3 = "OH.Media.Codec.Decoder.Audio.Mpeg";
-const char *OH_AVCODEC_DECODER_AUDIO_NAME_AAC = "OH.Media.Codec.Decoder.Audio.AAC";
-const char *OH_AVCODEC_DECODER_AUDIO_NAME_VORBIS = "OH.Media.Codec.Decoder.Audio.Vorbis";
-const char *OH_AVCODEC_DECODER_AUDIO_NAME_FLAC = "OH.Media.Codec.Decoder.Audio.Flac";
-const char *OH_AVCODEC_DECODER_VIDEO_NAME_AVC = "OH.Media.Codec.Decoder.Video.AVC";
-const char *OH_AVCODEC_ENCODER_AUDIO_NAME_FLAC = "OH.Media.Codec.Encoder.Audio.Flac";
-const char *OH_AVCODEC_ENCODER_AUDIO_NAME_AAC = "OH.Media.Codec.Encoder.Audio.AAC";
-
 const char *OH_ED_KEY_TIME_STAMP = "timeStamp";
 const char *OH_ED_KEY_EOS = "endOfStream";
 const char *OH_MD_KEY_TRACK_TYPE = "track_type";
