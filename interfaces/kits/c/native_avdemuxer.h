@@ -55,11 +55,11 @@ OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);
  * @brief The specified track is selected and the demuxer will read samples from
  * this track. MUltiple tracks are selected by calling this interface multiple times
  * with different track indexes. Only the selected tracks are valid when calling
- * OH_AVDemuxer_ReadSample th read samples. The interface returns AV_ERR_OK and the
+ * OH_AVDemuxer_ReadSample to read samples. The interface returns AV_ERR_OK and the
  * track is selected only once if the same track is selected multiple times.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
- * @param trackIndex The track of the selected track.
+ * @param trackIndex The index of the selected track.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
@@ -82,7 +82,7 @@ OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackI
 OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);
 
 /**
- * @brief Get the current encoded sample and sample-related infermation from the specified
+ * @brief Get the current encoded sample and sample-related information from the specified
  * track. The track index must be selected before reading sample. The demuxer will advance
  * automatically after calling this interface.
  * @syscap SystemCapability.Multimedia.Media.Spliter
@@ -101,7 +101,7 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
  * @brief All selected tracks seek near to the requested time according to the seek mode.
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param demuxer Pointer to an OH_AVDemuxer instance.
- * @param millisecond The millisecond for seeking, the timestamp is hte position of
+ * @param millisecond The millisecond for seeking, the timestamp is the position of
  * the file relative to the start of the file.
  * @param mode The mode for seeking. See {@link OH_AVSeekMode}.
  * @return Returns AV_ERR_OK if the execution is successful,

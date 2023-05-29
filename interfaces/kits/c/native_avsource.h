@@ -54,7 +54,7 @@ OH_AVSource *OH_AVSource_CreateWithFD(int32_t fd, int64_t offset, int64_t size);
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param source Pointer to an OH_AVSource instance.
  * @return Returns AV_ERR_OK if the execution is successful,
- *         otherwise returns a specific error code, refer to {@link OH_AVErrCode}
+ * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
 */
 OH_AVErrCode OH_AVSource_Destroy(OH_AVSource *source);
