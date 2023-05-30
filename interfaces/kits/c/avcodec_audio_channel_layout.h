@@ -18,13 +18,15 @@
 #include <cstdint>
 namespace OHOS {
 namespace Media {
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
- * @enum Audio Channel Set
- *
+ * @brief Audio Channel Set
  * A 64-bit integer with bits set for each channel.
- *
- * @since 4.0
- * @version 4.0
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
  */
 enum AudioChannelSet : uint64_t {
     FRONT_LEFT = 1ULL << 0U,
@@ -87,16 +89,14 @@ enum AudioChannelSet : uint64_t {
 };
 
 /**
- * @enum Audio AudioChannel Layout
- *
+ * @brief Audio AudioChannel Layout
  * Indicates that the channel order in which the user requests decoder output
  * is the native codec channel order.
- *
- * @since 4.0
- * @version 4.0
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
  */
-enum struct AudioChannelLayout : uint64_t {
-    UNKNOWN = 0,
+enum AudioChannelLayout : uint64_t {
+    UNKNOWN_CHANNEL_LAYOUT = 0,
     MONO = (AudioChannelSet::FRONT_CENTER),
     STEREO = (AudioChannelSet::FRONT_LEFT | AudioChannelSet::FRONT_RIGHT),
     CH_2POINT1 = (STEREO | AudioChannelSet::LOW_FREQUENCY),
@@ -157,6 +157,9 @@ enum struct AudioChannelLayout : uint64_t {
                 AudioChannelSet::AMBISONICS_ACN13 | AudioChannelSet::AMBISONICS_ACN14 |
                 AudioChannelSet::AMBISONICS_ACN15,
 };
+#ifdef __cplusplus
+}
+#endif
 } // namespace Media
 } // namespace OHOS
 #endif
