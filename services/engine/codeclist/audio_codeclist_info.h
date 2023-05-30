@@ -24,6 +24,12 @@ public:
     ~AudioCodeclistInfo();
     static AudioCodeclistInfo &GetInstance();
     std::vector<CapabilityData> GetAudioCapabilities() const noexcept;
+    CapabilityData GetMP3DecoderCapability();
+    CapabilityData GetAacDecoderCapability();
+    CapabilityData GetFlacDecoderCapability();
+    CapabilityData GetVorbisDecoderCapability();
+    CapabilityData GetAacEncoderCapability();
+    CapabilityData GetFlacEncoderCapability();
 
 private:
     std::vector<CapabilityData> audioCapabilities_;
