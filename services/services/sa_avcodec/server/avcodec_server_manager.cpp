@@ -435,6 +435,7 @@ void AVCodecServerManager::EraseObject(std::map<sptr<IRemoteObject>, pid_t>& stu
 void AVCodecServerManager::DestroyStubObjectForPid(pid_t pid)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    DestroyDumperForPid(pid);
     AVCODEC_LOGD("codec stub services(%{public}zu) pid(%{public}d).", codecStubMap_.size(), pid);
     EraseObject(codecStubMap_, pid);
     AVCODEC_LOGD("codec stub services(%{public}zu).", codecStubMap_.size());
