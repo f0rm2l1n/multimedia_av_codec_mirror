@@ -94,7 +94,7 @@ enum AudioChannelSet : uint64_t {
  * @since 10
  */
 enum AudioChannelLayout : uint64_t {
-    UNKNOWN = 0,
+    UNKNOWN_CHANNEL_LAYOUT = 0,
     MONO = (AudioChannelSet::FRONT_CENTER),
     STEREO = (AudioChannelSet::FRONT_LEFT | AudioChannelSet::FRONT_RIGHT),
     CH_2POINT1 = (STEREO | AudioChannelSet::LOW_FREQUENCY),
