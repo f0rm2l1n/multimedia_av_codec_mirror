@@ -18,6 +18,10 @@
 #include <cstdint>
 namespace OHOS {
 namespace Media {
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @enum Audio Channel Set
  *
@@ -155,6 +159,9 @@ enum AudioChannelLayout : uint64_t {
                 AudioChannelSet::AMBISONICS_ACN13 | AudioChannelSet::AMBISONICS_ACN14 |
                 AudioChannelSet::AMBISONICS_ACN15,
 };
+#ifdef __cplusplus
+}
+#endif
 } // namespace Media
 } // namespace OHOS
 #endif
