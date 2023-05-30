@@ -53,7 +53,10 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
 
     CHECK_AND_RETURN_RET_LOG(fd > STDERR_FILENO, nullptr,
         "Create source with uri failed because input fd is illegal, fd must be greater than 2!");
-    CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with fd failed because input size is negative");
+    CHECK_AND_RETURN_RET_LOG(offset >= 0, nullptr,
+        "Create source with fd failed because input offset is negative");
+    CHECK_AND_RETURN_RET_LOG(size > 0, nullptr,
+        "Create source with fd failed because input size must be greater than zero");
 
     CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDONLY) == O_RDONLY, nullptr, "No permission to read fd");
     CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "The fd is not seekable");
@@ -114,7 +117,7 @@ AVSourceImpl::AVSourceImpl()
 
 AVSourceImpl::~AVSourceImpl()
 {
-    AVCODEC_LOGI("uninit sourceImpl for source %{public}s", sourceUri.c_str());
+    AVCODEC_LOGI("uninit sourceImpl for source %{private}s", sourceUri.c_str());
     if (sourceClient_ != nullptr) {
         (void)AVCodecServiceFactory::GetInstance().DestroySourceService(sourceClient_);
         sourceClient_ = nullptr;
@@ -135,8 +138,6 @@ int32_t AVSourceImpl::GetSourceFormat(Format &format)
 {
     AVCodecTrace trace("AVSource::GetSourceFormat");
 
-    AVCODEC_LOGI("get source format: format=%{public}s", format.Stringify().c_str());
-
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "source service died when get source format!");
     
@@ -147,7 +148,7 @@ int32_t AVSourceImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
 {
     AVCodecTrace trace("AVSource::GetTrackFormat");
 
-    AVCODEC_LOGI("get track format: trackIndex=%{public}u, format=%{public}s", trackIndex, format.Stringify().c_str());
+    AVCODEC_LOGI("get track format: trackIndex=%{public}u", trackIndex);
 
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
                              "source service died when get track format!");

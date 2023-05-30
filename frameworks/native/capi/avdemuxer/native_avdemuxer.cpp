@@ -41,6 +41,8 @@ struct OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source)
     CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "Create demuxer failed because input source is nullptr!");
 
     struct AVSourceObject *sourceObj = reinterpret_cast<AVSourceObject *>(source);
+    CHECK_AND_RETURN_RET_LOG(sourceObj != nullptr, nullptr,
+        "Create demuxer failed because new sourceObj is nullptr!");
 
     std::shared_ptr<AVDemuxer> demuxer = AVDemuxerFactory::CreateWithSource(*(sourceObj->source_));
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, nullptr, "New demuxer with source by AVDemuxerFactory failed!");
@@ -97,17 +99,17 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
     OH_AVMemory *sample, OH_AVCodecBufferAttr *info)
 {
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, AV_ERR_INVALID_VAL,
-        "Copy sample failed because input demuxer is nullptr!");
+        "Read sample failed because input demuxer is nullptr!");
     CHECK_AND_RETURN_RET_LOG(demuxer->magic_ == AVMagic::AVCODEC_MAGIC_AVDEMUXER, AV_ERR_INVALID_VAL, "magic error!");
     
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, AV_ERR_INVALID_VAL,
-        "Copy sample failed because input buffer is nullptr!");
+        "Read sample failed because input sample is nullptr!");
     CHECK_AND_RETURN_RET_LOG(info != nullptr, AV_ERR_INVALID_VAL,
-        "Copy sample failed because input attr is nullptr!");
+        "Read sample failed because input info is nullptr!");
 
     struct DemuxerObject *demuxerObj = reinterpret_cast<DemuxerObject *>(demuxer);
     CHECK_AND_RETURN_RET_LOG(demuxerObj->demuxer_ != nullptr, AV_ERR_INVALID_VAL,
-        "New DemuxerObject failed when copy sample!");
+        "New DemuxerObject failed when read sample!");
 
     struct AVCodecBufferInfo bufferInfoInner;
     AVCodecBufferFlag bufferFlag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
