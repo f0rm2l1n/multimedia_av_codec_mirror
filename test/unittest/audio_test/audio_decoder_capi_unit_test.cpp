@@ -58,8 +58,8 @@ constexpr uint32_t DEFAULT_SAMPLE_RATE = 44100;
 constexpr uint32_t DEFAULT_BITRATE = 134000;
 constexpr uint32_t DEFAULT_BITS_PER_CODED_RATE = 16;
 constexpr uint32_t FRAME_DURATION_US = 33000;
-constexpr string_view inputFilePath = "/data/test441_2_noid3.mp3";
-constexpr string_view OUTPUT_FILE_PATH = "/data/audioOut.pcm";
+constexpr string_view inputFilePath = "/data/test/media/test441_2_noid3.mp3";
+constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/audioOut.pcm";
 } // namespace
 
 namespace OHOS {

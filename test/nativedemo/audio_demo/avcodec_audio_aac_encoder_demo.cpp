@@ -39,8 +39,8 @@ constexpr uint32_t CHANNEL_LAYOUT = 3;
 constexpr int32_t SAMPLE_FORMAT = 8;
 constexpr int32_t INPUT_FRAME_BYTES = 2 * 1024 * 4;
 
-constexpr string_view INPUT_FILE_PATH = "/data/media/test_fltp.pcm";
-constexpr string_view OUTPUT_FILE_PATH = "/data/media/encode2.aac";
+constexpr string_view INPUT_FILE_PATH = "/data/test/media/test_fltp.pcm";
+constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/encode2.aac";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
