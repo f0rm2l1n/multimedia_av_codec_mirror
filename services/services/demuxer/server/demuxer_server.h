@@ -33,7 +33,7 @@ public:
     int32_t UnselectTrackByID(uint32_t trackIndex) override;
     int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
-    int32_t SeekToTime(int64_t mSeconds, const AVSeekMode mode) override;
+    int32_t SeekToTime(int64_t millisecond, const AVSeekMode mode) override;
 
 private:
     std::shared_ptr<IDemuxerEngine> demuxerEngine_ = nullptr;

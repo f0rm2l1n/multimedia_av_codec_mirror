@@ -73,7 +73,7 @@ private:
         size_t offset = 0;
         size_t position = 0;
         bool eof = false;
-        size_t fileSize = 0;
+        uint64_t fileSize = 0;
         AVIOContext* avioContext = nullptr;
         std::shared_ptr<Buffer> bufMemory;
     };
@@ -94,7 +94,7 @@ private:
     static int64_t AVSeek(void* opaque, int64_t offset, int whence);
     void InitAVIOContext(int flags);
     int32_t InitAVFormatContext();
-    void GetStringFormatFromMetadata(std::string key, std::string_view formatName, Format &format);
+    void GetStringFormatFromMetadata(const std::string key, std::string_view formatName, Format &format);
 
     void GetPublicTrackFormat(Format &format, AVStream *avStream);
     void GetVideoTrackFormat(Format &format, AVStream *avStream);

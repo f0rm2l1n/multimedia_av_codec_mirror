@@ -229,6 +229,20 @@ extern const char *OH_MD_KEY_REQUEST_I_FRAME;
 /* Key for the desired encoding quality. value type is uint32_t, this key is only supported for encoders that
  * are configured in constant quality mode */
 extern const char *OH_MD_KEY_QUALITY;
+/* Key for the desired encoding channel layout. value type is int64_t, this key is only supported for encoders. */
+extern const char *OH_MD_KEY_CHANNEL_LAYOUT;
+/* Key for bits per coded sample, value type is uint32_t, supported for flac encoder when do configure. */
+extern const char *OH_MD_KEY_BITS_PER_CODED_SAMPLE;
+/* Key for the aac format, value type is uint32_t, supported for aac decoder. */
+extern const char *OH_MD_KEY_AAC_IS_ADTS;
+/* Key for aac sbr mode, value type is uint32_t, supported for aac encoder. */
+extern const char *OH_MD_KEY_SBR;
+/* Key for flac compliance level, value type is int32_t. */
+extern const char *OH_MD_KEY_COMPLIANCE_LEVEL;
+/* Key for vorbis identification header, value type is uint8_t*, supported only for vorbis decoder. */
+extern const char *OH_MD_KEY_IDENTIFICATION_HEADER;
+/* Key for vorbis setup header, value type is uint8_t*, supported only for vorbis decoder. */
+extern const char *OH_MD_KEY_SETUP_HEADER;
 
 /* source format Key for title, value type is string */
 extern const char *OH_MD_KEY_TITLE;
@@ -366,27 +380,27 @@ typedef enum OH_TransferCharacteristic {
 } OH_TransferCharacteristic;
 
 /**
- * @brief Maxtrix Coefficient
+ * @brief Matrix Coefficient
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
  * @version 4.0
  */
-typedef enum OH_MaxtrixCoefficient {
-    MATRIX_COFFICIENT_IDENTITY = 0,
-    MATRIX_COFFICIENT_BT709 = 1,
-    MATRIX_COFFICIENT_UNSPECIFIED = 2,
-    MATRIX_COFFICIENT_FCC = 4,
-    MATRIX_COFFICIENT_BT601_625 = 5,
-    MATRIX_COFFICIENT_BT601_525 = 6,
-    MATRIX_COFFICIENT_SMPTE_ST240 = 7,
-    MATRIX_COFFICIENT_YCGCO = 8,
-    MATRIX_COFFICIENT_BT2020_NCL = 9,
-    MATRIX_COFFICIENT_BT2020_CL = 10,
-    MATRIX_COFFICIENT_SMPTE_ST2085 = 11,
-    MATRIX_COFFICIENT_CHROMATICITY_NCL = 12,
-    MATRIX_COFFICIENT_CHROMATICITY_CL = 13,
-    MATRIX_COFFICIENT_ICTCP = 14,
-} OH_MaxtrixCoefficient;
+typedef enum OH_MatrixCoefficient {
+    MATRIX_COEFFICIENT_IDENTITY = 0,
+    MATRIX_COEFFICIENT_BT709 = 1,
+    MATRIX_COEFFICIENT_UNSPECIFIED = 2,
+    MATRIX_COEFFICIENT_FCC = 4,
+    MATRIX_COEFFICIENT_BT601_625 = 5,
+    MATRIX_COEFFICIENT_BT601_525 = 6,
+    MATRIX_COEFFICIENT_SMPTE_ST240 = 7,
+    MATRIX_COEFFICIENT_YCGCO = 8,
+    MATRIX_COEFFICIENT_BT2020_NCL = 9,
+    MATRIX_COEFFICIENT_BT2020_CL = 10,
+    MATRIX_COEFFICIENT_SMPTE_ST2085 = 11,
+    MATRIX_COEFFICIENT_CHROMATICITY_NCL = 12,
+    MATRIX_COEFFICIENT_CHROMATICITY_CL = 13,
+    MATRIX_COEFFICIENT_ICTCP = 14,
+} OH_MatrixCoefficient;
 #ifdef __cplusplus
 }
 #endif

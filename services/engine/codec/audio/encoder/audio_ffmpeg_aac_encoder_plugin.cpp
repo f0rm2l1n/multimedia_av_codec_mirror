@@ -108,7 +108,7 @@ static bool CheckChannelLayout(const std::shared_ptr<AVCodec> &codec, const uint
 
 bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
 {
-    if (!format.ContainKey(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT) ||
+    if (!format.ContainKey(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT) ||
         !format.ContainKey(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT) ||
         !format.ContainKey(MediaDescriptionKey::MD_KEY_SAMPLE_RATE)) {
         AVCODEC_LOGE("Format parameter missing");
@@ -117,7 +117,7 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
 
     auto avCodec = basePlugin->GetAVCodec();
     int sampleFormat;
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, sampleFormat);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, sampleFormat);
     if (!CheckSampleFormat(avCodec, (AVSampleFormat)sampleFormat)) {
         AVCODEC_LOGE("Sample format not supported");
         return false;

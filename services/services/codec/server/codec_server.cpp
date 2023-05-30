@@ -152,11 +152,7 @@ int32_t CodecServer::Start()
         AVCS_ERR_INVALID_STATE, "In invalid state");
     CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "Codecbase is nullptr");
     int32_t ret = codecBase_->Start();
-    if (codecCb_) {
-        status_ = (ret == AVCS_ERR_OK ? RUNNING : ERROR);
-    } else {
-        status_ = (ret == AVCS_ERR_OK ? FLUSHED : ERROR);
-    }
+    status_ = (ret == AVCS_ERR_OK ? RUNNING : ERROR);
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
     BehaviorEventWrite(GetStatusDescription(status_), "Codec");
     return ret;
@@ -217,11 +213,13 @@ int32_t CodecServer::Reset()
 int32_t CodecServer::Release()
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "Codecbase is nullptr");
+    int32_t ret = codecBase_->Release();
     std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(&CodecServer::ExitProcessor, this);
     if (thread->joinable()) {
         thread->join();
     }
-    return AVCS_ERR_OK;
+    return ret;
 }
 
 sptr<Surface> CodecServer::CreateInputSurface()
@@ -334,6 +332,7 @@ int32_t CodecServer::GetInputFormat(Format &format)
 
 int32_t CodecServer::DumpInfo(int32_t fd)
 {
+    CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "Codecbase is nullptr");
     Format codecFormat;
     int32_t ret = codecBase_->GetOutputFormat(codecFormat);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Get codec format failed.");
@@ -355,9 +354,10 @@ int32_t CodecServer::DumpInfo(int32_t fd)
             break;
     }
 
+    auto statusIt = CODEC_STATE_MAP.find(status_);
     dumpControler.AddInfo(DUMP_CODEC_INFO_INDEX, codecInfo);
     dumpControler.AddInfo(DUMP_STATUS_INDEX,
-        "Status", CODEC_STATE_MAP.find(status_)->second);
+        "Status", statusIt != CODEC_STATE_MAP.end() ? statusIt->second : "");
     dumpControler.AddInfo(DUMP_LAST_ERROR_INDEX,
         "Last_Error", lastErrMsg_.size() ? lastErrMsg_ : "Null");
 
@@ -368,7 +368,7 @@ int32_t CodecServer::DumpInfo(int32_t fd)
             codecFormat, iter.first, iter.second);
         dumpIndex++;
     }
-        
+
     std::string dumpString;
     dumpControler.GetDumpString(dumpString);
     write(fd, dumpString.c_str(), dumpString.size());

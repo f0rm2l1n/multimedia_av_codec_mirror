@@ -118,9 +118,9 @@ int32_t AVDemuxerDemo::ReadAllSamples(OH_AVMemory *sample, int32_t tracks)
     return ret;
 }
 
-int32_t AVDemuxerDemo::SeekToTime(int64_t mSeconds, OH_AVSeekMode mode)
+int32_t AVDemuxerDemo::SeekToTime(int64_t millisecond, OH_AVSeekMode mode)
 {
-    int32_t ret = OH_AVDemuxer_SeekToTime(this->avdemxuer_, mSeconds, mode);
+    int32_t ret = OH_AVDemuxer_SeekToTime(this->avdemxuer_, millisecond, mode);
     if (ret != 0) {
         printf("OH_AVDemuxer_CopyNextSample is faild \n");
     }

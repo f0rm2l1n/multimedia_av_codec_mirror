@@ -22,6 +22,17 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "DemuxerServiceStub"};
+
+    const std::map<int32_t, std::string> DEMUXER_FUNC_NAME = {
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::INIT, "DemuxerServiceStub Init" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::SELECT_TRACK_BY_ID,
+            "DemuxerServiceStub SelectTrackByID" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::UNSELECT_TRACK_BY_ID,
+            "DemuxerServiceStub UnselectTrackByID" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::READ_SAMPLE, "DemuxerServiceStub ReadSample" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::SEEK_TO_TIME, "DemuxerServiceStub SeekToTime" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::DESTROY_STUB, "DemuxerServiceStub DestroyStub" },
+    };
 }
 
 namespace OHOS {
@@ -77,8 +88,10 @@ int DemuxerServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             int32_t ret = -1;
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply),
-                "DemuxerServiceStub::OnRemoteRequest");
+            auto itFuncName = DEMUXER_FUNC_NAME.find(code);
+            std::string funcName =
+                itFuncName != DEMUXER_FUNC_NAME.end() ? itFuncName->second : "DemuxerServiceStub OnRemoteRequest";
+            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
             CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call memberFunc");
             return AVCS_ERR_OK;
         }
@@ -119,10 +132,10 @@ int32_t DemuxerServiceStub::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSh
     return demuxerServer_->ReadSample(trackIndex, sample, info, flag);
 }
 
-int32_t DemuxerServiceStub::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
+int32_t DemuxerServiceStub::SeekToTime(int64_t millisecond, const AVSeekMode mode)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->SeekToTime(mSeconds, mode);
+    return demuxerServer_->SeekToTime(millisecond, mode);
 }
 
 int32_t DemuxerServiceStub::DumpInfo(int32_t fd)
@@ -187,10 +200,10 @@ int32_t DemuxerServiceStub::ReadSample(MessageParcel &data, MessageParcel &reply
 
 int32_t DemuxerServiceStub::SeekToTime(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t mSeconds = data.ReadInt64();
+    int64_t millisecond = data.ReadInt64();
     AVSeekMode seekMode = static_cast<AVSeekMode>(data.ReadInt32());
 
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(mSeconds, seekMode)),
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SeekToTime(millisecond, seekMode)),
         AVCS_ERR_UNKNOWN, "Reply SeekToTime failed!");
     return AVCS_ERR_OK;
 }

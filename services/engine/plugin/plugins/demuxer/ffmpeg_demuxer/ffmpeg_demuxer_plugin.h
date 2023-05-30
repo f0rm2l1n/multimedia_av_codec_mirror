@@ -51,7 +51,7 @@ public:
     int32_t UnselectTrackByID(uint32_t trackIndex) override;
     int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
-    int32_t SeekToTime(int64_t mSeconds, AVSeekMode mode) override;
+    int32_t SeekToTime(int64_t millisecond, AVSeekMode mode) override;
     std::vector<uint32_t> GetSelectedTrackIds();
 private:
     struct SamplePacket {
@@ -73,6 +73,8 @@ private:
     std::shared_ptr<AVBSFContext> avbsfContext_ {nullptr};
     std::map<uint32_t, uint64_t> sampleIndex_;
     std::map<uint32_t, std::shared_ptr<BlockQueue<std::shared_ptr<SamplePacket>>>> sampleCache_;
+
+    void FreeCachePacket(const uint32_t trackIndex);
 };
 } // namespace FFmpeg
 } // namespace Plugin

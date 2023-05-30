@@ -85,12 +85,12 @@ int32_t DemuxerClient::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
     AVCODEC_LOGD("demuxer client call ReadSample");
     return demuxerProxy_->ReadSample(trackIndex, sample, info, flag);
 }
-int32_t DemuxerClient::SeekToTime(int64_t mSeconds, const AVSeekMode mode)
+int32_t DemuxerClient::SeekToTime(int64_t millisecond, const AVSeekMode mode)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
     AVCODEC_LOGD("demuxer client call SeekToTime");
-    return demuxerProxy_->SeekToTime(mSeconds, mode);
+    return demuxerProxy_->SeekToTime(millisecond, mode);
 }
 }  // namespace Media
 }  // namespace OHOS
