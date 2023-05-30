@@ -111,7 +111,7 @@ int32_t AVDemuxerImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
 
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "demuxer service died when read sample!");
-    
+
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_INVALID_VAL,
         "Copy sample failed because sample buffer is nullptr!");
 
