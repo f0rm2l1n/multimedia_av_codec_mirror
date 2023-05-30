@@ -246,7 +246,7 @@ int32_t Source::GetSourceFormat(Format &format)
     GetStringFormatFromMetadata("language", AVSourceFormat::SOURCE_LANGUAGE, format);
     GetStringFormatFromMetadata("description", AVSourceFormat::SOURCE_DESCRIPTION, format);
     GetStringFormatFromMetadata("lyrics", AVSourceFormat::SOURCE_LYRICS, format);
-    
+
     int64_t duration = formatContext_->duration;
     AVRational timeBase = AV_TIME_BASE_Q;
     if (duration == AV_NOPTS_VALUE) {
@@ -258,8 +258,7 @@ int32_t Source::GetSourceFormat(Format &format)
             }
         }
     }
-    double newDuration = duration * av_q2d(timeBase);
-    bool ret = format.PutDoubleValue(MediaDescriptionKey::MD_KEY_DURATION, newDuration);
+    bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, duration);
     if (!ret) {
         AVCODEC_LOGW("Put track info failed: miss duration info in file");
     }
