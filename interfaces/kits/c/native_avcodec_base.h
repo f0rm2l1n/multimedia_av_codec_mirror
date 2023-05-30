@@ -157,13 +157,22 @@ typedef struct OH_AVCodecAsyncCallback {
  * @version 1.0
  */
 extern const char *OH_AVCODEC_MIMETYPE_VIDEO_AVC;
+extern const char *OH_AVCODEC_MIMETYPE_AUDIO_AAC;
+
+/**
+ * @brief Enumerates the MIME types of audio and video codecs
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ * @version 1.0
+ */
 extern const char *OH_AVCODEC_MIMETYPE_VIDEO_MPEG4;
 extern const char *OH_AVCODEC_MIMETYPE_VIDEO_HEVC;
-extern const char *OH_AVCODEC_MIMETYPE_AUDIO_AAC;
 extern const char *OH_AVCODEC_MIMETYPE_AUDIO_MPEG;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_JPG;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_PNG;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_BMP;
+extern const char *OH_AVCODEC_MIMETYPE_AUDIO_FLAC;
+extern const char *OH_AVCODEC_MIMETYPE_AUDIO_VORBIS;
 
 /**
  * @brief The extra data's key of surface Buffer

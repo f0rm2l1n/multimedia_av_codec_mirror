@@ -29,6 +29,7 @@ group("av_codec_unit_test") {
     deps += [
       "unittest:av_audio_capi_unit_test",
       "unittest:av_audio_codecbase_unit_test",
+      "unittest:av_audio_encoder_capi_unit_test",
       "unittest:av_audio_inner_unit_test",
       "unittest:av_video_unit_test",
       "unittest/avcodec_test:acodec_capi_unit_test",

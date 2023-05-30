@@ -23,10 +23,13 @@ const char *OH_AVCODEC_MIMETYPE_VIDEO_AVC = "video/avc";
 const char *OH_AVCODEC_MIMETYPE_VIDEO_MPEG4 = "video/mp4v-es";
 const char *OH_AVCODEC_MIMETYPE_VIDEO_HEVC = "video/hevc";
 const char *OH_AVCODEC_MIMETYPE_AUDIO_AAC = "audio/mp4a-latm";
+const char *OH_AVCODEC_MIMETYPE_AUDIO_FLAC = "audio/flac";
+const char *OH_AVCODEC_MIMETYPE_AUDIO_VORBIS = "audio/vorbis";
 const char *OH_AVCODEC_MIMETYPE_AUDIO_MPEG = "audio/mpeg";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_JPG = "image/jpeg";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_PNG = "image/png";
 const char *OH_AVCODEC_MIMETYPE_IMAGE_BMP = "image/bmp";
+
 const char *OH_ED_KEY_TIME_STAMP = "timeStamp";
 const char *OH_ED_KEY_EOS = "endOfStream";
 const char *OH_MD_KEY_TRACK_TYPE = "track_type";
