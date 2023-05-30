@@ -40,8 +40,8 @@ constexpr int32_t SAMPLE_FORMAT = 1;
 constexpr uint32_t FRAME_BYTES = 18432;
 constexpr int32_t COMPLIANCE_LEVEL = -2;
 
-constexpr string_view INPUT_FILE_PATH = "/data/flac_test.pcm";
-constexpr string_view OUTPUT_FILE_PATH = "/data/flac_encoder_test.flac";
+constexpr string_view INPUT_FILE_PATH = "/data/test/media/flac_test.pcm";
+constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/flac_encoder_test.flac";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)

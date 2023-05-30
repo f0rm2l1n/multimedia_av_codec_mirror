@@ -49,8 +49,8 @@ constexpr int32_t SAMPLE_FORMAT = 1;
 constexpr uint32_t FRAME_BYTES = 18432;
 constexpr int32_t COMPLIANCE_LEVEL = -2;
 
-constexpr string_view INPUT_FILE_PATH = "/data/encoderTest.pcm";
-constexpr string_view OUTPUT_FILE_PATH = "/data/encoderTest.flac";
+constexpr string_view INPUT_FILE_PATH = "/data/test/media/encoderTest.pcm";
+constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/encoderTest.flac";
 } // namespace
 
 namespace OHOS {

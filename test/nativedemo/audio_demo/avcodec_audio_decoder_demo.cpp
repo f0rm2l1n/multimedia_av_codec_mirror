@@ -36,14 +36,14 @@ constexpr uint32_t BITS_PER_SAMPLE = 16;
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr uint32_t DEFAULT_AAC_TYPE = 1;
 constexpr int64_t BITS_RETE[TYPE_MAX] = {197000, 543000, 128000, 160000};
-constexpr string_view INPUT_AAC_FILE_PATH = "/data/aac_2c_44100hz_197k.dat";
-constexpr string_view OUTPUT_AAC_PCM_FILE_PATH = "/data/aac_2c_44100hz_197k.pcm";
-constexpr string_view INPUT_FLAC_FILE_PATH = "/data/flac_2c_44100hz_543k.dat";
-constexpr string_view OUTPUT_FLAC_PCM_FILE_PATH = "/data/flac_2c_44100hz_543k.pcm";
-constexpr string_view INPUT_MP3_FILE_PATH = "/data/mp3_2c_44100hz_128k.dat";
-constexpr string_view OUTPUT_MP3_PCM_FILE_PATH = "/data/mp3_2c_44100hz_128k.pcm";
-constexpr string_view INPUT_VORBIS_FILE_PATH = "/data/vorbis_2c_44100hz_160k.dat";
-constexpr string_view OUTPUT_VORBIS_PCM_FILE_PATH = "/data/vorbis_2c_44100hz_160k.pcm";
+constexpr string_view INPUT_AAC_FILE_PATH = "/data/test/media/aac_2c_44100hz_197k.dat";
+constexpr string_view OUTPUT_AAC_PCM_FILE_PATH = "/data/test/media/aac_2c_44100hz_197k.pcm";
+constexpr string_view INPUT_FLAC_FILE_PATH = "/data/test/media/flac_2c_44100hz_543k.dat";
+constexpr string_view OUTPUT_FLAC_PCM_FILE_PATH = "/data/test/media/flac_2c_44100hz_543k.pcm";
+constexpr string_view INPUT_MP3_FILE_PATH = "/data/test/media/mp3_2c_44100hz_128k.dat";
+constexpr string_view OUTPUT_MP3_PCM_FILE_PATH = "/data/test/media/mp3_2c_44100hz_128k.pcm";
+constexpr string_view INPUT_VORBIS_FILE_PATH = "/data/test/media/vorbis_2c_44100hz_160k.dat";
+constexpr string_view OUTPUT_VORBIS_PCM_FILE_PATH = "/data/test/media/vorbis_2c_44100hz_160k.pcm";
 } // namespace
 
 static void OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)

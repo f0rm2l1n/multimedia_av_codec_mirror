@@ -140,7 +140,7 @@ int32_t AEnInnerDemo::Release()
 
 void AEnInnerDemo::InputFunc()
 {
-    const char *filePath = "/data/media/test_fltp.pcm";
+    const char *filePath = "/data/test/media/test_fltp.pcm";
     int frameBytes = 2 * 1024 * 4;
     std::ifstream inputFile(filePath, std::ios::binary);
     if (!inputFile.is_open()) {
@@ -188,7 +188,7 @@ void AEnInnerDemo::InputFunc()
 
 void AEnInnerDemo::OutputFunc()
 {
-    std::ofstream outputFile("/data/media/encode.aac", std::ios::binary);
+    std::ofstream outputFile("/data/test/media/encode.aac", std::ios::binary);
     while (true) {
         if (!isRunning_.load()) {
             break;
