@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <unistd.h>
 #include "avsource.h"
 #include "native_avmagic.h"
 #include "avcodec_errors.h"
@@ -42,8 +42,7 @@ struct OH_AVSource *OH_AVSource_CreateWithURI(char *uri)
 
 struct OH_AVSource *OH_AVSource_CreateWithFD(int32_t fd, int64_t offset, int64_t size)
 {
-    // 0-err, 1-in, 2-out
-    CHECK_AND_RETURN_RET_LOG(fd > 2, nullptr,
+    CHECK_AND_RETURN_RET_LOG(fd > STDERR_FILENO, nullptr,
         "Create source with fd failed because input fd is illegal, fd must be greater than 2!");
     CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with fd failed because input size is negative");
 

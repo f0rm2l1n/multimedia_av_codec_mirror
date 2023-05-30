@@ -361,17 +361,11 @@ int32_t FCodec::Reset()
 {
     AVCODEC_SYNC_TRACE;
     int32_t ret = Release();
-    if (ret != AVCS_ERR_OK) {
-        AVCODEC_LOGE("Reset codec failed: cannot release codec");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Reset codec failed: cannot release codec");
     ret = Init();
-    if (ret != AVCS_ERR_OK) {
-        AVCODEC_LOGE("Reset codec failed: cannot init codec");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Reset codec failed: cannot init codec");
     AVCODEC_LOGI("Reset codec successful, state: Initialized");
-    return ret;
+    return AVCS_ERR_OK;
 }
 
 int32_t FCodec::Release()
@@ -919,6 +913,7 @@ void FCodec::RenderFrame()
     }
     std::unique_lock<std::mutex> oLock(outputMutex_);
     if (renderBuffers_.empty()) {
+        oLock.unlock();
         AVCODEC_LOGD("Failed to render frame to codec: empty render buffer");
         oLock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));

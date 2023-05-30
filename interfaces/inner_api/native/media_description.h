@@ -196,7 +196,7 @@ public:
     /**
      * Key for audio sample format, value type is uint32_t
      */
-    static constexpr std::string_view MD_KEY_SAMPLE_FORMAT = "sample_format";
+    static constexpr std::string_view MD_KEY_AUDIO_SAMPLE_FORMAT = "audio_sample_format";
 
     /**
      * Key for the number of bits used to encode each sample, value type is uint32_t
@@ -209,11 +209,6 @@ public:
     static constexpr std::string_view MD_KEY_AAC_IS_ADTS = "aac_is_adts";
 
     /**
-     * Key for aac profile, value type is uint32_t
-     */
-    static constexpr std::string_view MD_KEY_AAC_PROFILE = "aac_profile";
-
-    /**
      * Key for aac sbr, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_SBR = "sbr";
@@ -222,6 +217,16 @@ public:
      * Key for compliance level, value type is int32_t
      */
     static constexpr std::string_view MD_KEY_COMPLIANCE_LEVEL = "compliance_level";
+
+    /**
+     * Key for vorbis identification header, value type is uint8_t*
+     */
+    static constexpr std::string_view MD_KEY_IDENTIFICATION_HEADER = "identification_header";
+
+    /**
+     * Key for vorbis setup header, value type is uint8_t*
+     */
+    static constexpr std::string_view MD_KEY_SETUP_HEADER = "setup_header";
 
 private:
     MediaDescriptionKey() = delete;

@@ -84,7 +84,6 @@ private:
         Running,
         Flushed,
         Flushing,
-        Resetting,
         EOS,
         Error,
     };

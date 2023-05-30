@@ -57,10 +57,11 @@ static const std::map<AVSeekMode, int32_t>  g_seekModeToFFmpegSeekFlags = {
 };
 
 constexpr int32_t TIME_INTERNAL = 100;
+constexpr int32_t MAX_CONFIDENCE = 100;
 
 int32_t Sniff(const std::string& pluginName)
 {
-    return 100;
+    return MAX_CONFIDENCE;
 }
 
 Status RegisterDemuxerPlugins(const std::shared_ptr<Register>& reg)
