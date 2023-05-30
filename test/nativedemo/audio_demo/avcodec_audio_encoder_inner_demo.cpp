@@ -55,7 +55,7 @@ void AEnInnerDemo::RunCase()
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, SAMPLE_RATE);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, BITS_RATE);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, BITS_PER_CODED_RATE);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_FORMAT, DEFAULT_SAMPLE_FORMATE_VALE);
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, DEFAULT_SAMPLE_FORMATE_VALE);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, DEFAULT_CHANNEL_LAYOUT_COUNT);
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 

@@ -54,3 +54,5 @@ OpenHarmony 4.0.8.1 版本相较于OpenHarmony 之前的版本的API变更如下
 |avformat|struct OH_AVFormat \*OH_AVFormat_CreateVideoFormat(const char \*mimeType, int32_t width, int32_t height);|新增|创建视频轨的OH_AVFormat（用于avmuxer）|
 |avmemory|OH_AVMemory \*OH_AVMemory_Create(int32_t size);|新增|创建OH_AVMemory|
 |avmemory|OH_AVErrCode OH_AVMemory_Destroy(struct OH_AVMemory \*mem);|新增|销毁OH_AVMemory|
+| avcodec | OH_AVErrCode OH_AudioDecoder_IsValid(OH_AVCodec \*codec, bool \*isValid); | 新增 | 查询当前codec实例是否有效, 可用于故障恢复 |
+| avcodec | OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec \*codec, bool \*isValid); | 新增 | 查询当前codec实例是否有效, 可用于故障恢复 |
