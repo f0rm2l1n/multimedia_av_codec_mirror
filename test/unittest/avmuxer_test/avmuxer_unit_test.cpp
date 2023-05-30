@@ -28,7 +28,7 @@
 using namespace testing::ext;
 using namespace OHOS::Media;
 
-static const std::string TEST_FILE_PATH = "./";
+static const std::string TEST_FILE_PATH = "/data/test/media/";
 
 
 void AVMuxerUnitTest::SetUpTestCase() {}
