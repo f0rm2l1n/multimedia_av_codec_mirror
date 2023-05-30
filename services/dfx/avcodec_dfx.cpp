@@ -44,13 +44,6 @@ bool AVCodecEvent::CreateMsg(const char* format, ...)
     return true;
 }
 
-// void AVCodecEvent::BehaviorEventWrite(const std::string& eventName,
-//                                       OHOS::HiviewDFX::HiSysEvent::EventType type,
-//                                       const std::string& module)
-// {
-//     HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, eventName, type, "MODULE", module, "STATE", msg_);
-// }
-
 void AVCodecEvent::FaultEventWrite(const std::string& eventName,
                                    OHOS::HiviewDFX::HiSysEvent::EventType type,
                                    FaultType faultType,
