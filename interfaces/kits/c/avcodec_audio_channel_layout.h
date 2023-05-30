@@ -23,10 +23,9 @@ extern "C" {
 #endif
 
 /**
- * @enum Audio Channel Set
- *
+ * @brief Audio Channel Set
  * A 64-bit integer with bits set for each channel.
- *
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
  */
 enum AudioChannelSet : uint64_t {
@@ -90,11 +89,10 @@ enum AudioChannelSet : uint64_t {
 };
 
 /**
- * @enum Audio AudioChannel Layout
- *
+ * @brief Audio AudioChannel Layout
  * Indicates that the channel order in which the user requests decoder output
  * is the native codec channel order.
- *
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
  */
 enum AudioChannelLayout : uint64_t {
