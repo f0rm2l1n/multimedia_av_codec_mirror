@@ -258,7 +258,7 @@ int32_t Source::GetSourceFormat(Format &format)
             }
         }
     }
-    bool ret = format.PutDoubleValue(MediaDescriptionKey::MD_KEY_DURATION, duration);
+    bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, duration);
     if (!ret) {
         AVCODEC_LOGW("Put track info failed: miss duration info in file");
     }
