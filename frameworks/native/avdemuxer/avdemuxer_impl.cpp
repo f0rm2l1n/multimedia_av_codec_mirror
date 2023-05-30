@@ -34,7 +34,6 @@ namespace Media {
 std::shared_ptr<AVDemuxer> AVDemuxerFactory::CreateWithSource(AVSource &source)
 {
     AVCodecTrace trace("AVDemuxerFactory::CreateWithSource");
-    CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "Create source failed because source is nullptr!");
     AVCODEC_LOGI("create demuxerImpl from source %{private}s", source.sourceUri.c_str());
 
     std::shared_ptr<AVDemuxerImpl> demuxerImpl = std::make_shared<AVDemuxerImpl>();
@@ -49,7 +48,6 @@ std::shared_ptr<AVDemuxer> AVDemuxerFactory::CreateWithSource(AVSource &source)
 int32_t AVDemuxerImpl::Init(AVSource &source)
 {
     AVCodecTrace trace("AVDemuxer::Init");
-    CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "Init AVDemuxerImpl failed because source is nullptr!");
     demuxerClient_ = AVCodecServiceFactory::GetInstance().CreateDemuxerService();
     CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr,
         AVCS_ERR_CREATE_DEMUXER_SUB_SERVICE_FAILED, "Create demuxer service failed when init demuxerImpl");
