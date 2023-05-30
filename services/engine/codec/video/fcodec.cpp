@@ -437,7 +437,7 @@ int32_t FCodec::SetParameter(const Format &format)
     CHECK_AND_RETURN_RET_LOG(IsActive(), AVCS_ERR_INVALID_STATE,
                              "Set parameter failed: not in Running or Flushed state");
     for (auto &it : format.GetFormatMap()) {
-            if (it.second.type == FORMAT_TYPE_INT32) {
+        if (it.second.type == FORMAT_TYPE_INT32) {
             if (it.first == MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE &&
                 format.GetIntValue(it.first, inputBufferSize_)) {
                 format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, inputBufferSize_);
@@ -913,13 +913,13 @@ void FCodec::RenderFrame()
 {
     AVCODEC_SYNC_TRACE;
     if (state_ != State::Running && state_ != State::EOS) {
-        AVCODEC_LOGI("Failed to render frame to codec: not in Running or Flushed state");
+        AVCODEC_LOGD("Failed to render frame to codec: not in Running or Flushed state");
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
     std::unique_lock<std::mutex> oLock(outputMutex_);
     if (renderBuffers_.empty()) {
-        AVCODEC_LOGI("Failed to render frame to codec: empty render buffer");
+        AVCODEC_LOGD("Failed to render frame to codec: empty render buffer");
         oLock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
