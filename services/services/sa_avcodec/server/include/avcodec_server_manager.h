@@ -36,20 +36,14 @@ struct Dumper {
 
 class AVCodecServerManager : public NoCopyable {
 public:
-    static AVCodecServerManager &GetInstance();
+    static AVCodecServerManager& GetInstance();
     ~AVCodecServerManager();
 
-    enum StubType {
-        CODECLIST,
-        CODEC,
-        MUXER,
-        DEMUXER,
-        SOURCE
-    };
+    enum StubType { CODECLIST, CODEC, MUXER, DEMUXER, SOURCE };
     sptr<IRemoteObject> CreateStubObject(StubType type);
     void DestroyStubObject(StubType type, sptr<IRemoteObject> object);
     void DestroyStubObjectForPid(pid_t pid);
-    int32_t Dump(int32_t fd, const std::vector<std::u16string> &args);
+    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args);
     void DestroyDumper(StubType type, sptr<IRemoteObject> object);
     void DestroyDumperForPid(pid_t pid);
 
@@ -75,6 +69,11 @@ private:
 #ifdef SUPPORT_SOURCE
     sptr<IRemoteObject> CreateSourceStubObject();
 #endif
+    void EraseObject(std::map<sptr<IRemoteObject>, pid_t>::iterator& iter,
+                     std::map<sptr<IRemoteObject>, pid_t>& stubMap,
+                     pid_t pid,
+                     const std::string& stubName);
+    void EraseObject(std::map<sptr<IRemoteObject>, pid_t>& stubMap, pid_t pid);
 
     class AsyncExecutor {
     public:
@@ -82,6 +81,7 @@ private:
         virtual ~AsyncExecutor() = default;
         void Commit(sptr<IRemoteObject> obj);
         void Clear();
+
     private:
         void HandleAsyncExecution();
         std::list<sptr<IRemoteObject>> freeList_;
