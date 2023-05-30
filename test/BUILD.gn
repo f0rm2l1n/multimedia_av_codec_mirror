@@ -32,14 +32,14 @@ group("av_codec_unit_test") {
       "unittest:av_audio_encoder_capi_unit_test",
       "unittest:av_audio_inner_unit_test",
       "unittest:av_video_unit_test",
-      "unittest/avcodec_test:acodec_capi_unit_test",
-      "unittest/avcodec_test:vcodec_capi_unit_test",
       "unittest/avmuxer_test:avmuxer_capi_unit_test",
       "unittest/avmuxer_test:avmuxer_inner_unit_test",
       "unittest/codeclist_test:codeclist_capi_unit_test",
       "unittest/codeclist_test:codeclist_inner_unit_test",
       "unittest/format_test:avformat_capi_unit_test",
       "unittest/format_test:avformat_inner_unit_test",
+      "unittest/vcodec_test:videodec_capi_unit_test",
+      "unittest/vcodec_test:videodec_inner_unit_test",
     ]
     if (multimedia_av_codec_support_hcodec) {
       deps += [ "unittest/hcodec_test:hcodec_unit_test" ]
