@@ -220,10 +220,6 @@ sptr<IRemoteObject> AVCodecServerManager::CreateCodecListStubObject()
         pid_t pid = IPCSkeleton::GetCallingPid();
         codecListStubMap_[object] = pid;
         AVCODEC_LOGD("The number of codeclist services(%{public}zu).", codecListStubMap_.size());
-        SubAbilityCount subAbilityCount = {.codecCount = codecStubMap_.size(), .muxerCount = muxerStubMap_.size(),
-                                        .sourceCount = sourceStubMap_.size(),.demuxerCount = demuxerStubMap_.size(),
-                                        .codeclistCount = codecListStubMap_.size()};
-        StatisticEventWrite(subAbilityCount, "AV_CODEC service");
     }
     return object;
 }
@@ -255,10 +251,6 @@ sptr<IRemoteObject> AVCodecServerManager::CreateCodecStubObject()
         dumper.remoteObject_ = object;
         dumperTbl_[StubType::CODEC].emplace_back(dumper);
         AVCODEC_LOGD("The number of codec services(%{public}zu).", codecStubMap_.size());
-        SubAbilityCount subAbilityCount = {.codecCount = codecStubMap_.size(), .muxerCount = muxerStubMap_.size(),
-                                        .sourceCount = sourceStubMap_.size(),.demuxerCount = demuxerStubMap_.size(),
-                                        .codeclistCount = codecListStubMap_.size()};
-        StatisticEventWrite(subAbilityCount, "AV_CODEC service");
         if (Dump(-1, std::vector<std::u16string>()) != OHOS::NO_ERROR) {
             AVCODEC_LOGW("failed to call InstanceDump");
         }
@@ -294,10 +286,6 @@ sptr<IRemoteObject> AVCodecServerManager::CreateDemuxerStubObject()
         dumper.remoteObject_ = object;
         dumperTbl_[StubType::DEMUXER].emplace_back(dumper);
         AVCODEC_LOGD("The number of demuxer services(%{public}zu).", demuxerStubMap_.size());
-        SubAbilityCount subAbilityCount = {.codecCount = codecStubMap_.size(), .muxerCount = muxerStubMap_.size(),
-                                        .sourceCount = sourceStubMap_.size(),.demuxerCount = demuxerStubMap_.size(),
-                                        .codeclistCount = codecListStubMap_.size()};
-        StatisticEventWrite(subAbilityCount, "AV_CODEC service");
         if (Dump(-1, std::vector<std::u16string>()) != OHOS::NO_ERROR) {
             AVCODEC_LOGW("failed to call InstanceDump");
         }
@@ -333,10 +321,6 @@ sptr<IRemoteObject> AVCodecServerManager::CreateMuxerStubObject()
         dumper.remoteObject_ = object;
         dumperTbl_[StubType::MUXER].emplace_back(dumper);
         AVCODEC_LOGD("The number of muxer services(%{public}zu).", muxerStubMap_.size());
-        SubAbilityCount subAbilityCount = {.codecCount = codecStubMap_.size(), .muxerCount = muxerStubMap_.size(),
-                                        .sourceCount = sourceStubMap_.size(),.demuxerCount = demuxerStubMap_.size(),
-                                        .codeclistCount = codecListStubMap_.size()};
-        StatisticEventWrite(subAbilityCount, "AV_CODEC service");
         if (Dump(-1, std::vector<std::u16string>()) != OHOS::NO_ERROR) {
             AVCODEC_LOGW("Failed to call InstanceDump");
         }
@@ -372,10 +356,6 @@ sptr<IRemoteObject> AVCodecServerManager::CreateSourceStubObject()
         dumper.remoteObject_ = object;
         dumperTbl_[StubType::SOURCE].emplace_back(dumper);
         AVCODEC_LOGD("The number of source services(%{public}zu).", sourceStubMap_.size());
-        SubAbilityCount subAbilityCount = {.codecCount = codecStubMap_.size(), .muxerCount = muxerStubMap_.size(),
-                                            .sourceCount = sourceStubMap_.size(),.demuxerCount = demuxerStubMap_.size(),
-                                            .codeclistCount = codecListStubMap_.size()};
-        StatisticEventWrite(subAbilityCount, "AV_CODEC service");
         if (Dump(-1, std::vector<std::u16string>()) != OHOS::NO_ERROR) {
             AVCODEC_LOGW("failed to call InstanceDump");
         }
@@ -392,10 +372,6 @@ void AVCodecServerManager::EraseObject(std::map<sptr<IRemoteObject>, pid_t>::ite
         AVCODEC_LOGD("destroy %{public}s stub services(%{public}zu) pid(%{public}d).", stubName.c_str(), stubMap.size(),
                      pid);
         (void)stubMap.erase(iter);
-        SubAbilityCount subAbilityCount = {.codecCount = codecStubMap_.size(), .muxerCount = muxerStubMap_.size(),
-                                            .sourceCount = sourceStubMap_.size(),.demuxerCount = demuxerStubMap_.size(),
-                                            .codeclistCount = codecListStubMap_.size()};
-        StatisticEventWrite(subAbilityCount, "AV_CODEC service");
         return;
     }
     AVCODEC_LOGE("find %{public}s object failed, pid(%{public}d).", stubName.c_str(), pid);
@@ -445,7 +421,7 @@ void AVCodecServerManager::DestroyStubObject(StubType type, sptr<IRemoteObject> 
 
 void AVCodecServerManager::EraseObject(std::map<sptr<IRemoteObject>, pid_t>& stubMap, pid_t pid)
 {
-     for (auto it = stubMap.begin(); it != stubMap.end();) {
+    for (auto it = stubMap.begin(); it != stubMap.end();) {
         if (it->second == pid) {
             executor_.Commit(it->first);
             it = stubMap.erase(it);
@@ -475,10 +451,6 @@ void AVCodecServerManager::DestroyStubObjectForPid(pid_t pid)
     EraseObject(sourceStubMap_, pid);
     AVCODEC_LOGD("source stub services(%{public}zu).", sourceStubMap_.size());
     executor_.Clear();
-    SubAbilityCount subAbilityCount = {.codecCount = codecStubMap_.size(), .muxerCount = muxerStubMap_.size(),
-                                        .sourceCount = sourceStubMap_.size(),.demuxerCount = demuxerStubMap_.size(),
-                                        .codeclistCount = codecListStubMap_.size()};
-    StatisticEventWrite(subAbilityCount, "AV_CODEC service");
 }
 
 void AVCodecServerManager::DestroyDumper(StubType type, sptr<IRemoteObject> object)

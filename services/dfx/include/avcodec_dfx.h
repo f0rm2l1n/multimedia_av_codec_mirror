@@ -43,9 +43,6 @@ public:
     AVCodecEvent() = default;
     ~AVCodecEvent() = default;
     bool CreateMsg(const char* format, ...) __attribute__((__format__(printf, 2, 3)));
-    void BehaviorEventWrite(const std::string& eventName,
-                            OHOS::HiviewDFX::HiSysEvent::EventType type,
-                            const std::string& module);
     void FaultEventWrite(const std::string& eventName,
                          OHOS::HiviewDFX::HiSysEvent::EventType type,
                          FaultType faultType,
@@ -55,12 +52,9 @@ private:
     std::string msg_;
 };
 
-__attribute__((visibility("default"))) void BehaviorEventWrite(const std::string& status, const std::string& module);
 __attribute__((visibility("default"))) void FaultEventWrite(FaultType faultType, const std::string& msg,
                                                             const std::string& module);
-__attribute__((visibility("default"))) void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string& module);
-__attribute__((visibility("default"))) void StatisticEventWrite(const SubAbilityCount& subAbilityCount,
-                                                                const std::string& module);
+__attribute__((visibility("default"))) void BehaviorEventWrite(uint32_t useTime, const std::string& module);
 
 #define AVCODEC_SYNC_TRACE AVCodecTrace trace(std::string(__FUNCTION__))
 
