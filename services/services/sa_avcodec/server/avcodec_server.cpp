@@ -67,39 +67,56 @@ void AVCodecServer::OnStop()
 sptr<IRemoteObject> AVCodecServer::GetSubSystemAbility(IStandardAVCodecService::AVCodecSystemAbility subSystemId,
                                                        const sptr<IRemoteObject>& listener)
 {
-    int32_t ret = AVCodecServiceStub::SetDeathListener(listener);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "failed set death listener");
-
+    sptr<IRemoteObject> stubObject = nullptr;
+    AVCodecServerManager::StubType stubType;
     switch (subSystemId) {
 #ifdef SUPPORT_CODECLIST
         case AVCodecSystemAbility::AVCODEC_CODECLIST: {
-            return AVCodecServerManager::GetInstance().CreateStubObject(AVCodecServerManager::CODECLIST);
+            stubType = AVCodecServerManager::CODECLIST;
+            break;
         }
 #endif
 #ifdef SUPPORT_CODEC
         case AVCodecSystemAbility::AVCODEC_CODEC: {
-            return AVCodecServerManager::GetInstance().CreateStubObject(AVCodecServerManager::CODEC);
+            stubType = AVCodecServerManager::CODEC;
+            break;
         }
 #endif
 #ifdef SUPPORT_MUXER
         case AVCodecSystemAbility::AVCODEC_MUXER: {
-            return AVCodecServerManager::GetInstance().CreateStubObject(AVCodecServerManager::MUXER);
+            stubType = AVCodecServerManager::MUXER;
+            break;
         }
 #endif
 #ifdef SUPPORT_DEMUXER
         case AVCodecSystemAbility::AVCODEC_DEMUXER: {
-            return AVCodecServerManager::GetInstance().CreateStubObject(AVCodecServerManager::DEMUXER);
+            stubType = AVCodecServerManager::DEMUXER;
+            break;
         }
 #endif
 #ifdef SUPPORT_SOURCE
         case AVCodecSystemAbility::AVCODEC_SOURCE: {
-            return AVCodecServerManager::GetInstance().CreateStubObject(AVCodecServerManager::SOURCE);
+            stubType = AVCodecServerManager::SOURCE;
+            break;
         }
 #endif
         default: {
             AVCODEC_LOGE("subSystemId is invalid");
             return nullptr;
         }
+    }
+
+    stubObject = AVCodecServerManager::GetInstance().CreateStubObject(stubType);
+    if (stubObject) {
+        int32_t ret = AVCodecServiceStub::SetDeathListener(listener);
+        if (ret != AVCS_ERR_OK) {
+            AVCodecServerManager::GetInstance().DestroyStubObject(stubType, stubObject);
+            AVCODEC_LOGE("SetDeathListener failed");
+            return nullptr;
+        }
+        return stubObject;
+    } else {
+        return nullptr;
     }
 }
 
