@@ -29,7 +29,6 @@
 #include "native_avformat.h"
 #include "native_averrors.h"
 #include "native_avcodec_base.h"
-#include "avcodec_codec_name.h"
 
 using namespace std;
 using namespace OHOS;
@@ -53,7 +52,7 @@ OH_AVCodec *vdec_ = NULL;
 
 const string INVALID_CODEC_NAME = "avdec_h264";
 const string CODEC_MIME = "video/avc";
-const string CODEC_NAME = AVCodecCodecName::VIDEO_DECODER_AVC_NAME_KEY.data();
+const string CODEC_NAME = "video_decoder.avc";
 
 constexpr uint32_t DEFAULT_WIDTH = 1920;
 constexpr uint32_t DEFAULT_HEIGHT = 1080;
