@@ -23,8 +23,7 @@ namespace Media {
  *
  * A 64-bit integer with bits set for each channel.
  *
- * @since 4.0
- * @version 4.0
+ * @since 10
  */
 enum AudioChannelSet : uint64_t {
     FRONT_LEFT = 1ULL << 0U,
@@ -92,10 +91,9 @@ enum AudioChannelSet : uint64_t {
  * Indicates that the channel order in which the user requests decoder output
  * is the native codec channel order.
  *
- * @since 4.0
- * @version 4.0
+ * @since 10
  */
-enum struct AudioChannelLayout : uint64_t {
+enum AudioChannelLayout : uint64_t {
     UNKNOWN = 0,
     MONO = (AudioChannelSet::FRONT_CENTER),
     STEREO = (AudioChannelSet::FRONT_LEFT | AudioChannelSet::FRONT_RIGHT),
