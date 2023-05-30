@@ -51,7 +51,9 @@ public:
 OH_AVCodec *vdec_ = NULL;
 
 const string INVALID_CODEC_NAME = "avdec_h264";
-const string CODEC_NAME = "video_decoder.avc";
+const string CODEC_MIME = "video/avc";
+const string CODEC_NAME = AVCodecCodecName::VIDEO_DECODER_AVC_NAME_KEY.data();
+
 constexpr uint32_t DEFAULT_WIDTH = 1920;
 constexpr uint32_t DEFAULT_HEIGHT = 1080;
 constexpr uint32_t DEFAULT_FRAME_RATE = 30;
@@ -124,7 +126,7 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_1800, TestSize.Level2)
     cb2_.onNeedInputData = NULL;
     cb2_.onNeedOutputData = NULL;
     VDecSignal *signal_ = new VDecSignal();
-    ASSERT_EQ(AV_ERR_OK, OH_VideoDecoder_SetCallback(vdec_, cb2_, static_cast<void *>(signal_)));
+    ASSERT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_SetCallback(vdec_, cb2_, static_cast<void *>(signal_)));
 }
 
 /**
@@ -352,7 +354,7 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_2500, TestSize.Level2)
 HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_2600, TestSize.Level2)
 {
     vdec_ = OH_VideoDecoder_CreateByName(CODEC_NAME.c_str());
-    ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_RenderOutputData(vdec_, 0));
+    ASSERT_EQ(AV_ERR_INVALID_STATE, OH_VideoDecoder_RenderOutputData(vdec_, 0));
 }
 
 /**
@@ -373,7 +375,7 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_2700, TestSize.Level2)
 HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_2800, TestSize.Level2)
 {
     vdec_ = OH_VideoDecoder_CreateByName(CODEC_NAME.c_str());
-    ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_FreeOutputData(vdec_, 0));
+    ASSERT_EQ(AV_ERR_INVALID_STATE, OH_VideoDecoder_FreeOutputData(vdec_, 0));
 }
 
 /**
@@ -384,12 +386,12 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_2800, TestSize.Level2)
 HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_2900, TestSize.Level2)
 {
     vdec_ = OH_VideoDecoder_CreateByName(CODEC_NAME.c_str());
-    ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_FreeOutputData(vdec_, -1));
+    ASSERT_EQ(AV_ERR_INVALID_STATE, OH_VideoDecoder_FreeOutputData(vdec_, -1));
 }
 
 /**
  * @tc.number    : VIDEO_SWDEC_ILLEGAL_PARA_3000
- * @tc.name      : OH_VideoDecoder_FreeOutputData para error
+ * @tc.name      : OH_VideoDecoder_PushInputData para error
  * @tc.desc      : function test
  */
 HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_3000, TestSize.Level2)
@@ -407,7 +409,7 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_3000, TestSize.Level2)
 
 /**
  * @tc.number    : VIDEO_SWDEC_ILLEGAL_PARA_3100
- * @tc.name      : OH_VideoDecoder_FreeOutputData para error
+ * @tc.name      : OH_VideoDecoder_PushInputData para error
  * @tc.desc      : function test
  */
 HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_3100, TestSize.Level2)
@@ -423,7 +425,7 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_3100, TestSize.Level2)
 
 /**
  * @tc.number    : VIDEO_SWDEC_ILLEGAL_PARA_3200
- * @tc.name      : OH_VideoDecoder_FreeOutputData para error
+ * @tc.name      : OH_VideoDecoder_PushInputData para error
  * @tc.desc      : function test
  */
 HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_3200, TestSize.Level2)
@@ -637,4 +639,72 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_API_0800, TestSize.Level2)
     ASSERT_EQ(AV_ERR_OK, OH_VideoDecoder_Destroy(vdec_));
     vdec_ = nullptr;
     ASSERT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_Destroy(vdec_));
+}
+
+/**
+ * @tc.number    : VIDEO_SWDEC_API_0900
+ * @tc.name      : create create
+ * @tc.desc      : function test
+ */
+HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_API_0900, TestSize.Level2)
+{
+    vdec_ = OH_VideoDecoder_CreateByMime(CODEC_MIME.c_str());
+    ASSERT_NE(vdec_, NULL);
+    vdec_ = OH_VideoDecoder_CreateByMime(CODEC_MIME.c_str());
+    ASSERT_NE(vdec_, NULL);
+}
+
+/**
+ * @tc.number    : VIDEO_SWDEC_API_1000
+ * @tc.name      : repeat OH_VideoDecoder_SetCallback
+ * @tc.desc      : function test
+ */
+HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_API_1000, TestSize.Level2)
+{
+    vdec_ = OH_VideoDecoder_CreateByName(CODEC_NAME.c_str());
+    OH_AVCodecAsyncCallback cb_;
+    cb_.onError = VdecError;
+    cb_.onStreamChanged = VdecFormatChanged;
+    cb_.onNeedInputData = VdecInputDataReady;
+    cb_.onNeedOutputData = VdecOutputDataReady;
+    ASSERT_EQ(AV_ERR_OK, OH_VideoDecoder_SetCallback(vdec_, cb_, NULL));
+    ASSERT_EQ(AV_ERR_OK, OH_VideoDecoder_SetCallback(vdec_, cb_, NULL));
+}
+
+/**
+ * @tc.number    : VIDEO_SWDEC_API_1100
+ * @tc.name      : repeat OH_VideoDecoder_GetOutputDescription
+ * @tc.desc      : function test
+ */
+HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_API_1100, TestSize.Level2)
+{
+    vdec_ = OH_VideoDecoder_CreateByName(CODEC_NAME.c_str());
+    OH_AVFormat *format = OH_VideoDecoder_GetOutputDescription(vdec_);
+    ASSERT_NE(NULL, format);
+    format = OH_VideoDecoder_GetOutputDescription(vdec_);
+    ASSERT_NE(NULL, format);
+}
+
+/**
+ * @tc.number    : VIDEO_SWDEC_API_1200
+ * @tc.name      : repeat OH_VideoDecoder_SetParameter
+ * @tc.desc      : function test
+ */
+HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_API_1200, TestSize.Level2)
+{
+    vdec_ = OH_VideoDecoder_CreateByName(CODEC_NAME.c_str());
+    ASSERT_NE(NULL, vdec_);
+
+    OH_AVFormat *format = OH_AVFormat_Create();
+    ASSERT_NE(NULL, format);
+
+    string widthStr = "width";
+    string heightStr = "height";
+    string frameRateStr = "frame_rate";
+    (void)OH_AVFormat_SetIntValue(format, widthStr.c_str(), DEFAULT_WIDTH);
+    (void)OH_AVFormat_SetIntValue(format, heightStr.c_str(), DEFAULT_HEIGHT);
+    (void)OH_AVFormat_SetIntValue(format, frameRateStr.c_str(), DEFAULT_FRAME_RATE);
+
+    ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_SetParameter(vdec_, format));
+    ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_SetParameter(vdec_, format));
 }
