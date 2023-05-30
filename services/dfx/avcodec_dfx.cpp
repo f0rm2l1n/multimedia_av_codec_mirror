@@ -44,13 +44,6 @@ bool AVCodecEvent::CreateMsg(const char* format, ...)
     return true;
 }
 
-void AVCodecEvent::BehaviorEventWrite(const std::string& eventName,
-                                      OHOS::HiviewDFX::HiSysEvent::EventType type,
-                                      const std::string& module)
-{
-    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, eventName, type, "MODULE", module, "STATE", msg_);
-}
-
 void AVCodecEvent::FaultEventWrite(const std::string& eventName,
                                    OHOS::HiviewDFX::HiSysEvent::EventType type,
                                    FaultType faultType,
@@ -73,17 +66,6 @@ void AVCodecEvent::FaultEventWrite(const std::string& eventName,
     HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, eventName, type, "MODULE", module, "FAULTTYPE", faultName, "MSG", msg_);
 }
 
-void BehaviorEventWrite(const std::string& status, const std::string& module)
-{
-    AVCodecEvent event;
-    if (event.CreateMsg("%s, current state is: %s", "state change", status.c_str())) {
-        event.BehaviorEventWrite("SUB_ABILITY_STATE", OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-                                 module);
-    } else {
-        AVCODEC_LOGW("Failed to call CreateMsg");
-    }
-}
-
 void FaultEventWrite(FaultType faultType, const std::string& msg, const std::string& module)
 {
     AVCodecEvent event;
@@ -94,22 +76,13 @@ void FaultEventWrite(FaultType faultType, const std::string& msg, const std::str
     }
 }
 
-void StatisticTimeMemoryEventWrite(uint32_t useTime, const std::string& module)
+void BehaviorEventWrite(uint32_t useTime, const std::string& module)
 {
     OHOS::HiviewDFX::DumpUsage dumpUse;
     uint64_t useMemory = dumpUse.GetPss(getpid());
-    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "SERVER_STATISTICS",
-                    OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "MODULE", module.c_str(), "TIME", useTime,
+    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "SERVICE_START_INFO",
+                    OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "MODULE", module.c_str(), "TIME", useTime,
                     "MEMORY", useMemory);
-}
-
-void StatisticEventWrite(const SubAbilityCount& subAbilityCount, const std::string& module)
-{
-    HiSysEventWrite(HISYSEVENT_DOMAIN_AVCODEC, "SUB_ABILITY_COUNT",
-                    OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC, "MODULE", module.c_str(), "CODEC_COUNT",
-                    subAbilityCount.codecCount, "MUXER_COUNT", subAbilityCount.muxerCount, "SOURCE_COUNT",
-                    subAbilityCount.sourceCount, "DEMUXER_COUNT", subAbilityCount.demuxerCount, "CODECLIST_COUNT",
-                    subAbilityCount.codeclistCount);
 }
 
 AVCodecTrace::AVCodecTrace(const std::string& funcName)

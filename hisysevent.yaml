@@ -19,22 +19,8 @@ FAULT:
   FAULTTYPE: {type: STRING, desc: Fault type}
   MSG: {type: STRING, desc: Fault description}
 
-SERVER_STATISTICS:
-  __BASE: {type: STATISTIC, level: MINOR, desc: AV_CODEC server statistics}
-  MODULE: {type: STRING, desc: Server name}
-  TIME: {type: UINT32, desc: AV_CODEC server start time us}
-  MEMORY: {type: UINT32, desc: AV_CODEC server start use memory kb}
-
-SUB_ABILITY_COUNT:
-  __BASE: {type: STATISTIC, level: MINOR, desc: Sub ability count statistics}
-  MODULE: {type: STRING, desc: Server name}
-  CODEC_COUNT: {type: UINT32, desc: Codec sub ability count}
-  MUXER_COUNT: {type: UINT32, desc: Muxer sub ability count}
-  SOURCE_COUNT: {type: UINT32, desc: Source sub ability count}
-  DEMUXER_COUNT: {type: UINT32, desc: Demuxer sub ability count}
-  CODECLIST_COUNT: {type: UINT32, desc: Codeclist sub ability count}
-
-SUB_ABILITY_STATE:
-  __BASE: {type: BEHAVIOR, level: MINOR, desc: AV_CODEC sub ability state}
-  MODULE: {type: STRING, desc: Module name}
-  STATE: {type: STRING, desc: AV_CODEC sub ability current state}
+SERVICE_START_INFO:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: AV_CODEC service start information}
+  MODULE: {type: STRING, desc: Service name}
+  TIME: {type: UINT32, desc: AV_CODEC service start time us}
+  MEMORY: {type: UINT32, desc: AV_CODEC service start use memory kb}
