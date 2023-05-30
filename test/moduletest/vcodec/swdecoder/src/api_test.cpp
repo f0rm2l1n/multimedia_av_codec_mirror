@@ -29,6 +29,7 @@
 #include "native_avformat.h"
 #include "native_averrors.h"
 #include "native_avcodec_base.h"
+#include "avcodec_codec_name.h"
 
 using namespace std;
 using namespace OHOS;
@@ -142,7 +143,7 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_ILLEGAL_PARA_0300, TestSize.Level2)
     cb_.onStreamChanged = VdecFormatChanged;
     cb_.onNeedInputData = VdecInputDataReady;
     cb_.onNeedOutputData = VdecOutputDataReady;
-    ASSERT_EQ(AV_ERR_OK, OH_VideoDecoder_SetCallback(vdec_, cb_, NULL));
+    ASSERT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_SetCallback(vdec_, cb_, NULL));
 }
 
 /**
