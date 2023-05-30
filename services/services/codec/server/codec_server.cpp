@@ -152,11 +152,7 @@ int32_t CodecServer::Start()
         AVCS_ERR_INVALID_STATE, "In invalid state");
     CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "Codecbase is nullptr");
     int32_t ret = codecBase_->Start();
-    if (codecCb_) {
-        status_ = (ret == AVCS_ERR_OK ? RUNNING : ERROR);
-    } else {
-        status_ = (ret == AVCS_ERR_OK ? FLUSHED : ERROR);
-    }
+    status_ = (ret == AVCS_ERR_OK ? RUNNING : ERROR);
     AVCODEC_LOGI("Codec server in %{public}s status", GetStatusDescription(status_).data());
     BehaviorEventWrite(GetStatusDescription(status_), "Codec");
     return ret;
@@ -217,11 +213,13 @@ int32_t CodecServer::Reset()
 int32_t CodecServer::Release()
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "Codecbase is nullptr");
+    int32_t ret = codecBase_->Release();
     std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(&CodecServer::ExitProcessor, this);
     if (thread->joinable()) {
         thread->join();
     }
-    return AVCS_ERR_OK;
+    return ret;
 }
 
 sptr<Surface> CodecServer::CreateInputSurface()
