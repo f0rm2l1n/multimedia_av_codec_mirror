@@ -60,9 +60,9 @@
 
     // 通过 mimetype 创建解码器
     // 软/硬解: 创建 H264 解码器
-    OH_AVCodec *videoDec = OH_VideoDecoder_CreateByMime("video/avc", false);
+    OH_AVCodec *videoDec = OH_VideoDecoder_CreateByMime("video/avc");
     // 硬解: 创建 H265 解码器
-    OH_AVCodec *videoDec = OH_VideoDecoder_CreateByMime("video/hevc", false);
+    OH_AVCodec *videoDec = OH_VideoDecoder_CreateByMime("video/hevc");
    ``` 
 
 #### 2. 设置回调函数（必须）
@@ -75,25 +75,25 @@
         (void)userData;
     }
     // 设置 FormatChange 回调函数
-    static void OnOutputFormatChanged(OH_AVCodec *codec, OH_AVFormat *format, void *userData)
+    static void OnStreamChanged(OH_AVCodec *codec, OH_AVFormat *format, void *userData)
     {
         (void)codec;
         (void)format;
         (void)userData;
     }
     // 解码输入帧送入 InputBuffer 队列
-    static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
+    static void OnNeedInputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, void *userData)
     {
         (void)codec;
-        // 解码输入帧送入 InputBuffer 队列
+        // 将输入 buffer 的 index 送入 InputQueue 队列
+        // 将解码填充的数据 data 送入 InBufferQueue 队列
     }
     // 解码完成帧送入 OutputBuffer 队列
-    static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
-                                        void *userData)
+    static void OnNewOutputData(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr, void *userData)
     {
         (void)codec;
-        // 将对应输出 buffer 的 index 送入 OutputQueue 队列
-        // 将对应解码完成的数据 data 送入 outBuffer 队列
+        // 将输出 buffer 的 index 送入 OutputQueue 队列
+        // 将解码完成的数据 data 送入 OutBufferQueue 队列
     }
     OH_AVCodecAsyncCallback cb = {&OnError, &OnOutputFormatChanged, &OnInputBufferAvailable, &OnOutputBufferAvailable};
     // 配置异步回调
@@ -108,10 +108,12 @@
     constexpr uint32_t DEFAULT_HEIGHT = 240;
     OH_AVFormat *format = OH_AVFormat_Create();
     // 写入 format
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_PIXEL_FORMAT, AV_PIXEL_FORMAT_RGBA);
     // 配置解码器
     int32_t ret = OH_VideoDecoder_Configure(videoDec, format);
+    OH_AVFormat_Destroy(format);
    ```
 
 #### 4. 设置surface ( surface 模式下必须)
@@ -123,18 +125,13 @@
 
 #### 5. 额外配置解码器实例 (仅支持surface模式)
    ``` c++
-
-    Format format;
-    // 配置 PixelFormat 模式
-    VideoPixelFormat pixelFormat = VideoPixelFormat::RGBA;
+    OH_AVFormat *format = OH_AVFormat_Create();
     // 配置显示旋转角度
-    VideoRotation rotation = VideoRotation::VIDEO_ROTATION_90;
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_ROTATION, 90);
     // 配置视频与显示屏匹配模式(缩放与显示窗口适配, 裁剪与显示窗口适配)
-    ScalingMode scaleMode = ScalingMode::SCALING_MODE_SCALE_CROP;
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, pixelFormat);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, rotation);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SCALE_TYPE, scaleMode);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_SCALING_MODE, SCALING_MODE_SCALE_CROP);
     int32_t ret = OH_VideoDecoder_SetParameter(videoDec, format);
+    OH_AVFormat_Destroy(format);
    ``` 
 
 #### 6. 启动解码器
@@ -155,17 +152,18 @@
 
 #### 7. 写入解码码流
    ``` c++
-    // 配置 buffer info 信息
-    OH_AVCodecBufferAttr info;
-    // 调用 Ffmpeg 接口 av_packet_alloc 进行初始化并返回一个容器 pkt
-    AVPacket pkt = av_packet_alloc();
-    // 配置 info 的输入尺寸、偏移量、时间戳等字段信息
-    info.size = pkt->size;
-    info.offset = 0;
-    info.pts = pkt->pts;
-    info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
+    // 从码流文件inFile中读取完整nalu
+    inFile_->read(naluBuffer, naluBufferSize);
+    // 从OnNeedInputData获取的index、data，填充数据
+    memcpy_s(OH_AVMemory_GetAddr(data), naluBufferSize, naluBuffer, naluBufferSize)
+    OH_AVCodecBufferAttr attr;
+    // 配置 attr 的输入尺寸、偏移量、时间戳等字段信息
+    attr.pts = GetSystemTimeUs();
+    attr.size = naluBufferSize;
+    attr.offset = 0;
+    attr.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
     // 送入解码输入队列进行解码, index 为对应队列下标
-    int32_t ret = OH_VideoDecoder_PushInputData(videoDec, index, info);
+    int32_t ret = OH_VideoDecoder_PushInputData(videoDec, index, attr);
    ```
 
 #### 8. 输出解码帧
