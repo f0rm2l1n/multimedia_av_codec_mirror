@@ -55,13 +55,13 @@ static void RunNativeDemuxer(const std::string filePath, const std::string fileM
     OH_AVSource* av_source = avSourceDemo->GetAVSource();
     avDemuxerDemo->CreateWithSource(av_source);
     int32_t trackCount = 0;
-    double duration = 0;
+    int64_t duration = 0;
     OH_AVFormat* oh_avformat = avSourceDemo->GetSourceFormat();
     // 北向获取sourceformat
     OH_AVFormat_GetIntValue(oh_avformat, OH_MD_KEY_TRACK_COUNT, &trackCount);
-    OH_AVFormat_GetDoubleValue(oh_avformat, OH_MD_KEY_DURATION, &duration);
+    OH_AVFormat_GetLongValue(oh_avformat, OH_MD_KEY_DURATION, &duration);
     printf("====>total tracks:%d\n", trackCount);
-    printf("====>duration:%lf\n", duration);
+    printf("====>duration:" PRId64 "\n", duration);
     // 添加轨道
     for (int32_t i = 0;i < trackCount; i++) {
         avDemuxerDemo->SelectTrackByID(i);
@@ -106,11 +106,11 @@ static void RunInnerSourceDemuxer(const std::string filePath, const std::string 
     auto innerDemuxerDemo = std::make_shared<InnerDemuxerDemo>();
     innerDemuxerDemo->CreateWithSource(*(innerSourceDemo->avsource_));
     int32_t trackCount = 0;
-    double duration = 0;
+    int64_t duration = 0;
     Format source_format = innerSourceDemo->GetSourceFormat();
     source_format.GetIntValue(MediaDescriptionKey::MD_KEY_TRACK_COUNT, trackCount);
-    source_format.GetDoubleValue(MediaDescriptionKey::MD_KEY_DURATION, duration);
-    printf("====>duration:%lf\n", duration);
+    source_format.GetLongValue(MediaDescriptionKey::MD_KEY_DURATION, duration);
+    printf("====>duration:" PRId64 "\n", duration);
     printf("====>total tracks:%d\n", trackCount);
     // 添加轨道
     for (int32_t i = 0;i < trackCount; i++) {
