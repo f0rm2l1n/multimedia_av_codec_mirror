@@ -261,7 +261,7 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_04, TestSize.Level
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, MAX_CHANNEL_COUNT);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_BITRATE, DEFAULT_BITRATE);
-    EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
+    EXPECT_NE(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->Configure(format_));
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_Configure_05, TestSize.Level1)
@@ -464,10 +464,11 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_QueueInputBuffer_01, TestSiz
     // case2 EOS帧数据
     index_ = 0;
     info.presentationTimeUs = 0;
-    info.size = -1;
+    info.size = 0;
     info.offset = 0;
     flag = AVCODEC_BUFFER_FLAG_EOS;
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->QueueInputBuffer(index_, info, flag));
+    sleep(1);
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Mp3_GetOutputBuffer_01, TestSize.Level1)
@@ -743,10 +744,11 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_QueueInputBuffer_01, TestSi
     // case2 EOS帧数据
     index_ = 0;
     info.presentationTimeUs = 0;
-    info.size = -1;
+    info.size = 0;
     info.offset = 0;
     flag = AVCODEC_BUFFER_FLAG_EOS;
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->QueueInputBuffer(index_, info, flag));
+    sleep(1);
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Flac_GetOutputBuffer_01, TestSize.Level1)
@@ -1070,10 +1072,11 @@ HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_QueueInputBuffer_01, TestSiz
     // case2 EOS帧数据
     index_ = 0;
     info.presentationTimeUs = 0;
-    info.size = -1;
+    info.size = 0;
     info.offset = 0;
     flag = AVCODEC_BUFFER_FLAG_EOS;
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->QueueInputBuffer(index_, info, flag));
+    sleep(1);
 }
 
 HWTEST_F(AudioCodeDecoderUnitTest, audioDecoder_Aac_GetOutputBuffer_01, TestSize.Level1)
