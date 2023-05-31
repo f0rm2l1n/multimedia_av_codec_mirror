@@ -105,7 +105,7 @@ int32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 int32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
 {
     int32_t maxSize = (sampleRate / SAMPLE_RATE_RATIO + BUFFER_DIFF) * channels * sizeof(short);
-	int32_t minSize = MIN_OUTBUF_SIZE * channels * sizeof(short);
+    int32_t minSize = MIN_OUTBUF_SIZE * channels * sizeof(short);
     if (maxSize < minSize) {
         maxSize = minSize;
     }
