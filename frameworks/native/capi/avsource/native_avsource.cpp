@@ -35,7 +35,7 @@ struct OH_AVSource *OH_AVSource_CreateWithURI(char *uri)
     CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "New source with uri failed by AVSourceFactory!");
 
     struct AVSourceObject *object = new(std::nothrow) AVSourceObject(source);
-    CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "New AVSourceObject failed when create source with uri!");
+    CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "New AVSourceObject failed when create source with uri!");
     
     return object;
 }
@@ -44,13 +44,16 @@ struct OH_AVSource *OH_AVSource_CreateWithFD(int32_t fd, int64_t offset, int64_t
 {
     CHECK_AND_RETURN_RET_LOG(fd > STDERR_FILENO, nullptr,
         "Create source with fd failed because input fd is illegal, fd must be greater than 2!");
-    CHECK_AND_RETURN_RET_LOG(size >= 0, nullptr, "Create source with fd failed because input size is negative");
+    CHECK_AND_RETURN_RET_LOG(offset >= 0, nullptr,
+        "Create source with fd failed because input offset is negative");
+    CHECK_AND_RETURN_RET_LOG(size > 0, nullptr,
+        "Create source with fd failed because input size must be greater than zero");
 
     std::shared_ptr<AVSource> source = AVSourceFactory::CreateWithFD(fd, offset, size);
     CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "New source with fd failed by AVSourceFactory!");
 
     struct AVSourceObject *object = new(std::nothrow) AVSourceObject(source);
-    CHECK_AND_RETURN_RET_LOG(source != nullptr, nullptr, "New AVSourceObject failed when create source with fd!");
+    CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "New AVSourceObject failed when create source with fd!");
 
     return object;
 }
@@ -95,7 +98,7 @@ OH_AVFormat *OH_AVSource_GetTrackFormat(OH_AVSource *source, uint32_t trackIndex
     
     Format format;
     int32_t ret = sourceObj->source_->GetTrackFormat(format, trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "sourceTrack GetTrackFormat failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "Source GetTrackFormat failed!");
 
     OH_AVFormat *avFormat = OH_AVFormat_Create();
     avFormat->format_ = format;

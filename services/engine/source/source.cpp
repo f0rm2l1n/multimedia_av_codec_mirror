@@ -90,7 +90,7 @@ namespace {
 
     std::string GetUriSuffix(const std::string& uri)
     {
-        AVCODEC_LOGD("GetUriSuffix, input: uri=%{public}s", uri.c_str());
+        AVCODEC_LOGD("GetUriSuffix, input: uri=%{private}s", uri.c_str());
         std::string suffix;
         auto const pos = uri.find_last_of('.');
         if (pos != std::string::npos) {
@@ -102,7 +102,7 @@ namespace {
 
     int32_t ParseProtocol(const std::string& uri, std::string& protocol)
     {
-        AVCODEC_LOGD("ParseProtocol, input: uri=%{public}s, protocol=%{public}s", uri.c_str(), protocol.c_str());
+        AVCODEC_LOGD("ParseProtocol, input: uri=%{private}s, protocol=%{public}s", uri.c_str(), protocol.c_str());
         int32_t ret;
         auto const pos = uri.find("://");
         if (pos != std::string::npos) {
@@ -120,11 +120,11 @@ namespace {
 
     RegisterFunc OpenFilePlugin(const std::string& path, const std::string& name, void* handler)
     {
-        AVCODEC_LOGD("OpenFilePlugin, input: path=%{public}s, name=%{public}s", path.c_str(), name.c_str());
+        AVCODEC_LOGD("OpenFilePlugin, input: path=%{private}s, name=%{private}s", path.c_str(), name.c_str());
         if (FileIsExists(path.c_str())) {
             handler = ::dlopen(path.c_str(), RTLD_NOW);
             if (handler == nullptr) {
-                AVCODEC_LOGE("dlopen failed due to %{public}s", ::dlerror());
+                AVCODEC_LOGE("dlopen failed due to %{private}s", ::dlerror());
             }
         }
         if (handler) {
@@ -137,7 +137,7 @@ namespace {
                 AVCODEC_LOGE("register is not found in %{public}s", registerFuncName.c_str());
             }
         } else {
-            AVCODEC_LOGE("dlopen failed: %{public}s", path.c_str());
+            AVCODEC_LOGE("dlopen failed: %{private}s", path.c_str());
         }
         return {};
     }
@@ -362,7 +362,7 @@ int32_t Source::Create(std::string& uri)
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when load source plugin!");
     std::shared_ptr<MediaSource> mediaSource = std::make_shared<MediaSource>(uri);
-    AVCODEC_LOGD("mediaSource Init: %{public}s", mediaSource->GetSourceUri().c_str());
+    AVCODEC_LOGD("mediaSource Init: %{private}s", mediaSource->GetSourceUri().c_str());
     if (sourcePlugin_ == nullptr) {
         AVCODEC_LOGE("load sourcePlugin_ fail !");
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
@@ -419,10 +419,10 @@ int32_t Source::LoadInputFormatList()
 
 int32_t Source::LoadDynamicPlugin(const std::string& path)
 {
-    AVCODEC_LOGI("LoadDynamicPlugin: %{public}s", path.c_str());
+    AVCODEC_LOGI("LoadDynamicPlugin: %{private}s", path.c_str());
     std::string protocol;
     if (ParseProtocol(path, protocol) != AVCS_ERR_OK) {
-        AVCODEC_LOGE("Couldn't find valid protocol for %{public}s", path.c_str());
+        AVCODEC_LOGE("Couldn't find valid protocol for %{private}s", path.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
     if (g_pluginMap.count(protocol) == 0) {
@@ -441,7 +441,7 @@ int32_t Source::LoadDynamicPlugin(const std::string& path)
         AVCODEC_LOGD("regist source plugin successful");
         return AVCS_ERR_OK;
     } else {
-        AVCODEC_LOGD("regist source plugin failed, sourcePlugin path: %{public}s", filePluginPath.c_str());
+        AVCODEC_LOGD("regist source plugin failed, sourcePlugin path: %{private}s", filePluginPath.c_str());
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
 }
@@ -450,7 +450,7 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
 {
     std::string uriSuffix = GetUriSuffix(uri);
     if (uriSuffix.empty()) {
-        AVCODEC_LOGW("can't found suffix ,please check the file %{public}s's suffix", uri.c_str());
+        AVCODEC_LOGW("can't found suffix ,please check the file %{private}s's suffix", uri.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
