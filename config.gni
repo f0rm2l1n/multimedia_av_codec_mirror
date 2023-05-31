@@ -46,6 +46,12 @@ if (multimedia_av_codec_support_codeclist) {
   av_codec_defines += [ "UNSUPPORT_CODECLIST" ]
 }
 
+if (multimedia_av_codec_support_hcodec) {
+  av_codec_defines += [ "SUPPORT_HCODEC" ]
+} else {
+  av_codec_defines += [ "UNSUPPORT_HCODEC" ]
+}
+
 if (multimedia_av_codec_support_demuxer) {
   av_codec_defines += [ "SUPPORT_DEMUXER" ]
 } else {
