@@ -16,7 +16,8 @@
 #include "avcodec_server_manager.h"
 #include <thread>
 #include <unistd.h>
-#include <unordered_set>
+#include <codecvt>
+#include <locale>
 #include "avcodec_dfx.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -49,7 +50,15 @@ constexpr uint32_t DUMP_UID_INDEX = 0x01010200;
 constexpr uint32_t DUMP_OFFSET_16 = 16;
 
 const std::vector<const std::string> SA_DUMP_MENU_DUMP_TABLE = {
-    "all", "codec", "muxer", "demuxer", "source", " ", "switch_bitstream_dump"};
+    "All", "Codec", "Muxer", "Demuxer", "Source", " ", "Switch_bitstream_dump"
+};
+
+const std::map<OHOS::Media::AVCodecServerManager::StubType, const std::string> STUB_TYPE_STRING_MAP = {
+    { OHOS::Media::AVCodecServerManager::StubType::CODEC,  "Codec"},
+    { OHOS::Media::AVCodecServerManager::StubType::MUXER,  "Muxer"},
+    { OHOS::Media::AVCodecServerManager::StubType::DEMUXER,  "Demuxer"},
+    { OHOS::Media::AVCodecServerManager::StubType::SOURCE,  "Source"},
+};
 } // namespace
 
 namespace OHOS {
@@ -88,6 +97,21 @@ int32_t WriteInfo(int32_t fd, std::string& dumpString, std::vector<Dumper> dumpe
     return OHOS::NO_ERROR;
 }
 
+void AVCodecServerManager::DumpServer(int32_t fd, StubType stubType, std::unordered_set<std::u16string> &argSets)
+{
+    auto itServeName = STUB_TYPE_STRING_MAP.find(stubType);
+    CHECK_AND_RETURN_LOG(itServeName != STUB_TYPE_STRING_MAP.end(), "Get a unknow stub type!");
+
+    std::string ServeName = itServeName->second;
+    std::string dumpString = "[" + ServeName + "_Server]\n";
+    bool dumpFlag = argSets.find(u"All") != argSets.end();
+    dumpFlag = dumpFlag || (argSets.find(std::wstring_convert<
+        std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(ServeName)) != argSets.end());
+    int32_t ret = WriteInfo(fd, dumpString, dumperTbl_[stubType], dumpFlag);
+    CHECK_AND_RETURN_LOG(ret == OHOS::NO_ERROR,
+        "Failed to write %{public}s server information", ServeName.c_str());
+}
+
 int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     std::string dumpString;
@@ -95,39 +119,19 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     for (decltype(args.size()) index = 0; index < args.size(); ++index) {
         argSets.insert(args[index]);
     }
-    bool dumpAllFlag = argSets.find(u"all") != argSets.end();
     int32_t ret;
 
 #ifdef SUPPORT_CODEC
-    dumpString += "[Codec_Server]\n";
-    bool dumpCodecFlag = (argSets.find(u"codec") != argSets.end()) || dumpAllFlag;
-    ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::CODEC], dumpCodecFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
-                             "Failed to write codec server information");
+    DumpServer(fd, StubType::CODEC, argSets);
 #endif
-
 #ifdef SUPPORT_MUXER
-    dumpString += "[Muxer_Server]\n";
-    bool dumpMuxerFlag = (argSets.find(u"muxer") != argSets.end()) || dumpAllFlag;
-    ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::MUXER], dumpMuxerFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
-                             "Failed to write muxer server information");
+    DumpServer(fd, StubType::MUXER, argSets);
 #endif
-
 #ifdef SUPPORT_DEMUXER
-    dumpString += "[Demuxer_Server]\n";
-    bool dumpDemuxerFlag = (argSets.find(u"demuxer") != argSets.end()) || dumpAllFlag;
-    ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::DEMUXER], dumpDemuxerFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
-                             "Failed to write demuxer server information");
+    DumpServer(fd, StubType::DEMUXER, argSets);
 #endif
-
 #ifdef SUPPORT_SOURCE
-    dumpString += "[Source_Server]\n";
-    bool dumpSourceFlag = (argSets.find(u"source") != argSets.end()) || dumpAllFlag;
-    ret = WriteInfo(fd, dumpString, dumperTbl_[StubType::SOURCE], dumpSourceFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
-                             "Failed to write source server information");
+    DumpServer(fd, StubType::SOURCE, argSets);
 #endif
 
     ret = AVCodecXCollie::GetInstance().Dump(fd);
@@ -520,7 +524,7 @@ void AVCodecServerManager::PrintDumpMenu(int32_t fd)
     dumpControler.GetDumpString(dumpString);
     dumpString += "\n";
     dumpString += "Add args to get more infomation about avcodec components.\n";
-    dumpString += "Example: hidumper -s AVCodecService -a \"all\"\n";
+    dumpString += "Example: hidumper -s AVCodecService -a \"All\"\n";
 
     if (fd != -1) {
         write(fd, dumpString.c_str(), dumpString.size());
