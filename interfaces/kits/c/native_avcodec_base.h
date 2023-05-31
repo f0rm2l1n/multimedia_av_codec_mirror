@@ -221,7 +221,7 @@ extern const char *OH_MD_KEY_AUDIO_SAMPLE_FORMAT;
 extern const char *OH_MD_KEY_FRAME_RATE;
 /* video encode bitrate mode, the value type is int32_t, see @OH_VideoEncodeBitrateMode */
 extern const char *OH_MD_KEY_VIDEO_ENCODE_BITRATE_MODE;
-/* encode profile, the value type is number. see @OH_AVCProfile, OH_AACProfile. */
+/* encode profile, the value type is number. see @OH_AVCProfile, OH_HEVCProfile, OH_AACProfile. */
 extern const char *OH_MD_KEY_PROFILE;
 /* Key for audio channel count, value type is uint32_t */
 extern const char *OH_MD_KEY_AUD_CHANNEL_COUNT;
@@ -240,7 +240,7 @@ extern const char *OH_MD_KEY_REQUEST_I_FRAME;
 extern const char *OH_MD_KEY_QUALITY;
 /* Key for the desired encoding channel layout. value type is int64_t, this key is only supported for encoders. */
 extern const char *OH_MD_KEY_CHANNEL_LAYOUT;
-/* Key for bits per coded sample, value type is uint32_t, supported for flac encoder when do configure. */
+/* Key for bits per coded sample, value type is uint32_t, supported for flac encoder, see @OH_BitsPerSample. */
 extern const char *OH_MD_KEY_BITS_PER_CODED_SAMPLE;
 /* Key for the aac format, value type is uint32_t, supported for aac decoder. */
 extern const char *OH_MD_KEY_AAC_IS_ADTS;
@@ -410,6 +410,25 @@ typedef enum OH_MatrixCoefficient {
     MATRIX_COEFFICIENT_CHROMATICITY_CL = 13,
     MATRIX_COEFFICIENT_ICTCP = 14,
 } OH_MatrixCoefficient;
+
+/**
+ * @brief enum Audio Bits Per Coded Sample
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ */
+typedef enum OH_BitsPerSample {
+    SAMPLE_U8 = 0,
+    SAMPLE_S16LE = 1,
+    SAMPLE_S24LE = 2,
+    SAMPLE_S32LE = 3,
+    SAMPLE_F32LE = 4,
+    SAMPLE_U8P = 5,
+    SAMPLE_S16P = 6,
+    SAMPLE_S24P = 7,
+    SAMPLE_S32P = 8,
+    SAMPLE_F32P = 9,
+    INVALID_WIDTH = -1
+} OH_BitsPerSample;
 #ifdef __cplusplus
 }
 #endif

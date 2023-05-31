@@ -42,7 +42,7 @@ OH_AVSource *OH_AVSource_CreateWithURI(char *uri);
  * @syscap SystemCapability.Multimedia.Media.Spliter
  * @param fd The fileDescriptor of data source.
  * @param offset The offset into the file to start reading.
- * @param size The length in bytes to read.
+ * @param size The file size in bytes.
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10

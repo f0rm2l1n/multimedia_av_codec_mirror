@@ -66,6 +66,7 @@ void AVFormatCapiMock::Destroy()
 {
     if (format_ != nullptr) {
         OH_AVFormat_Destroy(format_);
+        format_ = nullptr;
     }
 }
 

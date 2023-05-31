@@ -71,15 +71,15 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
 int32_t AVSourceImpl::InitWithURI(const std::string &uri)
 {
     AVCodecTrace trace("AVSource::InitWithURI");
-    
+
     sourceClient_ = AVCodecServiceFactory::GetInstance().CreateSourceService();
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Create source service failed when init sourceImpl with uri");
-    
+
     int32_t ret = sourceClient_->InitWithURI(uri);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Call source service init failed when init sourceImpl with uri");
-        
+
     ret = sourceClient_->GetTrackCount(trackCount_);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Init track count failed when init sourceImpl with uri");
@@ -90,15 +90,15 @@ int32_t AVSourceImpl::InitWithURI(const std::string &uri)
 int32_t AVSourceImpl::InitWithFD(int32_t fd, int64_t offset, int64_t size)
 {
     AVCodecTrace trace("AVSource::InitWithFD");
-    
+
     sourceClient_ = AVCodecServiceFactory::GetInstance().CreateSourceService();
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Create source service failed when init sourceImpl with fd");
-    
+
     int32_t ret = sourceClient_->InitWithFD(fd, offset, size);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Call source service init failed when init sourceImpl with fd");
-        
+
     ret = sourceClient_->GetTrackCount(trackCount_);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Init track count failed when init sourceImpl with fd");
@@ -127,7 +127,7 @@ int32_t AVSourceImpl::GetSourceAddr(uintptr_t &addr)
 {
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
         "source service died when get source addr!");
-    
+
     return sourceClient_->GetSourceAddr(addr);
 }
 
