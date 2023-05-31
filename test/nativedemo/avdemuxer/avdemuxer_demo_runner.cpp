@@ -61,7 +61,7 @@ static void RunNativeDemuxer(const std::string filePath, const std::string fileM
     OH_AVFormat_GetIntValue(oh_avformat, OH_MD_KEY_TRACK_COUNT, &trackCount);
     OH_AVFormat_GetLongValue(oh_avformat, OH_MD_KEY_DURATION, &duration);
     printf("====>total tracks:%d\n", trackCount);
-    printf("====>duration:" PRId64 "\n", duration);
+    printf("====>duration:%" PRId64 "\n", duration);
     // 添加轨道
     for (int32_t i = 0;i < trackCount; i++) {
         avDemuxerDemo->SelectTrackByID(i);
@@ -110,7 +110,7 @@ static void RunInnerSourceDemuxer(const std::string filePath, const std::string 
     Format source_format = innerSourceDemo->GetSourceFormat();
     source_format.GetIntValue(MediaDescriptionKey::MD_KEY_TRACK_COUNT, trackCount);
     source_format.GetLongValue(MediaDescriptionKey::MD_KEY_DURATION, duration);
-    printf("====>duration:" PRId64 "\n", duration);
+    printf("====>duration:%" PRId64 "\n", duration);
     printf("====>total tracks:%d\n", trackCount);
     // 添加轨道
     for (int32_t i = 0;i < trackCount; i++) {
