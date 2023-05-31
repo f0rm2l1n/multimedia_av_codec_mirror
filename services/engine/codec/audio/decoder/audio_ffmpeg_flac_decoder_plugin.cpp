@@ -22,12 +22,11 @@
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacDecoderPlugin"};
-constexpr int32_t GET_INPUT_BUFFER_SIZE = 65536;
-constexpr int32_t GET_OUTPUT_BUFFER_SIZE = 65536;
+constexpr int32_t SAMPLES = 4608;
 constexpr int32_t MIN_CHANNELS = 1;
 constexpr int32_t MAX_CHANNELS = 8;
 static const uint32_t FLAC_DECODER_SAMPLE_RATE_TABLE[] = {
-    0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
+    88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
 static const uint32_t FLAC_DECODER_BITS_SAMPLE_TABLE[] = {16, 24, 32};
 }
@@ -36,6 +35,7 @@ namespace OHOS {
 namespace Media {
 AudioFFMpegFlacDecoderPlugin::AudioFFMpegFlacDecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
+    channels = 0;
 }
 
 AudioFFMpegFlacDecoderPlugin::~AudioFFMpegFlacDecoderPlugin()
@@ -65,24 +65,25 @@ static bool CheckBitsPerSample(uint32_t bitsPerCodedSample)
     return false;
 }
 
-int32_t AudioFFMpegFlacDecoderPlugin::CheckFormat(const Format &format) const
+int32_t AudioFFMpegFlacDecoderPlugin::CheckFormat(const Format &format)
 {
-    int32_t channels;
+    int32_t channelCount;
     int32_t sampleRate;
     int32_t bitsPerCodedSample;
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channelCount);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
     if (!CheckSampleRate(sampleRate)) {
         AVCODEC_LOGE("init failed, because sampleRate=%{public}d not in table.", sampleRate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
-    } else if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
-        AVCODEC_LOGE("init failed, because channels=%{public}d not support.", channels);
+    } else if (channelCount < MIN_CHANNELS || channelCount > MAX_CHANNELS) {
+        AVCODEC_LOGE("init failed, because channelCount=%{public}d not support.", channelCount);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
     } else if (!CheckBitsPerSample(bitsPerCodedSample)) {
         AVCODEC_LOGE("init failed, because bitsPerCodedSample=%{public}d not support.", bitsPerCodedSample);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
     }
+    channels = channelCount;
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
@@ -142,16 +143,18 @@ int32_t AudioFFMpegFlacDecoderPlugin::Flush()
 
 int32_t AudioFFMpegFlacDecoderPlugin::GetInputBufferSize() const
 {
+    int32_t inputBufferSize = SAMPLES * channels * sizeof(short);
     int32_t maxSize = basePlugin->GetMaxInputSize();
-    if (maxSize < 0 || maxSize > GET_INPUT_BUFFER_SIZE) {
-        maxSize = GET_INPUT_BUFFER_SIZE;
+    if (maxSize < 0 || maxSize > inputBufferSize) {
+        maxSize = inputBufferSize;
     }
     return maxSize;
 }
 
 int32_t AudioFFMpegFlacDecoderPlugin::GetOutputBufferSize() const
 {
-    return GET_OUTPUT_BUFFER_SIZE;
+    int32_t outputBufferSize = SAMPLES * channels * sizeof(short);
+    return outputBufferSize;
 }
 
 Format AudioFFMpegFlacDecoderPlugin::GetFormat() const noexcept
