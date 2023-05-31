@@ -42,17 +42,17 @@ SurfaceMemory::~SurfaceMemory()
     ReleaseSurfaceBuffer();
 }
 
-uint32_t SurfaceMemory::Write(const uint8_t *in, uint32_t writeSize, uint32_t position)
+int32_t SurfaceMemory::Write(const uint8_t *in, int32_t writeSize, int32_t position)
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
-    uint32_t start = 0;
-    uint32_t capacity = GetSize();
+    int32_t start = 0;
+    int32_t capacity = GetSize();
     if (position == INVALID_POSITION) {
         start = size_;
     } else {
         start = std::min(position, capacity);
     }
-    uint32_t length = std::min(writeSize, capacity - start);
+    int32_t length = std::min(writeSize, capacity - start);
     if (memcpy_s(GetBase() + start, length, in, length) != EOK) {
         return 0;
     }
@@ -60,16 +60,16 @@ uint32_t SurfaceMemory::Write(const uint8_t *in, uint32_t writeSize, uint32_t po
     return length;
 }
 
-uint32_t SurfaceMemory::Read(uint8_t *out, uint32_t readSize, uint32_t position)
+int32_t SurfaceMemory::Read(uint8_t *out, int32_t readSize, int32_t position)
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
-    uint32_t start = 0;
-    uint32_t maxLength = size_;
+    int32_t start = 0;
+    int32_t maxLength = size_;
     if (position != INVALID_POSITION) {
         start = std::min(position, size_);
         maxLength = size_ - start;
     }
-    uint32_t length = std::min(readSize, maxLength);
+    int32_t length = std::min(readSize, maxLength);
     if (memcpy_s(out, length, GetBase() + start, length) != EOK) {
         return 0;
     }
@@ -144,7 +144,7 @@ sptr<SurfaceBuffer> SurfaceMemory::GetSurfaceBuffer()
     return surfaceBuffer_;
 }
 
-uint32_t SurfaceMemory::GetSurfaceBufferStride()
+int32_t SurfaceMemory::GetSurfaceBufferStride()
 {
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
     return stride_;

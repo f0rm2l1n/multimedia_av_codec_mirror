@@ -32,6 +32,8 @@ ohos_executable("av_codec_demo") {
     "$av_codec_root_dir/../../graphic/graphic_2d/interfaces/inner_api",
     "$av_codec_root_dir/../../graphic/graphic_2d/interfaces/inner_api/surface",
     "$av_codec_root_dir/../../graphic/graphic_2d/interfaces/inner_api/common",
+    "$av_codec_root_dir/../../graphic/graphic_2d/rosen/modules/render_service_client/core",
+    "$av_codec_root_dir/../../window/window_manager/interfaces/innerkits",
     "./audio_demo",
     "./video_demo",
     "./avmuxer",
@@ -59,7 +61,7 @@ ohos_executable("av_codec_demo") {
     "-Wextra",
     "-Wimplicit-fallthrough",
     "-Wsign-compare",
-    "-Wunused-parameter",
+    "-Wno-unused-parameter",
     "-Wno-deprecated-declarations",
   ]
 
@@ -92,8 +94,10 @@ ohos_executable("av_codec_demo") {
 
   deps = [
     "$av_codec_root_dir/../../graphic/graphic_2d:libsurface",
+    "$av_codec_root_dir/../../graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "$av_codec_root_dir/../../graphic/graphic_2d/utils:libgraphic_utils",
     "$av_codec_root_dir/../../graphic/graphic_2d/utils:sync_fence",
+    "$av_codec_root_dir/../../window/window_manager/wm:libwm",
     "$av_codec_root_dir/interfaces/inner_api/native:av_codec_client",
     "$av_codec_root_dir/interfaces/kits/c:capi_packages",
     "$av_codec_root_dir/interfaces/kits/c:native_av_codec_avmuxer",

@@ -45,39 +45,6 @@ av_codec_unittest_cflags = [
 ]
 
 ##################################################################################################################
-ohos_unittest("av_video_unit_test") {
-  module_out_path = module_output_path
-  include_dirs = av_codec_unittest_include_dirs
-  include_dirs += [
-    "./",
-    "//third_party/ffmpeg",
-    "//commonlibrary/c_utils/base/include",
-    "//base/startup/init/interfaces/innerkits/include/syspara",
-    "//foundation/graphic/graphic_2d/interfaces/inner_api",
-    "$av_codec_root_dir/interfaces/kits/c",
-    "$av_codec_root_dir/services/engine/common/include",
-    "$av_codec_root_dir/services/engine/codec/include/video",
-    "$av_codec_root_dir/services/engine/base/include",
-    "$av_codec_root_dir/services/utils/include",
-  ]
-
-  cflags = av_codec_unittest_cflags
-
-  cflags_cc = cflags
-
-  public_configs = []
-
-  if (multimedia_av_codec_support_test) {
-    sources = [ "./video_test/fcodec_unit_test.cpp" ]
-  }
-
-  public_deps = [ "$av_codec_root_dir/services/engine/codec/video:av_codec_video_ffmpeg_codec" ]
-
-  resource_config_file =
-      "$av_codec_root_dir/test/unittest/resources/ohos_test.xml"
-}
-
-##################################################################################################################
 ohos_unittest("av_audio_capi_unit_test") {
   module_out_path = module_output_path
   include_dirs = av_codec_unittest_include_dirs

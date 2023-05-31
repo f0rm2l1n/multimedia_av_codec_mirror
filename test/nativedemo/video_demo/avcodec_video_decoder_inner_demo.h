@@ -39,15 +39,14 @@ namespace Media {
 namespace InnerVideoDemo {
 class TestConsumerListener : public IBufferConsumerListener {
 public:
-    TestConsumerListener(sptr<Surface> cs, std::string_view name, uint32_t &count);
+    TestConsumerListener(sptr<Surface> cs, std::string_view name);
     ~TestConsumerListener();
     void OnBufferAvailable() override;
 
 private:
     int64_t timestamp_ = 0;
-    Rect damage_ = {};
+    OHOS::Rect damage_ = {};
     sptr<Surface> cs_ = nullptr;
-    uint32_t &acquireFrameCount_;
     std::unique_ptr<std::ofstream> outFile_;
 };
 
@@ -81,12 +80,13 @@ class VDecInnerDemo : public NoCopyable {
 public:
     VDecInnerDemo();
     virtual ~VDecInnerDemo();
-    void RunCase(bool isSurfaceMode = false);
+    void RunCase(std::string &mode);
 
 private:
     int32_t CreateDec();
     int32_t Configure(const Format &format);
     int32_t SetOutputSurface(sptr<Surface> surface);
+    sptr<Surface> GetSurface(std::string &mode);
     int32_t Start();
     int32_t Stop();
     int32_t Flush();
@@ -119,7 +119,7 @@ private:
     uint8_t inbuf_[VIDEO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
     bool file_end_ = false;
 
-    bool isSurfaceMode_ = false;
+    std::string mode_ = "0";
 };
 } // namespace InnerVideoDemo
 } // namespace Media

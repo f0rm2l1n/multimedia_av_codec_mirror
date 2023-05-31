@@ -38,13 +38,13 @@ public:
     static void SetConfig(int32_t width, int32_t height, int32_t format, uint64_t usage = USAGE,
                           int32_t strideAlign = SURFACE_STRIDE_ALIGN, int32_t timeout = TIMEOUT);
     static void SetScaleType(ScalingMode videoScaleMode);
-    uint32_t Write(const uint8_t *in, uint32_t writeSize, uint32_t position = INVALID_POSITION);
-    uint32_t Read(uint8_t *out, uint32_t readSize, uint32_t position = INVALID_POSITION);
+    int32_t Write(const uint8_t *in, int32_t writeSize, int32_t position = INVALID_POSITION);
+    int32_t Read(uint8_t *out, int32_t readSize, int32_t position = INVALID_POSITION);
     void ClearUsedSize();
     void AllocSurfaceBuffer();
     void ReleaseSurfaceBuffer();
     sptr<SurfaceBuffer> GetSurfaceBuffer();
-    uint32_t GetSurfaceBufferStride();
+    int32_t GetSurfaceBufferStride();
     int32_t GetFlushFence();
     int32_t GetUsedSize() const;
     void UpdateSurfaceBufferScaleMode();
@@ -56,9 +56,9 @@ public:
 private:
     // Allocated memory size.
     sptr<SurfaceBuffer> surfaceBuffer_ = nullptr;
-    uint32_t size_ = 0;
+    int32_t size_ = 0;
     int32_t fence_ = -1;
-    uint32_t stride_ = 0;
+    int32_t stride_ = 0;
     bool needRender_ = false;
     static sptr<Surface> surface_;
     static BufferRequestConfig requestConfig_;
