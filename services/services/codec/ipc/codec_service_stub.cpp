@@ -223,7 +223,11 @@ int32_t CodecServiceStub::SetListenerObject(const sptr<IRemoteObject> &object)
 int32_t CodecServiceStub::Init(AVCodecType type, bool isMimeType, const std::string &name)
 {
     CHECK_AND_RETURN_RET_LOG(codecServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Codec server is nullptr");
-    return codecServer_->Init(type, isMimeType, name);
+    int32_t ret = codecServer_->Init(type, isMimeType, name);
+    if (ret != AVCS_ERR_OK) {
+        DestroyStub();
+    }
+    return ret;
 }
 
 int32_t CodecServiceStub::Configure(const Format &format)

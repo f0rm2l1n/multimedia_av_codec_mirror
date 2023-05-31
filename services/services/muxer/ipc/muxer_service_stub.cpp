@@ -103,7 +103,11 @@ int MuxerServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
 int32_t MuxerServiceStub::InitParameter(int32_t fd, OutputFormat format)
 {
     CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
-    return muxerServer_->InitParameter(fd, format);
+    int32_t ret = muxerServer_->InitParameter(fd, format);
+    if (ret != AVCS_ERR_OK) {
+        DestroyStub();
+    }
+    return ret;
 }
 
 int32_t MuxerServiceStub::SetRotation(int32_t rotation)

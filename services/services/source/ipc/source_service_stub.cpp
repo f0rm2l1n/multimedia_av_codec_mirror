@@ -112,13 +112,21 @@ int32_t SourceServiceStub::DestroyStub()
 int32_t SourceServiceStub::InitWithURI(const std::string &uri)
 {
     CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
-    return sourceServer_->InitWithURI(uri);
+    int32_t ret = sourceServer_->InitWithURI(uri);
+    if (ret != AVCS_ERR_OK) {
+        DestroyStub();
+    }
+    return ret;
 }
 
 int32_t SourceServiceStub::InitWithFD(int32_t fd, int64_t offset, int64_t size)
 {
     CHECK_AND_RETURN_RET_LOG(sourceServer_ != nullptr, AVCS_ERR_NO_MEMORY, "source server is nullptr");
-    return sourceServer_->InitWithFD(fd, offset, size);
+    int32_t ret = sourceServer_->InitWithFD(fd, offset, size);
+    if (ret != AVCS_ERR_OK) {
+        DestroyStub();
+    }
+    return ret;
 }
 
 int32_t SourceServiceStub::GetTrackCount(uint32_t &trackCount)
