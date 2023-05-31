@@ -108,8 +108,7 @@ private:
     int32_t CheckFormatChange(uint32_t index, int width, int height);
     void SetSurfaceParameter(const Format &format, const std::string_view &formatKey, uint32_t FORMAT_TYPE);
     int32_t UpdateSurfaceMemory(std::shared_ptr<SurfaceMemory> &surfaceMemory, int64_t pts);
-    int32_t FillFrameBufferImpl(const std::shared_ptr<AVBuffer> &frameBuffer, AVPixelFormat ffmpegFormat,
-                                VideoPixelFormat outputPixelFmt);
+
     std::string codecName_;
     std::atomic<State> state_ = State::Uninitialized;
     Format format_;
@@ -130,6 +129,7 @@ private:
     std::shared_ptr<Scale> scale_ = nullptr;
     bool isConverted_ = false;
     bool formatChange_ = false;
+    VideoPixelFormat outputPixelFmt_ = VideoPixelFormat::UNKNOWN_FORMAT;
     // Running
     std::vector<std::shared_ptr<AVBuffer>> buffers_[2];
     std::list<uint32_t> codecAvailBuffers_;

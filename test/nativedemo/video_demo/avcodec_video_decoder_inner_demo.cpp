@@ -19,11 +19,14 @@
 #include "surface.h"
 #include "buffer_queue_producer.h"
 #include "consumer_surface.h"
+#include "ui/rs_surface_node.h"
+#include "wm/window_option.h"
+#include "wm/window.h"
 #include "avcodec_errors.h"
 #include "avcodec_common.h"
 #include "demo_log.h"
 #include "media_description.h"
-
+#include "avcodec_codec_name.h"
 #include "avcodec_video_decoder_inner_demo.h"
 
 using namespace OHOS;
@@ -37,12 +40,11 @@ constexpr uint32_t DEFAULT_HEIGHT = 240;
 constexpr string_view inputFilePath = "/data/test/media/out_320_240_10s.h264";
 constexpr string_view outputFilePath = "/data/test/media/out_320_240_10s.yuv";
 constexpr string_view outputSurfacePath = "/data/test/media/out_320_240_10s.rgba";
-uint32_t writeFrameCount = 0;
+uint32_t outFrameCount = 0;
 constexpr uint32_t SLEEP_TIME = 10;
 } // namespace
 
-TestConsumerListener::TestConsumerListener(sptr<Surface> cs, std::string_view name, uint32_t &count)
-    : cs_(cs), acquireFrameCount_(count)
+TestConsumerListener::TestConsumerListener(sptr<Surface> cs, std::string_view name) : cs_(cs)
 {
     outFile_ = std::make_unique<std::ofstream>();
     outFile_->open(name.data(), std::ios::out | std::ios::binary);
@@ -63,15 +65,12 @@ void TestConsumerListener::OnBufferAvailable()
     cs_->AcquireBuffer(buffer, flushFence, timestamp_, damage_);
 
     (void)outFile_->write(reinterpret_cast<char *>(buffer->GetVirAddr()), buffer->GetSize());
-    acquireFrameCount_++;
     cs_->ReleaseBuffer(buffer, -1);
 }
 
-void VDecInnerDemo::RunCase(bool isSurfaceMode)
+void VDecInnerDemo::RunCase(std::string &mode)
 {
-    isSurfaceMode_ = isSurfaceMode;
-    sptr<Surface> cs = nullptr;
-    sptr<Surface> ps = nullptr;
+    mode_ = mode;
 
     DEMO_CHECK_AND_RETURN_LOG(CreateDec() == AVCS_ERR_OK, "Fatal: CreateDec fail");
 
@@ -80,14 +79,9 @@ void VDecInnerDemo::RunCase(bool isSurfaceMode)
     format.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
-    if (isSurfaceMode_) {
-        cs = Surface::CreateSurfaceAsConsumer();
-        sptr<IBufferConsumerListener> listener = new TestConsumerListener(cs, outputSurfacePath, writeFrameCount);
-        cs->RegisterConsumerListener(listener);
-        auto p = cs->GetProducer();
-        ps = Surface::CreateSurfaceAsProducer(p);
-
-        DEMO_CHECK_AND_RETURN_LOG(SetOutputSurface(ps) == AVCS_ERR_OK, "Fatal: SetOutputSurface fail");
+    if (mode_ != "0") {
+        sptr<Surface> ps = GetSurface(mode_);
+        DEMO_CHECK_AND_RETURN_LOG(SetOutputSurface(ps) == AVCS_ERR_OK, "Fatal: SetSurface fail");
     }
 
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
@@ -147,9 +141,34 @@ VDecInnerDemo::~VDecInnerDemo()
     }
 }
 
+sptr<Surface> VDecInnerDemo::GetSurface(std::string &mode)
+{
+    sptr<Surface> ps = nullptr;
+    if (mode == "1") {
+        sptr<Surface> cs = Surface::CreateSurfaceAsConsumer();
+        sptr<IBufferConsumerListener> listener = new InnerVideoDemo::TestConsumerListener(cs, outputSurfacePath);
+        cs->RegisterConsumerListener(listener);
+        auto p = cs->GetProducer();
+        ps = Surface::CreateSurfaceAsProducer(p);
+    } else if (mode == "2") {
+        sptr<Rosen::Window> window = nullptr;
+        sptr<Rosen::WindowOption> option = new Rosen::WindowOption();
+        option->SetWindowRect ({0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT});
+        option->SetWindowType(Rosen::WindowType::WINDOW_TYPE_APP_LAUNCHING);
+        option->SetWindowMode(Rosen::WindowMode::WINDOW_MODE_FLOATING);
+        window = Rosen::Window::Create("avcodec_unittest", option);
+        DEMO_CHECK_AND_RETURN_RET_LOG(window != nullptr && window->GetSurfaceNode() != nullptr, nullptr,
+                                      "Fatal: Create window fail");
+        window->Show();
+        ps = window->GetSurfaceNode()->GetSurface();
+    }
+
+    return ps;
+}
+
 int32_t VDecInnerDemo::CreateDec()
 {
-    videoDec_ = VideoDecoderFactory::CreateByName("video_decoder.avc");
+    videoDec_ = VideoDecoderFactory::CreateByName(AVCodecCodecName::VIDEO_DECODER_AVC_NAME.data());
     DEMO_CHECK_AND_RETURN_RET_LOG(videoDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
 
     signal_ = make_shared<VDecSignal>();
@@ -178,7 +197,7 @@ int32_t VDecInnerDemo::Start()
     DEMO_CHECK_AND_RETURN_RET_LOG(inputFile_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
     inputFile_->open(inputFilePath.data(), std::ios::in | std::ios::binary);
 
-    if (!isSurfaceMode_) {
+    if (mode_ == "0") {
         outFile_ = std::make_unique<std::ofstream>();
         DEMO_CHECK_AND_RETURN_RET_LOG(outFile_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: No memory");
         outFile_->open(outputFilePath.data(), std::ios::out | std::ios::binary);
@@ -360,26 +379,25 @@ void VDecInnerDemo::OutputFunc()
         }
 
         uint32_t index = signal_->outQueue_.front();
-        auto buffer = isSurfaceMode_ ? nullptr : videoDec_->GetOutputBuffer(index);
+        auto buffer = mode_ != "0" ? nullptr : videoDec_->GetOutputBuffer(index);
         auto attr = signal_->infoQueue_.front();
         auto flag = signal_->flagQueue_.front();
         if (flag == AVCODEC_BUFFER_FLAG_EOS) {
-            cout << "decode eos, write frame:" << writeFrameCount << endl;
+            cout << "decode eos, write frame:" << outFrameCount << endl;
             isRunning_.store(false);
         }
 
         if (outFile_ != nullptr && attr.size != 0 && buffer != nullptr && buffer->GetBase() != nullptr) {
             cout << "OutputFunc write file,buffer index" << index << ", data size = :" << attr.size << endl;
             outFile_->write(reinterpret_cast<char *>(buffer->GetBase()), attr.size);
-            writeFrameCount++;
         }
 
-        if (!isSurfaceMode_ && videoDec_->ReleaseOutputBuffer(index, false) != AVCS_ERR_OK) {
+        if (mode_ == "0" && videoDec_->ReleaseOutputBuffer(index, false) != AVCS_ERR_OK) {
             cout << "Fatal: ReleaseOutputBuffer fail" << endl;
             break;
         }
 
-        if (isSurfaceMode_ && videoDec_->ReleaseOutputBuffer(index, true) != AVCS_ERR_OK) {
+        if (mode_ != "0" && videoDec_->ReleaseOutputBuffer(index, true) != AVCS_ERR_OK) {
             cout << "Fatal: RenderOutputBuffer fail" << endl;
             break;
         }
@@ -420,5 +438,8 @@ void VDecDemoCallback::OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo
     signal_->outQueue_.push(index);
     signal_->infoQueue_.push(info);
     signal_->flagQueue_.push(flag);
+    if (info.size > 0) {
+        outFrameCount++;
+    }
     signal_->outCond_.notify_all();
 }

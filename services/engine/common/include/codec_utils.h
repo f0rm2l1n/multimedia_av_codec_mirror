@@ -55,15 +55,14 @@ AVPixelFormat ConvertPixelFormatToFFmpeg(VideoPixelFormat pixelFormat);
 GraphicTransformType TranslateSurfaceRotation(const VideoRotation &rotation);
 int32_t ConvertVideoFrame(std::shared_ptr<Scale> *scale, std::shared_ptr<AVFrame> frame, uint8_t **dstData,
                           int32_t *dstLineSize, AVPixelFormat dstPixFmt);
-int32_t WriteRgbDataStride(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData,
-                           int32_t *scaleLineSize, int32_t stride, const Format &format);
-int32_t WriteYuvData(const std::shared_ptr<AVSharedMemoryBase> &frameBuffer, uint8_t **scaleData,
-                     int32_t *scaleLineSize, const Format &format);
-int32_t WriteRgbData(const std::shared_ptr<SurfaceMemory> &frameBuffer, uint8_t **scaleData, int32_t *scaleLineSize,
-                     const Format &format);
+int32_t WriteSurfaceData(const std::shared_ptr<SurfaceMemory> &surfaceMemory, uint8_t **scaleData,
+                         int32_t *scaleLineSize, const Format &format);
+int32_t WriteBufferData(const std::shared_ptr<AVSharedMemoryBase> &bufferMemory, uint8_t **scaleData,
+                        int32_t *scaleLineSize, const Format &format);
+
 std::string AVStrError(int errnum);
-bool IsYuvFormat(AVPixelFormat format);
-bool IsRgbFormat(AVPixelFormat format);
+bool IsYuvFormat(VideoPixelFormat &format);
+bool IsRgbFormat(VideoPixelFormat &format);
 } // namespace Codec
 } // namespace Media
 } // namespace OHOS
