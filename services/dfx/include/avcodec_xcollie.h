@@ -26,7 +26,6 @@ class __attribute__((visibility("default"))) AVCodecXCollie {
 public:
     static AVCodecXCollie &GetInstance();
     uint64_t SetTimer(const std::string &name, bool recovery = false, uint32_t timeout = 10); // 10s
-    uint64_t SetTimerByLog(const std::string &name, uint32_t timeout = 10); // 10s
     void CancelTimer(uint64_t index);
     int32_t Dump(int32_t fd);
     constexpr static uint32_t timerTimeout = 10;
@@ -47,11 +46,6 @@ public:
     {
         index_ = AVCodecXCollie::GetInstance().SetTimer(name, recovery, timeout);
     };
-
-    AVCodecXcollieTimer(const std::string &name, uint32_t timeout)
-    {
-        index_ = AVCodecXCollie::GetInstance().SetTimerByLog(name, timeout);
-    }
 
     ~AVCodecXcollieTimer()
     {
