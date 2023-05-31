@@ -32,6 +32,12 @@ public:
     static constexpr std::string_view MEDIA_MIMETYPE_AUDIO_MPEG = "audio/mpeg";
 
     static constexpr std::string_view MEDIA_MIMETYPE_VIDEO_AVC = "video/avc";
+    static constexpr std::string_view MEDIA_MIMETYPE_VIDEO_MPEG4 = "video/mp4v-es";
+    static constexpr std::string_view MEDIA_MIMETYPE_VIDEO_HEVC = "video/hevc";
+
+    static constexpr std::string_view MEDIA_MIMETYPE_IMAGE_JPG = "image/jpeg";
+    static constexpr std::string_view MEDIA_MIMETYPE_IMAGE_PNG = "image/png";
+    static constexpr std::string_view MEDIA_MIMETYPE_IMAGE_BMP = "image/bmp";
 
 private:
     AVCodecMimeType() = delete;
