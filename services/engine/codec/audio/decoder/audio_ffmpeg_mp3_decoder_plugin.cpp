@@ -29,6 +29,7 @@ constexpr int MAX_BIT_RATE = 320000;
 constexpr int MIN_BIT_RATE = 32000;
 constexpr int SUPPORT_SAMPLE_RATE = 9;
 constexpr int BUFFER_DIFF = 128;
+constexpr int MIN_OUTBUF_SIZE = 2500;
 }
 
 namespace OHOS {
@@ -103,8 +104,12 @@ int32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 
 int32_t AudioFFMpegMp3DecoderPlugin::GetOutputBufferSize() const
 {
-    int32_t size = (sampleRate / SAMPLE_RATE_RATIO + BUFFER_DIFF) * channels * sizeof(short);
-    return size;
+    int32_t maxSize = (sampleRate / SAMPLE_RATE_RATIO + BUFFER_DIFF) * channels * sizeof(short);
+    int32_t minSize = MIN_OUTBUF_SIZE * channels * sizeof(short);
+    if (maxSize < minSize) {
+        maxSize = minSize;
+    }
+    return maxSize;
 }
 
 Format AudioFFMpegMp3DecoderPlugin::GetFormat() const noexcept
