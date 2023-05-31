@@ -96,7 +96,7 @@ int32_t AudioCodecAdapter::Configure(const Format &format)
 
     if (state_ != CodecState::INITIALIZED) {
         AVCODEC_LOGE("Configure failed, state =%{public}s", stateToString(state_).data());
-        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE;
     }
 
     ret = doConfigure(format);

@@ -76,16 +76,16 @@ typedef enum AVCodecServiceErrCode : ErrCode {
     AVCS_ERR_DATA_SOURCE_OBTAIN_MEM_ERROR,                 // avcodec data source get mem failed.
     AVCS_ERR_DATA_SOURCE_ERROR_UNKNOWN,                    // avcodec data source error unknow.
 
-    AVCS_ERR_NOT_ENOUGH_DATA,
-    AVCS_ERR_END_OF_STREAM,
-    AVCS_ERR_AGAIN,
-    AVCS_ERR_WRONG_STATE,
-    AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT,
-    AVCS_ERR_MISMATCH_SAMPLE_RATE,
-    AVCS_ERR_MISMATCH_BIT_RATE,
-    AVCS_ERR_CONFIGURE_ERROR,
+    AVCS_ERR_NOT_ENOUGH_DATA,                              // avcodec output buffer not full of a pack
+    AVCS_ERR_END_OF_STREAM,                                // the end of stream
+    AVCS_ERR_AGAIN,                                        // avcodec input buffer not full of a pack
+    AVCS_ERR_WRONG_STATE,                                  // ffmpeg initialize error
+    AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT,             // not configure channel count attribute
+    AVCS_ERR_MISMATCH_SAMPLE_RATE,                         // not configure channel sample rate
+    AVCS_ERR_MISMATCH_BIT_RATE,                            // not configure channel bit rate
+    AVCS_ERR_CONFIGURE_ERROR,                              // flac encoder configure compression level out of limit
 
-    AVCS_ERR_EXTEND_START = AVCS_ERR_OFFSET + 0xF000, // extend err start.
+    AVCS_ERR_EXTEND_START = AVCS_ERR_OFFSET + 0xF000,      // extend err start.
 } AVCodecServiceErrCode;
 
 __attribute__((visibility("default"))) std::string AVCSErrorToString(AVCodecServiceErrCode code);
