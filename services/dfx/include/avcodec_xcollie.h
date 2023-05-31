@@ -55,8 +55,7 @@ private:
     uint64_t index_ = 0;
 };
 
-// #define COLLIE_LISTEN(statement, args...) { AVCodecXcollieTimer xCollie(args); statement; }
-#define COLLIE_LISTEN(statement, args...) { statement; }
+#define COLLIE_LISTEN(statement, args...) { AVCodecXcollieTimer xCollie(args); statement; }
 } // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_XCOLLIE_H
