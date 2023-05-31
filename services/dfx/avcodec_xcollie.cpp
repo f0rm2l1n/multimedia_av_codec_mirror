@@ -45,7 +45,7 @@ void AVCodecXCollie::TimerCallback(void *data)
     threadDeadlockCount_++;
     std::string name = data != nullptr ? (char *)data : "";
     AVCODEC_LOGE("Task %{public}s timeout", name.c_str());
-    FaultEventWrite(FaultType::FAULT_TYPE_FREEZE, std::string("Task") + name + "timeout", "AVCodecXCollie");
+    FaultEventWrite(FaultType::FAULT_TYPE_FREEZE, std::string("Task ") + name + " timeout", "AVCodecXCollie");
     static constexpr uint32_t threshold = 5; // >5 Restart service
     if (threadDeadlockCount_ >= threshold) {
         FaultEventWrite(FaultType::FAULT_TYPE_FREEZE,
@@ -80,6 +80,8 @@ int32_t AVCodecXCollie::Dump(int32_t fd)
 uint64_t AVCodecXCollie::SetTimer(const std::string &name, bool recovery, uint32_t timeout)
 {
 #ifdef HICOLLIE_ENABLE
+    std::lock_guard<std::mutex> lock(mutex_);
+    
     auto func = [this](void *data) {
         this->TimerCallback(data);
     };
@@ -93,29 +95,12 @@ uint64_t AVCodecXCollie::SetTimer(const std::string &name, bool recovery, uint32
     int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(name,
         timeout, func, (void *)dfxDumper_[tempIndex].second.c_str(), flag);
     if (id == HiviewDFX::INVALID_ID) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        auto it = dfxDumper_.find(id);
+        auto it = dfxDumper_.find(tempIndex);
         if (it != dfxDumper_.end()) {
             dfxDumper_.erase(it);
         }
     }
     dfxDumper_[tempIndex].first = id;
-    return tempIndex;
-#else
-    return -1;
-#endif
-}
-
-uint64_t AVCodecXCollie::SetTimerByLog(const std::string &name, uint32_t timeout)
-{
-#ifdef HICOLLIE_ENABLE
-    unsigned int flag = HiviewDFX::XCOLLIE_FLAG_LOG;
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(name, timeout, nullptr, this, flag);
-    uint64_t tempIndex = dumperIndex_;
-    if (id != HiviewDFX::INVALID_ID) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        dfxDumper_.emplace(dumperIndex_++, std::pair<int32_t, std::string>(id, name));
-    }
     return tempIndex;
 #else
     return -1;
