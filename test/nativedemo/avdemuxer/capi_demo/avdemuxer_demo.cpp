@@ -92,7 +92,7 @@ int32_t AVDemuxerDemo::ReadAllSamples(OH_AVMemory *sample, int32_t tracks)
 {
     int32_t ret = -1;
     bool isEnd = false;
-    for (int i = 0;i < tracks; i++) {
+    for (int i = 0; i < tracks; i++) {
         frames_[i] = 0;
         key_frames_[i] = 0;
     }

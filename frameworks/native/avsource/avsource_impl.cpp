@@ -57,8 +57,11 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
         "Create source with fd failed because input offset is negative");
     CHECK_AND_RETURN_RET_LOG(size > 0, nullptr,
         "Create source with fd failed because input size must be greater than zero");
-
-    CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDONLY) == O_RDONLY, nullptr, "No permission to read fd");
+    int ret = fcntl(fd, F_GETFL, 0);
+    if (static_cast<int32_t>(fcntl(fd, F_GETFL, 0)) != static_cast<int32_t>(O_RDONLY)) {
+        AVCODEC_LOGE("No permission to read fd");
+        return nullptr;
+    }
     CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "The fd is not seekable");
 
     std::shared_ptr<AVSourceImpl> sourceImpl = std::make_shared<AVSourceImpl>();

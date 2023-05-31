@@ -263,7 +263,7 @@ void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
     AVCODEC_LOGI("FFmpegDemuxerPlugin::InitBitStreamContext");
     const AVBitStreamFilter* avBitStreamFilter {nullptr};
     char codeTag[AV_FOURCC_MAX_STRING_SIZE] {0};
-    av_fourcc_make_string(codeTag, avStream.codecpar->codec_tag);
+    av_fourcc_make_string(reinterpret_cast<char*>(codeTag), avStream.codecpar->codec_tag);
     if (strncmp(codeTag, "avc1", strlen("avc1")) == 0) {
         AVCODEC_LOGD("codeTag is avc1, will convert avc1 to annexb");
         avBitStreamFilter = av_bsf_get_by_name("h264_mp4toannexb");
@@ -301,11 +301,11 @@ void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
 int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> sample,
     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, std::shared_ptr<SamplePacket> samplePacket)
 {
-    int frameSize = 0;
+    uint64_t frameSize = 0;
     bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt_->pts, avStream->time_base));
     flag = ConvertFlagsFromFFmpeg(samplePacket->pkt_, avStream);
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-        frameSize = samplePacket->pkt_->size;
+        frameSize = static_cast<uint64_t>(samplePacket->pkt_->size);
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
         if (avStream->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
             AVCODEC_LOGE("unsupport raw video");
@@ -314,15 +314,15 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
         if (avbsfContext_) {
             ConvertAvcOrHevcToAnnexb(*(samplePacket->pkt_));
         }
-        frameSize = samplePacket->pkt_->size;
+        frameSize = static_cast<uint64_t>(samplePacket->pkt_->size);
     } else {
         AVCODEC_LOGE("unsupport stream type");
         return AVCS_ERR_UNSUPPORT_VID_PARAMS;
     }
   
-    bufferInfo.size = frameSize;
+    bufferInfo.size = static_cast<int32_t>(frameSize);
     bufferInfo.offset = 0;
-    auto copyFrameSize = frameSize-samplePacket->offset_;
+    auto copyFrameSize = frameSize - samplePacket->offset_;
     auto copySize = copyFrameSize;
     if (copySize > static_cast<uint64_t>(sample->GetSize())) {
         copySize = static_cast<uint64_t>(sample->GetSize());
@@ -361,7 +361,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     do {
         AVPacket* pkt = av_packet_alloc();
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
-        uint32_t stream_index = pkt->stream_index;
+        uint32_t stream_index = static_cast<uint32_t>(pkt->stream_index);
         if (ffmpegRet >= 0 && IsInSelectedTrack(stream_index)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
             cacheSamplePacket->offset_ = 0;
@@ -419,7 +419,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
         AVCODEC_LOGW("no track has been selected");
     }
     for (size_t i = 0; i < selectedTrackIds_.size(); i++) {
-        int trackIndex = selectedTrackIds_[i];
+        int trackIndex = static_cast<int>(selectedTrackIds_[i]);
         auto avStream = formatContext_->streams[trackIndex];
         int64_t ffTime = ConvertTimeToFFmpeg(millisecond*1000*1000, avStream->time_base);
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
