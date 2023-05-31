@@ -49,8 +49,6 @@ int32_t DemuxerClient::Init(uintptr_t sourceAddr)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "source service does not exist.");
-
-    AVCODEC_LOGD("demuxer client call Init");
     return demuxerProxy_->Init(sourceAddr);
 }
 
@@ -64,8 +62,6 @@ int32_t DemuxerClient::SelectTrackByID(uint32_t index)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
-
-    AVCODEC_LOGD("demuxer client call SelectTrackByID");
     return demuxerProxy_->SelectTrackByID(index);
 }
 
@@ -73,8 +69,6 @@ int32_t DemuxerClient::UnselectTrackByID(uint32_t index)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
-    
-    AVCODEC_LOGD("demuxer client call UnselectTrackByID");
     return demuxerProxy_->UnselectTrackByID(index);
 }
 int32_t DemuxerClient::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
@@ -82,14 +76,12 @@ int32_t DemuxerClient::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedM
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
-    AVCODEC_LOGD("demuxer client call ReadSample");
     return demuxerProxy_->ReadSample(trackIndex, sample, info, flag);
 }
 int32_t DemuxerClient::SeekToTime(int64_t millisecond, const AVSeekMode mode)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
-    AVCODEC_LOGD("demuxer client call SeekToTime");
     return demuxerProxy_->SeekToTime(millisecond, mode);
 }
 }  // namespace Media
