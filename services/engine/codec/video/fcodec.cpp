@@ -915,7 +915,6 @@ void FCodec::RenderFrame()
     if (renderBuffers_.empty()) {
         oLock.unlock();
         AVCODEC_LOGD("Failed to render frame to codec: empty render buffer");
-        oLock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_TRY_DECODE_TIME));
         return;
     }
@@ -946,6 +945,8 @@ int32_t FCodec::ReleaseOutputBuffer(uint32_t index)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG((state_ == State::Running || state_ == State::EOS), AVCS_ERR_INVALID_STATE,
                              "Release output buffer failed: not in Running/EOS state");
+    CHECK_AND_RETURN_RET_LOG(index < buffers_[INDEX_OUTPUT].size(), AVCS_ERR_INVALID_VAL,
+                             "Failed to release output buffer: invalid index");
     std::lock_guard<std::mutex> oLock(outputMutex_);
     if (std::find(codecAvailBuffers_.begin(), codecAvailBuffers_.end(), index) == codecAvailBuffers_.end() &&
         buffers_[INDEX_OUTPUT][index]->owner_ == AVBuffer::Owner::OWNED_BY_USER) {
@@ -991,6 +992,8 @@ int32_t FCodec::RenderOutputBuffer(uint32_t index)
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(((state_ == State::Running || state_ == State::EOS) && surface_ != nullptr),
                              AVCS_ERR_INVALID_STATE, "Failed to render output buffer: invalid state");
+    CHECK_AND_RETURN_RET_LOG(index < buffers_[INDEX_OUTPUT].size(), AVCS_ERR_INVALID_VAL,
+                             "Failed to render output buffer: invalid index");
     if (std::find(codecAvailBuffers_.begin(), codecAvailBuffers_.end(), index) == codecAvailBuffers_.end() &&
         buffers_[INDEX_OUTPUT][index]->owner_ == AVBuffer::Owner::OWNED_BY_USER) {
         std::shared_ptr<AVBuffer> outputBuffer = buffers_[INDEX_OUTPUT][index];
@@ -1040,7 +1043,6 @@ int32_t FCodec::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
                              "Set callback failed: cannot in executing state or error state");
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "Set callback failed: callback is NULL");
     callback_ = callback;
-    AVCODEC_LOGI("Set callback success");
     return AVCS_ERR_OK;
 }
 
