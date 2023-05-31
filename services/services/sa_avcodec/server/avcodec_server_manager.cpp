@@ -369,8 +369,8 @@ void AVCodecServerManager::EraseObject(std::map<sptr<IRemoteObject>, pid_t>::ite
                                        const std::string& stubName)
 {
     if (iter != stubMap.end()) {
-        AVCODEC_LOGD("destroy %{public}s stub services(%{public}zu) pid(%{public}d).", stubName.c_str(), stubMap.size(),
-                     pid);
+        AVCODEC_LOGD("destroy %{public}s stub services(%{public}zu) pid(%{public}d).", stubName.c_str(),
+                     stubMap.size(), pid);
         (void)stubMap.erase(iter);
         return;
     }
@@ -404,7 +404,7 @@ void AVCodecServerManager::DestroyStubObject(StubType type, sptr<IRemoteObject> 
         }
         case DEMUXER: {
             auto it = find_if(demuxerStubMap_.begin(), demuxerStubMap_.end(), compare_func);
-            EraseObject(it, demuxerStubMap_, pid, "deuxer");
+            EraseObject(it, demuxerStubMap_, pid, "demuxer");
             return;
         }
         case SOURCE: {
