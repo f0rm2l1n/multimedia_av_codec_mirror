@@ -82,7 +82,7 @@ int32_t DemuxerEngineImpl::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSha
     AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
     AVCodecTrace trace("DemuxerEngineImpl::ReadSample");
-    AVCODEC_LOGI("ReadSample");
+    AVCODEC_LOGD("ReadSample");
     std::unique_lock<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(demuxer_ != nullptr, AVCS_ERR_INVALID_OPERATION, "demuxer_ is nullptr");
     return demuxer_->ReadSample(trackIndex, sample, info, flag);
