@@ -304,7 +304,8 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     uint64_t frameSize = 0;
     bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt_->pts, avStream->time_base));
     flag = ConvertFlagsFromFFmpeg(samplePacket->pkt_, avStream);
-    CHECK_AND_RETURN_RET_LOG(samplePacket->pkt_->size >= 0, AVCS_ERR_DEMUXER_FAILED, "the sample size is must be positive");
+    CHECK_AND_RETURN_RET_LOG(samplePacket->pkt_->size >= 0, AVCS_ERR_DEMUXER_FAILED,
+        "the sample size is must be positive");
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
         frameSize = static_cast<uint64_t>(samplePacket->pkt_->size);
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -328,7 +329,8 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     if (copySize > static_cast<uint64_t>(sample->GetSize())) {
         copySize = static_cast<uint64_t>(sample->GetSize());
     }
-    (void)memset_s(sample->GetBase(), copySize, 0, copySize);
+    errno_t rs = memset_s(sample->GetBase(), copySize, 0, copySize);
+    CHECK_AND_RETURN_RET_LOG(rs == EOK, AVCS_ERR_UNKNOWN, "memset_s failed");
     errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt_->data+samplePacket->offset_, copySize);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
@@ -362,7 +364,8 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     do {
         AVPacket* pkt = av_packet_alloc();
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
-        CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED, "the stream_index is must be positive");
+        CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED,
+            "the stream_index is must be positive");
         uint32_t stream_index = static_cast<uint32_t>(pkt->stream_index);
         if (ffmpegRet >= 0 && IsInSelectedTrack(stream_index)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
