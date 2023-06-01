@@ -263,7 +263,7 @@ void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
     AVCODEC_LOGI("FFmpegDemuxerPlugin::InitBitStreamContext");
     const AVBitStreamFilter* avBitStreamFilter {nullptr};
     char codeTag[AV_FOURCC_MAX_STRING_SIZE] {0};
-    av_fourcc_make_string(reinterpret_cast<char*>(codeTag), avStream.codecpar->codec_tag);
+    av_fourcc_make_string(codeTag, avStream.codecpar->codec_tag);
     if (strncmp(codeTag, "avc1", strlen("avc1")) == 0) {
         AVCODEC_LOGD("codeTag is avc1, will convert avc1 to annexb");
         avBitStreamFilter = av_bsf_get_by_name("h264_mp4toannexb");
@@ -304,6 +304,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     uint64_t frameSize = 0;
     bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt_->pts, avStream->time_base));
     flag = ConvertFlagsFromFFmpeg(samplePacket->pkt_, avStream);
+    CHECK_AND_RETURN_RET_LOG(samplePacket->pkt_->size >= 0, AVCS_ERR_DEMUXER_FAILED, "the pkt size is must be positive");
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
         frameSize = static_cast<uint64_t>(samplePacket->pkt_->size);
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -361,6 +362,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     do {
         AVPacket* pkt = av_packet_alloc();
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
+        CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED, "the stream_index is must be positive");
         uint32_t stream_index = static_cast<uint32_t>(pkt->stream_index);
         if (ffmpegRet >= 0 && IsInSelectedTrack(stream_index)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
