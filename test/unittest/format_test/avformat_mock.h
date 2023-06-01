@@ -43,6 +43,9 @@ public:
     virtual bool GetStringValue(const std::string_view &key, std::string &value) = 0;
     virtual bool GetBuffer(const std::string_view &key, uint8_t **addr, size_t &size) = 0;
     virtual bool PutBuffer(const std::string_view &key, const uint8_t *addr, size_t size) = 0;
+    virtual void InitTrackFormat() = 0;
+    virtual void InitAudioTrackFormat(const std::string_view &mimeType, int32_t sampleRate, int32_t channelCount) = 0;
+    virtual void InitVideoTrackFormat(const std::string_view &mimeType, int32_t width, int32_t height) = 0;
     virtual const char *DumpInfo() = 0;
     virtual void Destroy() = 0;
 };
@@ -50,6 +53,10 @@ public:
 class __attribute__((visibility("default"))) FormatMockFactory {
 public:
     static std::shared_ptr<FormatMock> CreateFormat();
+    static std::shared_ptr<FormatMock> CreateAudioFormat(
+        const std::string_view &mimeType, int32_t sampleRate, int32_t channelCount);
+    static std::shared_ptr<FormatMock> CreateVideoFormat(
+        const std::string_view &mimeType, int32_t width, int32_t height);
 private:
     FormatMockFactory() = delete;
     ~FormatMockFactory() = delete;

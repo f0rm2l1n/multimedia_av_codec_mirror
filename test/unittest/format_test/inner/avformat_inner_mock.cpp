@@ -15,6 +15,7 @@
 
 #include "avformat_inner_mock.h"
 #include "securec.h"
+#include "media_description.h"
 
 namespace OHOS {
 namespace Media {
@@ -90,6 +91,21 @@ bool AVFormatInnerMock::GetBuffer(const std::string_view &key, uint8_t **addr, s
 bool AVFormatInnerMock::PutBuffer(const std::string_view &key, const uint8_t *addr, size_t size)
 {
     return format_.PutBuffer(key, addr, size);
+}
+
+void AVFormatInnerMock::InitAudioTrackFormat(const std::string_view &mimeType,
+                                             int32_t sampleRate, int32_t channelCount)
+{
+    format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, mimeType);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channelCount);
+}
+
+void AVFormatInnerMock::InitVideoTrackFormat(const std::string_view &mimeType, int32_t width, int32_t height)
+{
+    format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, mimeType);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, width);
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height);
 }
 
 const char *AVFormatInnerMock::DumpInfo()

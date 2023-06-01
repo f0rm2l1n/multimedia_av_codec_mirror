@@ -14,22 +14,23 @@
  */
 
 #include "avformat_capi_mock.h"
+#include "native_avformat.h"
 
 namespace OHOS {
 namespace Media {
-AVFormatCapiMock::AVFormatCapiMock()
+AVFormatCapiMock::AVFormatCapiMock() : format_(nullptr)
 {
-    format_ = OH_AVFormat_Create();
 }
 
 AVFormatCapiMock::~AVFormatCapiMock()
 {
+    Destroy();
 }
 
 bool AVFormatCapiMock::PutIntValue(const std::string_view &key, int32_t value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_SetIntValue(format_, std::string(key).c_str(), value);
+        return OH_AVFormat_SetIntValue(format_, key.data(), value);
     }
     return false;
 }
@@ -37,7 +38,7 @@ bool AVFormatCapiMock::PutIntValue(const std::string_view &key, int32_t value)
 bool AVFormatCapiMock::GetIntValue(const std::string_view &key, int32_t &value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_GetIntValue(format_, std::string(key).c_str(), &value);
+        return OH_AVFormat_GetIntValue(format_, key.data(), &value);
     }
     return false;
 }
@@ -45,7 +46,7 @@ bool AVFormatCapiMock::GetIntValue(const std::string_view &key, int32_t &value)
 bool AVFormatCapiMock::PutStringValue(const std::string_view &key, const std::string_view &value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_SetStringValue(format_, std::string(key).c_str(), std::string(value).c_str());
+        return OH_AVFormat_SetStringValue(format_, key.data(), std::string(value).c_str());
     }
     return false;
 }
@@ -54,7 +55,7 @@ bool AVFormatCapiMock::GetStringValue(const std::string_view &key, std::string &
 {
     if (format_ != nullptr) {
         const char *out = nullptr;
-        if (OH_AVFormat_GetStringValue(format_, std::string(key).c_str(), &out)) {
+        if (OH_AVFormat_GetStringValue(format_, key.data(), &out)) {
             value = out;
             return true;
         }
@@ -75,6 +76,24 @@ OH_AVFormat *AVFormatCapiMock::GetFormat()
     return format_;
 }
 
+void AVFormatCapiMock::InitTrackFormat()
+{
+    Destroy();
+    format_ = OH_AVFormat_Create();
+}
+
+void AVFormatCapiMock::InitAudioTrackFormat(const std::string_view &mimeType, int32_t sampleRate, int32_t channelCount)
+{
+    Destroy();
+    format_ = OH_AVFormat_CreateAudioFormat(mimeType.data(), sampleRate, channelCount);
+}
+
+void AVFormatCapiMock::InitVideoTrackFormat(const std::string_view &mimeType, int32_t width, int32_t height)
+{
+    Destroy();
+    format_ = OH_AVFormat_CreateVideoFormat(mimeType.data(), width, height);
+}
+
 bool AVFormatCapiMock::AVFormat_Copy(struct OH_AVFormat *to, struct OH_AVFormat *from)
 {
     return OH_AVFormat_Copy(to, from);
@@ -83,7 +102,7 @@ bool AVFormatCapiMock::AVFormat_Copy(struct OH_AVFormat *to, struct OH_AVFormat 
 bool AVFormatCapiMock::PutLongValue(const std::string_view &key, int64_t value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_SetLongValue(format_, std::string(key).c_str(), value);
+        return OH_AVFormat_SetLongValue(format_, key.data(), value);
     }
     return false;
 }
@@ -91,7 +110,7 @@ bool AVFormatCapiMock::PutLongValue(const std::string_view &key, int64_t value)
 bool AVFormatCapiMock::GetLongValue(const std::string_view &key, int64_t &value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_GetLongValue(format_, std::string(key).c_str(), &value);
+        return OH_AVFormat_GetLongValue(format_, key.data(), &value);
     }
     return false;
 }
@@ -99,7 +118,7 @@ bool AVFormatCapiMock::GetLongValue(const std::string_view &key, int64_t &value)
 bool AVFormatCapiMock::PutFloatValue(const std::string_view &key, float value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_SetFloatValue(format_, std::string(key).c_str(), value);
+        return OH_AVFormat_SetFloatValue(format_, key.data(), value);
     }
     return false;
 }
@@ -107,7 +126,7 @@ bool AVFormatCapiMock::PutFloatValue(const std::string_view &key, float value)
 bool AVFormatCapiMock::GetFloatValue(const std::string_view &key, float &value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_GetFloatValue(format_, std::string(key).c_str(), &value);
+        return OH_AVFormat_GetFloatValue(format_, key.data(), &value);
     }
     return false;
 }
@@ -115,7 +134,7 @@ bool AVFormatCapiMock::GetFloatValue(const std::string_view &key, float &value)
 bool AVFormatCapiMock::PutDoubleValue(const std::string_view &key, double value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_SetDoubleValue(format_, std::string(key).c_str(), value);
+        return OH_AVFormat_SetDoubleValue(format_, key.data(), value);
     }
     return false;
 }
@@ -123,7 +142,7 @@ bool AVFormatCapiMock::PutDoubleValue(const std::string_view &key, double value)
 bool AVFormatCapiMock::GetDoubleValue(const std::string_view &key, double &value)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_GetDoubleValue(format_, std::string(key).c_str(), &value);
+        return OH_AVFormat_GetDoubleValue(format_, key.data(), &value);
     }
     return false;
 }
@@ -131,7 +150,7 @@ bool AVFormatCapiMock::GetDoubleValue(const std::string_view &key, double &value
 bool AVFormatCapiMock::GetBuffer(const std::string_view &key, uint8_t **addr, size_t &size)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_GetBuffer(format_, std::string(key).c_str(), addr, &size);
+        return OH_AVFormat_GetBuffer(format_, key.data(), addr, &size);
     }
     return false;
 }
@@ -139,7 +158,7 @@ bool AVFormatCapiMock::GetBuffer(const std::string_view &key, uint8_t **addr, si
 bool AVFormatCapiMock::PutBuffer(const std::string_view &key, const uint8_t *addr, size_t size)
 {
     if (format_ != nullptr) {
-        return OH_AVFormat_SetBuffer(format_, std::string(key).c_str(), addr, size);
+        return OH_AVFormat_SetBuffer(format_, key.data(), addr, size);
     }
     return false;
 }

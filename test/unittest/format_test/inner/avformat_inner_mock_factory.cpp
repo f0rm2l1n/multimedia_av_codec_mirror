@@ -21,5 +21,21 @@ std::shared_ptr<FormatMock> FormatMockFactory::CreateFormat()
 {
     return std::make_shared<AVFormatInnerMock>();
 }
+
+std::shared_ptr<FormatMock> FormatMockFactory::CreateAudioFormat(
+    const std::string_view &mimeType, int32_t sampleRate, int32_t channelCount)
+{
+    std::shared_ptr<FormatMock> format = std::make_shared<AVFormatInnerMock>();
+    format->InitAudioTrackFormat(mimeType, sampleRate, channelCount);
+    return format;
+}
+
+std::shared_ptr<FormatMock> FormatMockFactory::CreateVideoFormat(
+    const std::string_view &mimeType, int32_t width, int32_t height)
+{
+    std::shared_ptr<FormatMock> format = std::make_shared<AVFormatInnerMock>();
+    format->InitVideoTrackFormat(mimeType, width, height);
+    return format;
+}
 } // namespace Media
 } // namespace OHOS
