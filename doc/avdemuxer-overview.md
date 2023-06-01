@@ -170,20 +170,18 @@
       if(!audioIsEnd) {
          int32_t ret = OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info);
          if (ret==AV_ERR_OK) {
-            printf("audio info.size: %d", info.size);
+            printf("audio info.size: %d\n", info.size);
             if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
                audioIsEnd = true;
-               break;
             }
          }
       }
       if(!videoIsEnd) {
          int32_t ret = OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info);
          if (ret==AV_ERR_OK) {
-            printf("video info.size: %d", info.size);
+            printf("video info.size: %d\n", info.size);
             if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
                videoIsEnd = true;
-               break;
             }
          }
       }
