@@ -65,10 +65,8 @@ ohos_unittest("avmuxer_capi_unit_test") {
 
   defines = [ "AVMUXER_UNITTEST_CAPI" ]
 
-  deps = [
-    "$av_codec_root_dir/interfaces/kits/c:capi_packages",
-  ]
-  
+  deps = [ "$av_codec_root_dir/interfaces/kits/c:capi_packages" ]
+
   external_deps = [
     "av_codec:av_codec_client",
     "selinux:librestorecon",
