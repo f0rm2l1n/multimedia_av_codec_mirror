@@ -21,6 +21,9 @@
 #include "avcodec_errors.h"
 #include "native_avcapability.h"
 
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeAVCapability"};
+}
 using namespace OHOS::Media;
 OH_AVCapability::OH_AVCapability(const CapabilityData &capabilityData) : capabilityData_(capabilityData) {}
 
@@ -28,13 +31,17 @@ OH_AVCapability::~OH_AVCapability() {}
 
 OH_AVCapability *OH_AVCodec_GetCapability(const char *mime, bool isEncoder)
 {
+    CHECK_AND_RETURN_RET_LOG(mime != nullptr, nullptr, "Get capability failed: mime is nullptr");
     std::shared_ptr<AVCodecList> codeclist = AVCodecListFactory::CreateAVCodecList();
     CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, AVCodecCategory::AVCODEC_NONE);
+    std::string name = capabilityData.codecName;
+    CHECK_AND_RETURN_RET_LOG(!name.empty(), nullptr, "Get capability failed: cannot find matched capability");
     return new (std::nothrow) OH_AVCapability(capabilityData);
 }
 
 OH_AVCapability *OH_AVCodec_GetCapabilityByCategory(const char *mime, bool isEncoder, OH_AVCodecCategory category)
 {
+    CHECK_AND_RETURN_RET_LOG(mime != nullptr, nullptr, "Get capabilityByCategory failed: mime is nullptr");
     std::shared_ptr<AVCodecList> codeclist = AVCodecListFactory::CreateAVCodecList();
     AVCodecCategory innerCategory;
     if (category == HARDWARE) {
@@ -43,6 +50,8 @@ OH_AVCapability *OH_AVCodec_GetCapabilityByCategory(const char *mime, bool isEnc
         innerCategory = AVCodecCategory::AVCODEC_SOFTWARE;
     }
     CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, innerCategory);
+    std::string name = capabilityData.codecName;
+    CHECK_AND_RETURN_RET_LOG(!name.empty(), nullptr, "Get capabilityByCategory failed: cannot find matched capability");
     return new (std::nothrow) OH_AVCapability(capabilityData);
 }
 
