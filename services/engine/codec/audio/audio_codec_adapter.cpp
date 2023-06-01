@@ -257,22 +257,22 @@ int32_t AudioCodecAdapter::GetOutputFormat(Format &format)
 std::shared_ptr<AVSharedMemoryBase> AudioCodecAdapter::GetInputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
-    AVCODEC_LOGD("adapter GetInputBuffer enter");
+    AVCODEC_LOGD("adapter GetInputBuffer enter,index:%{public}u", index);
     if (!callback_) {
-        AVCODEC_LOGE("adapter get input buffer error, call back not initialized .");
+        AVCODEC_LOGE("adapter get input buffer error,index:%{public}u, call back not initialized .", index);
         return nullptr;
     }
 
     std::shared_ptr<AudioBufferInfo> result = worker_->GetInputBufferInfo(index);
     if (result == nullptr) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY);
-        AVCODEC_LOGE("getMemory failed");
+        AVCODEC_LOGE("getMemory failed,index:%{public}u", index);
         return nullptr;
     }
 
     if (result->GetStatus() == BufferStatus::IDEL) {
         callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE);
-        AVCODEC_LOGE("GetStatus is IDEL");
+        AVCODEC_LOGE("GetStatus is IDEL,index:%{public}u", index);
         return nullptr;
     }
 
@@ -282,9 +282,9 @@ std::shared_ptr<AVSharedMemoryBase> AudioCodecAdapter::GetInputBuffer(uint32_t i
 int32_t AudioCodecAdapter::QueueInputBuffer(uint32_t index, const AVCodecBufferInfo &info, AVCodecBufferFlag flag)
 {
     AVCODEC_SYNC_TRACE;
-    AVCODEC_LOGD("adapter QueueInputBuffer enter");
+    AVCODEC_LOGD("adapter QueueInputBuffer enter,index:%{public}u", index);
     if (!callback_) {
-        AVCODEC_LOGE("adapter queue input buffer error, call back not initialized .");
+        AVCODEC_LOGE("adapter queue input buffer error,index:%{public}u, call back not initialized .", index);
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
     if (info.size < 0) {
@@ -320,9 +320,9 @@ int32_t AudioCodecAdapter::QueueInputBuffer(uint32_t index, const AVCodecBufferI
 std::shared_ptr<AVSharedMemoryBase> AudioCodecAdapter::GetOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
-    AVCODEC_LOGD("adapter GetOutputBuffer enter");
+    AVCODEC_LOGD("adapter GetOutputBuffer enter,index:%{public}u", index);
     if (!callback_) {
-        AVCODEC_LOGE("adapter get output buffer error, call back not initialized .");
+        AVCODEC_LOGE("adapter get output buffer error, call back not initialized .index:%{public}u", index);
         return nullptr;
     }
 
@@ -344,9 +344,9 @@ std::shared_ptr<AVSharedMemoryBase> AudioCodecAdapter::GetOutputBuffer(uint32_t 
 int32_t AudioCodecAdapter::ReleaseOutputBuffer(uint32_t index)
 {
     AVCODEC_SYNC_TRACE;
-    AVCODEC_LOGD("adapter ReleaseOutputBuffer enter");
+    AVCODEC_LOGD("adapter ReleaseOutputBuffer enter,index:%{public}u", index);
     if (!callback_) {
-        AVCODEC_LOGE("adapter release output buffer error, call back not initialized .");
+        AVCODEC_LOGE("adapter release output buffer error,index:%{public}u, call back not initialized .", index);
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
 
