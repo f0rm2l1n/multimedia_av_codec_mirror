@@ -19,9 +19,9 @@
 #include "securec.h"
 
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioBufferInfo"};
-    constexpr uint8_t LOGD_FREQUENCY = 5;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioBufferInfo"};
+constexpr uint8_t LOGD_FREQUENCY = 5;
+} // namespace
 
 namespace OHOS {
 namespace Media {
@@ -153,6 +153,7 @@ bool AudioBufferInfo::ResetBuffer()
     isEos_ = false;
     isFirstFrame_ = false;
     status_ = BufferStatus::IDEL;
+    flag_ = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     if (buffer_) {
         buffer_->ClearUsedSize();
     } else {

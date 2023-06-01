@@ -292,7 +292,7 @@ int32_t FCodec::ResetBuffers()
     std::unique_lock<std::mutex> oLock(outputMutex_);
     codecAvailBuffers_.clear();
     renderBuffers_.clear();
-    for (int32_t i = 0; i < buffers_[INDEX_OUTPUT].size(); i++) {
+    for (uint32_t i = 0; i < buffers_[INDEX_OUTPUT].size(); i++) {
         buffers_[INDEX_OUTPUT][i]->owner_ = AVBuffer::Owner::OWNED_BY_CODEC;
         codecAvailBuffers_.emplace_back(i);
     }

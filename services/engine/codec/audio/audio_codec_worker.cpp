@@ -79,7 +79,7 @@ AudioCodecWorker::~AudioCodecWorker()
 
 bool AudioCodecWorker::PushInputData(const uint32_t &index)
 {
-    AVCODEC_LOGD("Worker PushInputData enter");
+    AVCODEC_LOGD("Worker PushInputData enter,index:%{public}u", index);
 
     if (!isRunning) {
         return true;
@@ -264,7 +264,7 @@ void AudioCodecWorker::ProduceInputBuffer()
         isProduceInput = false;
         uint32_t index;
         if (inputBuffer_->RequestAvialbaleIndex(index)) {
-            AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "produceInputBuffer request success.");
+            AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "produceInputBuffer request success. index:%{public}u", index);
             auto inputBuffer = GetInputBufferInfo(index);
             callback_->OnInputBufferAvailable(index);
         } else {
@@ -291,6 +291,12 @@ bool AudioCodecWorker::HandInputBuffer(int32_t &ret)
     return isEos;
 }
 
+void AudioCodecWorker::ReleaseOutputBuffer(const uint32_t &index, const int32_t &ret)
+{
+    outputBuffer_->ReleaseBuffer(index);
+    callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, ret);
+}
+
 void AudioCodecWorker::ConsumerOutputBuffer()
 {
     AVCODEC_SYNC_TRACE;
@@ -305,18 +311,18 @@ void AudioCodecWorker::ConsumerOutputBuffer()
             int32_t ret;
             bool isEos = HandInputBuffer(ret);
             if (ret == AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA) {
-                AVCODEC_LOGW("current input buffer is not enough,skip this frame.");
+                AVCODEC_LOGW("current input buffer is not enough,skip this frame. index:%{public}u", index);
                 outputBuffer_->ReleaseBuffer(index);
                 continue;
             }
             if (ret != AVCodecServiceErrCode::AVCS_ERR_OK && ret != AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM) {
-                AVCODEC_LOGE("process input buffer error!");
-                outputBuffer_->ReleaseBuffer(index);
-                callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, ret);
+                AVCODEC_LOGE("process input buffer error! index:%{public}u", index);
+                ReleaseOutputBuffer(index, ret);
                 return;
             }
             auto outBuffer = GetOutputBufferInfo(index);
             if (isEos) {
+                AVCODEC_LOGI("set buffer EOS. index:%{public}u", index);
                 outBuffer->SetEos(isEos);
             }
             if (isFirFrame_) {
@@ -325,17 +331,16 @@ void AudioCodecWorker::ConsumerOutputBuffer()
             }
             ret = codec_->ProcessRecieveData(outBuffer);
             if (ret == AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA) {
-                AVCODEC_LOGW("current ouput buffer is not enough,skip this frame.");
+                AVCODEC_LOGW("current ouput buffer is not enough,skip this frame. index:%{public}u", index);
                 outputBuffer_->ReleaseBuffer(index);
                 continue;
             }
             if (ret != AVCodecServiceErrCode::AVCS_ERR_OK && ret != AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM) {
-                AVCODEC_LOGE("process output buffer error!");
-                outputBuffer_->ReleaseBuffer(index);
-                callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, ret);
+                AVCODEC_LOGE("process output buffer error! index:%{public}u", index);
+                ReleaseOutputBuffer(index, ret);
                 return;
             }
-            AVCODEC_LOGD("Work consumerOutputBuffer callback_");
+            AVCODEC_LOGD("Work consumerOutputBuffer callback_ index:%{public}u", index);
             callback_->OnOutputBufferAvailable(index, outBuffer->GetBufferAttr(), outBuffer->GetFlag());
         }
     }

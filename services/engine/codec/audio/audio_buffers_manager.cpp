@@ -90,11 +90,10 @@ bool AudioBuffersManager::RequestAvialbaleIndex(uint32_t &index)
     if (!isRunning_) {
         return false;
     }
-
     std::unique_lock lock(stateMutex_);
     index = inBufIndexQue_.front();
-    bufferInfo_[index]->SetBufferOwned();
     inBufIndexQue_.pop();
+    bufferInfo_[index]->SetBufferOwned();
     return true;
 }
 
@@ -102,7 +101,9 @@ void AudioBuffersManager::ReleaseAll()
 {
     isRunning_ = false;
     avilableCondition_.notify_all();
-
+    while (!inBufIndexQue_.empty()) {
+        inBufIndexQue_.pop();
+    }
     for (uint32_t i = 0; i < bufferInfo_.size(); ++i) {
         bufferInfo_[i]->ResetBuffer();
         inBufIndexQue_.push(i);

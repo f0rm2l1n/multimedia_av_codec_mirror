@@ -66,7 +66,11 @@ ohos_unittest("avmuxer_capi_unit_test") {
   defines = [ "AVMUXER_UNITTEST_CAPI" ]
 
   deps = [ "$av_codec_root_dir/interfaces/kits/c:capi_packages" ]
-  external_deps = [ "av_codec:av_codec_client" ]
+
+  external_deps = [
+    "av_codec:av_codec_client",
+    "selinux:librestorecon",
+  ]
 
   resource_config_file =
       "$av_codec_root_dir/test/unittest/resources/ohos_test.xml"
@@ -98,7 +102,11 @@ ohos_unittest("avmuxer_inner_unit_test") {
   }
 
   deps = [ "$av_codec_root_dir/services/utils:av_codec_service_utils" ]
-  external_deps = [ "av_codec:av_codec_client" ]
+
+  external_deps = [
+    "av_codec:av_codec_client",
+    "selinux:librestorecon",
+  ]
 
   resource_config_file =
       "$av_codec_root_dir/test/unittest/resources/ohos_test.xml"

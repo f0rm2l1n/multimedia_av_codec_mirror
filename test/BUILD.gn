@@ -31,6 +31,7 @@ group("av_codec_unit_test") {
       "unittest:av_audio_codecbase_unit_test",
       "unittest:av_audio_encoder_capi_unit_test",
       "unittest:av_audio_inner_unit_test",
+      "unittest:av_video_capi_unit_test",
       "unittest/avmuxer_test:avmuxer_capi_unit_test",
       "unittest/avmuxer_test:avmuxer_inner_unit_test",
       "unittest/codeclist_test:codeclist_capi_unit_test",

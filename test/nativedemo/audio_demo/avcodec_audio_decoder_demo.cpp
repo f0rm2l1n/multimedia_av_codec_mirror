@@ -133,7 +133,7 @@ void ADecDemo::RunCase(AudioFormatType audioType)
         // extradata for vorbis
         int64_t extradataSize;
         DEMO_CHECK_AND_RETURN_LOG(inputFile_.is_open(), "Fatal: file is not open");
-        inputFile_.read(reinterpret_cast<char*>(&extradataSize), sizeof(int64_t));
+        inputFile_.read(reinterpret_cast<char *>(&extradataSize), sizeof(int64_t));
         DEMO_CHECK_AND_RETURN_LOG(inputFile_.gcount() == sizeof(int64_t), "Fatal: read extradataSize bytes error");
         if (extradataSize < 0) {
             return;
@@ -141,7 +141,8 @@ void ADecDemo::RunCase(AudioFormatType audioType)
         char buffer[extradataSize];
         inputFile_.read(buffer, extradataSize);
         DEMO_CHECK_AND_RETURN_LOG(inputFile_.gcount() == extradataSize, "Fatal: read extradata bytes error");
-        OH_AVFormat_SetBuffer(format, MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t*)buffer, extradataSize);
+        OH_AVFormat_SetBuffer(format, MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t *)buffer,
+                              extradataSize);
     }
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
@@ -222,6 +223,13 @@ int32_t ADecDemo::Stop()
         signal_->inCond_.notify_all();
         lock.unlock();
         inputLoop_->join();
+        inputLoop_ = nullptr;
+        while (!signal_->inQueue_.empty()) {
+            signal_->inQueue_.pop();
+        }
+        while (!signal_->inBufferQueue_.empty()) {
+            signal_->inBufferQueue_.pop();
+        }
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
@@ -229,6 +237,16 @@ int32_t ADecDemo::Stop()
         signal_->outCond_.notify_all();
         lock.unlock();
         outputLoop_->join();
+        outputLoop_ = nullptr;
+        while (!signal_->outQueue_.empty()) {
+            signal_->outQueue_.pop();
+        }
+        while (!signal_->attrQueue_.empty()) {
+            signal_->attrQueue_.pop();
+        }
+        while (!signal_->outBufferQueue_.empty()) {
+            signal_->outBufferQueue_.pop();
+        }
     }
     std::cout << "start stop!\n";
     return OH_AudioDecoder_Stop(audioDec_);
@@ -236,6 +254,39 @@ int32_t ADecDemo::Stop()
 
 int32_t ADecDemo::Flush()
 {
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+        inputLoop_ = nullptr;
+        while (!signal_->inQueue_.empty()) {
+            signal_->inQueue_.pop();
+        }
+        while (!signal_->inBufferQueue_.empty()) {
+            signal_->inBufferQueue_.pop();
+        }
+        std::cout << "clear input buffer!\n";
+    }
+
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+        outputLoop_ = nullptr;
+        while (!signal_->outQueue_.empty()) {
+            signal_->outQueue_.pop();
+        }
+        while (!signal_->attrQueue_.empty()) {
+            signal_->attrQueue_.pop();
+        }
+        while (!signal_->outBufferQueue_.empty()) {
+            signal_->outBufferQueue_.pop();
+        }
+        std::cout << "clear output buffer!\n";
+    }
     return OH_AudioDecoder_Flush(audioDec_);
 }
 
@@ -302,16 +353,16 @@ void ADecDemo::InputFunc()
         uint32_t index = signal_->inQueue_.front();
         auto buffer = signal_->inBufferQueue_.front();
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
-        inputFile_.read(reinterpret_cast<char*>(&size), sizeof(size));
+        inputFile_.read(reinterpret_cast<char *>(&size), sizeof(size));
         if (inputFile_.eof() || inputFile_.gcount() == 0) {
             HandleInputEOS(index);
             std::cout << "end buffer\n";
             break;
         }
         DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == sizeof(size), "Fatal: read size fail");
-        inputFile_.read(reinterpret_cast<char*>(&pts), sizeof(pts));
+        inputFile_.read(reinterpret_cast<char *>(&pts), sizeof(pts));
         DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == sizeof(pts), "Fatal: read pts fail");
-        inputFile_.read((char*)OH_AVMemory_GetAddr(buffer), size);
+        inputFile_.read((char *)OH_AVMemory_GetAddr(buffer), size);
         DEMO_CHECK_AND_BREAK_LOG(inputFile_.gcount() == size, "Fatal: read buffer fail");
 
         int32_t ret = HandleNormalInput(index, pts, size);
