@@ -48,8 +48,6 @@ CodecClient::~CodecClient()
 
     if (codecProxy_ != nullptr) {
         (void)codecProxy_->DestroyStub();
-    } else {
-        AVCODEC_LOGE("Codec proxy is nullptr");
     }
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
