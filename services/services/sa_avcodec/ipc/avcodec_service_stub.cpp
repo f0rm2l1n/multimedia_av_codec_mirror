@@ -79,7 +79,7 @@ int32_t AVCodecServiceStub::DestroyStubForPid(pid_t pid)
 int AVCodecServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    AVCODEC_LOGI("Stub: OnRemoteRequest of code: %{public}u is received", code);
+    AVCODEC_LOGD("Stub: OnRemoteRequest of code: %{public}u is received", code);
 
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (AVCodecServiceStub::GetDescriptor() != remoteDescriptor) {

@@ -75,7 +75,7 @@ int32_t DemuxerServiceStub::InitStub()
 
 int DemuxerServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    AVCODEC_LOGI("Stub: OnRemoteRequest of code: %{public}u is received", code);
+    AVCODEC_LOGD("Stub: OnRemoteRequest of code: %{public}u is received", code);
 
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (DemuxerServiceStub::GetDescriptor() != remoteDescriptor) {
