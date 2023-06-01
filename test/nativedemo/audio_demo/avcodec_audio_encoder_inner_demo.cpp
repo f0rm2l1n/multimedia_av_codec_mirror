@@ -39,7 +39,7 @@ using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
-constexpr uint32_t BITS_RATE = 112000; // for aac encoding
+constexpr uint32_t BITS_RATE = 199000; // for aac encoding
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr uint32_t DEFAULT_SAMPLE_FORMATE_VALE = 8;
 constexpr uint32_t DEFAULT_CHANNEL_LAYOUT_COUNT = 3;
@@ -140,7 +140,7 @@ int32_t AEnInnerDemo::Release()
 
 void AEnInnerDemo::InputFunc()
 {
-    const char *filePath = "/data/test/media/test_fltp.pcm";
+    const char *filePath = "/data/test/media/aac_2c_44100hz_199k.pcm";
     int frameBytes = 2 * 1024 * 4;
     std::ifstream inputFile(filePath, std::ios::binary);
     if (!inputFile.is_open()) {
