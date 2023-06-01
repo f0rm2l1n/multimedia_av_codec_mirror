@@ -385,7 +385,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
         return AVCS_ERR_DEMUXER_FAILED;
     }
     int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, samplePacket);
-    if (ret==AVCS_ERR_NO_MEMORY) {
+    if (ret == AVCS_ERR_NO_MEMORY) {
         sampleCache_[trackIndex]->Push(samplePacket);
     }
     return ret;
