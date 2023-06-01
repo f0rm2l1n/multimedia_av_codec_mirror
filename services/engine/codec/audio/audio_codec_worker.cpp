@@ -291,6 +291,12 @@ bool AudioCodecWorker::HandInputBuffer(int32_t &ret)
     return isEos;
 }
 
+void AudioCodecWorker::ReleaseOutputBuffer(const uint32_t &index, const int32_t &ret)
+{
+    outputBuffer_->ReleaseBuffer(index);
+    callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, ret);
+}
+
 void AudioCodecWorker::ConsumerOutputBuffer()
 {
     AVCODEC_SYNC_TRACE;
@@ -311,8 +317,7 @@ void AudioCodecWorker::ConsumerOutputBuffer()
             }
             if (ret != AVCodecServiceErrCode::AVCS_ERR_OK && ret != AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM) {
                 AVCODEC_LOGE("process input buffer error! index:%{public}u", index);
-                outputBuffer_->ReleaseBuffer(index);
-                callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, ret);
+                ReleaseOutputBuffer(index, ret);
                 return;
             }
             auto outBuffer = GetOutputBufferInfo(index);
@@ -332,8 +337,7 @@ void AudioCodecWorker::ConsumerOutputBuffer()
             }
             if (ret != AVCodecServiceErrCode::AVCS_ERR_OK && ret != AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM) {
                 AVCODEC_LOGE("process output buffer error! index:%{public}u", index);
-                outputBuffer_->ReleaseBuffer(index);
-                callback_->OnError(AVCodecErrorType::AVCODEC_ERROR_INTERNAL, ret);
+                ReleaseOutputBuffer(index, ret);
                 return;
             }
             AVCODEC_LOGD("Work consumerOutputBuffer callback_ index:%{public}u", index);

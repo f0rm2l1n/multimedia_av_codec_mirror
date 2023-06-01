@@ -63,6 +63,7 @@ private:
     void Dispose();
     bool Begin();
     bool HandInputBuffer(int32_t &ret);
+    void ReleaseOutputBuffer(const uint32_t &index, const int32_t &ret);
 
 private:
     bool isFirFrame_;
