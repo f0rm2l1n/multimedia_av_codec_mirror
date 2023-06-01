@@ -322,7 +322,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
   
     bufferInfo.size = static_cast<int32_t>(frameSize);
     bufferInfo.offset = 0;
-    auto copyFrameSize = frameSize - samplePacket->offset_;
+    auto copyFrameSize = static_cast<uint64_t>(frameSize) - samplePacket->offset_;
     auto copySize = copyFrameSize;
     if (copySize > static_cast<uint64_t>(sample->GetSize())) {
         copySize = static_cast<uint64_t>(sample->GetSize());
