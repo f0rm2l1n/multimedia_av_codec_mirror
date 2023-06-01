@@ -162,26 +162,30 @@
    // 创建 buffer，用与保存用户解封装得到的数据
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
    OH_AVCodecBufferAttr info;
-   bool isEnd = false;
-   while (!isEnd) {
+   bool videoIsEnd = false;
+   bool audioIsEnd = false;
+   while (!audioIsEnd||!videoIsEnd) {
       // 在调用 OH_AVDemuxer_ReadSample 接口获取数据前，需要先调用 OH_AVDemuxer_SelectTrackByID 选中需要获取数据的轨道
       // 获取音频帧数据
-      if(OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info)) {
-         // 处理 buffer 数据
-         printf("audio info.size: %d", info.size);
-         break;
+      if(!audioIsEnd) {
+         int32_t ret = OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info);
+         if (ret==AV_ERR_OK) {
+            printf("audio info.size: %d", info.size);
+            if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
+               audioIsEnd = true;
+               break;
+            }
+         }
       }
-      if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
-         isEnd = true;
-      }
-      // 获取视频帧数据
-      if(OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info)) {
-         // 处理 buffer 数据
-         printf("video info.size: %d", info.size);
-         break;
-      }
-      if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
-         isEnd = true;
+      if(!videoIsEnd) {
+         int32_t ret = OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info);
+         if (ret==AV_ERR_OK) {
+            printf("video info.size: %d", info.size);
+            if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
+               videoIsEnd = true;
+               break;
+            }
+         }
       }
    }
    OH_AVMemory_Destroy(buffer);
@@ -201,5 +205,4 @@
       printf("destroy demuxer pointer error");
    }
    demuxer = NULL;
-   // close(fd);
    ```
