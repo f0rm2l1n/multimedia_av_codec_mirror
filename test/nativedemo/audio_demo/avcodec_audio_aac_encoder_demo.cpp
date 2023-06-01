@@ -32,14 +32,14 @@ using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
-constexpr uint32_t BITS_RATE = 112000;
+constexpr uint32_t BITS_RATE = 199000;
 constexpr uint32_t BITS_PER_CODED_RATE = 16;
 constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr uint32_t CHANNEL_LAYOUT = 3;
 constexpr int32_t SAMPLE_FORMAT = 8;
 constexpr int32_t INPUT_FRAME_BYTES = 2 * 1024 * 4;
 
-constexpr string_view INPUT_FILE_PATH = "/data/test/media/test_fltp.pcm";
+constexpr string_view INPUT_FILE_PATH = "/data/test/media/aac_2c_44100hz_199k.pcm";
 constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/encode2.aac";
 } // namespace
 
