@@ -228,7 +228,7 @@ OH_AVErrCode OH_VideoDecoder_Destroy(struct OH_AVCodec *codec)
         if (ret != AVCS_ERR_OK) {
             AVCODEC_LOGE("Video decoder destroy failed!");
             delete codec;
-            return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
+            return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret));
         }
     } else {
         AVCODEC_LOGD("Video decoder is nullptr!");
@@ -251,7 +251,7 @@ OH_AVErrCode OH_VideoDecoder_Configure(struct OH_AVCodec *codec, struct OH_AVFor
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
 
     int32_t ret = videoDecObj->videoDecoder_->Configure(format->format_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder configure failed!");
 
     return AV_ERR_OK;
@@ -267,7 +267,7 @@ OH_AVErrCode OH_VideoDecoder_Prepare(struct OH_AVCodec *codec)
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
 
     int32_t ret = videoDecObj->videoDecoder_->Prepare();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder prepare failed!");
 
     return AV_ERR_OK;
@@ -285,7 +285,7 @@ OH_AVErrCode OH_VideoDecoder_Start(struct OH_AVCodec *codec)
     videoDecObj->isStop_.store(false);
     videoDecObj->isEOS_.store(false);
     int32_t ret = videoDecObj->videoDecoder_->Start();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder start failed!");
 
     return AV_ERR_OK;
@@ -305,7 +305,7 @@ OH_AVErrCode OH_VideoDecoder_Stop(struct OH_AVCodec *codec)
     if (ret != AVCS_ERR_OK) {
         videoDecObj->isStop_.store(false);
         AVCODEC_LOGE("Video decoder stop failed");
-        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
+        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret));
     }
     videoDecObj->memoryObjList_.clear();
 
@@ -324,7 +324,7 @@ OH_AVErrCode OH_VideoDecoder_Flush(struct OH_AVCodec *codec)
     videoDecObj->isFlushing_.store(true);
     int32_t ret = videoDecObj->videoDecoder_->Flush();
     videoDecObj->isFlushing_.store(false);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder flush failed!");
     videoDecObj->memoryObjList_.clear();
 
@@ -345,7 +345,7 @@ OH_AVErrCode OH_VideoDecoder_Reset(struct OH_AVCodec *codec)
     if (ret != AVCS_ERR_OK) {
         videoDecObj->isStop_.store(false);
         AVCODEC_LOGE("Video decoder reset failed!");
-        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
+        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret));
     }
     videoDecObj->memoryObjList_.clear();
 
@@ -364,7 +364,7 @@ OH_AVErrCode OH_VideoDecoder_SetSurface(OH_AVCodec *codec, OHNativeWindow *windo
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
 
     int32_t ret = videoDecObj->videoDecoder_->SetOutputSurface(window->surface);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder set output surface failed!");
     videoDecObj->isOutputSurfaceMode_ = true;
 
@@ -388,7 +388,7 @@ OH_AVErrCode OH_VideoDecoder_PushInputData(struct OH_AVCodec *codec, uint32_t in
     enum AVCodecBufferFlag bufferFlag = static_cast<enum AVCodecBufferFlag>(attr.flags);
 
     int32_t ret = videoDecObj->videoDecoder_->QueueInputBuffer(index, bufferInfo, bufferFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder push input data failed!");
     if (bufferFlag == AVCODEC_BUFFER_FLAG_EOS) {
         videoDecObj->isEOS_.store(true);
@@ -426,7 +426,7 @@ OH_AVErrCode OH_VideoDecoder_RenderOutputData(struct OH_AVCodec *codec, uint32_t
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
 
     int32_t ret = videoDecObj->videoDecoder_->ReleaseOutputBuffer(index, true);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder render output data failed!");
 
     return AV_ERR_OK;
@@ -462,7 +462,7 @@ OH_AVErrCode OH_VideoDecoder_SetParameter(struct OH_AVCodec *codec, struct OH_AV
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
 
     int32_t ret = videoDecObj->videoDecoder_->SetParameter(format->format_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder set parameter failed!");
 
     return AV_ERR_OK;
@@ -489,7 +489,7 @@ OH_AVErrCode OH_VideoDecoder_SetCallback(struct OH_AVCodec *codec, struct OH_AVC
     videoDecObj->callback_ = std::make_shared<NativeVideoDecoderCallback>(codec, callback, userData);
 
     int32_t ret = videoDecObj->videoDecoder_->SetCallback(videoDecObj->callback_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "Video decoder set callback failed!");
 
     return AV_ERR_OK;
