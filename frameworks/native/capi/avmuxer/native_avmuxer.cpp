@@ -51,7 +51,8 @@ OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer *muxer, int32_t rotation)
     CHECK_AND_RETURN_RET_LOG(object->muxer_ != nullptr, AV_ERR_INVALID_VAL, "muxer_ is nullptr!");
 
     int32_t ret = object->muxer_->SetRotation(rotation);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "muxer_ SetRotation failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "muxer_ SetRotation failed!");
 
     return AV_ERR_OK;
 }
@@ -68,7 +69,8 @@ OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer *muxer, int32_t *trackIndex, OH_AVFo
     CHECK_AND_RETURN_RET_LOG(object->muxer_ != nullptr, AV_ERR_INVALID_VAL, "muxer_ is nullptr!");
 
     int32_t ret = object->muxer_->AddTrack(*trackIndex, trackFormat->format_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "muxer_ AddTrack failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "muxer_ AddTrack failed!");
 
     return AV_ERR_OK;
 }
@@ -82,7 +84,8 @@ OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer *muxer)
     CHECK_AND_RETURN_RET_LOG(object->muxer_ != nullptr, AV_ERR_INVALID_VAL, "muxer_ is nullptr!");
 
     int32_t ret = object->muxer_->Start();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "muxer_ Start failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "muxer_ Start failed!");
 
     return AV_ERR_OK;
 }
@@ -108,7 +111,8 @@ OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer *muxer,
     sampleInfo.flags = info.flags;
 
     int32_t ret = object->muxer_->WriteSample(sample->memory_, sampleInfo);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "muxer_ WriteSample failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "muxer_ WriteSample failed!");
 
     return AV_ERR_OK;
 }
@@ -122,7 +126,8 @@ OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer *muxer)
     CHECK_AND_RETURN_RET_LOG(object->muxer_ != nullptr, AV_ERR_INVALID_VAL, "muxer_ is nullptr!");
 
     int32_t ret = object->muxer_->Stop();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "muxer_ Stop failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "muxer_ Stop failed!");
 
     return AV_ERR_OK;
 }

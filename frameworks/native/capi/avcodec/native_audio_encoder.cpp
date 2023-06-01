@@ -222,7 +222,7 @@ OH_AVErrCode OH_AudioEncoder_Destroy(struct OH_AVCodec *codec)
         if (ret != AVCS_ERR_OK) {
             AVCODEC_LOGE("audioEncoder Release failed!");
             delete codec;
-            return AV_ERR_OPERATE_NOT_PERMIT;
+            return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
         }
     } else {
         AVCODEC_LOGD("audioEncoder_ is nullptr!");
@@ -244,7 +244,8 @@ OH_AVErrCode OH_AudioEncoder_Configure(struct OH_AVCodec *codec, struct OH_AVFor
     CHECK_AND_RETURN_RET_LOG(audioEncObj->audioEncoder_ != nullptr, AV_ERR_INVALID_VAL, "audioEncoder is nullptr!");
 
     int32_t ret = audioEncObj->audioEncoder_->Configure(format->format_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "audioEncoder Configure failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "audioEncoder Configure failed!");
 
     return AV_ERR_OK;
 }
@@ -259,7 +260,8 @@ OH_AVErrCode OH_AudioEncoder_Prepare(struct OH_AVCodec *codec)
     CHECK_AND_RETURN_RET_LOG(audioEncObj->audioEncoder_ != nullptr, AV_ERR_INVALID_VAL, "audioEncoder_ is nullptr!");
 
     int32_t ret = audioEncObj->audioEncoder_->Prepare();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "audioEncoder Prepare failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "audioEncoder Prepare failed!");
 
     return AV_ERR_OK;
 }
@@ -276,7 +278,8 @@ OH_AVErrCode OH_AudioEncoder_Start(struct OH_AVCodec *codec)
     audioEncObj->isEOS_.store(false);
     AVCODEC_LOGD("Set stop and eos status to false");
     int32_t ret = audioEncObj->audioEncoder_->Start();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "audioEncoder Start failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "audioEncoder Start failed!");
 
     return AV_ERR_OK;
 }
@@ -296,7 +299,7 @@ OH_AVErrCode OH_AudioEncoder_Stop(struct OH_AVCodec *codec)
     if (ret != AVCS_ERR_OK) {
         audioEncObj->isStop_.store(false);
         AVCODEC_LOGE("audioEncoder Stop failed! Set stop status to false");
-        return AV_ERR_OPERATE_NOT_PERMIT;
+        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
     }
     audioEncObj->memoryObjList_.clear();
 
@@ -319,7 +322,7 @@ OH_AVErrCode OH_AudioEncoder_Flush(struct OH_AVCodec *codec)
     if (ret != AVCS_ERR_OK) {
         audioEncObj->isFlushing_.store(false);
         AVCODEC_LOGE("audioEncObj Flush failed! Set flush status to false");
-        return AV_ERR_OPERATE_NOT_PERMIT;
+        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
     }
     audioEncObj->memoryObjList_.clear();
     audioEncObj->isFlushing_.store(false);
@@ -340,7 +343,7 @@ OH_AVErrCode OH_AudioEncoder_Reset(struct OH_AVCodec *codec)
     if (ret != AVCS_ERR_OK) {
         audioEncObj->isStop_.store(false);
         AVCODEC_LOGE("audioEncoder Reset failed! Set stop status to false");
-        return AV_ERR_OPERATE_NOT_PERMIT;
+        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
     }
     audioEncObj->memoryObjList_.clear();
     return AV_ERR_OK;
@@ -363,7 +366,8 @@ OH_AVErrCode OH_AudioEncoder_PushInputData(struct OH_AVCodec *codec, uint32_t in
     AVCodecBufferFlag bufferFlag = static_cast<AVCodecBufferFlag>(attr.flags);
 
     int32_t ret = audioEncObj->audioEncoder_->QueueInputBuffer(index, bufferInfo, bufferFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "audioEncoder QueueInputBuffer failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "audioEncoder QueueInputBuffer failed!");
     if (bufferFlag == AVCODEC_BUFFER_FLAG_EOS) {
         audioEncObj->isEOS_.store(true);
         AVCODEC_LOGD("Set eos status to true");
@@ -418,7 +422,8 @@ OH_AVErrCode OH_AudioEncoder_SetParameter(struct OH_AVCodec *codec, struct OH_AV
     CHECK_AND_RETURN_RET_LOG(audioEncObj->audioEncoder_ != nullptr, AV_ERR_INVALID_VAL, "audioEncoder_ is nullptr!");
 
     int32_t ret = audioEncObj->audioEncoder_->SetParameter(format->format_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "audioEncoder SetParameter failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "audioEncoder SetParameter failed!");
 
     return AV_ERR_OK;
 }
@@ -444,7 +449,8 @@ OH_AVErrCode OH_AudioEncoder_SetCallback(struct OH_AVCodec *codec, struct OH_AVC
     audioEncObj->callback_ = std::make_shared<NativeAudioEncoderCallback>(codec, callback, userData);
 
     int32_t ret = audioEncObj->audioEncoder_->SetCallback(audioEncObj->callback_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "audioEncoder SetCallback failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "audioEncoder SetCallback failed!");
 
     return AV_ERR_OK;
 }

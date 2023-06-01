@@ -74,7 +74,8 @@ OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackI
         "New DemuxerObject failed when select track!");
 
     int32_t ret = demuxerObj->demuxer_->SelectTrackByID(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SelectTrackByID failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "demuxer_ SelectTrackByID failed!");
 
     return AV_ERR_OK;
 }
@@ -90,7 +91,8 @@ OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trac
         "New DemuxerObject failed when unselect track!");
 
     int32_t ret = demuxerObj->demuxer_->UnselectTrackByID(trackIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ UnselectTrackByID failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "demuxer_ UnselectTrackByID failed!");
 
     return AV_ERR_OK;
 }
@@ -121,7 +123,8 @@ OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex,
 
     CHECK_AND_RETURN_RET_LOG(ret != AVCS_ERR_NO_MEMORY, AV_ERR_NO_MEMORY,
         "demuxer_ ReadSample failed! sample size is too small to copy full frame data");
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ ReadSample failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "demuxer_ ReadSample failed!");
 
     return AV_ERR_OK;
 }
@@ -139,7 +142,8 @@ OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t millisecond,
         "New DemuxerObject failed when seek!");
 
     int32_t ret = demuxerObj->demuxer_->SeekToTime(millisecond, static_cast<AVSeekMode>(mode));
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "demuxer_ SeekToTime failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "demuxer_ SeekToTime failed!");
 
     return AV_ERR_OK;
 }

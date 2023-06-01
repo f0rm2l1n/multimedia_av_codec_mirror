@@ -227,7 +227,7 @@ OH_AVErrCode OH_VideoEncoder_Destroy(struct OH_AVCodec *codec)
         if (ret != AVCS_ERR_OK) {
             AVCODEC_LOGE("Video encoder destroy failed!");
             delete codec;
-            return AV_ERR_OPERATE_NOT_PERMIT;
+            return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
         }
     } else {
         AVCODEC_LOGD("Video encoder is nullptr!");
@@ -250,7 +250,8 @@ OH_AVErrCode OH_VideoEncoder_Configure(struct OH_AVCodec *codec, struct OH_AVFor
     CHECK_AND_RETURN_RET_LOG(videoEncObj->videoEncoder_ != nullptr, AV_ERR_INVALID_VAL, "Video encoder is nullptr!");
 
     int32_t ret = videoEncObj->videoEncoder_->Configure(format->format_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder configure failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder configure failed!");
 
     return AV_ERR_OK;
 }
@@ -265,7 +266,8 @@ OH_AVErrCode OH_VideoEncoder_Prepare(struct OH_AVCodec *codec)
     CHECK_AND_RETURN_RET_LOG(videoEncObj->videoEncoder_ != nullptr, AV_ERR_INVALID_VAL, "Video encoder is nullptr!");
 
     int32_t ret = videoEncObj->videoEncoder_->Prepare();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder prepare failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder prepare failed!");
 
     return AV_ERR_OK;
 }
@@ -282,7 +284,8 @@ OH_AVErrCode OH_VideoEncoder_Start(struct OH_AVCodec *codec)
     videoEncObj->isStop_.store(false);
     videoEncObj->isEOS_.store(false);
     int32_t ret = videoEncObj->videoEncoder_->Start();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder start failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder start failed!");
 
     return AV_ERR_OK;
 }
@@ -301,7 +304,7 @@ OH_AVErrCode OH_VideoEncoder_Stop(struct OH_AVCodec *codec)
     if (ret != AVCS_ERR_OK) {
         videoEncObj->isStop_.store(false);
         AVCODEC_LOGE("Video encoder stop failed");
-        return AV_ERR_OPERATE_NOT_PERMIT;
+        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
     }
     videoEncObj->memoryObjList_.clear();
 
@@ -320,7 +323,8 @@ OH_AVErrCode OH_VideoEncoder_Flush(struct OH_AVCodec *codec)
     videoEncObj->isFlushing_.store(true);
     int32_t ret = videoEncObj->videoEncoder_->Flush();
     videoEncObj->isFlushing_.store(false);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder flush failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder flush failed!");
     videoEncObj->memoryObjList_.clear();
 
     return AV_ERR_OK;
@@ -340,7 +344,7 @@ OH_AVErrCode OH_VideoEncoder_Reset(struct OH_AVCodec *codec)
     if (ret != AVCS_ERR_OK) {
         videoEncObj->isStop_.store(false);
         AVCODEC_LOGE("Video encoder reset failed");
-        return AV_ERR_OPERATE_NOT_PERMIT;
+        return AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret);
     }
     videoEncObj->memoryObjList_.clear();
 
@@ -357,7 +361,8 @@ OH_AVErrCode OH_VideoEncoder_GetSurface(OH_AVCodec *codec, OHNativeWindow **wind
     CHECK_AND_RETURN_RET_LOG(videoEncObj->videoEncoder_ != nullptr, AV_ERR_INVALID_VAL, "Video encoder is nullptr!");
 
     OHOS::sptr<OHOS::Surface> surface = videoEncObj->videoEncoder_->CreateInputSurface();
-    CHECK_AND_RETURN_RET_LOG(surface != nullptr, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder get surface failed!");
+    CHECK_AND_RETURN_RET_LOG(surface != nullptr, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder get surface failed!");
 
     *window = CreateNativeWindowFromSurface(&surface);
     CHECK_AND_RETURN_RET_LOG(*window != nullptr, AV_ERR_INVALID_VAL, "Video encoder get surface failed!");
@@ -412,7 +417,7 @@ OH_AVErrCode OH_VideoEncoder_NotifyEndOfStream(OH_AVCodec *codec)
     CHECK_AND_RETURN_RET_LOG(videoEncObj->videoEncoder_ != nullptr, AV_ERR_INVALID_VAL, "Video encoder is nullptr!");
 
     int32_t ret = videoEncObj->videoEncoder_->NotifyEos();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT,
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
                              "Video encoder notify end of stream failed!");
 
     return AV_ERR_OK;
@@ -431,7 +436,8 @@ OH_AVErrCode OH_VideoEncoder_SetParameter(struct OH_AVCodec *codec, struct OH_AV
     CHECK_AND_RETURN_RET_LOG(videoEncObj->videoEncoder_ != nullptr, AV_ERR_INVALID_VAL, "Video encoder is nullptr!");
 
     int32_t ret = videoEncObj->videoEncoder_->SetParameter(format->format_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder set parameter failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder set parameter failed!");
 
     return AV_ERR_OK;
 }
@@ -457,7 +463,8 @@ OH_AVErrCode OH_VideoEncoder_SetCallback(
     videoEncObj->callback_ = std::make_shared<NativeVideoEncoderCallback>(codec, callback, userData);
 
     int32_t ret = videoEncObj->videoEncoder_->SetCallback(videoEncObj->callback_);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder set callback failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder set callback failed!");
 
     return AV_ERR_OK;
 }
@@ -479,7 +486,8 @@ OH_AVErrCode OH_VideoEncoder_PushInputData(struct OH_AVCodec *codec, uint32_t in
     enum AVCodecBufferFlag bufferFlag = static_cast<enum AVCodecBufferFlag>(attr.flags);
 
     int32_t ret = videoEncObj->videoEncoder_->QueueInputBuffer(index, bufferInfo, bufferFlag);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AV_ERR_OPERATE_NOT_PERMIT, "Video encoder push input data failed!");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret),
+                             "Video encoder push input data failed!");
     if (bufferFlag == AVCODEC_BUFFER_FLAG_EOS) {
         videoEncObj->isEOS_.store(true);
     }
