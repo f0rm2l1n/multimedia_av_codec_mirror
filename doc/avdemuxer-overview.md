@@ -170,6 +170,7 @@
       if(!audioIsEnd) {
          int32_t ret = OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info);
          if (ret==AV_ERR_OK) {
+            // 可通过 buffer 获取并处理音频帧数据
             printf("audio info.size: %d\n", info.size);
             if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
                audioIsEnd = true;
@@ -179,6 +180,7 @@
       if(!videoIsEnd) {
          int32_t ret = OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info);
          if (ret==AV_ERR_OK) {
+            // 可通过 buffer 获取并处理视频帧数据
             printf("video info.size: %d\n", info.size);
             if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
                videoIsEnd = true;
