@@ -37,6 +37,7 @@ public:
 
 protected:
     std::shared_ptr<CodecListMock> capability_ = nullptr;
+    bool isHardIncluded_ = false;
 };
 } // namespace Media
 } // namespace OHOS

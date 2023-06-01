@@ -110,7 +110,11 @@ int32_t DemuxerServiceStub::DestroyStub()
 int32_t DemuxerServiceStub::Init(uintptr_t sourceAddr)
 {
     CHECK_AND_RETURN_RET_LOG(demuxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service is nullptr");
-    return demuxerServer_->Init(sourceAddr);
+    int32_t ret = demuxerServer_->Init(sourceAddr);
+    if (ret != AVCS_ERR_OK) {
+        DestroyStub();
+    }
+    return ret;
 }
 
 int32_t DemuxerServiceStub::SelectTrackByID(uint32_t trackIndex)

@@ -30,7 +30,6 @@
 #include "native_averrors.h"
 #include "nocopyable.h"
 
-
 namespace OHOS {
 namespace Media {
 class CodecListMock : public NoCopyable {
@@ -83,6 +82,14 @@ const std::map<std::string, std::string> CAPABILITY_DECODER_NAME = {
 const std::map<std::string, std::string> CAPABILITY_ENCODER_NAME = {
     {std::string(CodecMimeType::AUDIO_FLAC), std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME)},
     {std::string(CodecMimeType::AUDIO_AAC), std::string(AVCodecCodecName::AUDIO_ENCODER_AAC_NAME)}};
+
+const std::map<std::string, std::string> CAPABILITY_DECODER_HARD_NAME = {
+    {std::string(CodecMimeType::VIDEO_AVC), "OMX.hisi.video.decoder.avc"},
+    {std::string(CodecMimeType::VIDEO_HEVC), "OMX.hisi.video.decoder.hevc"}};
+
+const std::map<std::string, std::string> CAPABILITY_ENCODER_HARD_NAME = {
+    {std::string(CodecMimeType::VIDEO_AVC), "OMX.hisi.video.encoder.avc"},
+    {std::string(CodecMimeType::VIDEO_HEVC), "OMX.hisi.video.encoder.hevc"}};
 
 const std::string DEFAULT_AUDIO_MIME = std::string(CodecMimeType::AUDIO_AAC);
 const std::string DEFAULT_VIDEO_MIME = std::string(CodecMimeType::VIDEO_AVC);

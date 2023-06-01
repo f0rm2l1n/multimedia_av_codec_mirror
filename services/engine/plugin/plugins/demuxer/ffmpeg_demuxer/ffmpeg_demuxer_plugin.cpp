@@ -119,7 +119,6 @@ int64_t FFmpegDemuxerPlugin::GetTotalStreamFrames(int streamIndex)
 
 AVCodecBufferFlag FFmpegDemuxerPlugin::ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::ConvertFlagsFromFFmpeg is called");
     AVCodecBufferFlag flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     if (pkt->flags == 0x0001) {
         if (abs((int)(avStream->duration-pkt->pts)) <= (pkt->duration)) {
@@ -253,7 +252,6 @@ std::vector<uint32_t> FFmpegDemuxerPlugin::GetSelectedTrackIds()
 
 bool FFmpegDemuxerPlugin::IsInSelectedTrack(uint32_t trackIndex)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::IsInSelectedTrack");
     return std::any_of(selectedTrackIds_.begin(), selectedTrackIds_.end(),
                        [trackIndex](uint32_t id) { return id == trackIndex; });
 }
@@ -292,7 +290,6 @@ void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
 
 void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb");
     (void)av_bsf_send_packet(avbsfContext_.get(), &pkt);
     (void)av_packet_unref(&pkt);
     (void)av_bsf_receive_packet(avbsfContext_.get(), &pkt);
@@ -331,7 +328,6 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt_->data+samplePacket->offset_, copySize);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
-    AVCODEC_LOGD("Copy from %{public}" PRIu64 ", copy size %{public}" PRIu64, samplePacket->offset_, copySize);
     if (copySize != copyFrameSize) {
         samplePacket->offset_ += copySize;
         return AVCS_ERR_NO_MEMORY;
@@ -343,7 +339,6 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
 int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
                                         AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
-    AVCODEC_LOGD("FFmpegDemuxerPlugin::ReadSample: trackIndex=%{public}u", trackIndex);
     if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
         AVCODEC_LOGE("read frame failed, track %{public}u has not been selected", trackIndex);
         return AVCS_ERR_DEMUXER_FAILED;

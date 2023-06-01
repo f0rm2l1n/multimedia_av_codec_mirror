@@ -21,6 +21,7 @@
 #include <queue>
 #include <string>
 #include <thread>
+#include <string>
 
 #include "surface/window.h"
 #include "nocopyable.h"
@@ -55,12 +56,13 @@ class VDecDemo : public NoCopyable {
 public:
     VDecDemo();
     virtual ~VDecDemo();
-    void RunCase(bool isSurfaceMode = false);
+    void RunCase(std::string &mode);
 
 private:
     int32_t CreateDec();
     int32_t Configure(OH_AVFormat *format);
     int32_t SetSurface(OHNativeWindow *window);
+    sptr<Surface> GetSurface(std::string &mode);
     int32_t Start();
     int32_t Stop();
     int32_t Flush();
@@ -92,7 +94,7 @@ private:
     uint8_t *data_ = nullptr;
     uint8_t inbuf_[VIDEO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
     bool file_end_ = false;
-    bool isSurfaceMode_ = false;
+    std::string mode_ = "0";
 };
 } // namespace VideoDemo
 } // namespace Media

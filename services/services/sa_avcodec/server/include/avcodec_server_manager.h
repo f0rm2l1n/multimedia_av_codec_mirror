@@ -20,6 +20,7 @@
 #include <functional>
 #include <map>
 #include <list>
+#include <unordered_set>
 #include "iremote_object.h"
 #include "ipc_skeleton.h"
 #include "nocopyable.h"
@@ -50,6 +51,7 @@ public:
 private:
     AVCodecServerManager();
     void PrintDumpMenu(int32_t fd);
+    void DumpServer(int32_t fd, StubType stubType, std::unordered_set<std::u16string> &argSets);
 
 #ifdef SUPPORT_DEMUXER
     sptr<IRemoteObject> CreateDemuxerStubObject();

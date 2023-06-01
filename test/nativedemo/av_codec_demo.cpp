@@ -79,7 +79,7 @@ static int RunAudioEncoder()
     } else if (mode == "1") {
         auto audioEnc = std::make_unique<AEncFlacDemo>();
         audioEnc->RunCase();
-    }  else {
+    } else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -108,7 +108,7 @@ static int RunAudioInnerDecoder()
     } else if (mode == "3") {
         auto audioDec = std::make_unique<ADecInnerDemo>();
         audioDec->RunCase();
-    }  else {
+    } else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -129,7 +129,7 @@ static int RunAudioInnerEncoder()
     } else if (mode == "1") {
         auto audioEnc = std::make_unique<AEnInnerDemo>();
         audioEnc->RunCase();
-    }  else {
+    } else {
         cout << "no that selection" << endl;
         return 0;
     }
@@ -149,26 +149,50 @@ static int RunCodecList()
     return 0;
 }
 
-static int RunVideoDecoder(bool isSurfaceMode)
+static int RunVideoDecoder()
 {
+    cout << "Please select number for output mode (default buffer mode): " << endl;
+    cout << "0: buffer" << endl;
+    cout << "1: surface file" << endl;
+    cout << "2: surface render" << endl;
+
+    string mode;
+    (void)getline(cin, mode);
+    if (mode != "0" && mode != "1" && mode != "2") {
+        cout << "parameter invalid" << endl;
+        return 0;
+    }
+
     auto videoDec = std::make_unique<VDecDemo>();
     if (videoDec == nullptr) {
         cout << "video decoder is null" << endl;
         return 0;
     }
-    videoDec->RunCase(isSurfaceMode);
+    videoDec->RunCase(mode);
     cout << "demo video decoder end" << endl;
     return 0;
 }
 
-static int RunVideoInnerDecoder(bool isSurfaceMode)
+static int RunVideoInnerDecoder()
 {
+    cout << "Please select number for output mode (default buffer mode): " << endl;
+    cout << "0: buffer" << endl;
+    cout << "1: surface file" << endl;
+    cout << "2: surface render" << endl;
+
+    string mode;
+    (void)getline(cin, mode);
+    if (mode != "0" && mode != "1" && mode != "2") {
+        cout << "parameter invalid" << endl;
+        return 0;
+    }
+
     auto videoDec = std::make_unique<VDecInnerDemo>();
     if (videoDec == nullptr) {
         cout << "video decoder is null" << endl;
         return 0;
     }
-    videoDec->RunCase(isSurfaceMode);
+    videoDec->RunCase(mode);
     cout << "demo video decoder end" << endl;
     return 0;
 }
@@ -182,11 +206,9 @@ static void OptionPrint()
     cout << "3:Audio Inner Encoder" << endl;
     cout << "4:muxer demo" << endl;
     cout << "6:codeclist" << endl;
-    cout << "7:Video Decoder (buffer mode)" << endl;
-    cout << "8:Video Decoder (surface mode)" << endl;
-    cout << "9:Video Inner Decoder (buffer mode)" << endl;
-    cout << "10:Video Inner Decoder (surface mode)" << endl;
-    cout << "11:demuxer demo" << endl;
+    cout << "7:Video Decoder" << endl;
+    cout << "8:Video Inner Decoder" << endl;
+    cout << "9:demuxer demo" << endl;
 }
 
 int main()
@@ -207,14 +229,10 @@ int main()
     } else if (mode == "6") {
         (void)RunCodecList();
     } else if (mode == "7") {
-        (void)RunVideoDecoder(false);
+        (void)RunVideoDecoder();
     } else if (mode == "8") {
-        (void)RunVideoDecoder(true);
+        (void)RunVideoInnerDecoder();
     } else if (mode == "9") {
-        (void)RunVideoInnerDecoder(false);
-    } else if (mode == "10") {
-        (void)RunVideoInnerDecoder(true);
-    } else if (mode == "11") {
         (void)AVSourceDemuxerDemoCase();
     } else {
         cout << "no that selection" << endl;

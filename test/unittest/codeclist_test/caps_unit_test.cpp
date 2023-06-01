@@ -158,7 +158,7 @@ void CapsUnitTest::CheckVideoCaps(const std::shared_ptr<VideoCaps> &videoCaps) c
         CheckAVDecMpeg2Video(videoCaps);
     } else if (codecName.compare("avdec_mpeg4") == 0) {
         CheckAVDecMpeg4(videoCaps);
-    } else if (codecName.compare("video_decoder.avc") == 0) {
+    } else if (codecName.compare("OH.Media.Codec.Decoder.Video.AVC") == 0) {
         CheckAVDecAVC(videoCaps);
     } else if (codecName.compare("avenc_mpeg4") == 0) {
         CheckAVEncMpeg4(videoCaps);
