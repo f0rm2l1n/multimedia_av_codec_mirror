@@ -24,6 +24,7 @@
 #include <string>
 #include <thread>
 #include "avcodec_codec_name.h"
+#include "avcodec_mime_type.h"
 #include "avcodec_common.h"
 #include "media_description.h"
 #include "native_avcodec_base.h"
@@ -263,7 +264,7 @@ void AudioCodeCapiEncoderUnitTest::OutputFunc()
 
 int32_t AudioCodeCapiEncoderUnitTest::ProceFunc(void)
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName("avenc_flac");
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME).data());
     EXPECT_NE((OH_AVCodec *)nullptr, audioEnc_);
 
     signal_ = new AEncSignal();
@@ -278,8 +279,51 @@ int32_t AudioCodeCapiEncoderUnitTest::ProceFunc(void)
 
 HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_CreateByName_01, TestSize.Level1)
 {
-    audioEnc_ = OH_AudioEncoder_CreateByName("avenc_flac");
+    audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME).data());
     EXPECT_NE(nullptr, audioEnc_);
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_CreateByMime_01, TestSize.Level1)
+{
+    audioEnc_ = OH_AudioEncoder_CreateByMime((AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC).data());
+    EXPECT_NE(nullptr, audioEnc_);
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_Prepare_01, TestSize.Level1)
+{
+    ProceFunc();
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Prepare(audioEnc_));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_GetOutputDescription_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    EXPECT_NE(nullptr, OH_AudioEncoder_GetOutputDescription(audioEnc_));
+}
+
+HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_IsValid_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_SAMPLE);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
+    OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL.data(), COMPLIANCE_LEVEL);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
+    bool value = true;
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_IsValid(audioEnc_, &value));
 }
 
 HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_SetParameter_01, TestSize.Level1)
