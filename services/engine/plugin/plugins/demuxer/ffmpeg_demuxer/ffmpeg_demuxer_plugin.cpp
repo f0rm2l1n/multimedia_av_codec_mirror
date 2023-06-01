@@ -304,7 +304,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     uint64_t frameSize = 0;
     bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt_->pts, avStream->time_base));
     flag = ConvertFlagsFromFFmpeg(samplePacket->pkt_, avStream);
-    CHECK_AND_RETURN_RET_LOG(samplePacket->pkt_->size >= 0, AVCS_ERR_DEMUXER_FAILED, "the pkt size is must be positive");
+    CHECK_AND_RETURN_RET_LOG(samplePacket->pkt_->size >= 0, AVCS_ERR_DEMUXER_FAILED, "the sample size is must be positive");
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
         frameSize = static_cast<uint64_t>(samplePacket->pkt_->size);
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
