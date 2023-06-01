@@ -78,7 +78,7 @@
       return;
    }
    stat(fileName.c_str(), &fileStatus);
-   // 为 fd 资源文件创建 source 资源对象, size 必须传入文件大小
+   // 为 fd 资源文件创建 source 资源对象, 传入 offset 不为文件起始位置 或 size 不为文件大小时，可能会因不能获取完整数据导致 source 创建失败、或后续解封装失败等问题
    OH_AVSource *source = OH_AVSource_CreateWithFD(fd, 0, fileSize);
    if(source==nullptr){
       printf("create source error: fd=%d, size=%zu", fd, fileSize);
@@ -162,26 +162,30 @@
    // 创建 buffer，用与保存用户解封装得到的数据
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
    OH_AVCodecBufferAttr info;
-   bool isEnd = false;
-   while (!isEnd) {
+   bool videoIsEnd = false;
+   bool audioIsEnd = false;
+   while (!audioIsEnd||!videoIsEnd) {
       // 在调用 OH_AVDemuxer_ReadSample 接口获取数据前，需要先调用 OH_AVDemuxer_SelectTrackByID 选中需要获取数据的轨道
       // 获取音频帧数据
-      if(OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info)) {
-         // 处理 buffer 数据
-         printf("audio info.size: %d", info.size);
-         break;
+      if(!audioIsEnd) {
+         int32_t ret = OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info);
+         if (ret==AV_ERR_OK) {
+            // 可通过 buffer 获取并处理音频帧数据
+            printf("audio info.size: %d\n", info.size);
+            if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
+               audioIsEnd = true;
+            }
+         }
       }
-      if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
-         isEnd = true;
-      }
-      // 获取视频帧数据
-      if(OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info)) {
-         // 处理 buffer 数据
-         printf("video info.size: %d", info.size);
-         break;
-      }
-      if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
-         isEnd = true;
+      if(!videoIsEnd) {
+         int32_t ret = OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info);
+         if (ret==AV_ERR_OK) {
+            // 可通过 buffer 获取并处理视频帧数据
+            printf("video info.size: %d\n", info.size);
+            if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
+               videoIsEnd = true;
+            }
+         }
       }
    }
    OH_AVMemory_Destroy(buffer);
@@ -197,9 +201,9 @@
       printf("destroy source pointer error");
    }
    source = NULL;
+   // 需要用户调用 OH_AVDemuxer_Destroy 接口成功后，手动将对象置为 NULL，对同一对象重复调用 OH_AVDemuxer_Destroy 会导致程序错误
    if (OH_AVDemuxer_Destroy(demuxer) != AV_ERR_OK) {
       printf("destroy demuxer pointer error");
    }
    demuxer = NULL;
-   // close(fd);
    ```
