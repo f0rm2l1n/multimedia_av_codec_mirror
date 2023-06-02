@@ -209,11 +209,7 @@ HWTEST_F(CodecListUnitTest, CodecList_GetMaxSupportedInstances_001, TestSize.Lev
     // video decoder
     capability_ = CodecListMockFactory::GetCapability(DEFAULT_VIDEO_MIME, false);
     ASSERT_NE(nullptr, capability_) << "video decoder codeclist create fail!" << std::endl;
-    if (capability_->IsHardware()) {
-        EXPECT_EQ(0, capability_->GetMaxSupportedInstances());
-    } else {
-        EXPECT_EQ(MAX_SURPPORT_VCODEC, capability_->GetMaxSupportedInstances());
-    }
+    EXPECT_EQ(MAX_SURPPORT_VCODEC, capability_->GetMaxSupportedInstances());
 }
 
 /**
