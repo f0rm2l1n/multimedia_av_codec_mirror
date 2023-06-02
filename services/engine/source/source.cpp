@@ -210,7 +210,7 @@ Source::~Source()
 int32_t Source::GetTrackCount(uint32_t &trackCount)
 {
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-        "call getTrackcount failed, because create source failed!");
+        "call GetTrackCount failed, because create source failed!");
     trackCount = static_cast<uint32_t>(formatContext_->nb_streams);
     return AVCS_ERR_OK;
 }
@@ -220,18 +220,18 @@ void Source::GetStringFormatFromMetadata(const std::string key, std::string_view
     AVDictionaryEntry *valPtr = nullptr;
     valPtr = av_dict_get(formatContext_->metadata, key.c_str(), nullptr, AV_DICT_MATCH_CASE);
     if (valPtr == nullptr) {
-        AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
+        AVCODEC_LOGW("Put source info failed: miss %{public}s info in file", key.c_str());
     } else {
         bool ret = format.PutStringValue(formatName, valPtr->value);
         if (!ret) {
-            AVCODEC_LOGW("Put track info failed: miss %{public}s info in file", key.c_str());
+            AVCODEC_LOGW("Put source info failed: miss %{public}s info in file", key.c_str());
         }
     }
 }
 
 int32_t Source::GetSourceFormat(Format &format)
 {
-    AVCODEC_LOGI("Source::GetFormat is on call");
+    AVCODEC_LOGI("Source::GetSourceFormat is on call");
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_INVALID_OPERATION, "formatContext_ is nullptr!");
     Format::FormatDataMap formatMap = format.GetFormatMap();
 
@@ -260,13 +260,13 @@ int32_t Source::GetSourceFormat(Format &format)
     }
     bool ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_DURATION, duration);
     if (!ret) {
-        AVCODEC_LOGW("Put track info failed: miss duration info in file");
+        AVCODEC_LOGW("Put source info failed: miss duration info in file");
     }
 
     ret = format.PutIntValue(
         MediaDescriptionKey::MD_KEY_TRACK_COUNT, static_cast<uint32_t>(formatContext_->nb_streams));
     if (!ret) {
-        AVCODEC_LOGW("Put track info failed: miss track count info in file");
+        AVCODEC_LOGW("Put source info failed: miss track count info in file");
     }
 
     AVCODEC_LOGD("Source::GetSourceFormat result: %{public}s", format.Stringify().c_str());
