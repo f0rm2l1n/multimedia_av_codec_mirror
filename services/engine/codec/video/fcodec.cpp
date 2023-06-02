@@ -89,14 +89,18 @@ int32_t FCodec::Init()
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(!codecName_.empty(), AVCS_ERR_INVALID_VAL, "Init codec failed:  empty name");
     std::string fcodecName;
+    std::string_view mime;
     for (uint32_t i = 0; i < SUPPORT_VCODEC_NUM; ++i) {
         if (SUPPORT_VCODEC[i].codecName == codecName_) {
             fcodecName = SUPPORT_VCODEC[i].ffmpegCodec;
+            mime = SUPPORT_VCODEC[i].mimeType;
             break;
         }
     }
     CHECK_AND_RETURN_RET_LOG(!fcodecName.empty(), AVCS_ERR_INVALID_VAL,
                              "Init codec failed: not support name: %{public}s", codecName_.c_str());
+    format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, mime);
+    format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_NAME, codecName_);
     avCodec_ = std::shared_ptr<AVCodec>(const_cast<AVCodec *>(avcodec_find_decoder_by_name(fcodecName.c_str())),
                                         [](void *ptr) {});
     CHECK_AND_RETURN_RET_LOG(avCodec_ != nullptr, AVCS_ERR_INVALID_VAL,
