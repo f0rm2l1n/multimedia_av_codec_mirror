@@ -74,7 +74,7 @@ void WriteFd(int32_t fd, std::string& str)
     if (fd != -1) {
         write(fd, str.c_str(), str.size());
     }
-    str.sclear();
+    str.clear();
 }
 
 int32_t WriteInfo(int32_t fd, std::string& dumpString, std::vector<Dumper> dumpers, bool needDetail)
