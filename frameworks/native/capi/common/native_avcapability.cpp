@@ -290,10 +290,10 @@ OH_AVErrCode OH_AVCapability_GetVideoWidthRangeForHeight(OH_AVCapability *capabi
 {
     CHECK_AND_RETURN_RET_LOG(widthRange != nullptr, AV_ERR_INVALID_VAL,
                              "Get video width range for height failed: null input");
-    if (capability == nullptr) {
+    if (capability == nullptr || height <= 0) {
         widthRange->minVal = 0;
         widthRange->maxVal = 0;
-        AVCODEC_LOGE("Get video width range for height failed: null input");
+        AVCODEC_LOGE("Get video width range for height failed: invalid input");
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
@@ -308,10 +308,10 @@ OH_AVErrCode OH_AVCapability_GetVideoHeightRangeForWidth(OH_AVCapability *capabi
 {
     CHECK_AND_RETURN_RET_LOG(heightRange != nullptr, AV_ERR_INVALID_VAL,
                              "Get video height range for width failed: null input");
-    if (capability == nullptr) {
+    if (capability == nullptr || width <= 0) {
         heightRange->minVal = 0;
         heightRange->maxVal = 0;
-        AVCODEC_LOGE("Get video height range for width failed: null input");
+        AVCODEC_LOGE("Get video height range for width failed: invalid input");
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capability->capabilityData_);
@@ -386,10 +386,10 @@ OH_AVErrCode OH_AVCapability_GetVideoFrameRateRangeForSize(OH_AVCapability *capa
 {
     CHECK_AND_RETURN_RET_LOG(frameRateRange != nullptr, AV_ERR_INVALID_VAL,
                              "Get video framerate range for size failed: null input");
-    if (capability == nullptr) {
+    if (capability == nullptr || width <= 0 || height <= 0) {
         frameRateRange->minVal = 0;
         frameRateRange->maxVal = 0;
-        AVCODEC_LOGE("Get video framerate range for size failed: null input");
+        AVCODEC_LOGE("Get video framerate range for size failed: invalid input");
         return AV_ERR_INVALID_VAL;
     }
     std::shared_ptr<VideoCaps> videoCap = std::make_shared<VideoCaps>(capability->capabilityData_);

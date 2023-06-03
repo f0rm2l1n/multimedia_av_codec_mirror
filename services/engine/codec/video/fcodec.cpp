@@ -464,6 +464,23 @@ int32_t FCodec::SetParameter(const Format &format)
 int32_t FCodec::GetOutputFormat(Format &format)
 {
     AVCODEC_SYNC_TRACE;
+    if (!format_.ContainKey(MediaDescriptionKey::MD_KEY_BITRATE)) {
+        if (avCodecContext_ != nullptr) {
+            format_.PutIntValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
+        }
+    }
+    if (!format_.ContainKey(MediaDescriptionKey::MD_KEY_FRAME_RATE)) {
+        if (avCodecContext_ != nullptr && avCodecContext_->framerate.den > 0) {
+            double value = static_cast<double>(avCodecContext_->framerate.num) /
+                           static_cast<double>(avCodecContext_->framerate.den);
+            format_.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, value);
+        }
+    }
+    if (!format_.ContainKey(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE)) {
+        int32_t stride = AlignUp(width_, VIDEO_ALIGN_SIZE);
+        int32_t maxInputSize = static_cast<int32_t>((stride * height_ * VIDEO_PIX_DEPTH_YUV) >> VIDEO_MIN_COMPRESSION);
+        format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize);
+    }
     format = format_;
     AVCODEC_LOGI("Get outputFormat successful");
     return AVCS_ERR_OK;
