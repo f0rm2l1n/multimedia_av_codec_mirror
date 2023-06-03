@@ -27,9 +27,8 @@
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "SourceServer"};
-    constexpr uint32_t DUMP_INPUT_URL_INDEX = 0x01010000;
-    constexpr uint32_t DUMP_SOURCE_INFO_INDEX = 0x01020000;
-    constexpr uint32_t DUMP_TRACK_INFO_INDEX = 0x01030000;
+    constexpr uint32_t DUMP_SOURCE_INFO_INDEX = 0x01010000;
+    constexpr uint32_t DUMP_TRACK_INFO_INDEX = 0x01020000;
     constexpr uint32_t DUMP_OFFSET_8 = 8;
 
     const std::vector<std::pair<std::string_view, const std::string>> SOURCE_DUMP_TABLE = {
