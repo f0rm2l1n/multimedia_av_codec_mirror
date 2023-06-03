@@ -177,7 +177,7 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
         int32_t trackType;
         trackFormat.GetIntValue("track_type", trackType);
         std::string indexString =
-            std::string("Index ") + std::to_string(idx) + std::string(" _ ") + (trackType ? "Video" : "Audio");
+            std::string("Index_") + std::to_string(idx) + std::string("_") + (trackType ? "Video" : "Audio");
         dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX + trackListIndex, indexString);
         const auto &dumpTable = trackType == MEDIA_TYPE_AUD ? AUDIO_TRACK_DUMP_TABLE : VIDEO_TRACK_DUMP_TABLE;
         for (auto iter : dumpTable) {
