@@ -381,7 +381,7 @@ const std::string &CodecServer::GetStatusDescription(OHOS::Media::CodecServer::C
 void CodecServer::OnError(int32_t errorType, int32_t errorCode)
 {
     std::lock_guard<std::mutex> lock(cbMutex_);
-    lastErrMsg_ = AVCSErrorToOHAVErrCodeString(static_cast<AVCodecServiceErrCode>(errorCode));
+    lastErrMsg_ = AVCSErrorToString(static_cast<AVCodecServiceErrCode>(errorCode));
     FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, lastErrMsg_, "Codec");
     if (codecCb_ == nullptr) {
         return;
