@@ -28,13 +28,21 @@
 #include "consumer_surface.h"
 #include "surface/window.h"
 #include "avcodec_codec_name.h"
+#include "avcodec_codec_name.h"
+#include "avcodec_common.h"
 #include "avcodec_common.h"
 #include "avcodec_errors.h"
+#include "avcodec_errors.h"
 #include "media_description.h"
+#include "buffer_queue_producer.h"
+#include "consumer_surface.h"
+#include "native_avcodec_base.h"
 #include "native_avcodec_base.h"
 #include "native_avformat.h"
 #include "native_avcodec_videodecoder.h"
+#include "native_avcodec_videodecoder.h"
 #include "unittest_log.h"
+#include "native_avformat.h"
 #include "securec.h"
 
 using namespace std;
@@ -236,6 +244,7 @@ void VideoCodeCapiDecoderUnitTest::SetUp(void)
 void VideoCodeCapiDecoderUnitTest::TearDown(void)
 {
     cout << "[TearDown]: over!!!" << endl;
+    OH_VideoDecoder_Destroy(videoDec_);
 }
 
 void VideoCodeCapiDecoderUnitTest::InputFunc()
@@ -347,11 +356,107 @@ int32_t VideoCodeCapiDecoderUnitTest::ProceFunc(void)
     return AVCS_ERR_OK;
 }
 
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Create, TestSize.Level1)
+{
+    videoDec_ = OH_VideoDecoder_CreateByName("");
+    EXPECT_EQ(nullptr, videoDec_);
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Configure_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Configure_02, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Configure_03, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Configure_04, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Start_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Start_02, TestSize.Level1)
+{
+    ProceFunc();
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Start_03, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Start_04, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_getOutputFormat_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_NE(nullptr, OH_VideoDecoder_GetOutputDescription(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_getOutputFormat_02, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_NE(nullptr, OH_VideoDecoder_GetOutputDescription(videoDec_));
+}
+
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_SetParameter_01, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     isRunning_.store(true);
@@ -382,31 +487,24 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_SetParameter_01, TestSize.Le
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_SetParameter(videoDec_, format_));
+    EXPECT_NE(nullptr, OH_VideoDecoder_GetOutputDescription(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_SetParameter_02, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
-
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_SetParameter(videoDec_, format_));
-}
-HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Configure_01, TestSize.Level1)
-{
-    ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
-
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_NE(nullptr, OH_VideoDecoder_GetOutputDescription(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_01, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     isRunning_.store(true);
@@ -435,14 +533,13 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_01, TestSize.Leve
         lock.unlock();
         outputLoop_->join();
     }
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_02, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
 
@@ -477,14 +574,13 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_02, TestSize.Leve
         lock.unlock();
         outputLoop_->join();
     }
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_03, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     isRunning_.store(true);
@@ -513,14 +609,13 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_03, TestSize.Leve
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_04, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     isRunning_.store(true);
@@ -551,14 +646,13 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_04, TestSize.Leve
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_05, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     isRunning_.store(true);
@@ -588,14 +682,13 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_05, TestSize.Leve
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_06, TestSize.Level1)
 {
     ProceFunc();
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     isRunning_.store(true);
@@ -626,15 +719,13 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_06, TestSize.Leve
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_01, TestSize.Level1)
 {
     EXPECT_EQ(nullptr, videoDec_);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_WIDTH.data(), DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_HEIGHT.data(), DEFAULT_HEIGHT);
-
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
 }
 
@@ -650,6 +741,69 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_03, TestSize.Le
     EXPECT_EQ(nullptr, videoDec_);
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_04, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_05, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_06, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_07, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_08, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_statuscase_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
 }
 } // namespace VCodecUT
 } // namespace Media
