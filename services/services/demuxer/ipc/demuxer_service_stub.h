@@ -39,7 +39,6 @@ public:
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t millisecond, const AVSeekMode mode) override;
 
-    int32_t DumpInfo(int32_t fd);
     int32_t DestroyStub() override;
 private:
     DemuxerServiceStub();
@@ -50,7 +49,6 @@ private:
     int32_t UnselectTrackByID(MessageParcel &data, MessageParcel &reply);
     int32_t ReadSample(MessageParcel &data, MessageParcel &reply);
     int32_t SeekToTime(MessageParcel &data, MessageParcel &reply);
-    int32_t GetDumpInfo(std::string& dumpInfo);
     int32_t DestroyStub(MessageParcel &data, MessageParcel &reply);
 
     std::shared_ptr<IDemuxerService> demuxerServer_ = nullptr;

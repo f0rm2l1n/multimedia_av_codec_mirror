@@ -50,14 +50,13 @@ constexpr uint32_t DUMP_UID_INDEX = 0x01010200;
 constexpr uint32_t DUMP_OFFSET_16 = 16;
 
 const std::vector<const std::string> SA_DUMP_MENU_DUMP_TABLE = {
-    "All", "Codec", "Muxer", "Demuxer", "Source", " ", "Switch_bitstream_dump"
+    "All", "Codec", "Muxer", "Source/Demuxer", " ", "Switch_bitstream_dump"
 };
 
 const std::map<OHOS::Media::AVCodecServerManager::StubType, const std::string> STUB_TYPE_STRING_MAP = {
     { OHOS::Media::AVCodecServerManager::StubType::CODEC,  "Codec"},
     { OHOS::Media::AVCodecServerManager::StubType::MUXER,  "Muxer"},
-    { OHOS::Media::AVCodecServerManager::StubType::DEMUXER,  "Demuxer"},
-    { OHOS::Media::AVCodecServerManager::StubType::SOURCE,  "Source"},
+    { OHOS::Media::AVCodecServerManager::StubType::SOURCE,  "Source/Demuxer"},
 };
 } // namespace
 
@@ -126,9 +125,6 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
 #endif
 #ifdef SUPPORT_MUXER
     DumpServer(fd, StubType::MUXER, argSets);
-#endif
-#ifdef SUPPORT_DEMUXER
-    DumpServer(fd, StubType::DEMUXER, argSets);
 #endif
 #ifdef SUPPORT_SOURCE
     DumpServer(fd, StubType::SOURCE, argSets);
@@ -282,14 +278,8 @@ sptr<IRemoteObject> AVCodecServerManager::CreateDemuxerStubObject()
     if (object != nullptr) {
         pid_t pid = IPCSkeleton::GetCallingPid();
         demuxerStubMap_[object] = pid;
-
-        Dumper dumper;
-        dumper.entry_ = [stub](int32_t fd) -> int32_t { return stub->DumpInfo(fd); };
-        dumper.pid_ = pid;
-        dumper.uid_ = IPCSkeleton::GetCallingUid();
-        dumper.remoteObject_ = object;
-        dumperTbl_[StubType::DEMUXER].emplace_back(dumper);
         AVCODEC_LOGD("The number of demuxer services(%{public}zu).", demuxerStubMap_.size());
+
         if (Dump(-1, std::vector<std::u16string>()) != OHOS::NO_ERROR) {
             AVCODEC_LOGW("failed to call InstanceDump");
         }

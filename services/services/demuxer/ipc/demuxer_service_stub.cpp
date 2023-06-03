@@ -142,18 +142,6 @@ int32_t DemuxerServiceStub::SeekToTime(int64_t millisecond, const AVSeekMode mod
     return demuxerServer_->SeekToTime(millisecond, mode);
 }
 
-int32_t DemuxerServiceStub::DumpInfo(int32_t fd)
-{
-    std::string dumpInfo;
-    dumpInfo += "# DemuxerServiceStub \n";
-    GetDumpInfo(dumpInfo);
-
-    CHECK_AND_RETURN_RET_LOG(fd != -1, AVCS_ERR_INVALID_VAL, "Attempt to write to a invalid fd: %{public}d", fd);
-    write(fd, dumpInfo.c_str(), dumpInfo.size());
-
-    return AVCS_ERR_OK;
-}
-
 int32_t DemuxerServiceStub::Init(MessageParcel &data, MessageParcel &reply)
 {
     uint64_t sourceAddr = data.ReadPointer();
@@ -216,13 +204,6 @@ int32_t DemuxerServiceStub::DestroyStub(MessageParcel &data, MessageParcel &repl
 {
     (void)data;
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(DestroyStub()), AVCS_ERR_UNKNOWN, "Reply DestroyStub failed!");
-    return AVCS_ERR_OK;
-}
-
-int32_t DemuxerServiceStub::GetDumpInfo(std::string& dumpInfo)
-{
-    dumpInfo += "## pid: " + std::to_string(getpid());
-    dumpInfo += "## uid: " + std::to_string(getuid());
     return AVCS_ERR_OK;
 }
 }  // namespace Media
