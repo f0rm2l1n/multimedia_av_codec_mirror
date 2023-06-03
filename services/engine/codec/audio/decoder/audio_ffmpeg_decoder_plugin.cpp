@@ -99,13 +99,13 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
     if (ret == 0) {
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     } else if (ret == AVERROR(EAGAIN)) {
-        AVCODEC_LOGW("skip this frame because data not enough: %{public}d", ret);
+        AVCODEC_LOGW("skip this frame because data not enough, msg:%{public}s", AVStrError(ret).data());
         return AVCodecServiceErrCode::AVCS_ERR_AGAIN;
     } else if (ret == AVERROR_EOF) {
-        AVCODEC_LOGW("eos send frame:%{public}d", ret);
+        AVCODEC_LOGW("eos send frame, msg:%{public}s", AVStrError(ret).data());
         return AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM;
     } else {
-        AVCODEC_LOGE("ffmpeg error message:%{public}s", AVStrError(ret).data());
+        AVCODEC_LOGE("ffmpeg error message, msg:%{public}s", AVStrError(ret).data());
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
 }
