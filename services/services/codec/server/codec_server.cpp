@@ -480,9 +480,9 @@ CodecServer::CodecType CodecServer::GetCodecType()
 {
     CodecType codecType;
     
-    if (codecName_.find("video") != codecName_.npos) {
+    if (codecName_.find("Video") != codecName_.npos) {
         codecType = CodecType::CODEC_TYPE_VIDEO;
-    } else if (codecName_.find("audio") != codecName_.npos) {
+    } else if (codecName_.find("Audio") != codecName_.npos) {
         codecType = CodecType::CODEC_TYPE_AUDIO;
     } else {
         codecType = CodecType::CODEC_TYPE_DEFAULT;
