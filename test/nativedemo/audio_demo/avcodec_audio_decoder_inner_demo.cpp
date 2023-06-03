@@ -32,7 +32,6 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 320000;
-constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr string_view INPUT_FILE_PATH = "/data/test/media/vorbis_2c_44100hz_320k.dat";
 constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/decode_ogg.pcm";
 constexpr uint32_t TMP_BUFFER_SIZE = 4096;
@@ -49,7 +48,6 @@ void ADecInnerDemo::RunCase()
     format.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, CHANNEL_COUNT);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, SAMPLE_RATE);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, BITS_RATE);
-    format.PutIntValue("bits_per_coded_sample", BITS_PER_CODED_RATE);
 
     // extradata for vorbis
     char buffer[TMP_BUFFER_SIZE]; // 临时buffer，仅测试vorbis时需要

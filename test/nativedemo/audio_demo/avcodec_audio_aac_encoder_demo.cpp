@@ -33,7 +33,6 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 199000;
-constexpr uint32_t BITS_PER_CODED_RATE = 16;
 constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr uint32_t CHANNEL_LAYOUT = 3;
 constexpr int32_t SAMPLE_FORMAT = 8;
@@ -98,7 +97,6 @@ void AEncAacDemo::RunCase()
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), BITS_RATE);
-    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT.data(), SAMPLE_FORMAT);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT.data(), CHANNEL_LAYOUT);
 

@@ -28,7 +28,6 @@ constexpr int32_t MAX_CHANNELS = 8;
 static const int32_t FLAC_DECODER_SAMPLE_RATE_TABLE[] = {
     88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
-static const int32_t FLAC_DECODER_BITS_SAMPLE_TABLE[] = {1, 3, 6, 8};
 }
 
 namespace OHOS {
@@ -55,33 +54,18 @@ static bool CheckSampleRate(int32_t sampleRate)
     return false;
 }
 
-static bool CheckBitsPerSample(int32_t bitsPerCodedSample)
-{
-    for (auto i : FLAC_DECODER_BITS_SAMPLE_TABLE) {
-        if (i == bitsPerCodedSample) {
-            return true;
-        }
-    }
-    return false;
-}
-
 int32_t AudioFFMpegFlacDecoderPlugin::CheckFormat(const Format &format)
 {
     int32_t channelCount;
     int32_t sampleRate;
-    int32_t bitsPerCodedSample;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channelCount);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
     if (!CheckSampleRate(sampleRate)) {
         AVCODEC_LOGE("init failed, because sampleRate=%{public}d not in table.", sampleRate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
     } else if (channelCount < MIN_CHANNELS || channelCount > MAX_CHANNELS) {
         AVCODEC_LOGE("init failed, because channelCount=%{public}d not support.", channelCount);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
-    } else if (!CheckBitsPerSample(bitsPerCodedSample)) {
-        AVCODEC_LOGE("init failed, because bitsPerCodedSample=%{public}d not support.", bitsPerCodedSample);
-        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     }
     channels = channelCount;
     return AVCodecServiceErrCode::AVCS_ERR_OK;

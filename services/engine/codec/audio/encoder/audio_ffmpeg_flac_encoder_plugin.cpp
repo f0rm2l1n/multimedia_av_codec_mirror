@@ -20,6 +20,7 @@
 #include "avcodec_log.h"
 #include "avcodec_mime_type.h"
 #include "avcodec_audio_common.h"
+#include "native_avcodec_base.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
@@ -32,9 +33,9 @@ static const int32_t FLAC_ENCODER_SAMPLE_RATE_TABLE[] = {
     88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
 const std::map<int32_t, int32_t> BITS_PER_RAW_SAMPLE_MAP = {
-    {OHOS::Media::SAMPLE_S16LE, 16},
-    {OHOS::Media::SAMPLE_S24LE, 24},
-    {OHOS::Media::SAMPLE_S32LE, 32},
+    {OH_BitsPerSample::SAMPLE_S16LE, 16},
+    {OH_BitsPerSample::SAMPLE_S24LE, 24},
+    {OH_BitsPerSample::SAMPLE_S32LE, 32},
 };
 }
 
@@ -80,7 +81,7 @@ int32_t AudioFFMpegFlacEncoderPlugin::SetContext(const Format &format)
     format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, complianceLevel);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
     avCodecContext->strict_std_compliance = complianceLevel;
-    if (!CheckBitsPerSample(bitsPerCodedSample)) {
+    if (BITS_PER_RAW_SAMPLE_MAP.find(bitsPerCodedSample) == BITS_PER_RAW_SAMPLE_MAP.end()) {
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     }
     avCodecContext->bits_per_raw_sample = BITS_PER_RAW_SAMPLE_MAP.at(bitsPerCodedSample);
