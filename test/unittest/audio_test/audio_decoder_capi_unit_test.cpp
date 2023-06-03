@@ -466,7 +466,8 @@ int32_t AudioCodeCapiDecoderUnitTest::Configure(const string &codecName)
             cout << "Fatal: read extradata bytes error" << endl;
             return OH_AVErrCode::AV_ERR_UNKNOWN;
         }
-        OH_AVFormat_SetBuffer(format_, MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t*)buffer, extradataSize);
+        OH_AVFormat_SetBuffer(format_, MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t*)buffer,
+                              extradataSize);
     }
     OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), bitRate);
     
@@ -485,7 +486,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_CreateByName_01, TestSiz
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Configure_01, TestSize.Level1)
 {
-    ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));  
+    ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     Release();
 }
@@ -913,7 +914,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_CreateByName_01, TestSiz
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Configure_01, TestSize.Level1)
 {
-    ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));  
+    ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     Release();
 }
@@ -1128,7 +1129,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_CreateByName_01, Test
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Configure_01, TestSize.Level1)
 {
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, InitFile(CODEC_VORBIS_NAME));
-    ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));  
+    ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     Release();
 }
