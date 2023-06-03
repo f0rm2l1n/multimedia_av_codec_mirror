@@ -79,6 +79,8 @@ void WriteFd(int32_t fd, std::string& str)
 
 int32_t WriteInfo(int32_t fd, std::string& dumpString, std::vector<Dumper> dumpers, bool needDetail)
 {
+    WriteFd(fd, dumpString);
+
     if (needDetail) {
         int32_t instanceIndex = 0;
         for (auto iter : dumpers) {
@@ -97,7 +99,6 @@ int32_t WriteInfo(int32_t fd, std::string& dumpString, std::vector<Dumper> dumpe
         }
     }
 
-    dumpString.clear();
     return OHOS::NO_ERROR;
 }
 
