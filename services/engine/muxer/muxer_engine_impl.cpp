@@ -44,7 +44,6 @@ namespace {
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_DUMP_TABLE = {
         { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
     };
 
@@ -52,7 +51,6 @@ namespace {
         { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> IMAGE_DUMP_TABLE = {

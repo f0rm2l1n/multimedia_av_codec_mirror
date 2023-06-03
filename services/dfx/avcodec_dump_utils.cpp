@@ -92,6 +92,22 @@ int32_t AVCodecDumpControler::AddInfoFromFormat(const uint32_t dumpIdx, const Fo
     return AVCS_ERR_OK;
 }
 
+int32_t AVCodecDumpControler::AddInfoFromFormatWithMapping(const uint32_t dumpIdx,
+                                                           const Format &format, const std::string_view &key,
+                                                           const std::string &name,
+                                                           std::map<int32_t, const std::string> mapping)
+{
+    int32_t val;
+    if (format.GetIntValue(key, val) == true) {
+        auto itMappingString = mapping.find(val);
+        const std::string mappingString = itMappingString != mapping.end() ? itMappingString->second : "";
+        AddInfo(dumpIdx, name, mappingString);
+    } else {
+        return AVCS_ERR_INVALID_VAL;
+    }
+    return AVCS_ERR_OK;
+}
+
 int32_t AVCodecDumpControler::GetDumpString(std::string &dumpString)
 {
     for (auto iter : dumpInfoMap_) {
@@ -105,7 +121,7 @@ int32_t AVCodecDumpControler::GetDumpString(std::string &dumpString)
         }
         dumpString += std::string("\n");
     }
-    return 0;
+    return AVCS_ERR_OK;
 }
 
 uint32_t AVCodecDumpControler::GetLevel(const uint32_t dumpIdx)
