@@ -396,7 +396,6 @@ int32_t FCodec::Release()
     callback_ = nullptr;
     CHECK_AND_RETURN_RET_LOG(ReleaseBuffers() == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
                              "Release codec failed: cannot release buffers");
-
     state_ = State::Uninitialized;
     AVCODEC_LOGI("Release codec successful, state: Uninitialized");
     return AVCS_ERR_OK;
@@ -608,6 +607,8 @@ int32_t FCodec::UpdateSurfaceMemory()
         outputBuffer = buffers_[INDEX_OUTPUT][idx];
         surfaceMemory = std::static_pointer_cast<SurfaceMemory>(outputBuffer->memory_);
         surfaceBuffer = surfaceMemory->GetSurfaceBuffer();
+        CHECK_AND_RETURN_RET_LOG(surfaceBuffer != nullptr, AVCS_ERR_NO_MEMORY, 
+                                 "getSurfaceBuffer failed, index=%{public}u", idx);
         surface_->CancelBuffer(surfaceBuffer);
         codecAvailBuffers_.erase(codecAvailBuffers_.begin());
         surfaceMemory->ReleaseSurfaceBuffer();
