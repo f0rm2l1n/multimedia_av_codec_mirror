@@ -705,6 +705,6 @@ HWTEST_F(ActsCodecApiNdkTest, VIDEO_SWDEC_API_1200, TestSize.Level2)
     (void)OH_AVFormat_SetIntValue(format, heightStr.c_str(), DEFAULT_HEIGHT);
     (void)OH_AVFormat_SetIntValue(format, frameRateStr.c_str(), DEFAULT_FRAME_RATE);
 
-    ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_SetParameter(vdec_, format));
-    ASSERT_EQ(AV_ERR_OPERATE_NOT_PERMIT, OH_VideoDecoder_SetParameter(vdec_, format));
+    ASSERT_EQ(AV_ERR_INVALID_STATE, OH_VideoDecoder_SetParameter(vdec_, format));
+    ASSERT_EQ(AV_ERR_INVALID_STATE, OH_VideoDecoder_SetParameter(vdec_, format));
 }
