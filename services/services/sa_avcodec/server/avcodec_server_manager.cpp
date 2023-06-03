@@ -91,7 +91,8 @@ int32_t WriteInfo(int32_t fd, std::string& dumpString, std::vector<Dumper> dumpe
             WriteFd(fd, dumpString);
 
             int32_t ret = iter.entry_(fd);
-            WriteFd(fd, std::string("\n"));
+            std::string lineBreak = "\n";
+            WriteFd(fd, lineBreak);
             CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, OHOS::INVALID_OPERATION, "Call dumper callback failed");
         }
     }
