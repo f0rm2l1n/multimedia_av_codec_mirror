@@ -42,7 +42,7 @@ private:
 
 class __attribute__((visibility("hidden"))) AVCodecXcollieTimer {
 public:
-    AVCodecXcollieTimer(const std::string &name, bool recovery = false, uint32_t timeout = 10)
+    AVCodecXcollieTimer(const std::string &name, bool recovery = false, uint32_t timeout = 30)
     {
         index_ = AVCodecXCollie::GetInstance().SetTimer(name, recovery, timeout);
     };
