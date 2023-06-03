@@ -23,6 +23,7 @@
 #include "ipc_skeleton.h"
 #include "avcodec_common.h"
 #include "media_description.h"
+#include "native_avcodec_base.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "SourceServer"};
@@ -47,7 +48,6 @@ namespace {
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_TRACK_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_TRACK_TYPE, "Track_Type" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
@@ -56,7 +56,6 @@ namespace {
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> VIDEO_TRACK_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_TRACK_TYPE, "Track_Type" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
@@ -161,12 +160,10 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
     AVCodecDumpControler dumpControler;
 
     dumpControler.AddInfo(DUMP_INPUT_URL_INDEX, "Input_Url", uri_);
-
     int32_t sourceDumpIndex = 1;
     dumpControler.AddInfo(DUMP_SOURCE_INFO_INDEX, "Source_Info");
     for (auto iter : SOURCE_DUMP_TABLE) {
-        dumpControler.AddInfoFromFormat(
-            DUMP_SOURCE_INFO_INDEX + (sourceDumpIndex << DUMP_OFFSET_8),
+        dumpControler.AddInfoFromFormat(DUMP_SOURCE_INFO_INDEX + (sourceDumpIndex << DUMP_OFFSET_8),
             sourceFormat, iter.first, iter.second);
         sourceDumpIndex++;
     }
@@ -174,21 +171,18 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
     dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX, "Track_Info");
     for (uint32_t idx = 0; idx < trackCount; idx++) {
         ret = GetTrackFormat(trackFormat, idx);
-        CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
-            AVCS_ERR_INVALID_OPERATION, "Get track format failed!");
-
+        CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "Get track format failed!");
         int32_t trackDumpIndex = 1;
         int32_t trackListIndex = (idx + 1) << DUMP_OFFSET_8;
-        std::string trackType;
+        // std::string trackType;
+        int32_t trackType;
         trackFormat.GetStringValue("track_type", trackType);
         std::string indexString =
-            std::string("Index ") + std::to_string(idx) + std::string(" _ ") + trackType;
+            std::string("Index ") + std::to_string(idx) + std::string(" _ ") + (trackType ? "Video" : "Audio");
         dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX + trackListIndex, indexString);
-        const auto &dumpTable =
-            trackType == "0" ? AUDIO_TRACK_DUMP_TABLE : VIDEO_TRACK_DUMP_TABLE;
+        const auto &dumpTable = trackType == MEDIA_TYPE_AUD ? AUDIO_TRACK_DUMP_TABLE : VIDEO_TRACK_DUMP_TABLE;
         for (auto iter : dumpTable) {
-            dumpControler.AddInfoFromFormat(
-                DUMP_TRACK_INFO_INDEX + trackListIndex + trackDumpIndex,
+            dumpControler.AddInfoFromFormat(DUMP_TRACK_INFO_INDEX + trackListIndex + trackDumpIndex,
                 trackFormat, iter.first, iter.second);
             trackDumpIndex++;
         }
