@@ -533,7 +533,6 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_01, TestSize.Leve
         lock.unlock();
         outputLoop_->join();
     }
-    // EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_02, TestSize.Level1)
@@ -575,7 +574,6 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_02, TestSize.Leve
         lock.unlock();
         outputLoop_->join();
     }
-    // EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_03, TestSize.Level1)
@@ -611,7 +609,6 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_03, TestSize.Leve
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
-    // EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_04, TestSize.Level1)
@@ -649,7 +646,6 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_04, TestSize.Leve
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
-    // EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Destroy(videoDec_));
 }
 
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_05, TestSize.Level1)
