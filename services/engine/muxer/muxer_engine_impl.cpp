@@ -247,8 +247,8 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
         "Output_Format", OutputFormatStringMap.at(format_));
 
     int32_t dumpTrackIndex = 3;
+    int mediaDescIdx = 0;
     for (auto it = mediaDescMap_.begin(); it != mediaDescMap_.end(); ++it) {
-        int mediaDescIdx = 0;
         auto mediaDesc = it->second;
         int32_t dumpInfoIndex = 1;
         std::string codecMime;
@@ -258,7 +258,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
         auto &dumpTable = MUXER_DUMP_TABLE.at(mimeType);
 
         dumpControler.AddInfo(DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << DUMP_OFFSET_8),
-            std::string("Track_") + std::to_string(mediaDescIdx) + "_Info");
+            std::string("Track_") + std::to_string(mediaDescIdx++) + "_Info");
         for (auto iter : dumpTable) {
             dumpControler.AddInfoFromFormat(
                 DUMP_MUXER_INFO_INDEX + (dumpTrackIndex << DUMP_OFFSET_8) + dumpInfoIndex,
@@ -266,7 +266,6 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
             dumpInfoIndex++;
         }
         dumpTrackIndex++;
-        mediaDescIdx++;
     }
 
     std::string dumpString;
