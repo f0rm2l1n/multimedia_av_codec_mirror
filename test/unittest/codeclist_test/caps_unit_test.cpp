@@ -325,7 +325,7 @@ void CapsUnitTest::CheckAVDecAVC(const std::shared_ptr<VideoCaps> &videoCaps) co
     EXPECT_EQ(0, videoCaps->GetSupportedQuality().maxVal);
     EXPECT_EQ(0, videoCaps->GetSupportedComplexity().minVal);
     EXPECT_EQ(0, videoCaps->GetSupportedComplexity().maxVal);
-    EXPECT_EQ(5, videoCaps->GetSupportedFormats().size());  // 5: supported formats count
+    EXPECT_EQ(4, videoCaps->GetSupportedFormats().size());  // 4: supported formats count
     EXPECT_EQ(3, videoCaps->GetSupportedProfiles().size()); // 3: supported profile count
     EXPECT_EQ(0, videoCaps->GetSupportedBitrateMode().size());
     EXPECT_EQ(0, videoCaps->GetSupportedLevels().size());

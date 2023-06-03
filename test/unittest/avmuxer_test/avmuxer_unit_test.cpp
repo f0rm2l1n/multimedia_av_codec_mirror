@@ -250,20 +250,16 @@ HWTEST_F(AVMuxerUnitTest, Muxer_AddTrack_003, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
     ret = avmuxer_->AddTrack(videoTrackId, videoParams);
     EXPECT_EQ(ret, AV_ERR_OK);
     EXPECT_GE(videoTrackId, 0);
 
     ASSERT_EQ(avmuxer_->Start(), 0);
-    std::shared_ptr<FormatMock> audioParams = FormatMockFactory::CreateFormat();
-    audioParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::AUDIO_MPEG);
-    audioParams->PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, 44100);
-    audioParams->PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, 2);
+    std::shared_ptr<FormatMock> audioParams =
+        FormatMockFactory::CreateAudioFormat(CodecMimeType::AUDIO_MPEG, 44100, 2);
     ret = avmuxer_->AddTrack(audioTrackId, audioParams);
     EXPECT_NE(ret, AV_ERR_OK);
 }
@@ -432,10 +428,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Start_001, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
 
     int32_t videoTrackId = -1;
@@ -458,10 +452,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Start_002, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
 
     int32_t videoTrackId = -1;
@@ -500,10 +492,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Start_004, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
 
     int32_t videoTrackId = -1;
@@ -528,10 +518,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Start_005, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, static_cast<OutputFormat>(-99));
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
 
     int32_t videoTrackId = -1;
@@ -554,10 +542,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Stop_001, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
     int32_t videoTrackId = -1;
     int32_t ret = avmuxer_->AddTrack(videoTrackId, videoParams);
@@ -595,10 +581,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Stop_003, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
     int32_t videoTrackId = -1;
     int32_t ret = avmuxer_->AddTrack(videoTrackId, videoParams);
@@ -620,10 +604,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Stop_004, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
     int32_t videoTrackId = -1;
     int32_t ret = avmuxer_->AddTrack(videoTrackId, videoParams);
@@ -650,10 +632,9 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Stop_005, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
     int32_t videoTrackId = -1;
     int32_t ret = avmuxer_->AddTrack(videoTrackId, videoParams);
@@ -676,10 +657,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Stop_006, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, static_cast<OutputFormat>(-99));
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
     int32_t videoTrackId = -1;
     int32_t ret = avmuxer_->AddTrack(videoTrackId, videoParams);
@@ -704,10 +683,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_001, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
 
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
@@ -734,10 +711,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_002, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, static_cast<OutputFormat>(-99));
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
 
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_NE(ret, 0);
@@ -766,10 +741,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_003, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
 
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
@@ -797,10 +770,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_004, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
 
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
@@ -835,10 +806,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_writeSample_005, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
 
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
@@ -868,10 +837,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_SetRotation_001, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
     ASSERT_GE(trackId, 0);
@@ -914,10 +881,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_SetRotation_003, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
     ASSERT_GE(trackId, 0);
@@ -942,10 +907,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_SetRotation_004, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
     ASSERT_GE(trackId, 0);
@@ -971,10 +934,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_SetRotation_005, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> vParam = FormatMockFactory::CreateFormat();
-    vParam->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_AVC);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    vParam->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> vParam =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_AVC, 352, 288);
 
     int ret = avmuxer_->AddTrack(trackId, vParam);
     ASSERT_EQ(ret, 0);
@@ -1087,10 +1048,8 @@ HWTEST_F(AVMuxerUnitTest, Muxer_Destroy_001, TestSize.Level0)
     bool isCreated = avmuxer_->CreateMuxer(fd_, outputFormat);
     ASSERT_TRUE(isCreated);
 
-    std::shared_ptr<FormatMock> videoParams = FormatMockFactory::CreateFormat();
-    videoParams->PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, CodecMimeType::VIDEO_MPEG4);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, 352);
-    videoParams->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, 288);
+    std::shared_ptr<FormatMock> videoParams =
+        FormatMockFactory::CreateVideoFormat(CodecMimeType::VIDEO_MPEG4, 352, 288);
     videoParams->PutBuffer(MediaDescriptionKey::MD_KEY_CODEC_CONFIG, buffer_, sizeof(buffer_));
     int32_t videoTrackId = -1;
     int32_t ret = avmuxer_->AddTrack(videoTrackId, videoParams);
