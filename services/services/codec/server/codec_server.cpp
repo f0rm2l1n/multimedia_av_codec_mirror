@@ -22,6 +22,7 @@
 #include "codec_factory.h"
 #include "avcodec_dump_utils.h"
 #include "media_description.h"
+#include "surface_type.h"
 
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecServer"};
@@ -64,7 +65,6 @@ namespace {
         { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_CONFIG, "Codec_Config" },
         { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
     };
 
@@ -73,6 +73,23 @@ namespace {
         { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_DEFAULT, DEFAULT_DUMP_TABLE },
         { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_VIDEO, VIDEO_DUMP_TABLE },
         { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_AUDIO, AUDIO_DUMP_TABLE },
+    };
+
+    const std::map<int32_t, const std::string> PIXEL_FORMAT_STRING_MAP = {
+        { OHOS::Media::VideoPixelFormat::YUV420P, "YUV420P" },
+        { OHOS::Media::VideoPixelFormat::YUVI420, "YUVI420" },
+        { OHOS::Media::VideoPixelFormat::NV12, "NV12" },
+        { OHOS::Media::VideoPixelFormat::NV21, "NV21" },
+        { OHOS::Media::VideoPixelFormat::SURFACE_FORMAT, "SURFACE_FORMAT" },
+        { OHOS::Media::VideoPixelFormat::RGBA, "RGBA" },
+        { OHOS::Media::VideoPixelFormat::UNKNOWN_FORMAT, "UNKNOWN_FORMAT" },
+    };
+
+    const std::map<int32_t, const std::string> SCALE_TYPE_STRING_MAP = {
+        { OHOS::ScalingMode::SCALING_MODE_FREEZE, "Freeze" },
+        { OHOS::ScalingMode::SCALING_MODE_SCALE_TO_WINDOW, "Scale_to_window" },
+        { OHOS::ScalingMode::SCALING_MODE_SCALE_CROP, "Scale_crop" },
+        { OHOS::ScalingMode::SCALING_MODE_NO_SCALE_CROP, "No_scale_crop" },
     };
 }
 
@@ -333,7 +350,6 @@ int32_t CodecServer::DumpInfo(int32_t fd)
     const auto &dumpTable = it != CODEC_DUMP_TABLE.end() ? it->second : DEFAULT_DUMP_TABLE;
     AVCodecDumpControler dumpControler;
     std::string codecInfo;
-
     switch (codecType) {
         case CODEC_TYPE_VIDEO:
             codecInfo = "Video_Codec_Info";
@@ -341,29 +357,34 @@ int32_t CodecServer::DumpInfo(int32_t fd)
         case CODEC_TYPE_DEFAULT:
             codecInfo = "Codec_Info";
             break;
-        default:
+        case CODEC_TYPE_AUDIO:
             codecInfo = "Audio_Codec_Info";
             break;
     }
-
     auto statusIt = CODEC_STATE_MAP.find(status_);
     dumpControler.AddInfo(DUMP_CODEC_INFO_INDEX, codecInfo);
-    dumpControler.AddInfo(DUMP_STATUS_INDEX,
-        "Status", statusIt != CODEC_STATE_MAP.end() ? statusIt->second : "");
-    dumpControler.AddInfo(DUMP_LAST_ERROR_INDEX,
-        "Last_Error", lastErrMsg_.size() ? lastErrMsg_ : "Null");
+    dumpControler.AddInfo(DUMP_STATUS_INDEX, "Status", statusIt != CODEC_STATE_MAP.end() ? statusIt->second : "");
+    dumpControler.AddInfo(DUMP_LAST_ERROR_INDEX, "Last_Error", lastErrMsg_.size() ? lastErrMsg_ : "Null");
 
     int32_t dumpIndex = 3;
     for (auto iter : dumpTable) {
-        dumpControler.AddInfoFromFormat(
-            DUMP_CODEC_INFO_INDEX + (dumpIndex << DUMP_OFFSET_8),
-            codecFormat, iter.first, iter.second);
+        if (iter.first == MediaDescriptionKey::MD_KEY_PIXEL_FORMAT) {
+            dumpControler.AddInfoFromFormatWithMapping(DUMP_CODEC_INFO_INDEX + (dumpIndex << DUMP_OFFSET_8),
+                codecFormat, iter.first, iter.second, PIXEL_FORMAT_STRING_MAP);
+        } else if (iter.first == MediaDescriptionKey::MD_KEY_SCALE_TYPE) {
+            dumpControler.AddInfoFromFormatWithMapping(DUMP_CODEC_INFO_INDEX + (dumpIndex << DUMP_OFFSET_8),
+                codecFormat, iter.first, iter.second, SCALE_TYPE_STRING_MAP);
+        } else {
+            dumpControler.AddInfoFromFormat(
+                DUMP_CODEC_INFO_INDEX + (dumpIndex << DUMP_OFFSET_8), codecFormat, iter.first, iter.second);
+        }
         dumpIndex++;
     }
-
     std::string dumpString;
     dumpControler.GetDumpString(dumpString);
-    write(fd, dumpString.c_str(), dumpString.size());
+    if (fd != -1) {
+        write(fd, dumpString.c_str(), dumpString.size());
+    }
     return AVCS_ERR_OK;
 }
 
@@ -381,7 +402,7 @@ const std::string &CodecServer::GetStatusDescription(OHOS::Media::CodecServer::C
 void CodecServer::OnError(int32_t errorType, int32_t errorCode)
 {
     std::lock_guard<std::mutex> lock(cbMutex_);
-    lastErrMsg_ = AVCSErrorToOHAVErrCodeString(static_cast<AVCodecServiceErrCode>(errorCode));
+    lastErrMsg_ = AVCSErrorToString(static_cast<AVCodecServiceErrCode>(errorCode));
     FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, lastErrMsg_, "Codec");
     if (codecCb_ == nullptr) {
         return;
@@ -480,9 +501,9 @@ CodecServer::CodecType CodecServer::GetCodecType()
 {
     CodecType codecType;
     
-    if (codecName_.find("video") != codecName_.npos) {
+    if (codecName_.find("Video") != codecName_.npos) {
         codecType = CodecType::CODEC_TYPE_VIDEO;
-    } else if (codecName_.find("audio") != codecName_.npos) {
+    } else if (codecName_.find("Audio") != codecName_.npos) {
         codecType = CodecType::CODEC_TYPE_AUDIO;
     } else {
         codecType = CodecType::CODEC_TYPE_DEFAULT;

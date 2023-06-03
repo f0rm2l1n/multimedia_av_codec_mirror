@@ -46,7 +46,7 @@ void AVCodecXCollie::TimerCallback(void *data)
     std::string name = data != nullptr ? (char *)data : "";
     AVCODEC_LOGE("Task %{public}s timeout", name.c_str());
     FaultEventWrite(FaultType::FAULT_TYPE_FREEZE, std::string("Task ") + name + " timeout", "AVCodecXCollie");
-    static constexpr uint32_t threshold = 5; // >5 Restart service
+    static constexpr uint32_t threshold = 1; // >= 1 Restart service
     if (threadDeadlockCount_ >= threshold) {
         FaultEventWrite(FaultType::FAULT_TYPE_FREEZE,
             "Process timeout, av_codec service process exit.", "AVCodecXCollie");
