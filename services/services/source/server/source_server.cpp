@@ -174,9 +174,8 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
         CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_INVALID_OPERATION, "Get track format failed!");
         int32_t trackDumpIndex = 1;
         int32_t trackListIndex = (idx + 1) << DUMP_OFFSET_8;
-        // std::string trackType;
         int32_t trackType;
-        trackFormat.GetStringValue("track_type", trackType);
+        trackFormat.GetIntValue("track_type", trackType);
         std::string indexString =
             std::string("Index ") + std::to_string(idx) + std::string(" _ ") + (trackType ? "Video" : "Audio");
         dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX + trackListIndex, indexString);
