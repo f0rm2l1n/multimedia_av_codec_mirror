@@ -41,16 +41,25 @@ namespace {
         { OHOS::Media::AVSourceFormat::SOURCE_GENRE, "Genre" },
         { OHOS::Media::AVSourceFormat::SOURCE_COPYRIGHT, "Copyright" },
         { OHOS::Media::AVSourceFormat::SOURCE_LANGUAGE, "Language" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_DURATION, "Duration" },
         { OHOS::Media::AVSourceFormat::SOURCE_DESCRIPTION, "Description" },
         { OHOS::Media::AVSourceFormat::SOURCE_LYRICS, "Lyrics" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_TRACK_DUMP_TABLE = {
         { OHOS::Media::MediaDescriptionKey::MD_KEY_TRACK_TYPE, "Track_Type" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bitrate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, "AAC_Is_ADTS" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> VIDEO_TRACK_DUMP_TABLE = {
         { OHOS::Media::MediaDescriptionKey::MD_KEY_TRACK_TYPE, "Track_Type" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
     };
 }
 
@@ -171,7 +180,7 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
         int32_t trackDumpIndex = 1;
         int32_t trackListIndex = (idx + 1) << DUMP_OFFSET_8;
         std::string trackType;
-        trackFormat.GetStringValue("track/type", trackType);
+        trackFormat.GetStringValue("track_type", trackType);
         std::string indexString =
             std::string("Index ") + std::to_string(idx) + std::string(" _ ") + trackType;
         dumpControler.AddInfo(DUMP_TRACK_INFO_INDEX + trackListIndex, indexString);
