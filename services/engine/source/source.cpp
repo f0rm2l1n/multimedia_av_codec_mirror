@@ -377,6 +377,9 @@ int32_t Source::Create(std::string& uri)
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when load demuxerlist!");
     ret = SniffInputFormat(uri);
+    if (ret != AVCS_ERR_OK) {
+        FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, "Sniff failed", "Source");
+    }
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
                              "create source failed when find input format!");
     CHECK_AND_RETURN_RET_LOG(inputFormat_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
