@@ -159,7 +159,6 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
         AVCS_ERR_INVALID_OPERATION, "Get track format failed!");
     AVCodecDumpControler dumpControler;
 
-    dumpControler.AddInfo(DUMP_INPUT_URL_INDEX, "Input_Url", uri_);
     int32_t sourceDumpIndex = 1;
     dumpControler.AddInfo(DUMP_SOURCE_INFO_INDEX, "Source_Info");
     for (auto iter : SOURCE_DUMP_TABLE) {
