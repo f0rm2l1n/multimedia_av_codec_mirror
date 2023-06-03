@@ -69,29 +69,32 @@ AVCodecServerManager& AVCodecServerManager::GetInstance()
     return instance;
 }
 
+void WriteFd(int32_t fd, std::string& str)
+{
+    if (fd != -1) {
+        write(fd, str.c_str(), str.size());
+    }
+    str.sclear();
+}
+
 int32_t WriteInfo(int32_t fd, std::string& dumpString, std::vector<Dumper> dumpers, bool needDetail)
 {
-    int32_t i = 0;
-    for (auto iter : dumpers) {
-        AVCodecDumpControler dumpControler;
-        dumpControler.AddInfo(DUMP_INSTANCE_INDEX, std::string("Instance_") + std::to_string(i++) + "_Info");
-        dumpControler.AddInfo(DUMP_PID_INDEX, "PID", std::to_string(iter.pid_));
-        dumpControler.AddInfo(DUMP_UID_INDEX, "UID", std::to_string(iter.uid_));
-        dumpControler.GetDumpString(dumpString);
-        if (fd != -1) {
-            write(fd, dumpString.c_str(), dumpString.size());
-            dumpString.clear();
-        }
+    if (needDetail) {
+        int32_t instanceIndex = 0;
+        for (auto iter : dumpers) {
+            AVCodecDumpControler dumpControler;
+            dumpControler.AddInfo(DUMP_INSTANCE_INDEX, std::string("Instance_") +
+                std::to_string(instanceIndex++) + "_Info");
+            dumpControler.AddInfo(DUMP_PID_INDEX, "PID", std::to_string(iter.pid_));
+            dumpControler.AddInfo(DUMP_UID_INDEX, "UID", std::to_string(iter.uid_));
+            dumpControler.GetDumpString(dumpString);
+            WriteFd(fd, dumpString);
 
-        if (needDetail && iter.entry_(fd) != AVCS_ERR_OK) {
-            return OHOS::INVALID_OPERATION;
-        } else if (fd != -1) {
-            write(fd, "\n", 1);
+            int32_t ret = iter.entry_(fd);
+            CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, OHOS::INVALID_OPERATION, "Call dumper callback failed");
         }
     }
-    if (fd != -1) {
-        write(fd, dumpString.c_str(), dumpString.size());
-    }
+
     dumpString.clear();
     return OHOS::NO_ERROR;
 }
@@ -118,7 +121,6 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     for (decltype(args.size()) index = 0; index < args.size(); ++index) {
         argSets.insert(args[index]);
     }
-    int32_t ret;
 
 #ifdef SUPPORT_CODEC
     DumpServer(fd, StubType::CODEC, argSets);
@@ -130,7 +132,7 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     DumpServer(fd, StubType::SOURCE, argSets);
 #endif
 
-    ret = AVCodecXCollie::GetInstance().Dump(fd);
+    int32_t ret = AVCodecXCollie::GetInstance().Dump(fd);
     CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
                              "Failed to write xcollie dump information");
 
@@ -138,17 +140,14 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
         PrintDumpMenu(fd);
     }
 
-    if (argSets.find(u"switch_bitstream_dump") != argSets.end()) {
+    if (argSets.find(u"Switch_bitstream_dump") != argSets.end()) {
         dumpString += "[Bitstream_Dump]\n";
         bool isEnable = AVCodecBitStreamDumper::GetInstance().SwitchEnable();
         dumpString += "    status - ";
         dumpString += isEnable ? "Enable" : "Disable";
         dumpString += "\n";
 
-        if (fd != -1) {
-            write(fd, dumpString.c_str(), dumpString.size());
-        }
-        dumpString.clear();
+        WriteFd(fd, dumpString);
     }
 
     return OHOS::NO_ERROR;
