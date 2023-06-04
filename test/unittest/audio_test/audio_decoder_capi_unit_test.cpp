@@ -44,7 +44,6 @@ extern "C" {
 }
 #endif
 
-
 using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Media;
@@ -114,7 +113,6 @@ static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemor
     signal->inCond_.notify_all();
 }
 
-
 static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemory *data, OH_AVCodecBufferAttr *attr,
                                     void *userData)
 {
@@ -140,6 +138,7 @@ public:
     int32_t ProceFunc();
     void InputFunc();
     void OutputFunc();
+
 protected:
     std::atomic<bool> isRunning_ = false;
     std::unique_ptr<std::ifstream> testFile_;
@@ -317,14 +316,13 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_CreateByName_01, TestSize.Le
     audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
 }
 
-
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_SetParameter_01, TestSize.Level1)
 {
     ProceFunc();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -337,21 +335,23 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_SetParameter_01, TestSize.Le
     EXPECT_NE(nullptr, outputLoop_);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        while (isRunning_.load()) {
+    while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
 
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
@@ -364,7 +364,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_SetParameter_02, TestSize.Le
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -376,7 +376,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Configure_01, TestSize.Level
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -388,7 +388,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_01, TestSize.Leve
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -404,18 +404,20 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_01, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
@@ -427,7 +429,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_02, TestSize.Leve
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -441,19 +443,21 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_02, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Stop(audioDec_));
@@ -466,7 +470,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_03, TestSize.Leve
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -482,25 +486,26 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_03, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
 }
-
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_04, TestSize.Level1)
 {
@@ -508,7 +513,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_04, TestSize.Leve
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -526,16 +531,18 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_04, TestSize.Leve
     }
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
@@ -548,7 +555,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_05, TestSize.Leve
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -563,19 +570,21 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_normalcase_05, TestSize.Leve
     while (isRunning_.load()) {
         sleep(1); // sleep 1s
     }
-    
+
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
@@ -588,7 +597,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_01, TestSize.Le
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), MAX_CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
+                            DEFAULT_BITS_PER_CODED_RATE);
     OH_AVFormat_SetLongValue(format, MediaDescriptionKey::MD_KEY_BITRATE.data(), DEFAULT_BITRATE);
 
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
@@ -605,5 +614,5 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_abnormalcase_03, TestSize.Le
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format));
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
 }
-}  // namespace Media
-}  // namespace OHOS
+} // namespace Media
+} // namespace OHOS

@@ -70,11 +70,11 @@ std::shared_ptr<AVCodecContext> AudioFFMpegVorbisDecoderPlugin::GenEncodeContext
 int32_t AudioFFMpegVorbisDecoderPlugin::AssignExtradata(std::shared_ptr<AVCodecContext> &context, const Format &format)
 {
     if (context == nullptr) {
-        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
     auto encodeContext = GenEncodeContext(format);
     if (encodeContext == nullptr) {
-        return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
     context->extradata_size = encodeContext->extradata_size;
     context->extradata = static_cast<uint8_t *>(av_mallocz(encodeContext->extradata_size));

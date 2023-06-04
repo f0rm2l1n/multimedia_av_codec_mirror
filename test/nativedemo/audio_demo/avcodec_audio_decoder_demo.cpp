@@ -219,9 +219,10 @@ int32_t ADecDemo::Stop()
 {
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
         inputLoop_ = nullptr;
         while (!signal_->inQueue_.empty()) {
@@ -233,9 +234,10 @@ int32_t ADecDemo::Stop()
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
         outputLoop_ = nullptr;
         while (!signal_->outQueue_.empty()) {
@@ -256,9 +258,10 @@ int32_t ADecDemo::Flush()
 {
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
         inputLoop_ = nullptr;
         while (!signal_->inQueue_.empty()) {
@@ -271,9 +274,10 @@ int32_t ADecDemo::Flush()
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
         outputLoop_ = nullptr;
         while (!signal_->outQueue_.empty()) {

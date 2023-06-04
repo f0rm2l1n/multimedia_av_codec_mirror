@@ -53,7 +53,7 @@ int32_t AudioFfmpegDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBuf
 {
     if (avCodecContext_ == nullptr) {
         AVCODEC_LOGE("avCodecContext_ is nullptr");
-        return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
     std::unique_lock lock(avMutext_);
     return SendBuffer(inputBuffer);
@@ -100,7 +100,7 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     } else if (ret == AVERROR(EAGAIN)) {
         AVCODEC_LOGW("skip this frame because data not enough: %{public}d", ret);
-        return AVCodecServiceErrCode::AVCS_ERR_AGAIN;
+        return AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA;
     } else if (ret == AVERROR_EOF) {
         AVCODEC_LOGW("eos send frame:%{public}d", ret);
         return AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM;
@@ -118,7 +118,7 @@ int32_t AudioFfmpegDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBuffer
     }
     if (avCodecContext_ == nullptr) {
         AVCODEC_LOGE("avCodecContext_ is nullptr");
-        return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
     int32_t status;
     {
@@ -243,7 +243,7 @@ int32_t AudioFfmpegDecoderPlugin::AllocateContext(const std::string &name)
     }
     if (avCodec_ == nullptr) {
         AVCODEC_LOGE("AllocateContext fail,parameter avcodec is nullptr.");
-        return AVCodecServiceErrCode::AVCS_ERR_UNSUPPORT_PROTOCOL_TYPE;
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
 
     AVCodecContext *context = nullptr;
