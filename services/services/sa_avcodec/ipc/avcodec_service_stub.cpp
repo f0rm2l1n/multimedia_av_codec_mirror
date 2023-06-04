@@ -79,7 +79,7 @@ int32_t AVCodecServiceStub::DestroyStubForPid(pid_t pid)
 int AVCodecServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    AVCODEC_LOGI("Stub: OnRemoteRequest of code: %{public}u is received", code);
+    AVCODEC_LOGD("Stub: OnRemoteRequest of code: %{public}u is received", code);
 
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (AVCodecServiceStub::GetDescriptor() != remoteDescriptor) {
@@ -117,7 +117,7 @@ int32_t AVCodecServiceStub::SetDeathListener(const sptr<IRemoteObject> &object)
     CHECK_AND_RETURN_RET_LOG(object != nullptr, AVCS_ERR_NO_MEMORY, "set listener object is nullptr");
 
     pid_t pid = IPCSkeleton::GetCallingPid();
-    for (auto it = avCodecListenerMap_.begin(); it != avCodecListenerMap_.end();) {
+    for (auto it = avCodecListenerMap_.begin(); it != avCodecListenerMap_.end(); ++it) {
         if (it->first == pid) {
             AVCODEC_LOGD("client pid already exits");
             return AVCS_ERR_OK;

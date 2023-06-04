@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <cinttypes>
 #include "avdemuxer_demo.h"
 
@@ -92,7 +92,7 @@ int32_t AVDemuxerDemo::ReadAllSamples(OH_AVMemory *sample, int32_t tracks)
 {
     int32_t ret = -1;
     bool isEnd = false;
-    for (int i = 0;i < tracks; i++) {
+    for (int i = 0; i < tracks; i++) {
         frames_[i] = 0;
         key_frames_[i] = 0;
     }

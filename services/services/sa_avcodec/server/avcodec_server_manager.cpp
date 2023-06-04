@@ -50,14 +50,13 @@ constexpr uint32_t DUMP_UID_INDEX = 0x01010200;
 constexpr uint32_t DUMP_OFFSET_16 = 16;
 
 const std::vector<const std::string> SA_DUMP_MENU_DUMP_TABLE = {
-    "All", "Codec", "Muxer", "Demuxer", "Source", " ", "Switch_bitstream_dump"
+    "All", "Codec", "Muxer", "Source/Demuxer", " ", "Switch_bitstream_dump"
 };
 
 const std::map<OHOS::Media::AVCodecServerManager::StubType, const std::string> STUB_TYPE_STRING_MAP = {
     { OHOS::Media::AVCodecServerManager::StubType::CODEC,  "Codec"},
     { OHOS::Media::AVCodecServerManager::StubType::MUXER,  "Muxer"},
-    { OHOS::Media::AVCodecServerManager::StubType::DEMUXER,  "Demuxer"},
-    { OHOS::Media::AVCodecServerManager::StubType::SOURCE,  "Source"},
+    { OHOS::Media::AVCodecServerManager::StubType::SOURCE,  "Source/Demuxer"},
 };
 } // namespace
 
@@ -70,30 +69,36 @@ AVCodecServerManager& AVCodecServerManager::GetInstance()
     return instance;
 }
 
+void WriteFd(int32_t fd, std::string& str)
+{
+    if (fd != -1) {
+        write(fd, str.c_str(), str.size());
+    }
+    str.clear();
+}
+
 int32_t WriteInfo(int32_t fd, std::string& dumpString, std::vector<Dumper> dumpers, bool needDetail)
 {
-    int32_t i = 0;
-    for (auto iter : dumpers) {
-        AVCodecDumpControler dumpControler;
-        dumpControler.AddInfo(DUMP_INSTANCE_INDEX, std::string("Instance_") + std::to_string(i++) + "_Info");
-        dumpControler.AddInfo(DUMP_PID_INDEX, "PID", std::to_string(iter.pid_));
-        dumpControler.AddInfo(DUMP_UID_INDEX, "UID", std::to_string(iter.uid_));
-        dumpControler.GetDumpString(dumpString);
-        if (fd != -1) {
-            write(fd, dumpString.c_str(), dumpString.size());
-            dumpString.clear();
-        }
+    WriteFd(fd, dumpString);
 
-        if (needDetail && iter.entry_(fd) != AVCS_ERR_OK) {
-            return OHOS::INVALID_OPERATION;
-        } else if (fd != -1) {
-            write(fd, "\n", 1);
+    if (needDetail) {
+        int32_t instanceIndex = 0;
+        for (auto iter : dumpers) {
+            AVCodecDumpControler dumpControler;
+            dumpControler.AddInfo(DUMP_INSTANCE_INDEX, std::string("Instance_") +
+                std::to_string(instanceIndex++) + "_Info");
+            dumpControler.AddInfo(DUMP_PID_INDEX, "PID", std::to_string(iter.pid_));
+            dumpControler.AddInfo(DUMP_UID_INDEX, "UID", std::to_string(iter.uid_));
+            dumpControler.GetDumpString(dumpString);
+            WriteFd(fd, dumpString);
+
+            int32_t ret = iter.entry_(fd);
+            std::string lineBreak = "\n";
+            WriteFd(fd, lineBreak);
+            CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, OHOS::INVALID_OPERATION, "Call dumper callback failed");
         }
     }
-    if (fd != -1) {
-        write(fd, dumpString.c_str(), dumpString.size());
-    }
-    dumpString.clear();
+
     return OHOS::NO_ERROR;
 }
 
@@ -119,7 +124,6 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
     for (decltype(args.size()) index = 0; index < args.size(); ++index) {
         argSets.insert(args[index]);
     }
-    int32_t ret;
 
 #ifdef SUPPORT_CODEC
     DumpServer(fd, StubType::CODEC, argSets);
@@ -127,14 +131,11 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
 #ifdef SUPPORT_MUXER
     DumpServer(fd, StubType::MUXER, argSets);
 #endif
-#ifdef SUPPORT_DEMUXER
-    DumpServer(fd, StubType::DEMUXER, argSets);
-#endif
 #ifdef SUPPORT_SOURCE
     DumpServer(fd, StubType::SOURCE, argSets);
 #endif
 
-    ret = AVCodecXCollie::GetInstance().Dump(fd);
+    int32_t ret = AVCodecXCollie::GetInstance().Dump(fd);
     CHECK_AND_RETURN_RET_LOG(ret == OHOS::NO_ERROR, OHOS::INVALID_OPERATION,
                              "Failed to write xcollie dump information");
 
@@ -142,17 +143,14 @@ int32_t AVCodecServerManager::Dump(int32_t fd, const std::vector<std::u16string>
         PrintDumpMenu(fd);
     }
 
-    if (argSets.find(u"switch_bitstream_dump") != argSets.end()) {
+    if (argSets.find(u"Switch_bitstream_dump") != argSets.end()) {
         dumpString += "[Bitstream_Dump]\n";
         bool isEnable = AVCodecBitStreamDumper::GetInstance().SwitchEnable();
         dumpString += "    status - ";
         dumpString += isEnable ? "Enable" : "Disable";
         dumpString += "\n";
 
-        if (fd != -1) {
-            write(fd, dumpString.c_str(), dumpString.size());
-        }
-        dumpString.clear();
+        WriteFd(fd, dumpString);
     }
 
     return OHOS::NO_ERROR;
@@ -282,14 +280,8 @@ sptr<IRemoteObject> AVCodecServerManager::CreateDemuxerStubObject()
     if (object != nullptr) {
         pid_t pid = IPCSkeleton::GetCallingPid();
         demuxerStubMap_[object] = pid;
-
-        Dumper dumper;
-        dumper.entry_ = [stub](int32_t fd) -> int32_t { return stub->DumpInfo(fd); };
-        dumper.pid_ = pid;
-        dumper.uid_ = IPCSkeleton::GetCallingUid();
-        dumper.remoteObject_ = object;
-        dumperTbl_[StubType::DEMUXER].emplace_back(dumper);
         AVCODEC_LOGD("The number of demuxer services(%{public}zu).", demuxerStubMap_.size());
+
         if (Dump(-1, std::vector<std::u16string>()) != OHOS::NO_ERROR) {
             AVCODEC_LOGW("failed to call InstanceDump");
         }

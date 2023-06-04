@@ -89,14 +89,18 @@ int32_t FCodec::Init()
     AVCODEC_SYNC_TRACE;
     CHECK_AND_RETURN_RET_LOG(!codecName_.empty(), AVCS_ERR_INVALID_VAL, "Init codec failed:  empty name");
     std::string fcodecName;
+    std::string_view mime;
     for (uint32_t i = 0; i < SUPPORT_VCODEC_NUM; ++i) {
         if (SUPPORT_VCODEC[i].codecName == codecName_) {
             fcodecName = SUPPORT_VCODEC[i].ffmpegCodec;
+            mime = SUPPORT_VCODEC[i].mimeType;
             break;
         }
     }
     CHECK_AND_RETURN_RET_LOG(!fcodecName.empty(), AVCS_ERR_INVALID_VAL,
                              "Init codec failed: not support name: %{public}s", codecName_.c_str());
+    format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, mime);
+    format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_NAME, codecName_);
     avCodec_ = std::shared_ptr<AVCodec>(const_cast<AVCodec *>(avcodec_find_decoder_by_name(fcodecName.c_str())),
                                         [](void *ptr) {});
     CHECK_AND_RETURN_RET_LOG(avCodec_ != nullptr, AVCS_ERR_INVALID_VAL,
@@ -292,7 +296,7 @@ int32_t FCodec::ResetBuffers()
     std::unique_lock<std::mutex> oLock(outputMutex_);
     codecAvailBuffers_.clear();
     renderBuffers_.clear();
-    for (int32_t i = 0; i < buffers_[INDEX_OUTPUT].size(); i++) {
+    for (uint32_t i = 0; i < buffers_[INDEX_OUTPUT].size(); i++) {
         buffers_[INDEX_OUTPUT][i]->owner_ = AVBuffer::Owner::OWNED_BY_CODEC;
         codecAvailBuffers_.emplace_back(i);
     }
@@ -460,6 +464,23 @@ int32_t FCodec::SetParameter(const Format &format)
 int32_t FCodec::GetOutputFormat(Format &format)
 {
     AVCODEC_SYNC_TRACE;
+    if (!format_.ContainKey(MediaDescriptionKey::MD_KEY_BITRATE)) {
+        if (avCodecContext_ != nullptr) {
+            format_.PutIntValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
+        }
+    }
+    if (!format_.ContainKey(MediaDescriptionKey::MD_KEY_FRAME_RATE)) {
+        if (avCodecContext_ != nullptr && avCodecContext_->framerate.den > 0) {
+            double value = static_cast<double>(avCodecContext_->framerate.num) /
+                           static_cast<double>(avCodecContext_->framerate.den);
+            format_.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, value);
+        }
+    }
+    if (!format_.ContainKey(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE)) {
+        int32_t stride = AlignUp(width_, VIDEO_ALIGN_SIZE);
+        int32_t maxInputSize = static_cast<int32_t>((stride * height_ * VIDEO_PIX_DEPTH_YUV) >> VIDEO_MIN_COMPRESSION);
+        format_.PutIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize);
+    }
     format = format_;
     AVCODEC_LOGI("Get outputFormat successful");
     return AVCS_ERR_OK;

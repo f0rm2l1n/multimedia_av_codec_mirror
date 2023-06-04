@@ -104,8 +104,8 @@ const std::map<AVCodecServiceErrCode, OH_AVErrCode> AVCSERRCODE_TO_OHAVCODECERRC
     {AVCS_ERR_VID_DEC_FAILED,                      AV_ERR_UNKNOWN},
     {AVCS_ERR_MUXER_FAILED,                        AV_ERR_UNKNOWN},
     {AVCS_ERR_DEMUXER_FAILED,                      AV_ERR_UNKNOWN},
-    {AVCS_ERR_OPEN_FILE_FAILED,                    AV_ERR_UNKNOWN},
-    {AVCS_ERR_FILE_ACCESS_FAILED,                  AV_ERR_UNKNOWN},
+    {AVCS_ERR_OPEN_FILE_FAILED,                    AV_ERR_IO},
+    {AVCS_ERR_FILE_ACCESS_FAILED,                  AV_ERR_IO},
     {AVCS_ERR_START_FAILED,                        AV_ERR_UNKNOWN},
     {AVCS_ERR_PAUSE_FAILED,                        AV_ERR_UNKNOWN},
     {AVCS_ERR_STOP_FAILED,                         AV_ERR_UNKNOWN},
@@ -209,11 +209,7 @@ std::string AVCSErrorToString(AVCodecServiceErrCode code)
         return AVCS_ERRCODE_INFOS.at(code);
     }
 
-    if (code > static_cast<int32_t>(AV_ERR_EXTEND_START)) {
-        return "extend error:" + std::to_string(code - static_cast<int32_t>(AV_ERR_EXTEND_START));
-    }
-
-    return "invalid error code:" + std::to_string(static_cast<int32_t>(code));
+    return "unkown error";
 }
 
 std::string OHAVErrCodeToString(OH_AVErrCode code)
@@ -222,11 +218,7 @@ std::string OHAVErrCodeToString(OH_AVErrCode code)
         return OHAVCODECERRCODE_INFOS.at(code);
     }
 
-    if (code > static_cast<int32_t>(AV_ERR_EXTEND_START)) {
-        return "extend error:" + std::to_string(code - static_cast<int32_t>(AV_ERR_EXTEND_START));
-    }
-
-    return "invalid error code:" + std::to_string(static_cast<int32_t>(code));
+    return "unkown error";
 }
 
 std::string AVCSErrorToOHAVErrCodeString(AVCodecServiceErrCode code)

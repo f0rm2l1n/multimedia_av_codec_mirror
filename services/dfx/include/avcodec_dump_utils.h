@@ -28,6 +28,8 @@ public:
     int32_t AddInfo(const uint32_t dumpIdx, const std::string &name, const std::string &value = "");
     int32_t AddInfoFromFormat(const uint32_t dumpIdx, const Format &format,
                               const std::string_view &key, const std::string &name);
+    int32_t AddInfoFromFormatWithMapping(const uint32_t dumpIdx, const Format &format, const std::string_view &key,
+                                         const std::string &name, std::map<int32_t, const std::string> mapping);
     int32_t GetDumpString(std::string &dumpString);
 
 private:

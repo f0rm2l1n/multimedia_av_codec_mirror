@@ -31,9 +31,9 @@ using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
-constexpr uint32_t BITS_RATE = 112000;
+constexpr uint32_t BITS_RATE = 320000;
 constexpr uint32_t BITS_PER_CODED_RATE = 4;
-constexpr string_view INPUT_FILE_PATH = "/data/test/media/vorbis_2c_44100hz_112k.dat";
+constexpr string_view INPUT_FILE_PATH = "/data/test/media/vorbis_2c_44100hz_320k.dat";
 constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/decode_ogg.pcm";
 constexpr uint32_t TMP_BUFFER_SIZE = 4096;
 } // namespace

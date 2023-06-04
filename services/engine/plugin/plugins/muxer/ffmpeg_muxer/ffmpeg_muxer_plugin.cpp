@@ -123,7 +123,8 @@ FFmpegMuxerPlugin::FFmpegMuxerPlugin(std::string name, int32_t fd)
     : MuxerPlugin(std::move(name)), fd_(dup(fd)), isWriteHeader_(false)
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
-    if ((fcntl(fd_, F_GETFL, 0) & O_RDWR) != O_RDWR) {
+    uint32_t fdPermission = static_cast<uint32_t>(fcntl(fd_, F_GETFL, 0));
+    if ((fdPermission & O_RDWR) != O_RDWR) {
         AVCODEC_LOGE("No permission to read and write fd");
     }
     if (lseek(fd_, 0, SEEK_SET) < 0) {
@@ -258,7 +259,8 @@ Status FFmpegMuxerPlugin::AddTrack(int32_t &trackIndex, const MediaDescription &
         AVCODEC_LOGD("mimeType %{public}s is unsupported", mimeType.c_str());
         return Status::ERROR_UNSUPPORTED_FORMAT;
     }
-    formatContext_->flags |= AVFMT_TS_NONSTRICT;
+    uint32_t flags = static_cast<uint32_t>(formatContext_->flags);
+    formatContext_->flags = static_cast<int32_t>(flags | AVFMT_TS_NONSTRICT);
     return Status::NO_ERROR;
 }
 
@@ -317,7 +319,7 @@ Status FFmpegMuxerPlugin::WriteSample(const uint8_t *sample, const TrackSampleIn
     cachePacket_->flags = 0;
     if (info.flags & AVCODEC_BUFFER_FLAG_SYNC_FRAME) {
         AVCODEC_LOGD("It is key frame");
-        cachePacket_->flags |= AV_PKT_FLAG_KEY;
+        cachePacket_->flags = AV_PKT_FLAG_KEY;
     }
     auto ret = av_write_frame(formatContext_.get(), cachePacket_.get());
     av_packet_unref(cachePacket_.get());
