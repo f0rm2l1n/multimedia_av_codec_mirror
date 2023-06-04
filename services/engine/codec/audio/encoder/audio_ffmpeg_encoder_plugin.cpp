@@ -259,11 +259,6 @@ int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
     avCodecContext_->sample_fmt = (AVSampleFormat)sampleFormat;
 
     AVCODEC_LOGI("avcodec name: %{public}s", avCodec_->name);
-    if (!strcmp(avCodec_->name, "flac")) {
-        int32_t compliance_level;
-        format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, compliance_level);
-        avCodecContext_->strict_std_compliance = compliance_level;
-    }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 

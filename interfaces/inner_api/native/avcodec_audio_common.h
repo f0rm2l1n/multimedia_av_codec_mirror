@@ -30,6 +30,11 @@ enum AudioSampleFormat : int32_t {
     SAMPLE_S24LE = 2,
     SAMPLE_S32LE = 3,
     SAMPLE_F32LE = 4,
+    SAMPLE_U8P = 5,
+    SAMPLE_S16P = 6,
+    SAMPLE_S24P = 7,
+    SAMPLE_S32P = 8,
+    SAMPLE_F32P = 9,
     INVALID_WIDTH = -1
 };
 
