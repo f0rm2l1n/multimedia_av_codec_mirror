@@ -112,7 +112,7 @@ const std::map<AVCodecServiceErrCode, OH_AVErrCode> AVCSERRCODE_TO_OHAVCODECERRC
     {AVCS_ERR_SEEK_FAILED,                         AV_ERR_UNKNOWN},
     {AVCS_ERR_NETWORK_TIMEOUT,                     AV_ERR_TIMEOUT},
     {AVCS_ERR_NOT_FIND_CONTAINER,                  AV_ERR_UNSUPPORT},
-	{AVCS_ERR_NOT_ENOUGH_DATA,                     AV_ERR_UNKNOWN},
+    {AVCS_ERR_NOT_ENOUGH_DATA,                     AV_ERR_UNKNOWN},
     {AVCS_ERR_END_OF_STREAM,                       AV_ERR_UNKNOWN},
     {AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT,    AV_ERR_UNSUPPORT},
     {AVCS_ERR_MISMATCH_SAMPLE_RATE,                AV_ERR_UNSUPPORT},
