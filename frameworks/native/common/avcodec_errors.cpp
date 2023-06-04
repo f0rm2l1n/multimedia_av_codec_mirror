@@ -63,7 +63,7 @@ const std::map<AVCodecServiceErrCode, std::string> AVCS_ERRCODE_INFOS = {
     {AVCS_ERR_NETWORK_TIMEOUT,                       "network timeout"},
     {AVCS_ERR_NOT_FIND_CONTAINER,                    "not find a demuxer"},
     {AVCS_ERR_NOT_ENOUGH_DATA,                       "audio output buffer not enough of a pack"},
-    {AVCS_ERR_END_OF_STREAM,                         "audio end of stream"},
+    {AVCS_ERR_END_OF_STREAM,                         "end of stream"},
     {AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT,      "missing channel count attribute in configure"},
     {AVCS_ERR_MISMATCH_SAMPLE_RATE,                  "missing sample rate attribute in configure"},
     {AVCS_ERR_MISMATCH_BIT_RATE,                     "missing bit rate attribute in configure"},
