@@ -61,7 +61,7 @@ int AVMuxerFFmpegDemo::DoAddTrack(int32_t &trackIndex, MediaDescription &trackDe
 
 void AVMuxerFFmpegDemo::DoRunMuxer()
 {
-    long long testTimeStart = get_timestamp();
+    long long testTimeStart = GetTimestamp();
     GetFfmpegRegister();
     if (register_->plugins.size() == 0) {
         std::cout<<"regist muxers failed!"<<std::endl;
@@ -109,7 +109,7 @@ void AVMuxerFFmpegDemo::DoRunMuxer()
     WriteCoverSample();
     WriteTrackSample();
     ffmpegMuxer_->Stop();
-    long long testTimeEnd = get_timestamp();
+    long long testTimeEnd = GetTimestamp();
     std::cout << "muxer used time: " << testTimeEnd - testTimeStart << "us" << std::endl;
 }
 

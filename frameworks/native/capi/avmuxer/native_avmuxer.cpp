@@ -35,7 +35,6 @@ struct AVMuxerObject : public OH_AVMuxer {
 
 struct OH_AVMuxer *OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format)
 {
-    CHECK_AND_RETURN_RET_LOG(fd >= 0, nullptr, "fd %{public}d is error!", fd);
     std::shared_ptr<AVMuxer> avmuxer = AVMuxerFactory::CreateAVMuxer(fd, static_cast<OutputFormat>(format));
     CHECK_AND_RETURN_RET_LOG(avmuxer != nullptr, nullptr, "create muxer failed!");
     struct AVMuxerObject *object = new(std::nothrow) AVMuxerObject(avmuxer);

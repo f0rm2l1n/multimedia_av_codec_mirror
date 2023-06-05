@@ -51,7 +51,7 @@ extern struct VideoTrackParam g_bmpCoverPar;
 extern const char *RUN_NORMAL;
 extern const char *RUN_MUL_THREAD;
 
-long long get_timestamp(void);
+long long GetTimestamp(void);
 #ifdef __cplusplus
 }
 #endif

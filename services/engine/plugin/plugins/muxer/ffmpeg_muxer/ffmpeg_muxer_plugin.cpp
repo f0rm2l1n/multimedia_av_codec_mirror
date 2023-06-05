@@ -123,6 +123,9 @@ FFmpegMuxerPlugin::FFmpegMuxerPlugin(std::string name, int32_t fd)
     : MuxerPlugin(std::move(name)), fd_(dup(fd)), isWriteHeader_(false)
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
+    if (fd_ < 0) {
+        AVCODEC_LOGE("fd_ %{public}d is error!", fd_);
+    }
     uint32_t fdPermission = static_cast<uint32_t>(fcntl(fd_, F_GETFL, 0));
     if ((fdPermission & O_RDWR) != O_RDWR) {
         AVCODEC_LOGE("No permission to read and write fd");

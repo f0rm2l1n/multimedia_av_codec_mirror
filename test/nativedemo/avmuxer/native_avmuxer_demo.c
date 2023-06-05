@@ -630,7 +630,7 @@ int RunNativeMuxer(const char *out)
         return -1;
     }
     printf("open file %s success, -fd:%d, -flags %x\n", outFileName, fdStr.outputFd, fcntl(fdStr.outputFd, F_GETFL, 0));
-    long long testTimeStart = get_timestamp();
+    long long testTimeStart = GetTimestamp();
     OH_AVMuxer *muxer = OH_AVMuxer_Create(fdStr.outputFd, g_muxerParam.outputFormat);
     DoRunMuxer(&fdStr, muxer);
 
@@ -640,7 +640,7 @@ int RunNativeMuxer(const char *out)
     }
 
     CloseAllFd(&fdStr);
-    long long testTimeEnd = get_timestamp();
+    long long testTimeEnd = GetTimestamp();
     printf("muxer used time: %lld us\n", testTimeEnd - testTimeStart);
 
     return 0;

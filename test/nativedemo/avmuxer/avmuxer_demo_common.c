@@ -69,14 +69,15 @@ struct VideoTrackParam g_bmpCoverPar = {
 const char *RUN_NORMAL = "normal";
 const char *RUN_MUL_THREAD = "multhrd";
 
-long long get_timestamp(void)
+long long GetTimestamp(void)
 {
+    static const int timeScaleUs = 1000000;
     long long tmp;
     struct timeval tv;
 
     gettimeofday(&tv, NULL);
     tmp = tv.tv_sec;
-    tmp = tmp * 1000000;
+    tmp = tmp * timeScaleUs;
     tmp = tmp + tv.tv_usec;
 
     return tmp;

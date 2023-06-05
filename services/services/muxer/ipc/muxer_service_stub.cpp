@@ -164,15 +164,18 @@ int32_t MuxerServiceStub::InitParameter(MessageParcel &data, MessageParcel &repl
 {
     int32_t fd = data.ReadFileDescriptor();
     OutputFormat format = static_cast<OutputFormat>(data.ReadInt32());
-    reply.WriteInt32(InitParameter(fd, format));
-    (void)::close(fd);
+    bool ret = reply.WriteInt32(InitParameter(fd, format));
+    if (fd >= 0) {
+        (void)::close(fd);
+    }
+    CHECK_AND_RETURN_RET_LOG(ret, AVCS_ERR_UNKNOWN, "Reply InitParameter failed!");
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::SetRotation(MessageParcel &data, MessageParcel &reply)
 {
     int32_t rotation = data.ReadInt32();
-    reply.WriteInt32(SetRotation(rotation));
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SetRotation(rotation)), AVCS_ERR_UNKNOWN, "WriteInt32 failed!");
     return AVCS_ERR_OK;
 }
 
@@ -182,21 +185,22 @@ int32_t MuxerServiceStub::AddTrack(MessageParcel &data, MessageParcel &reply)
     (void)AVCodecParcel::Unmarshalling(data, trackDesc);
     int32_t trackIndex = -1;
     int32_t ret = AddTrack(trackIndex, trackDesc);
-    reply.WriteInt32(trackIndex);
-    reply.WriteInt32(ret);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(trackIndex), AVCS_ERR_UNKNOWN, "Reply AddTrack failed!");
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply AddTrack failed!");
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::Start(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    reply.WriteInt32(Start());
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Start()), AVCS_ERR_UNKNOWN, "Reply Start failed!");
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::WriteSample(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<AVSharedMemory> sample = ReadAVSharedMemoryFromParcel(data);
+    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_UNKNOWN, "Read sample from parcel failed!");
     TrackSampleInfo info;
     info.trackIndex = data.ReadUint32();
     info.timeUs = data.ReadInt64();
@@ -204,14 +208,14 @@ int32_t MuxerServiceStub::WriteSample(MessageParcel &data, MessageParcel &reply)
     info.offset = data.ReadInt32();
     info.flags = data.ReadUint32();
     int32_t ret = WriteSample(sample, info);
-    reply.WriteInt32(ret);
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply WriteSample failed!");
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::Stop(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    reply.WriteInt32(Stop());
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Stop()), AVCS_ERR_UNKNOWN, "Reply Stop failed!");
     return AVCS_ERR_OK;
 }
 
@@ -226,7 +230,7 @@ int32_t MuxerServiceStub::Release(MessageParcel &data, MessageParcel &reply)
 int32_t MuxerServiceStub::DestroyStub(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    reply.WriteInt32(DestroyStub());
+    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(DestroyStub()), AVCS_ERR_UNKNOWN, "Reply DestroyStub failed!");
     return AVCS_ERR_OK;
 }
 }  // namespace Media

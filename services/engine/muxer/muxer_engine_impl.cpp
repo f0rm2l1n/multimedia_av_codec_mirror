@@ -92,7 +92,9 @@ std::shared_ptr<IMuxerEngine> IMuxerEngineFactory::CreateMuxerEngine(
     int32_t appUid, int32_t appPid, int32_t fd, OutputFormat format)
 {
     AVCodecTrace trace("IMuxerEngineFactory::CreateMuxerEngine");
-    CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDWR) == O_RDWR, nullptr, "no permission to read and write fd");
+    CHECK_AND_RETURN_RET_LOG(fd >= 0, nullptr, "fd %{public}d is error!", fd);
+    uint32_t fdPermission = static_cast<uint32_t>(fcntl(fd, F_GETFL, 0));
+    CHECK_AND_RETURN_RET_LOG((fdPermission & O_RDWR) == O_RDWR, nullptr, "no permission to read and write fd");
     CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "the fd is not seekable");
     std::shared_ptr<MuxerEngineImpl> muxerEngineImpl = std::make_shared<MuxerEngineImpl>(appUid, appPid, fd, format);
     int32_t ret = muxerEngineImpl->Init();
