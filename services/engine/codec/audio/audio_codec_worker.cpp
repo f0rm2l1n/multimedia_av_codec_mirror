@@ -282,8 +282,12 @@ void AudioCodecWorker::ProduceInputBuffer()
 
 bool AudioCodecWorker::HandInputBuffer(int32_t &ret)
 {
-    uint32_t inputIndex = inBufIndexQue_.front();
-    inBufIndexQue_.pop();
+    uint32_t inputIndex;
+    {
+        std::unique_lock lock(stateMutex_);
+        inputIndex = inBufIndexQue_.front();
+        inBufIndexQue_.pop();
+    }
     auto inputBuffer = GetInputBufferInfo(inputIndex);
     bool isEos = inputBuffer->CheckIsEos();
     ret = codec_->ProcessSendData(inputBuffer);
