@@ -43,8 +43,11 @@ public:
     }
 
 private:
-    std::shared_ptr<AVCodecContext> GenEncodeContext(const Format &format);
-    int32_t AssignExtradata(std::shared_ptr<AVCodecContext> &context, const Format &format);
+    bool CheckFormat(const Format &format) const;
+    void GetExtradataSize(size_t idSize, size_t setupSize) const;
+    int PutHeaderLength(uint8_t *p, size_t value) const;
+    void PutCommentHeader(int offset) const;
+    int32_t GenExtradata(const Format &format) const;
 
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
