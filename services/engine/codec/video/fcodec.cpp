@@ -81,6 +81,7 @@ FCodec::~FCodec()
         ResetContext();
     }
     surface_ = nullptr;
+    callback_ = nullptr;
     ReleaseBuffers();
 }
 
@@ -393,7 +394,6 @@ int32_t FCodec::Release()
     ResetContext();
     format_ = Format();
     surface_ = nullptr;
-    callback_ = nullptr;
     CHECK_AND_RETURN_RET_LOG(ReleaseBuffers() == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
                              "Release codec failed: cannot release buffers");
     state_ = State::Uninitialized;
