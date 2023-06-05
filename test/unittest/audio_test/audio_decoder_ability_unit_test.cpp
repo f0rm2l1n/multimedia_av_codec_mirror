@@ -549,7 +549,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Leve
                                     stoi(INPUT_OGG_FILE_SOURCE_PATH[i][2]));
         OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(),
                                     stol(INPUT_OGG_FILE_SOURCE_PATH[i][3]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data()
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                     stoi(INPUT_OGG_FILE_SOURCE_PATH[i][4]));
         
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format_));
