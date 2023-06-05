@@ -14,6 +14,8 @@
  */
 
 #include "avmuxer_demo_common.h"
+#include <sys/time.h>
+#include <time.h>
 
 struct AudioTrackParam g_audioMpegPar = {
     .fileName = "mpeg_44100_2.dat",
@@ -66,3 +68,16 @@ struct VideoTrackParam g_bmpCoverPar = {
 
 const char *RUN_NORMAL = "normal";
 const char *RUN_MUL_THREAD = "multhrd";
+
+long long get_timestamp(void)
+{
+    long long tmp;
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+    tmp = tv.tv_sec;
+    tmp = tmp * 1000000;
+    tmp = tmp + tv.tv_usec;
+
+    return tmp;
+}

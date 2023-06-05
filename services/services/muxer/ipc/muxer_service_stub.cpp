@@ -15,6 +15,7 @@
 
 #include "muxer_service_stub.h"
 #include <map>
+#include <unistd.h>
 #include "avcodec_server_manager.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -130,7 +131,6 @@ int32_t MuxerServiceStub::Start()
 
 int32_t MuxerServiceStub::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
 {
-    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_INVALID_VAL, "sampleData is nullptr");
     CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
     return muxerServer_->WriteSample(sample, info);
 }
@@ -164,15 +164,15 @@ int32_t MuxerServiceStub::InitParameter(MessageParcel &data, MessageParcel &repl
 {
     int32_t fd = data.ReadFileDescriptor();
     OutputFormat format = static_cast<OutputFormat>(data.ReadInt32());
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitParameter(fd, format)), AVCS_ERR_UNKNOWN,
-        "Reply InitParameter failed!");
+    reply.WriteInt32(InitParameter(fd, format));
+    (void)::close(fd);
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::SetRotation(MessageParcel &data, MessageParcel &reply)
 {
     int32_t rotation = data.ReadInt32();
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(SetRotation(rotation)), AVCS_ERR_UNKNOWN, "WriteInt32 failed!");
+    reply.WriteInt32(SetRotation(rotation));
     return AVCS_ERR_OK;
 }
 
@@ -182,22 +182,21 @@ int32_t MuxerServiceStub::AddTrack(MessageParcel &data, MessageParcel &reply)
     (void)AVCodecParcel::Unmarshalling(data, trackDesc);
     int32_t trackIndex = -1;
     int32_t ret = AddTrack(trackIndex, trackDesc);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(trackIndex), AVCS_ERR_UNKNOWN, "Reply AddTrack failed!");
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply AddTrack failed!");
+    reply.WriteInt32(trackIndex);
+    reply.WriteInt32(ret);
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::Start(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Start()), AVCS_ERR_UNKNOWN, "Reply Start failed!");
+    reply.WriteInt32(Start());
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::WriteSample(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<AVSharedMemory> sample = ReadAVSharedMemoryFromParcel(data);
-    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_UNKNOWN, "Read sample from parcel failed!");
     TrackSampleInfo info;
     info.trackIndex = data.ReadUint32();
     info.timeUs = data.ReadInt64();
@@ -205,14 +204,14 @@ int32_t MuxerServiceStub::WriteSample(MessageParcel &data, MessageParcel &reply)
     info.offset = data.ReadInt32();
     info.flags = data.ReadUint32();
     int32_t ret = WriteSample(sample, info);
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply WriteSample failed!");
+    reply.WriteInt32(ret);
     return AVCS_ERR_OK;
 }
 
 int32_t MuxerServiceStub::Stop(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(Stop()), AVCS_ERR_UNKNOWN, "Reply Stop failed!");
+    reply.WriteInt32(Stop());
     return AVCS_ERR_OK;
 }
 
@@ -227,7 +226,7 @@ int32_t MuxerServiceStub::Release(MessageParcel &data, MessageParcel &reply)
 int32_t MuxerServiceStub::DestroyStub(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(DestroyStub()), AVCS_ERR_UNKNOWN, "Reply DestroyStub failed!");
+    reply.WriteInt32(DestroyStub());
     return AVCS_ERR_OK;
 }
 }  // namespace Media

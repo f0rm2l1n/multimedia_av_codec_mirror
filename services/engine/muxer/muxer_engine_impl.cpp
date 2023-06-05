@@ -94,24 +94,16 @@ std::shared_ptr<IMuxerEngine> IMuxerEngineFactory::CreateMuxerEngine(
     AVCodecTrace trace("IMuxerEngineFactory::CreateMuxerEngine");
     CHECK_AND_RETURN_RET_LOG((fcntl(fd, F_GETFL, 0) & O_RDWR) == O_RDWR, nullptr, "no permission to read and write fd");
     CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "the fd is not seekable");
-    std::shared_ptr<IMuxerEngine> muxerEngineImpl = std::make_shared<MuxerEngineImpl>(appUid, appPid, fd, format);
+    std::shared_ptr<MuxerEngineImpl> muxerEngineImpl = std::make_shared<MuxerEngineImpl>(appUid, appPid, fd, format);
+    int32_t ret = muxerEngineImpl->Init();
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr, "Init muxer engine implementation failed");
     return muxerEngineImpl;
 }
 
 MuxerEngineImpl::MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, OutputFormat format)
     : appUid_(appUid), appPid_(appPid), fd_(fd), format_(format), que_("muxer_write_queue")
 {
-    format_ = (format_ == OUTPUT_FORMAT_DEFAULT) ? OUTPUT_FORMAT_MPEG_4 : format_;
-    AVCodecTrace trace("MuxerEngine::Create");
-    AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
-    muxer_ = Plugin::MuxerFactory::Instance().CreatePlugin(fd_, format_);
-    if (muxer_ != nullptr && fd_ >= 0) {
-        state_ = State::INITIALIZED;
-        AVCODEC_LOGI("state_ is INITIALIZED");
-    } else {
-        AVCODEC_LOGE("state_ is UNINITIALIZED");
-        FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, AVCSErrorToString(AVCS_ERR_INVALID_STATE), "Muxer");
-    }
+    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
 }
 
 MuxerEngineImpl::~MuxerEngineImpl()
@@ -127,7 +119,23 @@ MuxerEngineImpl::~MuxerEngineImpl()
     appPid_ = -1;
     muxer_ = nullptr;
     tracks_.clear();
-    AVCODEC_LOGI("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+}
+
+int32_t MuxerEngineImpl::Init()
+{
+    AVCodecTrace trace("MuxerEngine::Init");
+    format_ = (format_ == OUTPUT_FORMAT_DEFAULT) ? OUTPUT_FORMAT_MPEG_4 : format_;
+    muxer_ = Plugin::MuxerFactory::Instance().CreatePlugin(fd_, format_);
+    if (muxer_ != nullptr && fd_ >= 0) {
+        state_ = State::INITIALIZED;
+        AVCODEC_LOGI("state_ is INITIALIZED");
+    } else {
+        AVCODEC_LOGE("state_ is UNINITIALIZED");
+        FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, AVCSErrorToString(AVCS_ERR_INVALID_STATE), "Muxer");
+    }
+    CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_STATE, "state_ is UNINITIALIZED");
+    return AVCS_ERR_OK;
 }
 
 int32_t MuxerEngineImpl::SetRotation(int32_t rotation)
