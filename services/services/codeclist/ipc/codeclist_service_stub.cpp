@@ -122,13 +122,12 @@ std::string CodecListServiceStub::FindEncoder(const Format &format)
     return codecListServer_->FindEncoder(format);
 }
 
-CapabilityData CodecListServiceStub::GetCapability(const std::string &mime, const bool isEncoder,
-                                                   const AVCodecCategory &category)
+int32_t CodecListServiceStub::GetCapability(CapabilityData &capabilityData, const std::string &mime,
+                                            const bool isEncoder, const AVCodecCategory &category)
 {
-    CapabilityData capabilityData;
-    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, capabilityData,
+    CHECK_AND_RETURN_RET_LOG(codecListServer_ != nullptr, AVCS_ERR_NO_MEMORY,
                              "Get capability failed: avcodeclist server is null");
-    return codecListServer_->GetCapability(mime, isEncoder, category);
+    return codecListServer_->GetCapability(capabilityData, mime, isEncoder, category);
 }
 
 int32_t CodecListServiceStub::DoFindDecoder(MessageParcel &data, MessageParcel &reply)
@@ -152,7 +151,8 @@ int32_t CodecListServiceStub::DoGetCapability(MessageParcel &data, MessageParcel
     std::string mime = data.ReadString();
     bool isEncoder = data.ReadBool();
     AVCodecCategory category = static_cast<AVCodecCategory>(data.ReadInt32());
-    CapabilityData capabilityData = GetCapability(mime, isEncoder, category);
+    CapabilityData capabilityData;
+    (void)GetCapability(capabilityData, mime, isEncoder, category);
     (void)CodecListParcel::Marshalling(reply, capabilityData);
     return AVCS_ERR_OK;
 }

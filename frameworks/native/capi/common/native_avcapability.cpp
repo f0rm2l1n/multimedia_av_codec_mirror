@@ -25,7 +25,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeAVCapability"};
 }
 using namespace OHOS::Media;
-OH_AVCapability::OH_AVCapability(const CapabilityData &capabilityData) : capabilityData_(capabilityData) {}
 
 OH_AVCapability::~OH_AVCapability() {}
 
@@ -34,10 +33,18 @@ OH_AVCapability *OH_AVCodec_GetCapability(const char *mime, bool isEncoder)
     CHECK_AND_RETURN_RET_LOG(mime != nullptr, nullptr, "Get capability failed: mime is nullptr");
     CHECK_AND_RETURN_RET_LOG(strlen(mime) != 0, nullptr, "Get capability failed: mime is empty");
     std::shared_ptr<AVCodecList> codeclist = AVCodecListFactory::CreateAVCodecList();
-    CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, AVCodecCategory::AVCODEC_NONE);
-    std::string name = capabilityData.codecName;
+    uint32_t sizeOfCap = sizeof(OH_AVCapability);
+    CapabilityData *capabilityData = codeclist->GetCapability(mime, isEncoder, AVCodecCategory::AVCODEC_NONE);
+    CHECK_AND_RETURN_RET_LOG(capabilityData != nullptr, nullptr,
+                             "Get capability failed: cannot find matched capability");
+    const std::string &name = capabilityData->codecName;
     CHECK_AND_RETURN_RET_LOG(!name.empty(), nullptr, "Get capability failed: cannot find matched capability");
-    return new (std::nothrow) OH_AVCapability(capabilityData);
+    void *addr = codeclist->GetBuffer(name, sizeOfCap);
+    CHECK_AND_RETURN_RET_LOG(addr != nullptr, nullptr, "Get capability failed: malloc capability buffer failed");
+    OH_AVCapability *obj = static_cast<OH_AVCapability *>(addr);
+    obj->capabilityData_ = capabilityData;
+    AVCODEC_LOGD("OH_AVCodec_GetCapability successful");
+    return obj;
 }
 
 OH_AVCapability *OH_AVCodec_GetCapabilityByCategory(const char *mime, bool isEncoder, OH_AVCodecCategory category)
@@ -51,10 +58,19 @@ OH_AVCapability *OH_AVCodec_GetCapabilityByCategory(const char *mime, bool isEnc
     } else {
         innerCategory = AVCodecCategory::AVCODEC_SOFTWARE;
     }
-    CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, innerCategory);
-    std::string name = capabilityData.codecName;
+    uint32_t sizeOfCap = sizeof(OH_AVCapability);
+    CapabilityData *capabilityData = codeclist->GetCapability(mime, isEncoder, innerCategory);
+    CHECK_AND_RETURN_RET_LOG(capabilityData != nullptr, nullptr,
+                             "Get capabilityByCategory failed: cannot find matched capability");
+    const std::string &name = capabilityData->codecName;
     CHECK_AND_RETURN_RET_LOG(!name.empty(), nullptr, "Get capabilityByCategory failed: cannot find matched capability");
-    return new (std::nothrow) OH_AVCapability(capabilityData);
+    void *addr = codeclist->GetBuffer(name, sizeOfCap);
+    CHECK_AND_RETURN_RET_LOG(addr != nullptr, nullptr,
+                             "Get capabilityByCategory failed: malloc capability buffer failed");
+    OH_AVCapability *obj = static_cast<OH_AVCapability *>(addr);
+    obj->capabilityData_ = capabilityData;
+    AVCODEC_LOGD("OH_AVCodec_GetCapability successful");
+    return obj;
 }
 
 const char *OH_AVCapability_GetName(OH_AVCapability *capability)

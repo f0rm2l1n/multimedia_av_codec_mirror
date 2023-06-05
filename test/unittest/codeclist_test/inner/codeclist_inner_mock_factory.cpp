@@ -21,7 +21,7 @@ std::shared_ptr<CodecListMock> CodecListMockFactory::GetCapability(const std::st
 {
     auto codeclist = AVCodecListFactory::CreateAVCodecList();
     if (codeclist != nullptr) {
-        CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, AVCodecCategory::AVCODEC_NONE);
+        CapabilityData *capabilityData = codeclist->GetCapability(mime, isEncoder, AVCodecCategory::AVCODEC_NONE);
         return std::make_shared<CodecListInnerMock>(codeclist, capabilityData);
     }
     return nullptr;
@@ -32,7 +32,7 @@ std::shared_ptr<CodecListMock> CodecListMockFactory::GetCapabilityByCategory(con
 {
     auto codeclist = AVCodecListFactory::CreateAVCodecList();
     if (codeclist != nullptr) {
-        CapabilityData capabilityData = codeclist->GetCapability(mime, isEncoder, category);
+        CapabilityData *capabilityData = codeclist->GetCapability(mime, isEncoder, category);
         return std::make_shared<CodecListInnerMock>(codeclist, capabilityData);
     }
     return nullptr;

@@ -24,9 +24,6 @@ void CodecListDemo::RunCase()
     std::cout << "===== ============== ======" << std::endl;
     const char *mime = "video/avc";
     OH_AVCapability *cap = OH_AVCodec_GetCapability(mime, false);
-    // OH_AVCodec_GetCapabilityByCategory
-    CapabilityData capsData = cap->capabilityData_;
-    std::cout << capsData.maxInstance << std::endl;
     const char *name = OH_AVCapability_GetName(cap);
     std::cout << name << std::endl;
     std::cout << "get caps successful" << std::endl;

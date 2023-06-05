@@ -15,6 +15,7 @@
 
 #include "codeclist_client.h"
 #include "avcodec_log.h"
+#include "avcodec_errors.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListClient"};
@@ -63,14 +64,13 @@ std::string CodecListClient::FindEncoder(const Format &format)
     return codecListProxy_->FindEncoder(format);
 }
 
-CapabilityData CodecListClient::GetCapability(const std::string &mime, const bool isEncoder,
-                                              const AVCodecCategory &category)
+int32_t CodecListClient::GetCapability(CapabilityData &capabilityData, const std::string &mime, const bool isEncoder,
+                                       const AVCodecCategory &category)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    CapabilityData capData;
-    CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, capData,
+    CHECK_AND_RETURN_RET_LOG(codecListProxy_ != nullptr, AVCS_ERR_NO_MEMORY,
                              "Get capability failed: codeclist service does not exist.");
-    return codecListProxy_->GetCapability(mime, isEncoder, category);
+    return codecListProxy_->GetCapability(capabilityData, mime, isEncoder, category);
 }
 } // namespace Media
 } // namespace OHOS

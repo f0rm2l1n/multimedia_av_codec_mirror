@@ -225,12 +225,12 @@ std::vector<int32_t> CodecListInnerMock::GetSupportedProfiles()
 {
     if (codeclist_ != nullptr) {
         std::vector<int32_t> ret;
-        if (capabilityData_.codecType == AVCODEC_TYPE_VIDEO_ENCODER ||
-            capabilityData_.codecType == AVCODEC_TYPE_VIDEO_DECODER) {
+        if (capabilityData_->codecType == AVCODEC_TYPE_VIDEO_ENCODER ||
+            capabilityData_->codecType == AVCODEC_TYPE_VIDEO_DECODER) {
             std::shared_ptr<VideoCaps> codecInfo = std::make_shared<VideoCaps>(capabilityData_);
             ret = codecInfo->GetSupportedProfiles();
-        } else if (capabilityData_.codecType == AVCODEC_TYPE_AUDIO_DECODER ||
-                   capabilityData_.codecType == AVCODEC_TYPE_AUDIO_ENCODER) {
+        } else if (capabilityData_->codecType == AVCODEC_TYPE_AUDIO_DECODER ||
+                   capabilityData_->codecType == AVCODEC_TYPE_AUDIO_ENCODER) {
             std::shared_ptr<AudioCaps> codecInfo = std::make_shared<AudioCaps>(capabilityData_);
             ret = codecInfo->GetSupportedProfiles();
         }
