@@ -61,7 +61,7 @@ public:
     static constexpr std::string_view MD_KEY_BITRATE = "bitrate";
 
     /**
-     * Key for max input size, value type is int32_t
+     * Key for max input size, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_MAX_INPUT_SIZE = "max_input_size";
 

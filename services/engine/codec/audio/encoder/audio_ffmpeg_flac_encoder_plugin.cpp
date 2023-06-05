@@ -19,6 +19,8 @@
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
 #include "avcodec_mime_type.h"
+#include "avcodec_audio_common.h"
+#include "native_avcodec_base.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
@@ -27,10 +29,14 @@ constexpr int32_t MAX_CHANNELS = 8;
 constexpr int32_t MIN_COMPLIANCE_LEVEL = -2;
 constexpr int32_t MAX_COMPLIANCE_LEVEL = 2;
 constexpr int32_t SAMPLES = 4608;
-static const uint32_t FLAC_ENCODER_SAMPLE_RATE_TABLE[] = {
+static const int32_t FLAC_ENCODER_SAMPLE_RATE_TABLE[] = {
     88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
-static const uint32_t FLAC_ENCODER_BITS_SAMPLE_TABLE[] = {16, 24, 32};
+const std::map<int32_t, int32_t> BITS_PER_RAW_SAMPLE_MAP = {
+    {OH_BitsPerSample::SAMPLE_S16LE, 16},
+    {OH_BitsPerSample::SAMPLE_S24LE, 24},
+    {OH_BitsPerSample::SAMPLE_S32LE, 32},
+};
 }
 
 namespace OHOS {
@@ -47,7 +53,7 @@ AudioFFMpegFlacEncoderPlugin::~AudioFFMpegFlacEncoderPlugin()
     basePlugin = nullptr;
 }
 
-static bool CheckSampleRate(uint32_t sampleRate)
+static bool CheckSampleRate(int32_t sampleRate)
 {
     for (auto i : FLAC_ENCODER_SAMPLE_RATE_TABLE) {
         if (i == sampleRate) {
@@ -57,14 +63,29 @@ static bool CheckSampleRate(uint32_t sampleRate)
     return false;
 }
 
-static bool CheckBitsPerSample(uint32_t bitsPerCodedSample)
+static bool CheckBitsPerSample(int32_t bitsPerCodedSample)
 {
-    for (auto i : FLAC_ENCODER_BITS_SAMPLE_TABLE) {
-        if (i == bitsPerCodedSample) {
+    for (auto &i : BITS_PER_RAW_SAMPLE_MAP) {
+        if (i.first == bitsPerCodedSample) {
             return true;
         }
     }
     return false;
+}
+
+int32_t AudioFFMpegFlacEncoderPlugin::SetContext(const Format &format)
+{
+    int32_t complianceLevel;
+    int32_t bitsPerCodedSample;
+    auto avCodecContext = basePlugin->GetCodecContext();
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, complianceLevel);
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
+    avCodecContext->strict_std_compliance = complianceLevel;
+    if (BITS_PER_RAW_SAMPLE_MAP.find(bitsPerCodedSample) == BITS_PER_RAW_SAMPLE_MAP.end()) {
+        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
+    }
+    avCodecContext->bits_per_raw_sample = BITS_PER_RAW_SAMPLE_MAP.at(bitsPerCodedSample);
+    return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
 int32_t AudioFFMpegFlacEncoderPlugin::CheckFormat(const Format &format)
@@ -85,7 +106,7 @@ int32_t AudioFFMpegFlacEncoderPlugin::CheckFormat(const Format &format)
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
     } else if (!CheckBitsPerSample(bitsPerCodedSample)) {
         AVCODEC_LOGE("init failed, because bitsPerCodedSample=%{public}d not support.", bitsPerCodedSample);
-        return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
+        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     } else if (complianceLevel < MIN_COMPLIANCE_LEVEL || complianceLevel > MAX_COMPLIANCE_LEVEL) {
         AVCODEC_LOGE("init failed, because complianceLevel=%{public}d not support.", complianceLevel);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
@@ -111,6 +132,12 @@ int32_t AudioFFMpegFlacEncoderPlugin::Init(const Format &format)
     ret = basePlugin->InitContext(format);
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         AVCODEC_LOGE("init failed, because InitContext failed. ret=%{public}d", ret);
+        return ret;
+    }
+
+    ret = SetContext(format);
+    if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
+        AVCODEC_LOGE("init failed, because SetContext failed. ret=%{public}d", ret);
         return ret;
     }
 
