@@ -210,6 +210,10 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
                     trackIndex, std::make_shared<BlockQueue<std::shared_ptr<SamplePacket>>>(
                         "track_sample_cache_" + std::to_string(trackIndex))));
         }
+
+        if(trackIsEnd_.count(trackIndex) == 0) {
+            trackIsEnd_.insert(std::make_pair(trackIndex, false));
+        }
     } else {
         AVCODEC_LOGW("track %{public}u is already in selected list!", trackIndex);
     }
@@ -364,6 +368,11 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
         uint32_t stream_index = static_cast<uint32_t>(pkt->stream_index);
         if (ffmpegRet >= 0 && IsInSelectedTrack(stream_index)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
+            if (avStream->duration <= (pkt->pts + pkt->duration)) {
+                if (trackIsEnd_.count(stream_index) != 0) {
+                    trackIsEnd_[stream_index] = true;
+                }
+            }
             cacheSamplePacket->offset_ = 0;
             cacheSamplePacket->pkt_ = pkt;
             if (stream_index == trackIndex) {
@@ -377,6 +386,14 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
             sampleCache_[stream_index]->Push(cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
+
+    if (ffmpegRet == AVERROR_EOF || (trackIsEnd_.count(trackIndex) != 0 && trackIsEnd_[trackIndex])) {
+        info.presentationTimeUs = 0;
+        info.size = 0;
+        info.offset = 0;
+        flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
+    }
+
     if (ffmpegRet < 0) {
         AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ffmpegRet);
         av_packet_free(&(samplePacket->pkt_));
@@ -454,6 +471,9 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
     for (auto it:sampleCache_) {
         FreeCachePacket(it.first);
         it.second->Clear();
+        if (trackIsEnd_.count(it.first) != 0) {
+            trackIsEnd_[it.first] = false;
+        }
     }
     return AVCS_ERR_OK;
 }
