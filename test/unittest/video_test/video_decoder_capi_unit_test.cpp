@@ -554,6 +554,18 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_SetParameter_02, TestSize.Le
     EXPECT_NE(nullptr, OH_VideoDecoder_GetOutputDescription(videoDec_));
 }
 
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_SetParameter_03, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_MAX_INPUT_SIZE, 114514);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_SetParameter(videoDec_, format_));
+    EXPECT_NE(nullptr, OH_VideoDecoder_GetOutputDescription(videoDec_));
+}
+
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_01, TestSize.Level1)
 {
     ProceFunc();
