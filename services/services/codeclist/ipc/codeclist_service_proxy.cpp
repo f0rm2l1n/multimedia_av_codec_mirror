@@ -64,25 +64,24 @@ std::string CodecListServiceProxy::FindEncoder(const Format &format)
     return reply.ReadString();
 }
 
-CapabilityData CodecListServiceProxy::GetCapability(const std::string &mime, const bool isEncoder,
-                                                    const AVCodecCategory &category)
+int32_t CodecListServiceProxy::GetCapability(CapabilityData &capabilityData, const std::string &mime,
+                                             const bool isEncoder, const AVCodecCategory &category)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     Format profileFormat;
-    CapabilityData capabilityData;
     bool token = data.WriteInterfaceToken(CodecListServiceProxy::GetDescriptor());
-    CHECK_AND_RETURN_RET_LOG(token, capabilityData, "Write descriptor failed!");
+    CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_UNKNOWN, "Write descriptor failed!");
     (void)data.WriteString(mime);
     (void)data.WriteBool(isEncoder);
     (void)data.WriteInt32(static_cast<int32_t>(category));
     int32_t ret =
         Remote()->SendRequest(static_cast<uint32_t>(AVCodecListServiceMsg::GET_CAPABILITY), data, reply, option);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, capabilityData, "GetCodecCapabilityInfos failed, send request error");
+    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_UNKNOWN,
+                             "GetCodecCapabilityInfos failed, send request error");
     (void)CodecListParcel::Unmarshalling(reply, capabilityData);
-
-    return capabilityData;
+    return AVCS_ERR_OK;
 }
 
 int32_t CodecListServiceProxy::DestroyStub()
