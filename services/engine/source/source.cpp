@@ -587,8 +587,10 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
     int rtv = -1;
     auto readSize = bufSize;
     auto customIOContext = static_cast<CustomIOContext*>(opaque);
-    auto bufferVector = customIOContext->bufMemory;
-    if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize != 0)) {
+    auto buffer = std::make_shared<Buffer>();
+    auto bufData = buffer->WrapMemory(buf, bufSize, 0);
+    if ((customIOContext->avioContext->seekable == static_cast<int>(Seekable::SEEKABLE)) &&
+        (customIOContext->fileSize != 0)) {
         if (customIOContext->offset > customIOContext->fileSize) {
             AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}" PRIu64,
                          customIOContext->offset, customIOContext->fileSize);
@@ -596,10 +598,6 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
         }
         if (static_cast<size_t>(customIOContext->offset + bufSize) > customIOContext->fileSize) {
             readSize = customIOContext->fileSize - customIOContext->offset;
-        }
-        if (buf != nullptr && bufferVector->GetMemory() != nullptr) {
-            auto memSize = static_cast<int>(bufferVector->GetMemory()->GetCapacity());
-            readSize = (readSize > memSize) ? memSize : readSize;
         }
         if (customIOContext->position != customIOContext->offset) {
             int32_t err = static_cast<int32_t>(customIOContext->sourcePlugin->SeekTo(customIOContext->offset));
@@ -610,11 +608,9 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
             customIOContext->position = customIOContext->offset;
         }
         int32_t result = static_cast<int32_t>(
-                    customIOContext->sourcePlugin->Read(bufferVector, static_cast<size_t>(readSize)));
-        AVCODEC_LOGD("AVReadPacket read data size = %{public}d",
-                     static_cast<int32_t>(bufferVector->GetMemory()->GetSize()));
+                    customIOContext->sourcePlugin->Read(buffer, static_cast<size_t>(readSize)));
         if (result == 0) {
-            rtv = bufferVector->GetMemory()->GetSize();
+            rtv = buffer->GetMemory()->GetSize();
             customIOContext->offset += rtv;
             customIOContext->position += rtv;
         } else if (static_cast<int>(result) == 1) {
