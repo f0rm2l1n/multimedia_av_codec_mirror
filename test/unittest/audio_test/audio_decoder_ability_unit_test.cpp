@@ -45,6 +45,11 @@ const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NA
 const string CODEC_OGG_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME);
 const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME);
 const string INPUT_SOURCE_PATH = "/data/test/media/dat/";
+const int MP3_TESTCASES_NUMS = 15;
+const int FLAC_TESTCASES_NUMS = 19;
+const int OGG_TESTCASES_NUMS = 14;
+const int AAC_TESTCASES_NUMS = 6;
+
 const string INPUT_MP3_FILE_SOURCE_PATH[][5] = {{"MP3_11k_2c_20kb.dat", "11025", "2", "32000", "16"},
                                                 {"MP3_16k_2c_32kb.dat", "16000", "2", "32000", "16"},
                                                 {"MP3_16k_2c_40kb.dat", "16000", "2", "40000", "16"},
@@ -62,24 +67,24 @@ const string INPUT_MP3_FILE_SOURCE_PATH[][5] = {{"MP3_11k_2c_20kb.dat", "11025",
                                                 {"MP3_8k_2c_18kb.dat", "16000", "2", "32000", "16"}};
 
 const string INPUT_FLAC_FILE_SOURCE_PATH[][5] = {{"FLAC_176k_1c_xxkb.dat", "176400", "1", "320000", "16"},
-                                                {"FLAC_176k_2c_xxkb.dat", "176400", "2", "320000", "16"},
-                                                {"FLAC_176k_6c_xxkb.dat", "176400", "6", "320000", "16"},
-                                                {"FLAC_192k_1c_xxkb.dat", "192000", "1", "320000", "16"},
-                                                {"FLAC_192k_2c_xxkb.dat", "192000", "2", "320000", "16"},
-                                                {"FLAC_192k_3c_xxkb.dat", "192000", "3", "320000", "16"},
-                                                {"FLAC_192k_4c_xxkb.dat", "192000", "4", "320000", "16"},
-                                                {"FLAC_192k_5c_xxkb.dat", "192000", "5", "320000", "16"},
-                                                {"FLAC_192k_6c_xxkb.dat", "192000", "6", "320000", "16"},
-                                                {"FLAC_192k_7c_xxkb.dat", "192000", "7", "320000", "16"},
-                                                {"FLAC_192k_8c_xxkb.dat", "192000", "8", "320000", "16"},
-                                                {"FLAC_6k_1c_xxkb.dat", "8000", "1", "320000", "16"},
-                                                {"FLAC_6k_2c_xxkb.dat", "8000", "2", "320000", "16"},
-                                                {"FLAC_6k_3c_xxkb.dat", "8000", "3", "320000", "16"},
-                                                {"FLAC_6k_4c_xxkb.dat", "8000", "4", "320000", "16"},
-                                                {"FLAC_6k_5c_xxkb.dat", "8000", "5", "320000", "16"},
-                                                {"FLAC_6k_6c_xxkb.dat", "8000", "6", "320000", "16"},
-                                                {"FLAC_6k_7c_xxkb.dat", "8000", "7", "320000", "16"},
-                                                {"FLAC_6k_8c_xxkb.dat", "8000", "8", "320000", "16"}};
+                                                 {"FLAC_176k_2c_xxkb.dat", "176400", "2", "320000", "16"},
+                                                 {"FLAC_176k_6c_xxkb.dat", "176400", "6", "320000", "16"},
+                                                 {"FLAC_192k_1c_xxkb.dat", "192000", "1", "320000", "16"},
+                                                 {"FLAC_192k_2c_xxkb.dat", "192000", "2", "320000", "16"},
+                                                 {"FLAC_192k_3c_xxkb.dat", "192000", "3", "320000", "16"},
+                                                 {"FLAC_192k_4c_xxkb.dat", "192000", "4", "320000", "16"},
+                                                 {"FLAC_192k_5c_xxkb.dat", "192000", "5", "320000", "16"},
+                                                 {"FLAC_192k_6c_xxkb.dat", "192000", "6", "320000", "16"},
+                                                 {"FLAC_192k_7c_xxkb.dat", "192000", "7", "320000", "16"},
+                                                 {"FLAC_192k_8c_xxkb.dat", "192000", "8", "320000", "16"},
+                                                 {"FLAC_6k_1c_xxkb.dat", "8000", "1", "320000", "16"},
+                                                 {"FLAC_6k_2c_xxkb.dat", "8000", "2", "320000", "16"},
+                                                 {"FLAC_6k_3c_xxkb.dat", "8000", "3", "320000", "16"},
+                                                 {"FLAC_6k_4c_xxkb.dat", "8000", "4", "320000", "16"},
+                                                 {"FLAC_6k_5c_xxkb.dat", "8000", "5", "320000", "16"},
+                                                 {"FLAC_6k_6c_xxkb.dat", "8000", "6", "320000", "16"},
+                                                 {"FLAC_6k_7c_xxkb.dat", "8000", "7", "320000", "16"},
+                                                 {"FLAC_6k_8c_xxkb.dat", "8000", "8", "320000", "16"}};
 
 const string INPUT_OGG_FILE_SOURCE_PATH[][5] = {{"OGG_192k_1c_100pkb.dat", "176400", "1", "320000", "16"},
                                                 {"OGG_192k_1c_xxkb.dat", "176400", "1", "320000", "16"},
@@ -400,13 +405,13 @@ int32_t AudioCodeCapiDecoderUnitTest::Stop()
 int32_t AudioCodeCapiDecoderUnitTest::InitFile(const string &codecName, string inputTestFile)
 {
     format_ = OH_AVFormat_Create();
-    if (codecName.compare(CODEC_MP3_NAME) == 0){
+    if (codecName.compare(CODEC_MP3_NAME) == 0) {
         audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
-    } else if (codecName.compare(CODEC_FLAC_NAME) == 0){
+    } else if (codecName.compare(CODEC_FLAC_NAME) == 0) {
         audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_FLAC_NAME).data());
-    } else if (codecName.compare(CODEC_OGG_NAME) == 0){
+    } else if (codecName.compare(CODEC_OGG_NAME) == 0) {
         audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME).data());
-    } else if (codecName.compare(CODEC_AAC_NAME) == 0){
+    } else if (codecName.compare(CODEC_AAC_NAME) == 0) {
         audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_AAC_NAME).data());
         OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_AAC_IS_ADTS.data(), 1);
     }
@@ -423,7 +428,7 @@ int32_t AudioCodeCapiDecoderUnitTest::InitFile(const string &codecName, string i
     if (!pcmOutputFile_.is_open()) {
         cout << "Fatal: open output file failed" << endl;
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
-    }    
+    }
 
     signal_ = new ADecSignal();
     cb_ = {&OnError, &OnOutputFormatChanged, &OnInputBufferAvailable, &OnOutputBufferAvailable};
@@ -440,7 +445,7 @@ int32_t AudioCodeCapiDecoderUnitTest::InitFile(const string &codecName, string i
         }
         char buffer[extradataSize];
         inputFile_.read(buffer, extradataSize);
-        if(inputFile_.gcount() != extradataSize){
+        if (inputFile_.gcount() != extradataSize) {
             cout << "read extradata bytes error" << endl;
         }
         OH_AVFormat_SetBuffer(format_, MediaDescriptionKey::MD_KEY_CODEC_CONFIG.data(), (uint8_t *)buffer,
@@ -454,13 +459,16 @@ int32_t AudioCodeCapiDecoderUnitTest::InitFile(const string &codecName, string i
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Level1)
 {
     bool result;
-    for (int i =0; i < 15; i++){
+    for (int i = 0; i < MP3_TESTCASES_NUMS; i++){
         cout << "decode start " << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_MP3_NAME, INPUT_MP3_FILE_SOURCE_PATH[i][0]));
 
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), stoi(INPUT_MP3_FILE_SOURCE_PATH[i][1]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), stoi(INPUT_MP3_FILE_SOURCE_PATH[i][2]));
-        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), stol(INPUT_MP3_FILE_SOURCE_PATH[i][3]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), 
+                                    stoi(INPUT_MP3_FILE_SOURCE_PATH[i][1]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), 
+                                    stoi(INPUT_MP3_FILE_SOURCE_PATH[i][2]));
+        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), 
+                                    stol(INPUT_MP3_FILE_SOURCE_PATH[i][3]));
         OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), 
                                     stoi(INPUT_MP3_FILE_SOURCE_PATH[i][4]));
         OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), (uint32_t) 16);
@@ -479,9 +487,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Leve
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false);
-        if (result){
+        if (result) {
             cout << "error occur, decode fail" << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
-        } else{
+        } else {
             cout << "decode success " << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
         }
 
@@ -492,13 +500,15 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Leve
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Level1)
 {
     bool result;
-    for (int i =0; i < 19; i++){
+    for (int i = 0; i < FLAC_TESTCASES_NUMS; i++){
         cout << "decode start " << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_FLAC_NAME, INPUT_FLAC_FILE_SOURCE_PATH[i][0]));
-
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][1]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][2]));
-        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), stol(INPUT_FLAC_FILE_SOURCE_PATH[i][3]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), 
+                                    stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][1]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), 
+                                    stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][2]));
+        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), 
+                                    stol(INPUT_FLAC_FILE_SOURCE_PATH[i][3]));
         OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), 
                                     stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][4]));
         
@@ -516,9 +526,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Leve
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false);
-        if (result){
+        if (result) {
             cout << "error occur, decode fail" << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
-        } else{
+        } else {
             cout << "decode success " << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
         }
 
@@ -529,14 +539,17 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Leve
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Level1)
 {
     bool result;
-    for (int i =0; i < 14; i++){
+    for (int i = 0; i < OGG_TESTCASES_NUMS; i++){
         cout << "decode start " << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_OGG_NAME, INPUT_OGG_FILE_SOURCE_PATH[i][0]));
 
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), stoi(INPUT_OGG_FILE_SOURCE_PATH[i][1]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), stoi(INPUT_OGG_FILE_SOURCE_PATH[i][2]));
-        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), stol(INPUT_OGG_FILE_SOURCE_PATH[i][3]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), 
+                                    stoi(INPUT_OGG_FILE_SOURCE_PATH[i][1]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), 
+                                    stoi(INPUT_OGG_FILE_SOURCE_PATH[i][2]));
+        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), 
+                                    stol(INPUT_OGG_FILE_SOURCE_PATH[i][3]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                     stoi(INPUT_OGG_FILE_SOURCE_PATH[i][4]));
         
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format_));
@@ -553,9 +566,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Leve
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false);
-        if (result){
+        if (result) {
             cout << "error occur, decode fail" << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
-        } else{
+        } else {
             cout << "decode success " << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
         }
 
@@ -566,7 +579,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Leve
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_04, TestSize.Level1)
 {
     bool result;
-    for (int i =0; i < 6; i++){
+    for (int i = 0; i < AAC_TESTCASES_NUMS; i++){
         cout << "decode start " << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_AAC_NAME, INPUT_AAC_FILE_SOURCE_PATH[i][0]));
 
@@ -590,15 +603,14 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_04, TestSize.Leve
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false);
-        if (result){
+        if (result) {
             cout << "error occur, decode fail" << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
-        } else{
+        } else {
             cout << "decode success " << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
         }
 
         Release();
     }
 }
-
 }  // namespace Media
 }  // namespace OHOS
