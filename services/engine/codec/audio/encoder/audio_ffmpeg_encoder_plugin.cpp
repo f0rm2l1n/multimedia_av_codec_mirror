@@ -27,11 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 namespace OHOS {
 namespace Media {
 AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin()
-    : maxInputSize_(-1),
-      avCodec_(nullptr),
-      avCodecContext_(nullptr),
-      cachedFrame_(nullptr),
-      avPacket_(nullptr)
+    : maxInputSize_(-1), avCodec_(nullptr), avCodecContext_(nullptr), cachedFrame_(nullptr), avPacket_(nullptr)
 {
 }
 
@@ -45,7 +41,7 @@ int32_t AudioFfmpegEncoderPlugin::ProcessSendData(const std::shared_ptr<AudioBuf
 {
     if (avCodecContext_ == nullptr) {
         AVCODEC_LOGE("avCodecContext_ is nullptr");
-        return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
+        return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
     std::unique_lock lock(avMutext_);
     return SendBuffer(inputBuffer);
@@ -110,9 +106,10 @@ int32_t AudioFfmpegEncoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
     if (ret == 0) {
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     } else if (ret == AVERROR(EAGAIN)) {
-        return AVCodecServiceErrCode::AVCS_ERR_AGAIN;
+        AVCODEC_LOGW("skip this frame because data not enough, msg:%{public}s", AVStrError(ret).data());
+        return AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA;
     } else if (ret == AVERROR_EOF) {
-        AVCODEC_LOGI("End of stream");
+        AVCODEC_LOGW("eos send frame, msg:%{public}s", AVStrError(ret).data());
         return AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM;
     } else {
         AVCODEC_LOGE("Send frame unknown error: %{public}s", AVStrError(ret).c_str());
@@ -131,7 +128,7 @@ int32_t AudioFfmpegEncoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBuffer
         std::unique_lock l(avMutext_);
         if (avCodecContext_ == nullptr) {
             AVCODEC_LOGE("avCodecContext_ is nullptr");
-            return AVCodecServiceErrCode::AVCS_ERR_WRONG_STATE;
+            return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
         }
         status = ReceiveBuffer(outBuffer);
     }
@@ -169,7 +166,7 @@ int32_t AudioFfmpegEncoderPlugin::ReceivePacketSucc(std::shared_ptr<AudioBufferI
             AVCODEC_LOGE("Get header failed.");
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
-        uint32_t len = memory->Write(reinterpret_cast<uint8_t *>(const_cast<char*>(header.c_str())), headerSize);
+        uint32_t len = memory->Write(reinterpret_cast<uint8_t *>(const_cast<char *>(header.c_str())), headerSize);
         if (len < headerSize) {
             AVCODEC_LOGE("Write header failed, len = %{public}d", len);
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;

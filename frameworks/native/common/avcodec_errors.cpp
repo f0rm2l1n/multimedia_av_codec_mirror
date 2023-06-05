@@ -62,15 +62,13 @@ const std::map<AVCodecServiceErrCode, std::string> AVCS_ERRCODE_INFOS = {
     {AVCS_ERR_SEEK_FAILED,                           "audio or video seek failed"},
     {AVCS_ERR_NETWORK_TIMEOUT,                       "network timeout"},
     {AVCS_ERR_NOT_FIND_CONTAINER,                    "not find a demuxer"},
-    {AVCS_ERR_EXTEND_START,                          "extend start error code"},
     {AVCS_ERR_NOT_ENOUGH_DATA,                       "audio output buffer not enough of a pack"},
-    {AVCS_ERR_END_OF_STREAM,                         "audio end of stream"},
-    {AVCS_ERR_AGAIN,                                 "audio input buffer not enough of a pack"},
-    {AVCS_ERR_WRONG_STATE,                           "ffmpeg initialize failed"},
+    {AVCS_ERR_END_OF_STREAM,                         "end of stream"},
     {AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT,      "missing channel count attribute in configure"},
     {AVCS_ERR_MISMATCH_SAMPLE_RATE,                  "missing sample rate attribute in configure"},
     {AVCS_ERR_MISMATCH_BIT_RATE,                     "missing bit rate attribute in configure"},
-    {AVCS_ERR_CONFIGURE_ERROR,                       "compression level incorrect in flac encoder"}};
+    {AVCS_ERR_CONFIGURE_ERROR,                       "compression level incorrect in flac encoder"},
+    {AVCS_ERR_EXTEND_START,                          "extend start error code"}};
 
 const std::map<AVCodecServiceErrCode, OH_AVErrCode> AVCSERRCODE_TO_OHAVCODECERRCODE = {
     {AVCS_ERR_OK,                                  AV_ERR_OK},
@@ -114,15 +112,13 @@ const std::map<AVCodecServiceErrCode, OH_AVErrCode> AVCSERRCODE_TO_OHAVCODECERRC
     {AVCS_ERR_SEEK_FAILED,                         AV_ERR_UNKNOWN},
     {AVCS_ERR_NETWORK_TIMEOUT,                     AV_ERR_TIMEOUT},
     {AVCS_ERR_NOT_FIND_CONTAINER,                  AV_ERR_UNSUPPORT},
-    {AVCS_ERR_EXTEND_START,                        AV_ERR_EXTEND_START},
     {AVCS_ERR_NOT_ENOUGH_DATA,                     AV_ERR_UNKNOWN},
     {AVCS_ERR_END_OF_STREAM,                       AV_ERR_UNKNOWN},
-    {AVCS_ERR_AGAIN,                               AV_ERR_UNKNOWN},
-    {AVCS_ERR_WRONG_STATE,                         AV_ERR_INVALID_VAL},
     {AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT,    AV_ERR_UNSUPPORT},
     {AVCS_ERR_MISMATCH_SAMPLE_RATE,                AV_ERR_UNSUPPORT},
     {AVCS_ERR_MISMATCH_BIT_RATE,                   AV_ERR_UNSUPPORT},
-    {AVCS_ERR_CONFIGURE_ERROR,                     AV_ERR_UNSUPPORT}};
+    {AVCS_ERR_CONFIGURE_ERROR,                     AV_ERR_UNSUPPORT},
+    {AVCS_ERR_EXTEND_START,                        AV_ERR_EXTEND_START}};
 
 const std::map<OH_AVErrCode, std::string> OHAVCODECERRCODE_INFOS = {
     {AV_ERR_OK,                    "success"},

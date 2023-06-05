@@ -112,11 +112,7 @@ void AEncAacDemo::RunCase()
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }
 
-AEncAacDemo::AEncAacDemo()
-    : isRunning_(false),
-      audioEnc_(nullptr),
-      signal_(nullptr),
-      frameCount_(0)
+AEncAacDemo::AEncAacDemo() : isRunning_(false), audioEnc_(nullptr), signal_(nullptr), frameCount_(0)
 {
     inputFile_ = std::make_unique<std::ifstream>(INPUT_FILE_PATH, std::ios::binary);
 }
@@ -168,16 +164,18 @@ int32_t AEncAacDemo::Stop()
     isRunning_.store(false);
 
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
 

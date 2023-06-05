@@ -78,8 +78,6 @@ typedef enum AVCodecServiceErrCode : ErrCode {
 
     AVCS_ERR_NOT_ENOUGH_DATA,                              // avcodec output buffer not full of a pack
     AVCS_ERR_END_OF_STREAM,                                // the end of stream
-    AVCS_ERR_AGAIN,                                        // avcodec input buffer not full of a pack
-    AVCS_ERR_WRONG_STATE,                                  // ffmpeg initialize error
     AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT,             // not configure channel count attribute
     AVCS_ERR_MISMATCH_SAMPLE_RATE,                         // not configure channel sample rate
     AVCS_ERR_MISMATCH_BIT_RATE,                            // not configure channel bit rate

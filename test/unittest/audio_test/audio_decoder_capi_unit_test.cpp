@@ -179,7 +179,7 @@ void AudioCodeCapiDecoderUnitTest::SetUp(void)
 void AudioCodeCapiDecoderUnitTest::TearDown(void)
 {
     cout << "[TearDown]: over!!!" << endl;
-    
+
     if (signal_) {
         delete signal_;
         signal_ = nullptr;
@@ -256,7 +256,7 @@ void AudioCodeCapiDecoderUnitTest::InputFunc()
             cout << "Fatal: GetInputBuffer fail" << endl;
             break;
         }
-        inputFile_.read(reinterpret_cast<char*>(&size), sizeof(size));
+        inputFile_.read(reinterpret_cast<char *>(&size), sizeof(size));
         if (inputFile_.eof() || inputFile_.gcount() == 0) {
             HandleInputEOS(index);
             cout << "end buffer\n";
@@ -266,12 +266,12 @@ void AudioCodeCapiDecoderUnitTest::InputFunc()
             cout << "Fatal: read size fail" << endl;
             break;
         }
-        inputFile_.read(reinterpret_cast<char*>(&pts), sizeof(pts));
+        inputFile_.read(reinterpret_cast<char *>(&pts), sizeof(pts));
         if (inputFile_.gcount() != sizeof(pts)) {
             cout << "Fatal: read size fail" << endl;
             break;
         }
-        inputFile_.read((char*)OH_AVMemory_GetAddr(buffer), size);
+        inputFile_.read((char *)OH_AVMemory_GetAddr(buffer), size);
         if (inputFile_.gcount() != size) {
             cout << "Fatal: read buffer fail" << endl;
             break;
@@ -347,16 +347,18 @@ int32_t AudioCodeCapiDecoderUnitTest::Stop()
 {
     isRunning_.store(false);
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
         inputLoop_->join();
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
-        unique_lock<mutex> lock(signal_->outMutex_);
-        signal_->outCond_.notify_all();
-        lock.unlock();
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
         outputLoop_->join();
     }
     return OH_AudioDecoder_Stop(audioDec_);
@@ -1332,5 +1334,5 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_ReleaseOutputBuffer_0
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_FreeOutputData(audioDec_, index));
     Release();
 }
-}  // namespace Media
-}  // namespace OHOS
+} // namespace Media
+} // namespace OHOS
