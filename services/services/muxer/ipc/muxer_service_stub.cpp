@@ -15,6 +15,7 @@
 
 #include "muxer_service_stub.h"
 #include <map>
+#include <unistd.h>
 #include "avcodec_server_manager.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -130,7 +131,6 @@ int32_t MuxerServiceStub::Start()
 
 int32_t MuxerServiceStub::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
 {
-    CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_INVALID_VAL, "sampleData is nullptr");
     CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
     return muxerServer_->WriteSample(sample, info);
 }
@@ -164,8 +164,11 @@ int32_t MuxerServiceStub::InitParameter(MessageParcel &data, MessageParcel &repl
 {
     int32_t fd = data.ReadFileDescriptor();
     OutputFormat format = static_cast<OutputFormat>(data.ReadInt32());
-    CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(InitParameter(fd, format)), AVCS_ERR_UNKNOWN,
-        "Reply InitParameter failed!");
+    bool ret = reply.WriteInt32(InitParameter(fd, format));
+    if (fd >= 0) {
+        (void)::close(fd);
+    }
+    CHECK_AND_RETURN_RET_LOG(ret, AVCS_ERR_UNKNOWN, "Reply InitParameter failed!");
     return AVCS_ERR_OK;
 }
 

@@ -54,7 +54,7 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
         return;
     }
     std::cout<<"==== open success! =====\noutputFileName: "<<outFileName<<"\n============"<<std::endl;
-
+    long long testTimeStart = GetTimestamp();
     avmuxer_ = IMuxerEngineFactory::CreateMuxerEngine(-1, -1, outFd_, outputFormat_);
     if (avmuxer_ == nullptr) {
         std::cout << "avmuxer_ is null" << std::endl;
@@ -99,6 +99,8 @@ void AVMuxerEngineDemo::DoRunMuxer(const std::string &runMode)
         return;
     }
     std::cout << "stop muxer success" << std::endl;
+    long long testTimeEnd = GetTimestamp();
+    std::cout << "muxer used time: " << testTimeEnd - testTimeStart << "us" << std::endl;
 }
 
 void AVMuxerEngineDemo::DoRunMuxer()
