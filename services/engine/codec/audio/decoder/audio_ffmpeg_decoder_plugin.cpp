@@ -100,7 +100,7 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     } else if (ret == AVERROR(EAGAIN)) {
         AVCODEC_LOGW("skip this frame because data not enough, msg:%{public}s", AVStrError(ret).data());
-        return AVCodecServiceErrCode::AVCS_ERR_AGAIN;
+        return AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA;
     } else if (ret == AVERROR_EOF) {
         AVCODEC_LOGW("eos send frame, msg:%{public}s", AVStrError(ret).data());
         return AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM;
