@@ -607,7 +607,7 @@ int32_t FCodec::UpdateSurfaceMemory()
         outputBuffer = buffers_[INDEX_OUTPUT][idx];
         surfaceMemory = std::static_pointer_cast<SurfaceMemory>(outputBuffer->memory_);
         surfaceBuffer = surfaceMemory->GetSurfaceBuffer();
-        CHECK_AND_RETURN_RET_LOG(surfaceBuffer != nullptr, AVCS_ERR_NO_MEMORY, 
+        CHECK_AND_RETURN_RET_LOG(surfaceBuffer != nullptr, AVCS_ERR_NO_MEMORY,
                                  "getSurfaceBuffer failed, index=%{public}u", idx);
         surface_->CancelBuffer(surfaceBuffer);
         codecAvailBuffers_.erase(codecAvailBuffers_.begin());
