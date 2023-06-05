@@ -83,10 +83,14 @@ const uint32_t ES_H264[] = { // H264_FRAME_SIZE_240
     305,  198,   166,  3641, 297,   172,  148,  3608,  301,  200,  159,  3693, 322,  209,  166,  3453, 318,  206,  162,
     3696, 341,   200,  176,  3386,  320,  192,  176,   3903, 373,  207,  187,  3305, 361,  200,  202,  3110, 367,  220,
     197,  2357,  332,  196,  201,   1827, 377,  187,   199,  860,  472,  173,  223,  238};
+const uint32_t FC_H264[] = {139107, 1114, 474, 253, 282, 146, 197, 90, 108, 3214, 301, 77, 51, 43, 234, 210, 143, 108,
+                            139107, 1114, 474, 253, 282, 146, 197, 90, 108};
 constexpr uint32_t ES_LENGTH_H264 = sizeof(ES_H264) / sizeof(uint32_t);
+constexpr uint32_t FC_LENGTH_H264 = sizeof(FC_H264) / sizeof(uint32_t);
 constexpr uint32_t DEFAULT_WIDTH = 320;
 constexpr uint32_t DEFAULT_HEIGHT = 240;
 constexpr string_view inputFilePath = "/data/test/media/out_320_240_10s.h264";
+constexpr string_view formatChangeInputFilePath = "/data/test/media/format_change_testseq.h264";
 constexpr string_view outputFilePath = "/data/test/media/out_320_240_10s.yuv";
 constexpr string_view outputSurfacePath = "/data/test/media/out_320_240_10s.rgba";
 uint32_t writeFrameCount = 0;
@@ -206,6 +210,7 @@ public:
     void TearDown();
     int32_t ProceFunc();
     void InputFunc();
+    void FormatChangeInputFunc();
     void OutputFunc();
 
 protected:
@@ -266,6 +271,55 @@ void VideoCodeCapiDecoderUnitTest::InputFunc()
         OH_AVCodecBufferAttr info = {0, 0, 0, AVCODEC_BUFFER_FLAGS_EOS};
         if (frameCount_ < ES_LENGTH_H264) {
             info.size = ES_H264[frameCount_];
+            char *fileBuffer = static_cast<char *>(malloc(sizeof(char) * info.size + 1));
+            UNITTEST_CHECK_AND_RETURN_LOG(fileBuffer != nullptr, "Fatal: malloc fail.");
+            (void)testFile_->read(fileBuffer, info.size);
+            if (memcpy_s(OH_AVMemory_GetAddr(buffer), OH_AVMemory_GetSize(buffer), fileBuffer, info.size) != EOK) {
+                cout << "Fatal: memcpy fail" << endl;
+                free(fileBuffer);
+                break;
+            }
+            free(fileBuffer);
+            info.flags = AVCODEC_BUFFER_FLAGS_NONE;
+            if (isFirstFrame_) {
+                info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
+                isFirstFrame_ = false;
+            }
+            int32_t ret = OH_VideoDecoder_PushInputData(videoDec_, index, info);
+            UNITTEST_CHECK_AND_RETURN_LOG(ret == AVCS_ERR_OK, "Fatal error, exit.");
+            frameCount_++;
+        } else {
+            OH_VideoDecoder_PushInputData(videoDec_, index, info);
+            std::cout << "input end buffer" << std::endl;
+            break;
+        }
+        signal_->inQueue_.pop();
+        signal_->inBufferQueue_.pop();
+    }
+    if (testFile_ != nullptr) {
+        testFile_->close();
+    }
+}
+
+void VideoCodeCapiDecoderUnitTest::FormatChangeInputFunc()
+{
+    testFile_ = std::make_unique<std::ifstream>();
+    UNITTEST_CHECK_AND_RETURN_LOG(testFile_ != nullptr, "Fatal: No memory");
+    testFile_->open(formatChangeInputFilePath, std::ios::in | std::ios::binary);
+    while (true) {
+        if (!isRunning_.load()) {
+            break;
+        }
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.wait(lock, [this]() { return (signal_->inQueue_.size() > 0 || !isRunning_.load()); });
+        if (!isRunning_.load()) {
+            break;
+        }
+        uint32_t index = signal_->inQueue_.front();
+        auto buffer = signal_->inBufferQueue_.front();
+        OH_AVCodecBufferAttr info = {0, 0, 0, AVCODEC_BUFFER_FLAGS_EOS};
+        if (frameCount_ < FC_LENGTH_H264) {
+            info.size = FC_H264[frameCount_];
             char *fileBuffer = static_cast<char *>(malloc(sizeof(char) * info.size + 1));
             UNITTEST_CHECK_AND_RETURN_LOG(fileBuffer != nullptr, "Fatal: malloc fail.");
             (void)testFile_->read(fileBuffer, info.size);
@@ -576,22 +630,6 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_02, TestSize.Leve
     }
 }
 
-HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_statuscase_02, TestSize.Level1)
-{
-    ProceFunc();
-    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
-    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
-    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
-}
-
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_03, TestSize.Level1)
 {
     ProceFunc();
@@ -737,6 +775,47 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_06, TestSize.Leve
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
 }
 
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_normalcase_formatchange, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, 1920);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, 1080);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+
+    surface_ = GetSurface();
+    EXPECT_NE(nullptr, surface_);
+    OHNativeWindow *nativeWindow = CreateNativeWindowFromSurface(&surface_);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_SetSurface(videoDec_, nativeWindow));
+
+    isRunning_.store(true);
+
+    inputLoop_ = make_unique<thread>(&VideoCodeCapiDecoderUnitTest::FormatChangeInputFunc, this);
+    EXPECT_NE(nullptr, inputLoop_);
+
+    outputLoop_ = make_unique<thread>(&VideoCodeCapiDecoderUnitTest::OutputFunc, this);
+    EXPECT_NE(nullptr, outputLoop_);
+
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    while (isRunning_.load()) {
+        sleep(1); // sleep 1s
+    }
+
+    isRunning_.store(false);
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->inMutex_);
+        signal_->inCond_.notify_all();
+        lock.unlock();
+        inputLoop_->join();
+    }
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outCond_.notify_all();
+        lock.unlock();
+        outputLoop_->join();
+    }
+}
+
 HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_abnormalcase_01, TestSize.Level1)
 {
     EXPECT_EQ(nullptr, videoDec_);
@@ -820,6 +899,22 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_statuscase_01, TestSize.Leve
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_statuscase_02, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Stop(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Reset(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
 }
 } // namespace VCodecUT
 } // namespace Media

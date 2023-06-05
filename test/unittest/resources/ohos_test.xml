@@ -48,6 +48,7 @@
         <preparer>
             <option name="shell" value="restorecon /data/test/media"/>
             <option name="push" value="video_res/out_320_240_10s.h264 -> /data/test/media" src="res"/>
+            <option name="push" value="video_res/format_change_testseq.h264 -> /data/test/media" src="res"/>
             <option name="shell" value="restorecon /data/test/media"/>
         </preparer>
     </target>
