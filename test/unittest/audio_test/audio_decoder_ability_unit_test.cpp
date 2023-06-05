@@ -459,17 +459,17 @@ int32_t AudioCodeCapiDecoderUnitTest::InitFile(const string &codecName, string i
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Level1)
 {
     bool result;
-    for (int i = 0; i < MP3_TESTCASES_NUMS; i++){
+    for (int i = 0; i < MP3_TESTCASES_NUMS; i++) {
         cout << "decode start " << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_MP3_NAME, INPUT_MP3_FILE_SOURCE_PATH[i][0]));
 
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(),
                                     stoi(INPUT_MP3_FILE_SOURCE_PATH[i][1]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(),
                                     stoi(INPUT_MP3_FILE_SOURCE_PATH[i][2]));
-        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), 
+        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(),
                                     stol(INPUT_MP3_FILE_SOURCE_PATH[i][3]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                     stoi(INPUT_MP3_FILE_SOURCE_PATH[i][4]));
         OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), (uint32_t) 16);
 
@@ -500,16 +500,16 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Leve
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Level1)
 {
     bool result;
-    for (int i = 0; i < FLAC_TESTCASES_NUMS; i++){
+    for (int i = 0; i < FLAC_TESTCASES_NUMS; i++) {
         cout << "decode start " << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_FLAC_NAME, INPUT_FLAC_FILE_SOURCE_PATH[i][0]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(),
                                     stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][1]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(),
                                     stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][2]));
-        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), 
+        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(),
                                     stol(INPUT_FLAC_FILE_SOURCE_PATH[i][3]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
                                     stoi(INPUT_FLAC_FILE_SOURCE_PATH[i][4]));
         
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format_));
@@ -539,17 +539,17 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Leve
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Level1)
 {
     bool result;
-    for (int i = 0; i < OGG_TESTCASES_NUMS; i++){
+    for (int i = 0; i < OGG_TESTCASES_NUMS; i++) {
         cout << "decode start " << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_OGG_NAME, INPUT_OGG_FILE_SOURCE_PATH[i][0]));
 
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(),
                                     stoi(INPUT_OGG_FILE_SOURCE_PATH[i][1]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), 
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(),
                                     stoi(INPUT_OGG_FILE_SOURCE_PATH[i][2]));
-        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), 
+        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(),
                                     stol(INPUT_OGG_FILE_SOURCE_PATH[i][3]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data()
                                     stoi(INPUT_OGG_FILE_SOURCE_PATH[i][4]));
         
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Configure(audioDec_, format_));
@@ -579,13 +579,16 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Leve
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_04, TestSize.Level1)
 {
     bool result;
-    for (int i = 0; i < AAC_TESTCASES_NUMS; i++){
+    for (int i = 0; i < AAC_TESTCASES_NUMS; i++) {
         cout << "decode start " << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
         ASSERT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, InitFile(CODEC_AAC_NAME, INPUT_AAC_FILE_SOURCE_PATH[i][0]));
 
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), stoi(INPUT_AAC_FILE_SOURCE_PATH[i][1]));
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), stoi(INPUT_AAC_FILE_SOURCE_PATH[i][2]));
-        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(), stol(INPUT_AAC_FILE_SOURCE_PATH[i][3]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(),
+                                    stoi(INPUT_AAC_FILE_SOURCE_PATH[i][1]));
+        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(),
+                                    stoi(INPUT_AAC_FILE_SOURCE_PATH[i][2]));
+        OH_AVFormat_SetLongValue(format_, MediaDescriptionKey::MD_KEY_BITRATE.data(),
+                                    stol(INPUT_AAC_FILE_SOURCE_PATH[i][3]));
         OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), 
                                     stoi(INPUT_AAC_FILE_SOURCE_PATH[i][4]));
         
