@@ -230,7 +230,7 @@ sptr<IStandardAVCodecService> AVCodecClient::GetAVCodecProxy()
     AVCODEC_LOGD("enter");
     sptr<ISystemAbilityManager> samgr = nullptr;
     CLIENT_COLLIE_LISTEN(samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager(),
-                  "AVCodecClient GetAVCodecProxy");
+        "AVCodecClient GetAVCodecProxy");
     CHECK_AND_RETURN_RET_LOG(samgr != nullptr, nullptr, "system ability manager is nullptr.");
 
     sptr<IRemoteObject> object = nullptr;
