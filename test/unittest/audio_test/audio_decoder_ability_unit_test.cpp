@@ -101,12 +101,12 @@ const string INPUT_OGG_FILE_SOURCE_PATH[][5] = {{"OGG_192k_1c_100pkb.dat", "1764
                                                 {"OGG_8k_1c_0pkb.dat", "8000", "1", "32000", "16"},
                                                 {"OGG_8k_1c_100pkb.dat", "8000", "1", "32000", "16"}};
 
-const string INPUT_AAC_FILE_SOURCE_PATH[][5] = {{"/AAC_44k_1c_xxkb.dat", "44100", "1", "32000", "16"},
-                                                {"/AAC_44k_2c_xxkb.dat", "44100", "2", "320000", "16"},
-                                                {"/AAC_44k_6c_xxkb.dat", "44100", "6", "320000", "16"},
-                                                {"/AAC_48k_1c_xxkb.dat", "48000", "1", "320000", "16"},
-                                                {"/AAC_48k_2c_xxkb.dat", "48000", "2", "320000", "16"},
-                                                {"/AAC_48k_6c_xxkb.dat", "48000", "6", "192000", "16"}};
+const string INPUT_AAC_FILE_SOURCE_PATH[][5] = {{"AAC_44k_1c_xxkb.dat", "44100", "1", "32000", "16"},
+                                                {"AAC_44k_2c_xxkb.dat", "44100", "2", "320000", "16"},
+                                                {"AAC_44k_6c_xxkb.dat", "44100", "6", "320000", "16"},
+                                                {"AAC_48k_1c_xxkb.dat", "48000", "1", "320000", "16"},
+                                                {"AAC_48k_2c_xxkb.dat", "48000", "2", "320000", "16"},
+                                                {"AAC_48k_6c_xxkb.dat", "48000", "6", "192000", "16"}};
 
 constexpr string_view OUTPUT_PCM_FILE_PATH = "/data/test/media/out.pcm";
 } // namespace
