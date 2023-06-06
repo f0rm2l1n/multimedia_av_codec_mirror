@@ -460,7 +460,8 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
     for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
         std::shared_ptr<AVInputFormat> inputFormat = iter->second;
         int32_t ret = av_match_name(uriSuffix.c_str(), inputFormat->extensions);
-        if (ret == 1) {
+        int32_t ret2 = av_match_name(uriSuffix.c_str(), inputFormat->name);
+        if (ret || ret2) {
             bestInputFormat = inputFormat;
             AVCODEC_LOGD("find input fromat successful: %{public}s", inputFormat->name);
             break;
