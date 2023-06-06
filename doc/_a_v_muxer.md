@@ -5,7 +5,7 @@
 
 AVMuxer模块提供用于音视频封装功能的函数。
 
-\@syscap SystemCapability.Multimedia.Avcodec.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **Since:**
 
@@ -52,15 +52,15 @@ OH_AVErrCode OH_AVMuxer_AddTrack (OH_AVMuxer * muxer, int32_t * trackIndex, OH_A
 
 该接口必须在OH_AVMuxer_Start后调用。
 
-\@syscap SystemCapability.Multimedia.Media.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **参数:**
 
-| 名称 | 描述 | 
+| 名称 | 描述 |
 | -------- | -------- |
-| muxer | 指向OH_AVMuxer实例的指针 | 
-| trackIndex | 用于获取该轨的索引。该值在OH_AVMuxer_WriteSampleBuffer接口中使用 如果媒体轨添加成功，该值大于或等于0，否则小于0 | 
-| trackFormat | 指向OH_AVFormat实例的指针 | 
+| muxer | 指向OH_AVMuxer实例的指针 |
+| trackIndex | 用于获取该轨的索引。该值在OH_AVMuxer_WriteSample接口中使用。如果媒体轨添加成功，该值大于或等于0，否则小于0 |
+| trackFormat | 指向OH_AVFormat实例的指针 |
 
 **返回:**
 
@@ -80,14 +80,14 @@ OH_AVMuxer* OH_AVMuxer_Create (int32_t fd, OH_AVOutputFormat format )
 
 通过文件描述符fd和封装格式创建OH_AVMuxer实例。
 
-\@syscap SystemCapability.Multimedia.Media.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **参数:**
 
-| 名称 | 描述 | 
+| 名称 | 描述 |
 | -------- | -------- |
-| fd | fd用读写方式打开（O_RDWR），由使用者关闭该fd | 
-| format | 封装输出的文件格式，参考**OH_AVOutputFormat** | 
+| fd | fd用读写方式打开（O_RDWR），由调用者关闭该fd |
+| format | 封装输出的文件格式，参考**OH_AVOutputFormat** |
 
 **返回:**
 
@@ -105,17 +105,17 @@ OH_AVErrCode OH_AVMuxer_Destroy (OH_AVMuxer * muxer)
 
 清理内部资源，销毁OH_AVMuxer实例。
 
-\@syscap SystemCapability.Multimedia.Media.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **参数:**
 
-| 名称 | 描述 | 
+| 名称 | 描述 |
 | -------- | -------- |
-| codec | Pointer to an OH_AVMuxer instance | 
+| muxer | 指向OH_AVMuxer实例的指针 |
 
 **返回:**
 
-执行成功返回AV_ERR_OK，指向成功需要调用者将muxer置空
+执行成功返回AV_ERR_OK，执行成功需要调用者将muxer置空
 
 执行失败返回具体错误码，参考[OH_AVErrCode](_core.md#oh_averrcode-1)
 
@@ -129,11 +129,11 @@ OH_AVErrCode OH_AVMuxer_SetRotation (OH_AVMuxer * muxer, int32_t rotation )
 
 **描述:**
 
-设置视频的旋转角度。
+设置视频的旋转角度（顺时针）。
 
 这个接口必须在OH_AVMuxer_Start前调用。
 
-\@syscap SystemCapability.Multimedia.Media.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **参数:**
 
@@ -160,9 +160,9 @@ OH_AVErrCode OH_AVMuxer_Start (OH_AVMuxer * muxer)
 
 开始封装。
 
-该接口必须在OH_AVMuxer_AddTrack后， 再OH_AVMuxer_WriteSampleBuffer前调用。
+该接口必须在OH_AVMuxer_AddTrack后， 在OH_AVMuxer_WriteSample前调用。
 
-\@syscap SystemCapability.Multimedia.Media.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **参数:**
 
@@ -190,7 +190,7 @@ OH_AVErrCode OH_AVMuxer_Stop (OH_AVMuxer * muxer)
 
 封装器一旦停止，不能重新开始。
 
-\@syscap SystemCapability.Multimedia.Media.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **参数:**
 
@@ -220,7 +220,7 @@ OH_AVErrCode OH_AVMuxer_WriteSample (OH_AVMuxer * muxer, uint32_t trackIndex, OH
 
 调用者需要保证数据写入的顺序是按时间递增的。
 
-\@syscap SystemCapability.Multimedia.Media.AVMuxer
+\@syscap SystemCapability.Multimedia.Media.Muxer
 
 **参数:**
 
