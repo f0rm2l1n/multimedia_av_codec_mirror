@@ -30,8 +30,6 @@
 #include "media_description.h"
 #include "native_avcodec_base.h"
 #include "native_avformat.h"
-#include "avcodec_common.h"
-#include "avcodec_errors.h"
 #include "native_avcodec_audiodecoder.h"
 #include "securec.h"
 
@@ -44,7 +42,7 @@ const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NA
 const string CODEC_AAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME);
 const string CODEC_OGG_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME);
 const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME);
-const string INPUT_SOURCE_PATH = "/data/test/media/dat/";
+const string INPUT_SOURCE_PATH = "/data/test/media/";
 const int MP3_TESTCASES_NUMS = 15;
 const int FLAC_TESTCASES_NUMS = 19;
 const int OGG_TESTCASES_NUMS = 14;
@@ -482,16 +480,13 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        sleep(1);
+        while (isRunning_.load()) {
+            sleep(1);
+        }
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
-        EXPECT_EQ(result, false);
-        if (result) {
-            cout << "error occur, decode fail" << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
-        } else {
-            cout << "decode success " << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
-        }
+        EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
 
         Release();
     }
@@ -521,16 +516,13 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        sleep(1);
+        while (isRunning_.load()) {
+            sleep(1);
+        }
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
-        EXPECT_EQ(result, false);
-        if (result) {
-            cout << "error occur, decode fail" << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
-        } else {
-            cout << "decode success " << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
-        }
+        EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
 
         Release();
     }
@@ -561,16 +553,13 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        sleep(1);
+        while (isRunning_.load()) {
+            sleep(1);
+        }
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
-        EXPECT_EQ(result, false);
-        if (result) {
-            cout << "error occur, decode fail" << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
-        } else {
-            cout << "decode success " << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
-        }
+        EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
 
         Release();
     }
@@ -601,16 +590,13 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_04, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        sleep(1);
+        while (isRunning_.load()) {
+            sleep(1);
+        }
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
-        EXPECT_EQ(result, false);
-        if (result) {
-            cout << "error occur, decode fail" << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
-        } else {
-            cout << "decode success " << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
-        }
+        EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
 
         Release();
     }
