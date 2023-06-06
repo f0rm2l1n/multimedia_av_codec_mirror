@@ -344,7 +344,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
 {
     if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
         AVCODEC_LOGE("read frame failed, track %{public}u has not been selected", trackIndex);
-        return AVCS_ERR_DEMUXER_FAILED;
+        return AVCS_ERR_INVALID_OPERATION;
     }
     AVStream* avStream = formatContext_->streams[trackIndex];
     if (!sampleCache_[trackIndex]->Empty()) {
@@ -426,7 +426,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
         millisecond, mode);
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
-        return AVCS_ERR_SEEK_FAILED;
+        return AVCS_ERR_INVALID_OPERATION;
     }
     int flags = g_seekModeToFFmpegSeekFlags.at(mode);
     if (selectedTrackIds_.empty()) {
@@ -440,7 +440,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
             if (ffTime > avStream->duration) {
                 AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
                              ffTime, avStream->duration);
-                return AVCS_ERR_SEEK_FAILED;
+                return AVCS_ERR_INVALID_OPERATION;
             }
             if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - millisecond) <= TIME_INTERNAL
                 && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {

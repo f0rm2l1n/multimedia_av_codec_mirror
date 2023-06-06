@@ -527,9 +527,6 @@ void Source::InitAVIOContext(int flags)
     customIOContext_.offset = 0;
     customIOContext_.eof = false;
     auto buffer = static_cast<unsigned char*>(av_malloc(bufferSize));
-    auto bufferVector = std::make_shared<Buffer>();
-    customIOContext_.bufMemory = bufferVector;
-    auto bufMemory = bufferVector->WrapMemory(buffer, bufferSize, 0);
     if (buffer == nullptr) {
         AVCODEC_LOGE("AllocAVIOContext failed to av_malloc...");
         return;
@@ -594,7 +591,7 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
         if (customIOContext->offset > customIOContext->fileSize) {
             AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}" PRIu64,
                          customIOContext->offset, customIOContext->fileSize);
-            return AVCS_ERR_SEEK_FAILED;
+            return AVCS_ERR_INVALID_OPERATION;
         }
         if (static_cast<size_t>(customIOContext->offset + bufSize) > customIOContext->fileSize) {
             readSize = customIOContext->fileSize - customIOContext->offset;
