@@ -339,6 +339,15 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     return AVCS_ERR_OK;
 }
 
+void SaveCacheSample(uint32_t trackIndex, std::shared_ptr<SamplePacket> cacheSamplePacket)
+{
+    if (sampleCache_[trackIndex]->Size() == sampleCache_[trackIndex]->Capacity()) {
+        AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", trackIndex);
+        sampleCache_[trackIndex]->Pop();
+    }
+    sampleCache_[trackIndex]->Push(cacheSamplePacket);
+}
+
 int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
                                         AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
@@ -359,8 +368,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     do {
         AVPacket* pkt = av_packet_alloc();
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
-        CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED,
-            "the stream_index is must be positive");
+        CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED, "the stream_index must be positive");
         uint32_t streamIndex = static_cast<uint32_t>(pkt->stream_index);
         if (ffmpegRet >= 0 && IsInSelectedTrack(streamIndex)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
@@ -373,11 +381,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
                 samplePacket = cacheSamplePacket;
                 break;
             }
-            if (sampleCache_[streamIndex]->Size() == sampleCache_[streamIndex]->Capacity()) {
-                AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", streamIndex);
-                sampleCache_[streamIndex]->Pop();
-            }
-            sampleCache_[streamIndex]->Push(cacheSamplePacket);
+            SaveCacheSample(streamIndex, cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
     if (ffmpegRet == AVERROR_EOF || (trackIsEnd_.count(trackIndex) != 0 && trackIsEnd_[trackIndex])) {
@@ -385,10 +389,9 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
         return AVCS_ERR_OK;
     }
     if (ffmpegRet < 0) {
-        AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ffmpegRet);
         av_packet_free(&(samplePacket->pkt_));
-        return AVCS_ERR_DEMUXER_FAILED;
     }
+    CHECK_AND_RETURN_RET_LOG(ffmpegRet >= 0, AVCS_ERR_DEMUXER_FAILED, "read failed, FfmpegError:%{public}d", ffmpegRet);
     int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, samplePacket);
     if (ret == AVCS_ERR_NO_MEMORY) {
         sampleCache_[trackIndex]->Push(samplePacket);

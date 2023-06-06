@@ -79,6 +79,7 @@ private:
     void ResetStatus();
     void SetEndStatus(uint32_t trackIndex);
     void SetEosBufferInfo(AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag);
+    void SaveCacheSample(uint32_t trackIndex, std::shared_ptr<SamplePacket> cacheSamplePacket);
 };
 } // namespace FFmpeg
 } // namespace Plugin
