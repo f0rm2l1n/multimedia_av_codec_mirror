@@ -339,7 +339,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     return AVCS_ERR_OK;
 }
 
-void SaveCacheSample(uint32_t trackIndex, std::shared_ptr<SamplePacket> cacheSamplePacket)
+void FFmpegDemuxerPlugin::SaveCacheSample(uint32_t trackIndex, std::shared_ptr<SamplePacket> cacheSamplePacket)
 {
     if (sampleCache_[trackIndex]->Size() == sampleCache_[trackIndex]->Capacity()) {
         AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", trackIndex);
