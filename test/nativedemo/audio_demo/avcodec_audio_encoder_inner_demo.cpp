@@ -22,8 +22,8 @@
 #include "demo_log.h"
 #include "media_description.h"
 #include "securec.h"
-#include "native_avcodec_base.h"
 #include "avcodec_audio_encoder_inner_demo.h"
+#include "ffmpeg_converter.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -41,9 +41,9 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 199000; // for aac encoding
-constexpr uint32_t BITS_PER_CODED_SAMPLE = OH_BitsPerSample::SAMPLE_F32LE;
-constexpr uint32_t DEFAULT_SAMPLE_FORMATE_VALE = 8;
-constexpr uint32_t DEFAULT_CHANNEL_LAYOUT_COUNT = 3;
+constexpr uint32_t BITS_PER_CODED_SAMPLE = AudioSampleFormat::SAMPLE_F32LE;
+constexpr uint32_t DEFAULT_SAMPLE_FORMATE_VALE = AudioSampleFormat::SAMPLE_F32LE;
+constexpr uint32_t DEFAULT_CHANNEL_LAYOUT_COUNT = AudioChannelLayout::STEREO;
 constexpr uint32_t DEFAULT_SLEEP_TIME = 30;
 } // namespace
 

@@ -20,7 +20,7 @@
 #include "avcodec_log.h"
 #include "avcodec_mime_type.h"
 #include "avcodec_audio_common.h"
-#include "native_avcodec_base.h"
+#include "ffmpeg_converter.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegFlacEncoderPlugin"};
@@ -32,10 +32,20 @@ constexpr int32_t SAMPLES = 4608;
 static const int32_t FLAC_ENCODER_SAMPLE_RATE_TABLE[] = {
     88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
+static const uint64_t FLAC_CHANNEL_LAYOUT_TABLE[] = {
+    AV_CH_LAYOUT_MONO,
+    AV_CH_LAYOUT_STEREO,
+    AV_CH_LAYOUT_SURROUND,
+    AV_CH_LAYOUT_QUAD,
+    AV_CH_LAYOUT_5POINT0,
+    AV_CH_LAYOUT_5POINT1,
+    AV_CH_LAYOUT_6POINT1,
+    AV_CH_LAYOUT_7POINT1
+};
 const std::map<int32_t, int32_t> BITS_PER_RAW_SAMPLE_MAP = {
-    {OH_BitsPerSample::SAMPLE_S16LE, 16},
-    {OH_BitsPerSample::SAMPLE_S24LE, 24},
-    {OH_BitsPerSample::SAMPLE_S32LE, 32},
+    {OHOS::Media::AudioSampleFormat::SAMPLE_S16LE, 16},
+    {OHOS::Media::AudioSampleFormat::SAMPLE_S24LE, 24},
+    {OHOS::Media::AudioSampleFormat::SAMPLE_S32LE, 32},
 };
 }
 
@@ -57,6 +67,16 @@ static bool CheckSampleRate(int32_t sampleRate)
 {
     for (auto i : FLAC_ENCODER_SAMPLE_RATE_TABLE) {
         if (i == sampleRate) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool CheckChannelLayout(uint64_t channelLayout)
+{
+    for (auto i : FLAC_CHANNEL_LAYOUT_TABLE) {
+        if (i == channelLayout) {
             return true;
         }
     }
@@ -94,10 +114,14 @@ int32_t AudioFFMpegFlacEncoderPlugin::CheckFormat(const Format &format)
     int32_t sampleRate;
     int32_t bitsPerCodedSample;
     int32_t complianceLevel;
+    int64_t channelLayout;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channelCount);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, complianceLevel);
+    format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, channelLayout);
+    auto ffChannelLayout = FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
+
     if (!CheckSampleRate(sampleRate)) {
         AVCODEC_LOGE("init failed, because sampleRate=%{public}d not in table.", sampleRate);
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
@@ -109,6 +133,9 @@ int32_t AudioFFMpegFlacEncoderPlugin::CheckFormat(const Format &format)
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     } else if (complianceLevel < MIN_COMPLIANCE_LEVEL || complianceLevel > MAX_COMPLIANCE_LEVEL) {
         AVCODEC_LOGE("init failed, because complianceLevel=%{public}d not support.", complianceLevel);
+        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
+    } else if (!CheckChannelLayout(ffChannelLayout)) {
+        AVCODEC_LOGE("init failed, because ffChannelLayout=%{public}llu not support.", ffChannelLayout);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     }
     channels = channelCount;

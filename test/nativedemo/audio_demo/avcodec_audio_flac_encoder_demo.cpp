@@ -21,9 +21,9 @@
 #include "media_description.h"
 #include "native_avformat.h"
 #include "demo_log.h"
-#include "native_avcodec_base.h"
 #include "avcodec_codec_name.h"
 #include "avcodec_audio_flac_encoder_demo.h"
+#include "ffmpeg_converter.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -33,10 +33,10 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 261000;
-constexpr uint32_t BITS_PER_CODED_SAMPLE = OH_BitsPerSample::SAMPLE_S16LE;
+constexpr uint32_t BITS_PER_CODED_SAMPLE = AudioSampleFormat::SAMPLE_S16LE;
 constexpr uint32_t FRAME_DURATION_US = 33000;
-constexpr uint32_t CHANNEL_LAYOUT = 3;
-constexpr int32_t SAMPLE_FORMAT = 1;
+constexpr uint32_t CHANNEL_LAYOUT = AudioChannelLayout::STEREO;
+constexpr int32_t SAMPLE_FORMAT = AudioSampleFormat::SAMPLE_S16LE;
 constexpr uint32_t FRAME_BYTES = 18432;
 constexpr int32_t COMPLIANCE_LEVEL = -2;
 
