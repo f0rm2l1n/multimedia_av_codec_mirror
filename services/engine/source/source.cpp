@@ -316,7 +316,7 @@ void Source::GetAudioTrackFormat(Format &format, AVStream *avStream)
     if (!ret) {
         AVCODEC_LOGW("Get track info failed:  miss channel count info in track %{public}d", avStream->index);
     }
-    ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avStream->codecpar->bit_rate);
+    ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_BITRATE, avStream->codecpar->bit_rate);
     if (!ret) {
         AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
     }
