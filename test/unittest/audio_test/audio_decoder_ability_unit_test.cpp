@@ -115,8 +115,10 @@ class ADecSignal {
 public:
     std::mutex inMutex_;
     std::mutex outMutex_;
+    std::mutex startMutex_;
     std::condition_variable inCond_;
     std::condition_variable outCond_;
+    std::condition_variable startCond_;;
     std::queue<uint32_t> inQueue_;
     std::queue<uint32_t> outQueue_;
     std::queue<OH_AVMemory *> inBufferQueue_;
@@ -371,6 +373,7 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
             cout << "decode eos" << endl;
             isRunning_.store(false);
+            signal_->startCond_.notify_all();
         }
         signal_->outBufferQueue_.pop();
         signal_->attrQueue_.pop();
@@ -450,7 +453,6 @@ int32_t AudioCodeCapiDecoderUnitTest::InitFile(const string &codecName, string i
                               extradataSize);
     }
 
-    sleep(1);
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
@@ -480,9 +482,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        while (isRunning_.load()) {
-            sleep(1);
-        }
+
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
@@ -516,9 +518,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        while (isRunning_.load()) {
-            sleep(1);
-        }
+
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
@@ -553,9 +555,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        while (isRunning_.load()) {
-            sleep(1);
-        }
+
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
@@ -590,9 +592,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_04, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        while (isRunning_.load()) {
-            sleep(1);
-        }
+        
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
