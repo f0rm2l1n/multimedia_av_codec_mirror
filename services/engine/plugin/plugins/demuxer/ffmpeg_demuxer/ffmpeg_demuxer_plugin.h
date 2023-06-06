@@ -76,6 +76,9 @@ private:
     std::map<uint32_t, std::shared_ptr<BlockQueue<std::shared_ptr<SamplePacket>>>> sampleCache_;
 
     void FreeCachePacket(const uint32_t trackIndex);
+    void ResetStatus();
+    void SetEndStatus(uint32_t trackIndex);
+    void SetEosBufferInfo(AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag);
 };
 } // namespace FFmpeg
 } // namespace Plugin
