@@ -392,6 +392,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
         info.size = 0;
         info.offset = 0;
         flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
+        return AVCS_ERR_OK;
     }
 
     if (ffmpegRet < 0) {
