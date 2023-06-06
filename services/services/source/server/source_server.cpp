@@ -81,6 +81,10 @@ SourceServer::~SourceServer()
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
     sourceEngine_ = nullptr;
+    if (fd_ >= 0) {
+        (void)::close(fd_);
+        fd_ = -1;
+    }
 }
 
 int32_t SourceServer::InitWithURI(const std::string &uri)
@@ -99,6 +103,7 @@ int32_t SourceServer::InitWithFD(int32_t fd, int64_t offset, int64_t size)
 
     sourceEngine_ = ISourceEngineFactory::CreateSourceEngine(appUid_, appPid_, uri);
     uri_ = uri;
+    fd_ = fd;
     int32_t ret = sourceEngine_->Create();
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call InitWithFD");
     return AVCS_ERR_OK;
