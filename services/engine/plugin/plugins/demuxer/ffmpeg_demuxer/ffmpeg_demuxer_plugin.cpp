@@ -121,11 +121,7 @@ AVCodecBufferFlag FFmpegDemuxerPlugin::ConvertFlagsFromFFmpeg(AVPacket* pkt,  AV
 {
     AVCodecBufferFlag flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     if (pkt->flags == 0x0001) {
-        if (abs((int)(avStream->duration-pkt->pts)) <= (pkt->duration)) {
-            flags =  AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
-        } else {
-            flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_SYNC_FRAME;
-        }
+        flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_SYNC_FRAME;
     } else {
         flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     }
@@ -365,25 +361,25 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
         CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED,
             "the stream_index is must be positive");
-        uint32_t stream_index = static_cast<uint32_t>(pkt->stream_index);
-        if (ffmpegRet >= 0 && IsInSelectedTrack(stream_index)) {
+        uint32_t streamIndex = static_cast<uint32_t>(pkt->stream_index);
+        if (ffmpegRet >= 0 && IsInSelectedTrack(streamIndex)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
             if (avStream->duration <= (pkt->pts + pkt->duration)) {
-                if (trackIsEnd_.count(stream_index) != 0) {
-                    trackIsEnd_[stream_index] = true;
+                if (trackIsEnd_.count(streamIndex) != 0) {
+                    trackIsEnd_[streamIndex] = true;
                 }
             }
             cacheSamplePacket->offset_ = 0;
             cacheSamplePacket->pkt_ = pkt;
-            if (stream_index == trackIndex) {
+            if (streamIndex == trackIndex) {
                 samplePacket = cacheSamplePacket;
                 break;
             }
-            if (sampleCache_[stream_index]->Size() == sampleCache_[stream_index]->Capacity()) {
-                AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", stream_index);
-                sampleCache_[stream_index]->Pop();
+            if (sampleCache_[streamIndex]->Size() == sampleCache_[streamIndex]->Capacity()) {
+                AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", streamIndex);
+                sampleCache_[streamIndex]->Pop();
             }
-            sampleCache_[stream_index]->Push(cacheSamplePacket);
+            sampleCache_[streamIndex]->Push(cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
 
