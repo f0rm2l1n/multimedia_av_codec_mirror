@@ -62,7 +62,7 @@ private:
         std::shared_ptr<BlockQueue<std::shared_ptr<SamplePacket>>> blockQue;
     };
     std::string name_;
-    uint32_t queCount_;
+    uint32_t queCount_ = 0;
     std::map<uint32_t, InnerQueue> quePool_;
     std::map<uint32_t, std::vector<uint32_t>> queMap_;
     size_t singleQueSize_;
