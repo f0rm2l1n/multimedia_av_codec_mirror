@@ -135,7 +135,7 @@ int32_t AudioFFMpegFlacEncoderPlugin::CheckFormat(const Format &format)
         AVCODEC_LOGE("init failed, because complianceLevel=%{public}d not support.", complianceLevel);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     } else if (!CheckChannelLayout(ffChannelLayout)) {
-        AVCODEC_LOGE("init failed, because ffChannelLayout=%{public}llu not support.", ffChannelLayout);
+        AVCODEC_LOGE("init failed, because ffChannelLayout=%{public}" PRId64 "not support.", ffChannelLayout);
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     }
     channels = channelCount;
