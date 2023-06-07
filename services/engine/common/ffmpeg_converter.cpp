@@ -93,14 +93,24 @@ const std::vector<std::pair<AudioChannelLayout, std::string_view>> g_ChannelLayo
     {AudioChannelLayout::HOA_THIRD, "HOA_THIRD"},
 };
 
-AudioSampleFormat FFMpegConverter::ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleformate)
+AudioSampleFormat FFMpegConverter::ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleFormat)
 {
     auto ite = std::find_if(g_pFfSampleFmtMap.begin(), g_pFfSampleFmtMap.end(),
-                            [&ffSampleformate](const auto &item) -> bool { return item.first == ffSampleformate; });
+                            [&ffSampleFormat](const auto &item) -> bool { return item.first == ffSampleFormat; });
     if (ite == g_pFfSampleFmtMap.end()) {
         return AudioSampleFormat::INVALID_WIDTH;
     }
     return ite->second;
+}
+
+AVSampleFormat FFMpegConverter::ConvertOHAudioFormatToFFMpeg(AudioSampleFormat sampleFormat)
+{
+    auto ite = std::find_if(g_pFfSampleFmtMap.begin(), g_pFfSampleFmtMap.end(),
+                            [&sampleFormat](const auto &item) -> bool { return item.second == sampleFormat; });
+    if (ite == g_pFfSampleFmtMap.end()) {
+        return AVSampleFormat::AV_SAMPLE_FMT_NONE;
+    }
+    return ite->first;
 }
 
 AudioChannelLayout FFMpegConverter::ConvertFFToOHAudioChannelLayout(uint64_t ffChannelLayout)
@@ -111,6 +121,16 @@ AudioChannelLayout FFMpegConverter::ConvertFFToOHAudioChannelLayout(uint64_t ffC
         return AudioChannelLayout::MONO;
     }
     return ite->first;
+}
+
+uint64_t FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(AudioChannelLayout channelLayout)
+{
+    auto ite = std::find_if(g_toFFMPEGChannelLayout.begin(), g_toFFMPEGChannelLayout.end(),
+                            [&channelLayout](const auto &item) -> bool { return item.first == channelLayout; });
+    if (ite == g_toFFMPEGChannelLayout.end()) {
+        return AV_CH_LAYOUT_NATIVE;
+    }
+    return ite->second;
 }
 
 std::string_view FFMpegConverter::ConvertOHAudioChannelLayoutToString(AudioChannelLayout layout)

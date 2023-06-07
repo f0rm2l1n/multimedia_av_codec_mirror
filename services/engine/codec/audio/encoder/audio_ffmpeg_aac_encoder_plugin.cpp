@@ -19,8 +19,18 @@
 #include "avcodec_log.h"
 #include "media_description.h"
 #include "avcodec_mime_type.h"
+#include "ffmpeg_converter.h"
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegAacEncoderPlugin"};
+static const uint64_t AAC_CHANNEL_LAYOUT_TABLE[] = {
+    AV_CH_LAYOUT_MONO,
+    AV_CH_LAYOUT_STEREO,
+    AV_CH_LAYOUT_SURROUND,
+    AV_CH_LAYOUT_4POINT0,
+    AV_CH_LAYOUT_5POINT0_BACK,
+    AV_CH_LAYOUT_5POINT1_BACK,
+    AV_CH_LAYOUT_7POINT1,
+};
 }
 
 namespace OHOS {
@@ -65,23 +75,11 @@ static int32_t GetAdtsHeader(std::string &adtsHeader, uint32_t &headerSize, std:
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-static bool CheckSampleFormat(const std::shared_ptr<AVCodec> &codec, AVSampleFormat sample_fmt)
-{
-    const AVSampleFormat *p = codec->sample_fmts;
-    while (*p != AV_SAMPLE_FMT_NONE) { // 通过AV_SAMPLE_FMT_NONE作为结束符
-        if (*p == sample_fmt) {
-            return true;
-        }
-        p++;
-    }
-    return false;
-}
-
-static bool CheckSampleRate(const std::shared_ptr<AVCodec> &codec, const int sample_rate)
+static bool CheckSampleRate(const std::shared_ptr<AVCodec> &codec, const int sampleRate)
 {
     const int *p = codec->supported_samplerates;
     while (*p != 0) { // 0作为退出条件，比如libfdk-aacenc.c的aac_sample_rates
-        if (*p == sample_rate) {
+        if (*p == sampleRate) {
             return true;
         }
         p++;
@@ -89,19 +87,12 @@ static bool CheckSampleRate(const std::shared_ptr<AVCodec> &codec, const int sam
     return false;
 }
 
-static bool CheckChannelLayout(const std::shared_ptr<AVCodec> &codec, const uint64_t channel_layout)
+static bool CheckChannelLayout(const uint64_t channelLayout)
 {
-    // 不是每个codec都给出支持的channel_layout
-    const uint64_t *p = codec->channel_layouts;
-    if (!p) {
-        AVCODEC_LOGI("The encoder %{public}s do not set channel_layouts", codec->name);
-        return true;
-    }
-    while (*p != 0) { // 0作为退出条件，比如libfdk-aacenc.c的aac_channel_layout
-        if (*p == channel_layout) {
+    for (auto i : AAC_CHANNEL_LAYOUT_TABLE) {
+        if (i == channelLayout) {
             return true;
         }
-        p++;
     }
     return false;
 }
@@ -116,13 +107,6 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
     }
 
     auto avCodec = basePlugin->GetAVCodec();
-    int sampleFormat;
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, sampleFormat);
-    if (!CheckSampleFormat(avCodec, (AVSampleFormat)sampleFormat)) {
-        AVCODEC_LOGE("Sample format not supported");
-        return false;
-    }
-
     int sampleRate;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
     if (!CheckSampleRate(avCodec, sampleRate)) {
@@ -132,7 +116,9 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
 
     int64_t channelLayout;
     format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, channelLayout);
-    if (!CheckChannelLayout(avCodec, channelLayout)) {
+    auto ffChannelLayout =
+        FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
+    if (!CheckChannelLayout(ffChannelLayout)) {
         AVCODEC_LOGE("Channel layout not supported");
         return false;
     }

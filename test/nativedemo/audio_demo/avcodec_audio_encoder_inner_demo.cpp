@@ -22,7 +22,7 @@
 #include "demo_log.h"
 #include "media_description.h"
 #include "securec.h"
-#include "native_avcodec_base.h"
+#include "ffmpeg_converter.h"
 #include "avcodec_audio_encoder_inner_demo.h"
 
 extern "C" {
@@ -41,9 +41,9 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 199000; // for aac encoding
-constexpr uint32_t BITS_PER_CODED_SAMPLE = OH_BitsPerSample::SAMPLE_F32LE;
-constexpr uint32_t DEFAULT_SAMPLE_FORMATE_VALE = 8;
-constexpr uint32_t DEFAULT_CHANNEL_LAYOUT_COUNT = 3;
+constexpr uint32_t BITS_PER_CODED_SAMPLE = AudioSampleFormat::SAMPLE_F32P;
+constexpr uint32_t DEFAULT_SAMPLE_FORMAT = AudioSampleFormat::SAMPLE_F32P;
+constexpr uint32_t DEFAULT_CHANNEL_LAYOUT_COUNT = AudioChannelLayout::STEREO;
 constexpr uint32_t DEFAULT_SLEEP_TIME = 30;
 } // namespace
 
@@ -56,7 +56,7 @@ void AEnInnerDemo::RunCase()
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, SAMPLE_RATE);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, BITS_RATE);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, BITS_PER_CODED_SAMPLE);
-    format.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, DEFAULT_SAMPLE_FORMATE_VALE);
+    format.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, DEFAULT_SAMPLE_FORMAT);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, DEFAULT_CHANNEL_LAYOUT_COUNT);
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
