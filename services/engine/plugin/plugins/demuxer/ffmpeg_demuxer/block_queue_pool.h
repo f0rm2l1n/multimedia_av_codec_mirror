@@ -30,7 +30,6 @@ extern "C" {
 
 namespace OHOS {
 namespace Media {
-
 struct SamplePacket {
     uint64_t offset;
     AVPacket* pkt;
