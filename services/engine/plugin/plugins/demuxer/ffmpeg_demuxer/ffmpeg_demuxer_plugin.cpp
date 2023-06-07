@@ -277,6 +277,9 @@ void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
 int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> sample,
     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, std::shared_ptr<SamplePacket> samplePacket)
 {
+    if (samplePacket == nullptr || samplePacket->pkt == nullptr) {
+        return AVCS_ERR_INVALID_OPERATION;
+    }
     uint64_t frameSize = 0;
     if (avStream->duration <= (samplePacket->pkt->pts + samplePacket->pkt->duration)) {
         SetEndStatus(samplePacket->pkt->stream_index);
@@ -321,7 +324,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     return AVCS_ERR_OK;
 }
 
-int32_t FFmpegDemuxerPlugin::GetNextPacket(uint32_t trackIndex, std::shared_ptr<SamplePacket> samplePacket)
+int32_t FFmpegDemuxerPlugin::GetNextPacket(uint32_t trackIndex, std::shared_ptr<SamplePacket> *samplePacket)
 {
     int32_t ffmpegRet;
     // std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
@@ -335,7 +338,7 @@ int32_t FFmpegDemuxerPlugin::GetNextPacket(uint32_t trackIndex, std::shared_ptr<
             cacheSamplePacket->offset = 0;
             cacheSamplePacket->pkt = pkt;
             if (streamIndex == trackIndex) {
-                samplePacket = cacheSamplePacket;
+                *samplePacket = cacheSamplePacket;
                 break;
             }
             blockQueue_.Push(streamIndex, cacheSamplePacket);
@@ -366,7 +369,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     }
 
     std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
-    int32_t ffmpegRet = GetNextPacket(trackIndex, samplePacket);
+    int32_t ffmpegRet = GetNextPacket(trackIndex, &samplePacket);
     // int32_t ffmpegRet;
     // std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
     // do {
