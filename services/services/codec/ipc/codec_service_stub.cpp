@@ -65,8 +65,8 @@ public:
 
     int32_t WriteToParcel(uint32_t index, const std::shared_ptr<AVSharedMemory> &memory, MessageParcel &parcel)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         CacheFlag flag = CacheFlag::UPDATE_CACHE;
-
         if (memory == nullptr || memory->GetBase() == nullptr) {
             AVCODEC_LOGE("Invalid memory for index: %{public}u", index);
             flag = CacheFlag::INVALIDATE_CACHE;
@@ -100,6 +100,7 @@ public:
     }
 
 private:
+    std::mutex mutex_;
     enum CacheFlag : uint8_t {
         HIT_CACHE = 1,
         UPDATE_CACHE,
@@ -449,6 +450,7 @@ int32_t CodecServiceStub::CreateInputSurface(MessageParcel &data, MessageParcel 
     (void)data;
     sptr<OHOS::Surface> surface = CreateInputSurface();
 
+    reply.WriteInt32(surface == nullptr ? AVCS_ERR_INVALID_OPERATION : AVCS_ERR_OK);
     if (surface != nullptr && surface->GetProducer() != nullptr) {
         sptr<IRemoteObject> object = surface->GetProducer()->AsObject();
         bool ret = reply.WriteRemoteObject(object);
@@ -487,6 +489,7 @@ int32_t CodecServiceStub::GetInputBuffer(MessageParcel &data, MessageParcel &rep
 
     uint32_t index = data.ReadUint32();
     auto buffer = GetInputBuffer(index);
+    reply.WriteInt32(buffer == nullptr ? AVCS_ERR_NO_MEMORY : AVCS_ERR_OK);
     CHECK_AND_RETURN_RET_LOG(buffer != nullptr, AVCS_ERR_NO_MEMORY, "Buffer is nullptr");
 
     return inputBufferCache_->WriteToParcel(index, buffer, reply);
@@ -516,6 +519,7 @@ int32_t CodecServiceStub::GetOutputBuffer(MessageParcel &data, MessageParcel &re
 
     uint32_t index = data.ReadUint32();
     auto buffer = GetOutputBuffer(index);
+    reply.WriteInt32(buffer == nullptr ? AVCS_ERR_NO_MEMORY : AVCS_ERR_OK);
     CHECK_AND_RETURN_RET_LOG(buffer != nullptr, AVCS_ERR_NO_MEMORY, "Buffer is nullptr");
     
     return outputBufferCache_->WriteToParcel(index, buffer, reply);
