@@ -163,7 +163,10 @@ Range VideoCaps::GetVideoWidthRangeForHeight(int32_t height)
     Range ret = data_->width;
     if (data_->blockSize.width != 0 && data_->blockSize.height != 0) {
         int32_t blockNum = ((height + data_->blockSize.height - 1) / data_->blockSize.height);
-        ret.maxVal = (data_->blockPerFrame.maxVal / blockNum) * data_->blockSize.width;
+        ret.maxVal = std::min((data_->blockPerFrame.maxVal / blockNum) * data_->blockSize.width, ret.maxVal);
+    }
+    if (ret.minVal > ret.maxVal) {
+        return Range(0, 0);
     }
     return ret;
 }
@@ -176,7 +179,10 @@ Range VideoCaps::GetVideoHeightRangeForWidth(int32_t width)
     Range ret = data_->height;
     if (data_->blockSize.width != 0 && data_->blockSize.height != 0) {
         int32_t blockNum = ((width + data_->blockSize.width - 1) / data_->blockSize.width);
-        ret.maxVal = (data_->blockPerFrame.maxVal / blockNum) * data_->blockSize.height;
+        ret.maxVal = std::min((data_->blockPerFrame.maxVal / blockNum) * data_->blockSize.height, ret.maxVal);
+    }
+    if (ret.minVal > ret.maxVal) {
+        return Range(0, 0);
     }
     return ret;
 }
@@ -188,18 +194,21 @@ Range VideoCaps::GetSupportedFrameRate()
 
 Range VideoCaps::GetSupportedFrameRatesFor(int32_t width, int32_t height)
 {
-    Range frameRatesRange;
     if (!IsSizeSupported(width, height)) {
         AVCODEC_LOGD("The %{public}s can not support of:%{public}d * %{public}d", data_->codecName.c_str(), width,
                      height);
-        return frameRatesRange;
+        return Range(0, 0);
     }
+    Range frameRatesRange;
     UpdateParams();
     int64_t blockPerFrame = DivCeil(width, blockWidth_) * static_cast<int64_t>(DivCeil(height, blockHeight_));
     if (blockPerFrame != 0) {
         frameRatesRange =
             Range(std::max(static_cast<int32_t>(blockPerSecondRange_.minVal / blockPerFrame), frameRateRange_.minVal),
                   std::min(static_cast<int32_t>(blockPerSecondRange_.maxVal / blockPerFrame), frameRateRange_.maxVal));
+    }
+    if (frameRatesRange.minVal > frameRatesRange.maxVal) {
+        return Range(0, 0);
     }
     return frameRatesRange;
 }
