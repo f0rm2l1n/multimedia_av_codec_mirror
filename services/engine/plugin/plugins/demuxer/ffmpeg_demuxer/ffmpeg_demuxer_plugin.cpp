@@ -327,7 +327,6 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
 int32_t FFmpegDemuxerPlugin::GetNextPacket(uint32_t trackIndex, std::shared_ptr<SamplePacket> *samplePacket)
 {
     int32_t ffmpegRet;
-    // std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
     do {
         AVPacket* pkt = av_packet_alloc();
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
@@ -370,24 +369,6 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
 
     std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
     int32_t ffmpegRet = GetNextPacket(trackIndex, &samplePacket);
-    // int32_t ffmpegRet;
-    // std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
-    // do {
-    //     AVPacket* pkt = av_packet_alloc();
-    //     ffmpegRet = av_read_frame(formatContext_.get(), pkt);
-    //     CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED, "the stream_index must be positive");
-    //     uint32_t streamIndex = static_cast<uint32_t>(pkt->stream_index);
-    //     if (ffmpegRet >= 0 && IsInSelectedTrack(streamIndex)) {
-    //         std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
-    //         cacheSamplePacket->offset = 0;
-    //         cacheSamplePacket->pkt = pkt;
-    //         if (streamIndex == trackIndex) {
-    //             samplePacket = cacheSamplePacket;
-    //             break;
-    //         }
-    //         blockQueue_.Push(streamIndex, cacheSamplePacket);
-    //     }
-    // } while (ffmpegRet >= 0);
     if (ffmpegRet == AVERROR_EOF) {
         SetEosBufferInfo(info, flag);
         return AVCS_ERR_OK;
