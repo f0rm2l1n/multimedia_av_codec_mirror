@@ -72,4 +72,4 @@ private:
 };
 } // namespace Media
 } // namespace OHOS
-#endif // !UTILS_BLOCK_QUEUE_H
+#endif // !UTILS_BLOCK_QUEUE_POOL_H
