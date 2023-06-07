@@ -249,7 +249,8 @@ int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
 
     int64_t channelLayout;
     format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, channelLayout);
-    auto ffChannelLayout = FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
+    auto ffChannelLayout = 
+        FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
     if (ffChannelLayout == AV_CH_LAYOUT_NATIVE) {
         AVCODEC_LOGE("InitContext failed, because ffChannelLayout is AV_CH_LAYOUT_NATIVE");
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;

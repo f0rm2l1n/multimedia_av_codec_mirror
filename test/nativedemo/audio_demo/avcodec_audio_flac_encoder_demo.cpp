@@ -22,8 +22,8 @@
 #include "native_avformat.h"
 #include "demo_log.h"
 #include "avcodec_codec_name.h"
-#include "avcodec_audio_flac_encoder_demo.h"
 #include "ffmpeg_converter.h"
+#include "avcodec_audio_flac_encoder_demo.h"
 
 using namespace OHOS;
 using namespace OHOS::Media;
@@ -38,7 +38,7 @@ constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr uint32_t CHANNEL_LAYOUT = AudioChannelLayout::STEREO;
 constexpr int32_t SAMPLE_FORMAT = AudioSampleFormat::SAMPLE_S16LE;
 constexpr uint32_t FRAME_BYTES = 18432;
-constexpr int32_t COMPLIANCE_LEVEL = -2;
+constexpr int32_t COMPLIANCE_LEVEL = 0;
 
 constexpr string_view INPUT_FILE_PATH = "/data/test/media/flac_2c_44100hz_261k.pcm";
 constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/flac_encoder_test.flac";

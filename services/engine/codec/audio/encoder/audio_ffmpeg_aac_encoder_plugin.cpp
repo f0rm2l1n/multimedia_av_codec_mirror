@@ -116,7 +116,8 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
 
     int64_t channelLayout;
     format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, channelLayout);
-    auto ffChannelLayout = FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
+    auto ffChannelLayout = 
+        FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
     if (!CheckChannelLayout(ffChannelLayout)) {
         AVCODEC_LOGE("Channel layout not supported");
         return false;

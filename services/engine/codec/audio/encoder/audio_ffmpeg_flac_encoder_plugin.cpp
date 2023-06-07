@@ -120,7 +120,8 @@ int32_t AudioFFMpegFlacEncoderPlugin::CheckFormat(const Format &format)
     format.GetIntValue(MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE, bitsPerCodedSample);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, complianceLevel);
     format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, channelLayout);
-    auto ffChannelLayout = FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
+    auto ffChannelLayout = 
+        FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
 
     if (!CheckSampleRate(sampleRate)) {
         AVCODEC_LOGE("init failed, because sampleRate=%{public}d not in table.", sampleRate);
