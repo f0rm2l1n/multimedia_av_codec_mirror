@@ -17,7 +17,7 @@
 #define UTILS_BLOCK_QUEUE_POOL_H
 #include <vector>
 #include <map>
-#include <stdint.h>
+#include <cstdint>
 #include "block_queue.h"
 
 #ifdef __cplusplus
