@@ -38,7 +38,7 @@ int32_t BlockQueuePool::AddTrackQueue(uint32_t trackIndex)
     AVCODEC_LOGD("block queue %{public}s AddTrackQueue enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
     if (!IsInQueue(trackIndex)) {
         uint32_t queIndex = GetValidQueue();
-        queMap_[trackIndex] = std::vector<uint32_t>({ queIndex });
+        queMap_[trackIndex] = std::vector<uint32_t>( { queIndex } );
         AVCODEC_LOGD("block queue %{public}s AddTrackQueue finish, add track %{public}u, get queue %{public}u",
                      name_.c_str(), trackIndex, queIndex);
     } else {
