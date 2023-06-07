@@ -38,7 +38,7 @@ int32_t BlockQueuePool::AddTrackQueue(uint32_t trackIndex)
     AVCODEC_LOGD("block queue %{public}s AddTrackQueue enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
     if (!IsInQueue(trackIndex)) {
         uint32_t queIndex = GetValidQueue();
-        queMap_[trackIndex] = std::vector<uint32_t>( { queIndex } );
+        queMap_[trackIndex] = std::vector<uint32_t>({ queIndex });
         AVCODEC_LOGD("block queue %{public}s AddTrackQueue finish, add track %{public}u, get queue %{public}u",
                      name_.c_str(), trackIndex, queIndex);
     } else {
@@ -59,7 +59,7 @@ int32_t BlockQueuePool::RemoveTrackQueue(uint32_t trackIndex)
             FreeQueue(queIndex);
         }
     }
-    AVCODEC_LOGD("block queue %{public}s RemoveTrackQueue finish");
+    AVCODEC_LOGD("block queue %{public}s RemoveTrackQueue finish", name_.c_str());
     return AVCS_ERR_OK;
 }
 
@@ -72,11 +72,11 @@ bool BlockQueuePool::HasCache(uint32_t trackIndex)
             continue;
         }
         if (quePool_[queIndex].blockQue->Size() > 0) {
-            AVCODEC_LOGD("block queue %{public}s HasCache finish, result: have cache");
+            AVCODEC_LOGD("block queue %{public}s HasCache finish, result: have cache", name_.c_str());
             return true;
         }
     }
-    AVCODEC_LOGD("block queue %{public}s HasCache finish, result: don't have cache");
+    AVCODEC_LOGD("block queue %{public}s HasCache finish, result: don't have cache", name_.c_str());
     return false;
 }
 
