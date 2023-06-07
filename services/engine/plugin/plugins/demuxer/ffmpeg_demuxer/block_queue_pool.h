@@ -30,9 +30,6 @@ extern "C" {
 
 namespace OHOS {
 namespace Media {
-namespace {
-constexpr size_t SINGLE_QUEUE_SIZE = 100;
-}
 
 struct SamplePacket {
     uint64_t offset;
@@ -61,6 +58,7 @@ private:
         bool isValid;
         std::shared_ptr<BlockQueue<std::shared_ptr<SamplePacket>>> blockQue;
     };
+    static constexpr size_t SINGLE_QUEUE_SIZE = 100;
     std::string name_;
     uint32_t queCount_ = 0;
     std::map<uint32_t, InnerQueue> quePool_;
