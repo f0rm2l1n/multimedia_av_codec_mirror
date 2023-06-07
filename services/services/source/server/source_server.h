@@ -42,6 +42,7 @@ private:
     std::string uri_;
     int32_t appUid_ = 0;
     int32_t appPid_ = 0;
+    int fd_ = -1;
 };
 }  // namespace Media
 }  // namespace OHOS

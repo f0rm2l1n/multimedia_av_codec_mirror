@@ -121,11 +121,7 @@ AVCodecBufferFlag FFmpegDemuxerPlugin::ConvertFlagsFromFFmpeg(AVPacket* pkt,  AV
 {
     AVCodecBufferFlag flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     if (pkt->flags == 0x0001) {
-        if (abs((int)(avStream->duration-pkt->pts)) <= (pkt->duration)) {
-            flags =  AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
-        } else {
-            flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_SYNC_FRAME;
-        }
+        flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_SYNC_FRAME;
     } else {
         flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     }
@@ -209,6 +205,10 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
                 std::make_pair(
                     trackIndex, std::make_shared<BlockQueue<std::shared_ptr<SamplePacket>>>(
                         "track_sample_cache_" + std::to_string(trackIndex))));
+        }
+
+        if (trackIsEnd_.count(trackIndex) == 0) {
+            trackIsEnd_.insert(std::make_pair(trackIndex, false));
         }
     } else {
         AVCODEC_LOGW("track %{public}u is already in selected list!", trackIndex);
@@ -339,12 +339,21 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     return AVCS_ERR_OK;
 }
 
+void FFmpegDemuxerPlugin::SaveCacheSample(uint32_t trackIndex, std::shared_ptr<SamplePacket> cacheSamplePacket)
+{
+    if (sampleCache_[trackIndex]->Size() == sampleCache_[trackIndex]->Capacity()) {
+        AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", trackIndex);
+        sampleCache_[trackIndex]->Pop();
+    }
+    sampleCache_[trackIndex]->Push(cacheSamplePacket);
+}
+
 int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
                                         AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
 {
     if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
         AVCODEC_LOGE("read frame failed, track %{public}u has not been selected", trackIndex);
-        return AVCS_ERR_DEMUXER_FAILED;
+        return AVCS_ERR_INVALID_OPERATION;
     }
     AVStream* avStream = formatContext_->streams[trackIndex];
     if (!sampleCache_[trackIndex]->Empty()) {
@@ -359,29 +368,30 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     do {
         AVPacket* pkt = av_packet_alloc();
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
-        CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED,
-            "the stream_index is must be positive");
-        uint32_t stream_index = static_cast<uint32_t>(pkt->stream_index);
-        if (ffmpegRet >= 0 && IsInSelectedTrack(stream_index)) {
+        CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED, "the stream_index must be positive");
+        uint32_t streamIndex = static_cast<uint32_t>(pkt->stream_index);
+        if (ffmpegRet >= 0 && IsInSelectedTrack(streamIndex)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
+            if (avStream->duration <= (pkt->pts + pkt->duration)) {
+                SetEndStatus(streamIndex);
+            }
             cacheSamplePacket->offset_ = 0;
             cacheSamplePacket->pkt_ = pkt;
-            if (stream_index == trackIndex) {
+            if (streamIndex == trackIndex) {
                 samplePacket = cacheSamplePacket;
                 break;
             }
-            if (sampleCache_[stream_index]->Size() == sampleCache_[stream_index]->Capacity()) {
-                AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", stream_index);
-                sampleCache_[stream_index]->Pop();
-            }
-            sampleCache_[stream_index]->Push(cacheSamplePacket);
+            SaveCacheSample(streamIndex, cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
-    if (ffmpegRet < 0) {
-        AVCODEC_LOGE("read frame failed, ffmpeg error: %{public}d", ffmpegRet);
-        av_packet_free(&(samplePacket->pkt_));
-        return AVCS_ERR_DEMUXER_FAILED;
+    if (ffmpegRet == AVERROR_EOF || (trackIsEnd_.count(trackIndex) != 0 && trackIsEnd_[trackIndex])) {
+        SetEosBufferInfo(info, flag);
+        return AVCS_ERR_OK;
     }
+    if (ffmpegRet < 0) {
+        av_packet_free(&(samplePacket->pkt_));
+    }
+    CHECK_AND_RETURN_RET_LOG(ffmpegRet >= 0, AVCS_ERR_DEMUXER_FAILED, "read failed, FfmpegError:%{public}d", ffmpegRet);
     int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, samplePacket);
     if (ret == AVCS_ERR_NO_MEMORY) {
         sampleCache_[trackIndex]->Push(samplePacket);
@@ -412,7 +422,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
         millisecond, mode);
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
-        return AVCS_ERR_SEEK_FAILED;
+        return AVCS_ERR_INVALID_OPERATION;
     }
     int flags = g_seekModeToFFmpegSeekFlags.at(mode);
     if (selectedTrackIds_.empty()) {
@@ -426,7 +436,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
             if (ffTime > avStream->duration) {
                 AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
                              ffTime, avStream->duration);
-                return AVCS_ERR_SEEK_FAILED;
+                return AVCS_ERR_INVALID_OPERATION;
             }
             if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - millisecond) <= TIME_INTERNAL
                 && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
@@ -451,11 +461,36 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
             return AVCS_ERR_SEEK_FAILED;
         }
     }
+    ResetStatus();
+    return AVCS_ERR_OK;
+}
+
+void FFmpegDemuxerPlugin::ResetStatus()
+{
     for (auto it:sampleCache_) {
         FreeCachePacket(it.first);
         it.second->Clear();
+        if (trackIsEnd_.count(it.first) != 0) {
+            trackIsEnd_[it.first] = false;
+        }
     }
-    return AVCS_ERR_OK;
+}
+
+void FFmpegDemuxerPlugin::SetEndStatus(uint32_t trackIndex)
+{
+    if (trackIsEnd_.count(trackIndex) != 0) {
+        trackIsEnd_[trackIndex] = true;
+    } else {
+        trackIsEnd_.insert(std::make_pair(trackIndex, true));
+    }
+}
+
+void FFmpegDemuxerPlugin::SetEosBufferInfo(AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag)
+{
+    bufferInfo.presentationTimeUs = 0;
+    bufferInfo.size = 0;
+    bufferInfo.offset = 0;
+    flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
 }
 
 void FFmpegDemuxerPlugin::FreeCachePacket(const uint32_t trackIndex)

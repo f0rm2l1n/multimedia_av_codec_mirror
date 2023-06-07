@@ -316,7 +316,7 @@ void Source::GetAudioTrackFormat(Format &format, AVStream *avStream)
     if (!ret) {
         AVCODEC_LOGW("Get track info failed:  miss channel count info in track %{public}d", avStream->index);
     }
-    ret = format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avStream->codecpar->bit_rate);
+    ret = format.PutIntValue(MediaDescriptionKey::MD_KEY_BITRATE, avStream->codecpar->bit_rate);
     if (!ret) {
         AVCODEC_LOGW("Get track info failed:  miss bitrate info in track %{public}d", avStream->index);
     }
@@ -527,9 +527,6 @@ void Source::InitAVIOContext(int flags)
     customIOContext_.offset = 0;
     customIOContext_.eof = false;
     auto buffer = static_cast<unsigned char*>(av_malloc(bufferSize));
-    auto bufferVector = std::make_shared<Buffer>();
-    customIOContext_.bufMemory = bufferVector;
-    auto bufMemory = bufferVector->WrapMemory(buffer, bufferSize, 0);
     if (buffer == nullptr) {
         AVCODEC_LOGE("AllocAVIOContext failed to av_malloc...");
         return;
@@ -587,19 +584,17 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
     int rtv = -1;
     auto readSize = bufSize;
     auto customIOContext = static_cast<CustomIOContext*>(opaque);
-    auto bufferVector = customIOContext->bufMemory;
-    if ((customIOContext->avioContext->seekable == (int) Seekable::SEEKABLE)&&(customIOContext->fileSize != 0)) {
+    auto buffer = std::make_shared<Buffer>();
+    auto bufData = buffer->WrapMemory(buf, bufSize, 0);
+    if ((customIOContext->avioContext->seekable == static_cast<int>(Seekable::SEEKABLE)) &&
+        (customIOContext->fileSize != 0)) {
         if (customIOContext->offset > customIOContext->fileSize) {
             AVCODEC_LOGW("ERROR: offset: %{public}zu is larger than totalSize: %{public}" PRIu64,
                          customIOContext->offset, customIOContext->fileSize);
-            return AVCS_ERR_SEEK_FAILED;
+            return AVCS_ERR_INVALID_OPERATION;
         }
         if (static_cast<size_t>(customIOContext->offset + bufSize) > customIOContext->fileSize) {
             readSize = customIOContext->fileSize - customIOContext->offset;
-        }
-        if (buf != nullptr && bufferVector->GetMemory() != nullptr) {
-            auto memSize = static_cast<int>(bufferVector->GetMemory()->GetCapacity());
-            readSize = (readSize > memSize) ? memSize : readSize;
         }
         if (customIOContext->position != customIOContext->offset) {
             int32_t err = static_cast<int32_t>(customIOContext->sourcePlugin->SeekTo(customIOContext->offset));
@@ -610,11 +605,9 @@ int Source::AVReadPacket(void *opaque, uint8_t *buf, int bufSize)
             customIOContext->position = customIOContext->offset;
         }
         int32_t result = static_cast<int32_t>(
-                    customIOContext->sourcePlugin->Read(bufferVector, static_cast<size_t>(readSize)));
-        AVCODEC_LOGD("AVReadPacket read data size = %{public}d",
-                     static_cast<int32_t>(bufferVector->GetMemory()->GetSize()));
+                    customIOContext->sourcePlugin->Read(buffer, static_cast<size_t>(readSize)));
         if (result == 0) {
-            rtv = bufferVector->GetMemory()->GetSize();
+            rtv = buffer->GetMemory()->GetSize();
             customIOContext->offset += rtv;
             customIOContext->position += rtv;
         } else if (static_cast<int>(result) == 1) {
