@@ -140,9 +140,8 @@ void ADecDemo::RunCase(AudioFormatType audioType)
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
 
-    while (isRunning_.load()) {
-        sleep(1); // sleep 1s
-    }
+    unique_lock<mutex> lock(signal_->startMutex_);
+    signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
 
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     std::cout << "end stop!\n";
@@ -398,6 +397,7 @@ void ADecDemo::OutputFunc()
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
             cout << "decode eos" << endl;
             isRunning_.store(false);
+            signal_->startCond_.notify_all();
         }
         signal_->outBufferQueue_.pop();
         signal_->attrQueue_.pop();

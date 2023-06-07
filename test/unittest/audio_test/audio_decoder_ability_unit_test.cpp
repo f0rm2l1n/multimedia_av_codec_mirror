@@ -118,7 +118,7 @@ public:
     std::mutex startMutex_;
     std::condition_variable inCond_;
     std::condition_variable outCond_;
-    std::condition_variable startCond_;;
+    std::condition_variable startCond_;
     std::queue<uint32_t> inQueue_;
     std::queue<uint32_t> outQueue_;
     std::queue<OH_AVMemory *> inBufferQueue_;

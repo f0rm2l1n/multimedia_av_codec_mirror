@@ -104,9 +104,8 @@ void AEncAacDemo::RunCase()
 
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
 
-    while (isRunning_.load()) {
-        sleep(1);
-    }
+    unique_lock<mutex> lock(signal_->startMutex_);
+    signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
 
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
@@ -294,6 +293,7 @@ void AEncAacDemo::OutputFunc()
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS || attr.size == 0) {
             cout << "encode eos" << endl;
             isRunning_.store(false);
+            signal_->startCond_.notify_all();
         }
 
         signal_->outBufferQueue_.pop();
@@ -306,6 +306,7 @@ void AEncAacDemo::OutputFunc()
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
             cout << "decode eos" << endl;
             isRunning_.store(false);
+            signal_->startCond_.notify_all();
         }
     }
     outputFile.close();
