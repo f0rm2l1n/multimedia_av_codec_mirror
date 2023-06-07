@@ -321,7 +321,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     return AVCS_ERR_OK;
 }
 
-int32_t FFmpegDemuxerPlugin::GetNextPacket(std::shared_ptr<SamplePacket> samplePacket)
+int32_t FFmpegDemuxerPlugin::GetNextPacket(uint32_t trackIndex, std::shared_ptr<SamplePacket> samplePacket)
 {
     int32_t ffmpegRet;
     // std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
@@ -366,7 +366,7 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     }
 
     std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
-    int32_t ffmpegRet = GetNextPacket(samplePacket);
+    int32_t ffmpegRet = GetNextPacket(trackIndex, samplePacket);
     // int32_t ffmpegRet;
     // std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
     // do {

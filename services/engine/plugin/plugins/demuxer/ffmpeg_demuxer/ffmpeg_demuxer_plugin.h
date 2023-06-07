@@ -67,7 +67,7 @@ private:
     void ResetStatus();
     void SetEndStatus(uint32_t trackIndex);
     void SetEosBufferInfo(AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag);
-    int32_t GetNextPacket(std::shared_ptr<SamplePacket> samplePacket);
+    int32_t GetNextPacket(uint32_t trackIndex, std::shared_ptr<SamplePacket> samplePacket);
     std::vector<uint32_t> selectedTrackIds_;
     std::shared_ptr<AVFormatContext> formatContext_;
     std::shared_ptr<AVBSFContext> avbsfContext_ {nullptr};
