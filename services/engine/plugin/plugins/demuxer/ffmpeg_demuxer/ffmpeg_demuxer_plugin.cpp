@@ -374,9 +374,10 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
         return AVCS_ERR_OK;
     }
     if (ffmpegRet < 0) {
+        AVCODEC_LOGE("read frame failed, ffmpeg error:%{public}d", ffmpegRet);
         av_packet_free(&(samplePacket->pkt));
+        return AVCS_ERR_DEMUXER_FAILED;
     }
-    CHECK_AND_RETURN_RET_LOG(ffmpegRet >= 0, AVCS_ERR_DEMUXER_FAILED, "read frame failed, error:%{public}d", ffmpegRet);
     int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, samplePacket);
     if (ret == AVCS_ERR_NO_MEMORY) {
         blockQueue_.Push(trackIndex, samplePacket);
