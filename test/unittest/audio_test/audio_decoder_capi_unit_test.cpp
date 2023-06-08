@@ -51,7 +51,6 @@ constexpr uint32_t DEFAULT_MP3_BITRATE = 60000;
 constexpr uint32_t DEFAULT_FLAC_BITRATE = 261000;
 constexpr uint32_t DEFAULT_AAC_BITRATE = 199000;
 constexpr uint32_t DEFAULT_VORBIS_BITRATE = 320000;
-constexpr uint32_t DEFAULT_BITS_PER_CODED_RATE = 16;
 constexpr uint32_t DEFAULT_AAC_TYPE = 1;
 constexpr string_view INPUT_AAC_FILE_PATH = "/data/test/media/aac_2c_44100hz_199k.dat";
 constexpr string_view OUTPUT_AAC_PCM_FILE_PATH = "/data/test/media/aac_2c_44100hz_199k.pcm";
@@ -444,8 +443,6 @@ int32_t AudioCodeCapiDecoderUnitTest::Configure(const string &codecName)
     OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), DEFAULT_SAMPLE_RATE);
     if (codecName.compare(CODEC_FLAC_NAME) == 0) {
         bitRate = DEFAULT_FLAC_BITRATE;
-        OH_AVFormat_SetIntValue(format_, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(),
-                                DEFAULT_BITS_PER_CODED_RATE);
     }
     if (codecName.compare(CODEC_AAC_NAME) == 0) {
         bitRate = DEFAULT_AAC_BITRATE;

@@ -21,8 +21,8 @@
 #include "media_description.h"
 #include "native_avformat.h"
 #include "demo_log.h"
-#include "native_avcodec_base.h"
 #include "avcodec_codec_name.h"
+#include "ffmpeg_converter.h"
 #include "avcodec_audio_aac_encoder_demo.h"
 
 using namespace OHOS;
@@ -34,8 +34,8 @@ constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 199000;
 constexpr uint32_t FRAME_DURATION_US = 33000;
-constexpr uint32_t CHANNEL_LAYOUT = 3;
-constexpr int32_t SAMPLE_FORMAT = 8;
+constexpr uint32_t CHANNEL_LAYOUT = AudioChannelLayout::STEREO;
+constexpr int32_t SAMPLE_FORMAT = AudioSampleFormat::SAMPLE_F32P;
 constexpr int32_t INPUT_FRAME_BYTES = 2 * 1024 * 4;
 
 constexpr string_view INPUT_FILE_PATH = "/data/test/media/aac_2c_44100hz_199k.pcm";
@@ -109,6 +109,7 @@ void AEncAacDemo::RunCase()
 
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
+    OH_AVFormat_Destroy(format);
 }
 
 AEncAacDemo::AEncAacDemo() : isRunning_(false), audioEnc_(nullptr), signal_(nullptr), frameCount_(0)
@@ -118,7 +119,6 @@ AEncAacDemo::AEncAacDemo() : isRunning_(false), audioEnc_(nullptr), signal_(null
 
 AEncAacDemo::~AEncAacDemo()
 {
-    OH_AudioEncoder_Destroy(audioEnc_);
     if (signal_) {
         delete signal_;
         signal_ = nullptr;

@@ -19,7 +19,7 @@
 #include "avcodec_dfx.h"
 #include "avcodec_log.h"
 #include "securec.h"
-
+#include "ffmpeg_converter.h"
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegEncoderPlugin"};
 }
@@ -247,13 +247,24 @@ int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, maxInputSize_);
 
-    int64_t layout;
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, layout);
-    avCodecContext_->channel_layout = layout;
+    int64_t channelLayout;
+    format.GetLongValue(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT, channelLayout);
+    auto ffChannelLayout =
+        FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
+    if (ffChannelLayout == AV_CH_LAYOUT_NATIVE) {
+        AVCODEC_LOGE("InitContext failed, because ffChannelLayout is AV_CH_LAYOUT_NATIVE");
+        return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+    }
+    avCodecContext_->channel_layout = ffChannelLayout;
 
     int32_t sampleFormat;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, sampleFormat);
-    avCodecContext_->sample_fmt = (AVSampleFormat)sampleFormat;
+    auto ffSampleFormat = FFMpegConverter::ConvertOHAudioFormatToFFMpeg(static_cast<AudioSampleFormat>(sampleFormat));
+    if (ffSampleFormat == AV_SAMPLE_FMT_NONE) {
+        AVCODEC_LOGE("InitContext failed, because avSampleFormat is AV_SAMPLE_FMT_NONE");
+        return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+    }
+    avCodecContext_->sample_fmt = ffSampleFormat;
 
     AVCODEC_LOGI("avcodec name: %{public}s", avCodec_->name);
     return AVCodecServiceErrCode::AVCS_ERR_OK;

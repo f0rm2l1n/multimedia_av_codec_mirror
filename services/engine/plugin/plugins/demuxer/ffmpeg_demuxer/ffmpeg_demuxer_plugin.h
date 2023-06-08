@@ -37,6 +37,7 @@ extern "C" {
 #include "avcodec_common.h"
 #include "avsharedmemory.h"
 #include "block_queue.h"
+#include "block_queue_pool.h"
 
 namespace OHOS {
 namespace Media {
@@ -54,11 +55,6 @@ public:
     int32_t SeekToTime(int64_t millisecond, AVSeekMode mode) override;
     std::vector<uint32_t> GetSelectedTrackIds();
 private:
-    struct SamplePacket {
-        uint64_t offset_;
-        AVPacket* pkt_;
-    };
-
     bool IsInSelectedTrack(uint32_t trackIndex);
     AVCodecBufferFlag ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream);
     int64_t GetTotalStreamFrames(int streamIndex);
@@ -68,16 +64,20 @@ private:
     void ConvertAvcOrHevcToAnnexb(AVPacket& pkt);
     void InitBitStreamContext(const AVStream& avStream);
     int64_t CalculateTimeByFrameIndex(AVStream* avStream, int keyFrameIdx);
+    void ResetStatus();
+    void SetEndStatus(uint32_t trackIndex);
+    void SetEosBufferInfo(AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag);
+    int32_t GetNextPacket(uint32_t trackIndex, std::shared_ptr<SamplePacket> *samplePacket);
     std::vector<uint32_t> selectedTrackIds_;
     std::shared_ptr<AVFormatContext> formatContext_;
     std::shared_ptr<AVBSFContext> avbsfContext_ {nullptr};
     std::map<uint32_t, uint64_t> sampleIndex_;
-    std::map<uint32_t, std::shared_ptr<BlockQueue<std::shared_ptr<SamplePacket>>>> sampleCache_;
-
-    void FreeCachePacket(const uint32_t trackIndex);
+    BlockQueuePool blockQueue_;
+    std::map<uint32_t, bool> trackIsEnd_;
+    std::mutex mutex_;
 };
 } // namespace FFmpeg
 } // namespace Plugin
-} // namespace AVCodec
+} // namespace Media
 } // namespace OH
 #endif // FFMPEG_DEMUXER_PLUGIN_H
