@@ -238,7 +238,6 @@ sptr<Surface> CodecServer::CreateInputSurface()
     CHECK_AND_RETURN_RET_LOG(status_ == CONFIGURED, nullptr, "In invalid state");
     CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, nullptr, "Codecbase is nullptr");
     sptr<Surface> surface = codecBase_->CreateInputSurface();
-    firstFrameTraceId_ = FAKE_POINTER(surface.GetRefPtr());
     return surface;
 }
 
@@ -261,10 +260,11 @@ std::shared_ptr<AVSharedMemory> CodecServer::GetInputBuffer(uint32_t index)
 int32_t CodecServer::QueueInputBuffer(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    firstFrameTraceId_ = FAKE_POINTER(this);
     if (isFirstFrameIn_) {
-        AVCodecTrace::TraceBegin("CodecServer::FirstFrame", firstFrameTraceId_);
+        AVCodecTrace::TraceBegin("CodecServer::FirstFrame", info.presentationTimeUs);
         isFirstFrameIn_ = false;
+    } else {
+        AVCodecTrace::TraceBegin("CodecServer::Frame", info.presentationTimeUs);
     }
     CHECK_AND_RETURN_RET_LOG(status_ == RUNNING, AVCS_ERR_INVALID_STATE, "In invalid state");
     CHECK_AND_RETURN_RET_LOG(codecBase_ != nullptr, AVCS_ERR_NO_MEMORY, "Codecbase is nullptr");
@@ -432,30 +432,21 @@ void CodecServer::OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info
 {
     std::lock_guard<std::mutex> lock(cbMutex_);
     if (isFirstFrameOut_) {
-        AVCodecTrace::TraceEnd("CodecServer::FirstFrame", firstFrameTraceId_);
+        AVCodecTrace::TraceEnd("CodecServer::FirstFrame", info.presentationTimeUs);
         isFirstFrameOut_ = false;
     } else {
-        AVCodecTrace::TraceEnd("CodecServer::Frame", FAKE_POINTER(this));
+        AVCodecTrace::TraceEnd("CodecServer::Frame", info.presentationTimeUs);
     }
 
     if (flag == AVCODEC_BUFFER_FLAG_EOS) {
-        ResetTrace();
-    } else {
-        AVCodecTrace::TraceBegin("CodecServer::Frame", FAKE_POINTER(this));
+        isFirstFrameIn_ = true;
+        isFirstFrameOut_ = true;
     }
 
     if (codecCb_ == nullptr) {
         return;
     }
     codecCb_->OnOutputBufferAvailable(index, info, flag);
-}
-
-void CodecServer::ResetTrace()
-{
-    isFirstFrameIn_ = true;
-    isFirstFrameOut_ = true;
-    AVCodecTrace::TraceEnd("CodecServer::Frame", FAKE_POINTER(this));
-    AVCodecTrace::TraceEnd("CodecServer::FirstFrame", firstFrameTraceId_);
 }
 
 CodecBaseCallback::CodecBaseCallback(const std::shared_ptr<CodecServer> &codec)

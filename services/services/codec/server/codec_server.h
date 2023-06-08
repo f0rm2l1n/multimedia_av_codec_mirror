@@ -69,7 +69,6 @@ public:
     void OnOutputFormatChanged(const Format &format);
     void OnInputBufferAvailable(uint32_t index);
     void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag);
-    void ResetTrace();
 
 private:
     int32_t InitServer();
@@ -87,7 +86,6 @@ private:
     Format config_;
     std::string lastErrMsg_;
     std::string codecName_;
-    int32_t firstFrameTraceId_ = 0;
     bool isFirstFrameIn_ = true;
     bool isFirstFrameOut_ = true;
 };
