@@ -68,8 +68,10 @@ class ADecSignal {
 public:
     std::mutex inMutex_;
     std::mutex outMutex_;
+    std::mutex startMutex_;
     std::condition_variable inCond_;
     std::condition_variable outCond_;
+    std::condition_variable startCond_;
     std::queue<uint32_t> inQueue_;
     std::queue<uint32_t> outQueue_;
     std::queue<OH_AVMemory *> inBufferQueue_;
@@ -189,7 +191,6 @@ void AudioCodeCapiDecoderUnitTest::TearDown(void)
     if (pcmOutputFile_.is_open()) {
         pcmOutputFile_.close();
     }
-    sleep(1);
 }
 
 void AudioCodeCapiDecoderUnitTest::Release()
@@ -314,6 +315,7 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
             cout << "decode eos" << endl;
             isRunning_.store(false);
+            signal_->startCond_.notify_all();
         }
         signal_->outBufferQueue_.pop();
         signal_->attrQueue_.pop();
@@ -425,7 +427,6 @@ int32_t AudioCodeCapiDecoderUnitTest::CreateCodecFunc(const string &codecName)
         return OH_AVErrCode::AV_ERR_UNKNOWN;
     }
 
-    sleep(1);
     return OH_AVErrCode::AV_ERR_OK;
 }
 
@@ -496,11 +497,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_SetParameter_01, TestSiz
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_SetParameter(audioDec_, format_));
     Release();
@@ -520,9 +520,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Start_01, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
     Release();
 }
@@ -536,9 +536,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Start_02, TestSize.Level
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
 
-    while (isRunning_.load()) {
-        sleep(1);
-    }
+
     Release();
 }
 
@@ -560,11 +558,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Flush_01, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     Release();
 }
@@ -582,11 +579,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Reset_02, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
@@ -598,11 +594,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Reset_03, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
 }
@@ -613,11 +608,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Destroy_01, TestSize.Lev
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
 }
@@ -710,11 +704,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_SetParameter_01, TestSi
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_SetParameter(audioDec_, format_));
     Release();
@@ -734,9 +727,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Start_01, TestSize.Leve
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
     Release();
 }
@@ -749,9 +742,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Start_02, TestSize.Leve
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
     Release();
 }
@@ -774,11 +767,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Flush_01, TestSize.Leve
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     Release();
 }
@@ -796,11 +788,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Reset_02, TestSize.Leve
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
@@ -812,11 +803,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Reset_03, TestSize.Leve
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
 }
@@ -827,11 +817,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Destroy_01, TestSize.Le
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
 }
@@ -924,11 +913,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_SetParameter_01, TestSiz
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_SetParameter(audioDec_, format_));
     Release();
@@ -948,9 +936,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Start_01, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
     Release();
 }
@@ -963,9 +951,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Start_02, TestSize.Level
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
     Release();
 }
@@ -988,11 +976,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Flush_01, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     Release();
 }
@@ -1010,11 +997,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Reset_02, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
@@ -1026,11 +1012,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Reset_03, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
 }
@@ -1041,11 +1026,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Destroy_01, TestSize.Lev
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
 }
@@ -1139,11 +1123,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_SetParameter_01, Test
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_SetParameter(audioDec_, format_));
     Release();
@@ -1164,9 +1147,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Start_01, TestSize.Le
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
     Release();
 }
@@ -1179,9 +1162,9 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Start_02, TestSize.Le
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
     Release();
 }
@@ -1204,11 +1187,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Flush_01, TestSize.Le
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Flush(audioDec_));
     Release();
 }
@@ -1227,11 +1209,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Reset_02, TestSize.Le
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
@@ -1243,11 +1224,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Reset_03, TestSize.Le
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
     Release();
 }
@@ -1258,11 +1238,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Destroy_01, TestSize.
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
-
-    while (isRunning_.load()) {
-        sleep(1);
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
     }
-
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Destroy(audioDec_));
 }
