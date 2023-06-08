@@ -192,7 +192,6 @@ void AudioCodeCapiDecoderUnitTest::TearDown(void)
     if (pcmOutputFile_.is_open()) {
         pcmOutputFile_.close();
     }
-
 }
 
 void AudioCodeCapiDecoderUnitTest::Release()
