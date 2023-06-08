@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <algorithm>
 #include <string>
 #include <sstream>
@@ -145,6 +146,7 @@ int32_t FFmpegDemuxerPlugin::Create(uintptr_t sourceAddr)
 }
 
 FFmpegDemuxerPlugin::FFmpegDemuxerPlugin()
+    :blockQueue_("cache_que")
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::FFmpegDemuxerPlugin");
 }
@@ -153,19 +155,6 @@ FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin()
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::~FFmpegDemuxerPlugin");
     selectedTrackIds_.clear();
-    for (auto& it : sampleCache_) {
-        if (it.second == nullptr) {
-            continue;
-        }
-        if (!it.second->Empty()) {
-            for (auto ele = it.second->Pop(); ele != nullptr;) {
-                av_packet_free(&(ele->pkt_));
-                ele = nullptr;
-            }
-        }
-        it.second->Clear();
-        it.second = nullptr;
-    }
 }
 
 int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
@@ -183,9 +172,10 @@ int32_t FFmpegDemuxerPlugin::SetBitStreamFormat()
 int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::SelectTrackByID: trackIndex=%{public}u", trackIndex);
+    std::unique_lock<std::mutex> lock(mutex_);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
-        selectedTracksString << index;
+        selectedTracksString << index << " | ";
     }
     AVCODEC_LOGI("Total track in file: %{public}d | add track index: %{public}u",
         formatContext_.get()->nb_streams, trackIndex);
@@ -199,17 +189,10 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
                               [trackIndex](uint32_t selectedId) {return trackIndex == selectedId;});
     if (index == selectedTrackIds_.end()) {
         selectedTrackIds_.push_back(trackIndex);
-
-        if (sampleCache_.count(trackIndex) == 0) {
-            sampleCache_.insert(
-                std::make_pair(
-                    trackIndex, std::make_shared<BlockQueue<std::shared_ptr<SamplePacket>>>(
-                        "track_sample_cache_" + std::to_string(trackIndex))));
-        }
-
         if (trackIsEnd_.count(trackIndex) == 0) {
             trackIsEnd_.insert(std::make_pair(trackIndex, false));
         }
+        return blockQueue_.AddTrackQueue(trackIndex);
     } else {
         AVCODEC_LOGW("track %{public}u is already in selected list!", trackIndex);
     }
@@ -219,9 +202,10 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::UnselectTrackByID: trackIndex=%{public}u", trackIndex);
+    std::unique_lock<std::mutex> lock(mutex_);
     std::stringstream selectedTracksString;
     for (const auto &index : selectedTrackIds_) {
-        selectedTracksString << index;
+        selectedTracksString << index << " | ";
     }
     AVCODEC_LOGI("Selected track in file: %{public}s | remove track: %{public}u",
         selectedTracksString.str().c_str(), trackIndex);
@@ -230,12 +214,7 @@ int32_t FFmpegDemuxerPlugin::UnselectTrackByID(uint32_t trackIndex)
                               [trackIndex](uint32_t selectedId) {return trackIndex == selectedId; });
     if (index != selectedTrackIds_.end()) {
         selectedTrackIds_.erase(index);
-        if (sampleCache_.count(trackIndex) != 0) {
-            FreeCachePacket(trackIndex);
-            sampleCache_[trackIndex]->Clear();
-            sampleCache_[trackIndex] = nullptr;
-            sampleCache_.erase(trackIndex);
-        }
+        return blockQueue_.RemoveTrackQueue(trackIndex);
     } else {
         AVCODEC_LOGW("Unselect track failed, track %{public}u is not in selected list!", trackIndex);
     }
@@ -298,22 +277,28 @@ void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
 int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> sample,
     AVCodecBufferInfo &bufferInfo, AVCodecBufferFlag &flag, std::shared_ptr<SamplePacket> samplePacket)
 {
+    if (samplePacket == nullptr || samplePacket->pkt == nullptr) {
+        return AVCS_ERR_INVALID_OPERATION;
+    }
     uint64_t frameSize = 0;
-    bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt_->pts, avStream->time_base));
-    flag = ConvertFlagsFromFFmpeg(samplePacket->pkt_, avStream);
-    CHECK_AND_RETURN_RET_LOG(samplePacket->pkt_->size >= 0, AVCS_ERR_DEMUXER_FAILED,
+    if (avStream->duration <= (samplePacket->pkt->pts + samplePacket->pkt->duration)) {
+        SetEndStatus(samplePacket->pkt->stream_index);
+    }
+    bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt->pts, avStream->time_base));
+    flag = ConvertFlagsFromFFmpeg(samplePacket->pkt, avStream);
+    CHECK_AND_RETURN_RET_LOG(samplePacket->pkt->size >= 0, AVCS_ERR_DEMUXER_FAILED,
         "the sample size is must be positive");
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-        frameSize = static_cast<uint64_t>(samplePacket->pkt_->size);
+        frameSize = static_cast<uint64_t>(samplePacket->pkt->size);
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
         if (avStream->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
             AVCODEC_LOGE("unsupport raw video");
             return AVCS_ERR_UNSUPPORT_STREAM;
         }
         if (avbsfContext_) {
-            ConvertAvcOrHevcToAnnexb(*(samplePacket->pkt_));
+            ConvertAvcOrHevcToAnnexb(*(samplePacket->pkt));
         }
-        frameSize = static_cast<uint64_t>(samplePacket->pkt_->size);
+        frameSize = static_cast<uint64_t>(samplePacket->pkt->size);
     } else {
         AVCODEC_LOGE("unsupport stream type");
         return AVCS_ERR_UNSUPPORT_VID_PARAMS;
@@ -321,50 +306,27 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
   
     bufferInfo.size = static_cast<int32_t>(frameSize);
     bufferInfo.offset = 0;
-    auto copyFrameSize = static_cast<uint64_t>(frameSize) - samplePacket->offset_;
+    auto copyFrameSize = static_cast<uint64_t>(frameSize) - samplePacket->offset;
     auto copySize = copyFrameSize;
     if (copySize > static_cast<uint64_t>(sample->GetSize())) {
         copySize = static_cast<uint64_t>(sample->GetSize());
     }
     errno_t rs = memset_s(sample->GetBase(), copySize, 0, copySize);
     CHECK_AND_RETURN_RET_LOG(rs == EOK, AVCS_ERR_UNKNOWN, "memset_s failed");
-    errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt_->data+samplePacket->offset_, copySize);
+    errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt->data+samplePacket->offset, copySize);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
     if (copySize != copyFrameSize) {
-        samplePacket->offset_ += copySize;
+        samplePacket->offset += copySize;
         return AVCS_ERR_NO_MEMORY;
     }
-    av_packet_free(&(samplePacket->pkt_));
+    av_packet_free(&(samplePacket->pkt));
     return AVCS_ERR_OK;
 }
 
-void FFmpegDemuxerPlugin::SaveCacheSample(uint32_t trackIndex, std::shared_ptr<SamplePacket> cacheSamplePacket)
+int32_t FFmpegDemuxerPlugin::GetNextPacket(uint32_t trackIndex, std::shared_ptr<SamplePacket> *samplePacket)
 {
-    if (sampleCache_[trackIndex]->Size() == sampleCache_[trackIndex]->Capacity()) {
-        AVCODEC_LOGW("track %{public}d cache queue is full, will drop the oldest data", trackIndex);
-        sampleCache_[trackIndex]->Pop();
-    }
-    sampleCache_[trackIndex]->Push(cacheSamplePacket);
-}
-
-int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
-                                        AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
-{
-    if (selectedTrackIds_.empty() || !std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex)) {
-        AVCODEC_LOGE("read frame failed, track %{public}u has not been selected", trackIndex);
-        return AVCS_ERR_INVALID_OPERATION;
-    }
-    AVStream* avStream = formatContext_->streams[trackIndex];
-    if (!sampleCache_[trackIndex]->Empty()) {
-        int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, sampleCache_[trackIndex]->Front());
-        if (ret == AVCS_ERR_OK) {
-            sampleCache_[trackIndex]->Pop();
-        }
-        return ret;
-    }
     int32_t ffmpegRet;
-    std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
     do {
         AVPacket* pkt = av_packet_alloc();
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
@@ -372,29 +334,53 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
         uint32_t streamIndex = static_cast<uint32_t>(pkt->stream_index);
         if (ffmpegRet >= 0 && IsInSelectedTrack(streamIndex)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
-            if (avStream->duration <= (pkt->pts + pkt->duration)) {
-                SetEndStatus(streamIndex);
-            }
-            cacheSamplePacket->offset_ = 0;
-            cacheSamplePacket->pkt_ = pkt;
+            cacheSamplePacket->offset = 0;
+            cacheSamplePacket->pkt = pkt;
             if (streamIndex == trackIndex) {
-                samplePacket = cacheSamplePacket;
+                *samplePacket = cacheSamplePacket;
                 break;
             }
-            SaveCacheSample(streamIndex, cacheSamplePacket);
+            blockQueue_.Push(streamIndex, cacheSamplePacket);
         }
     } while (ffmpegRet >= 0);
-    if (ffmpegRet == AVERROR_EOF || (trackIsEnd_.count(trackIndex) != 0 && trackIsEnd_[trackIndex])) {
+    return ffmpegRet;
+}
+
+int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+                                        AVCodecBufferInfo &info, AVCodecBufferFlag &flag)
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (selectedTrackIds_.empty() || std::count(selectedTrackIds_.begin(), selectedTrackIds_.end(), trackIndex) == 0) {
+        AVCODEC_LOGE("read frame failed, track %{public}u has not been selected", trackIndex);
+        return AVCS_ERR_INVALID_OPERATION;
+    }
+    AVStream* avStream = formatContext_->streams[trackIndex];
+    if (blockQueue_.HasCache(trackIndex)) {
+        int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, blockQueue_.Front(trackIndex));
+        if (ret == AVCS_ERR_OK) {
+            blockQueue_.Pop(trackIndex);
+        }
+        return ret;
+    }
+    if (trackIsEnd_.count(trackIndex) != 0 && trackIsEnd_[trackIndex]) {
+        SetEosBufferInfo(info, flag);
+        return AVCS_ERR_OK;
+    }
+
+    std::shared_ptr<SamplePacket> samplePacket = std::make_shared<SamplePacket>();
+    int32_t ffmpegRet = GetNextPacket(trackIndex, &samplePacket);
+    if (ffmpegRet == AVERROR_EOF) {
         SetEosBufferInfo(info, flag);
         return AVCS_ERR_OK;
     }
     if (ffmpegRet < 0) {
-        av_packet_free(&(samplePacket->pkt_));
+        AVCODEC_LOGE("read frame failed, ffmpeg error:%{public}d", ffmpegRet);
+        av_packet_free(&(samplePacket->pkt));
+        return AVCS_ERR_DEMUXER_FAILED;
     }
-    CHECK_AND_RETURN_RET_LOG(ffmpegRet >= 0, AVCS_ERR_DEMUXER_FAILED, "read failed, FfmpegError:%{public}d", ffmpegRet);
     int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, samplePacket);
     if (ret == AVCS_ERR_NO_MEMORY) {
-        sampleCache_[trackIndex]->Push(samplePacket);
+        blockQueue_.Push(trackIndex, samplePacket);
     }
     return ret;
 }
@@ -420,6 +406,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
 {
     AVCODEC_LOGD("FFmpegDemuxerPlugin::SeekToTime: millisecond=%{public}" PRId64 ", mode=%{public}d",
         millisecond, mode);
+    std::unique_lock<std::mutex> lock(mutex_);
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
         return AVCS_ERR_INVALID_OPERATION;
@@ -467,11 +454,10 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
 
 void FFmpegDemuxerPlugin::ResetStatus()
 {
-    for (auto it:sampleCache_) {
-        FreeCachePacket(it.first);
-        it.second->Clear();
-        if (trackIsEnd_.count(it.first) != 0) {
-            trackIsEnd_[it.first] = false;
+    for (size_t i = 0; i < selectedTrackIds_.size(); ++i) {
+        blockQueue_.ResetQueue(selectedTrackIds_[i]);
+        if (trackIsEnd_.count(selectedTrackIds_[i]) != 0) {
+            trackIsEnd_[selectedTrackIds_[i]] = false;
         }
     }
 }
@@ -491,16 +477,6 @@ void FFmpegDemuxerPlugin::SetEosBufferInfo(AVCodecBufferInfo &bufferInfo, AVCode
     bufferInfo.size = 0;
     bufferInfo.offset = 0;
     flag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_EOS;
-}
-
-void FFmpegDemuxerPlugin::FreeCachePacket(const uint32_t trackIndex)
-{
-    if (!sampleCache_[trackIndex]->Empty()) {
-        for (auto ele = sampleCache_[trackIndex]->Pop(); ele != nullptr;) {
-            av_packet_free(&(ele->pkt_));
-            ele = nullptr;
-        }
-    }
 }
 } // FFmpeg
 } // Plugin
