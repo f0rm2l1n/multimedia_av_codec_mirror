@@ -104,7 +104,10 @@ constexpr OH_AVRange DEFAULT_HEIGHT_RANGE_OF_WIDTH = {96, 4096};
 constexpr OH_AVRange DEFAULT_WIDTH_RANGE_OF_HEIGHT = {96, 2304};
 constexpr OH_AVRange DEFAULT_HEIGHT_RANGE = {96, 2304};
 constexpr OH_AVRange DEFAULT_WIDTH_RANGE = {96, 4096};
+constexpr OH_AVRange DEFAULT_HEIGHT_RANGE_ENC = {144, 2772};
+constexpr OH_AVRange DEFAULT_WIDTH_RANGE_ENC = {176, 3840};
 constexpr OH_AVRange DEFAULT_FRAMERATE_RANGE = {0, 120};
+constexpr OH_AVRange DEFAULT_BITRATE_RANGE_ENC = {280000, 100000000};
 
 const std::vector<int32_t> DEFAULT_AUDIO_ACC_SAMPLES = {8000,  11025, 12000, 16000, 22050, 24000,
                                                         32000, 44100, 48000, 64000, 88200, 96000};
@@ -116,6 +119,8 @@ const std::vector<int32_t> DEFAULT_VIDEO_AVC_LEVELS = {
 
 constexpr int32_t DEFAULT_WIDTH_ALIGNMENT = 2;
 constexpr int32_t DEFAULT_HEIGHT_ALIGNMENT = 2;
+constexpr int32_t DEFAULT_ALIGNMENT_ENC = 4;
+constexpr int32_t DEFAULT_BITRATEMODE_ENC = 2;
 
 constexpr int32_t DEFAULT_FRAMERATE = 1;
 constexpr int32_t DEFAULT_WIDTH = 1920;
@@ -130,13 +135,16 @@ constexpr int32_t ERROR_LEVEL = -1;
 
 constexpr uint32_t MAX_VIDEO_BITRATE = 300000000;
 constexpr uint32_t MAX_AUDIO_BITRATE = 320000;
+constexpr uint32_t MIN_AUDIO_BITRATE = 32000;
+constexpr uint32_t MAX_AUDIO_BITRATE_AAC = 448000;
 constexpr uint32_t DEFAULT_SAMPLE_RATE = 8000;
-constexpr uint32_t MAX_CHANNEL_COUNT = 2;
-constexpr uint32_t MAX_CHANNEL_COUNT_VORBIS = 8;
+constexpr uint32_t DEFAULT_SAMPLE_RATE_SIZE = 12;
+constexpr uint32_t MAX_CHANNEL_COUNT = 8;
+constexpr uint32_t MAX_CHANNEL_COUNT_MP3 = 2;
 
 const std::vector<std::string> videoDecoderList = {std::string(CodecMimeType::VIDEO_AVC)};
 
-const std::vector<std::string> videoEncoderList = {};
+const std::vector<std::string> videoEncoderList = {std::string(CodecMimeType::VIDEO_AVC)};
 
 const std::vector<std::string> audioDecoderList = {
     std::string(CodecMimeType::AUDIO_MPEG), std::string(CodecMimeType::AUDIO_AAC),
