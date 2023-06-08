@@ -35,6 +35,7 @@ static const uint64_t AAC_CHANNEL_LAYOUT_TABLE[] = {
 
 namespace OHOS {
 namespace Media {
+constexpr std::string_view AUDIO_CODEC_NAME = "aac";
 constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
 constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 8192;
 constexpr uint32_t ADTS_HEADER_SIZE = 7;
@@ -203,6 +204,11 @@ Format AudioFFMpegAacEncoderPlugin::GetFormat() const noexcept
     auto format = basePlugin->GetFormat();
     format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC);
     return format;
+}
+
+std::string_view AudioFFMpegAacEncoderPlugin::GetCodecType() const noexcept
+{
+    return AUDIO_CODEC_NAME;
 }
 } // namespace Media
 } // namespace OHOS

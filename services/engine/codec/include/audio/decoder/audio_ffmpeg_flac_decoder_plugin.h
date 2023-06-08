@@ -36,6 +36,7 @@ public:
     int32_t GetInputBufferSize() const override;
     int32_t GetOutputBufferSize() const override;
     Format GetFormat() const noexcept override;
+    std::string_view GetCodecType() const noexcept override;
     const static std::string Identify()
     {
         return std::string(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME);

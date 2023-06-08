@@ -72,9 +72,10 @@ private:
     std::shared_ptr<AudioBaseCodec> codec_;
     int32_t inputBufferSize;
     int32_t outputBufferSize;
+    const std::string_view name_;
     std::mutex stateMutex_;
-    std::mutex inputMuxt_;
-    std::mutex outputMuxt_;
+    std::mutex inputMutex_;
+    std::mutex outputMutex_;
     std::condition_variable inputCondition_;
     std::condition_variable outputCondition_;
 

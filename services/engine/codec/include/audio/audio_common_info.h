@@ -19,8 +19,8 @@
 namespace OHOS {
 namespace Media {
 enum class BufferStatus {
-    IDEL,
-    OWNE_BY_CLIENT,
+    IDLE,
+    OWEN_BY_CLIENT,
 };
 
 enum class CodecState {
@@ -30,11 +30,11 @@ enum class CodecState {
     RUNNING,
 
     INITIALIZING, // RELEASED -> INITIALIZED
-    STARTING,   // INITIALIZED -> RUNNING
-    STOPPING,   // RUNNING -> INITIALIZED
-    FLUSHING,   // RUNNING -> FLUSHED
-    RESUMING,   // FLUSHED -> RUNNING
-    RELEASING, // {ANY EXCEPT RELEASED} -> RELEASED
+    STARTING,     // INITIALIZED -> RUNNING
+    STOPPING,     // RUNNING -> INITIALIZED
+    FLUSHING,     // RUNNING -> FLUSHED
+    RESUMING,     // FLUSHED -> RUNNING
+    RELEASING,    // {ANY EXCEPT RELEASED} -> RELEASED
 };
 } // namespace Media
 } // namespace OHOS

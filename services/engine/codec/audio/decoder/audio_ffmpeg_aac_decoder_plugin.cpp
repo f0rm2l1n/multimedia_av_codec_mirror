@@ -28,6 +28,7 @@ namespace OHOS {
 namespace Media {
 static constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
 static constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
+constexpr std::string_view AUDIO_CODEC_NAME = "aac";
 
 AudioFFMpegAacDecoderPlugin::AudioFFMpegAacDecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>()) {}
 
@@ -107,6 +108,11 @@ Format AudioFFMpegAacDecoderPlugin::GetFormat() const noexcept
     auto format = basePlugin->GetFormat();
     format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC);
     return format;
+}
+
+std::string_view AudioFFMpegAacDecoderPlugin::GetCodecType() const noexcept
+{
+    return AUDIO_CODEC_NAME;
 }
 } // namespace Media
 } // namespace OHOS

@@ -48,6 +48,8 @@ public:
     virtual int32_t GetOutputBufferSize() const = 0;
 
     virtual Format GetFormat() const noexcept = 0;
+
+    virtual std::string_view GetCodecType() const noexcept = 0;
 };
 } // namespace Media
 } // namespace OHOS

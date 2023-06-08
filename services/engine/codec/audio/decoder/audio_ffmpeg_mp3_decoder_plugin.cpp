@@ -30,10 +30,11 @@ constexpr int SUPPORT_SAMPLE_RATE = 9;
 constexpr int BUFFER_DIFF = 128;
 constexpr int MIN_OUTBUF_SIZE = 2500;
 constexpr int INPUT_BUFFER_SIZE_DEFAULT = 8192;
-}
+} // namespace
 
 namespace OHOS {
 namespace Media {
+constexpr std::string_view AUDIO_CODEC_NAME = "mp3";
 AudioFFMpegMp3DecoderPlugin::AudioFFMpegMp3DecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
     channels = 0;
@@ -141,6 +142,11 @@ int32_t AudioFFMpegMp3DecoderPlugin::Checkinit(const Format &format)
     }
 
     return AVCodecServiceErrCode::AVCS_ERR_OK;
+}
+
+std::string_view AudioFFMpegMp3DecoderPlugin::GetCodecType() const noexcept
+{
+    return AUDIO_CODEC_NAME;
 }
 } // namespace Media
 } // namespace OHOS

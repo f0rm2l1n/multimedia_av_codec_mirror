@@ -42,7 +42,7 @@ public:
 
     bool RequestNewBuffer(uint32_t &index, std::shared_ptr<AudioBufferInfo> &buffer);
 
-    bool RequestAvialbaleIndex(uint32_t &index);
+    bool RequestAvailableIndex(uint32_t &index);
 
     void ReleaseAll();
 
@@ -54,9 +54,10 @@ private:
 
 private:
     std::atomic<bool> isRunning_;
-    std::mutex avilableMuxt_;
-    std::condition_variable avilableCondition_;
+    std::mutex availableMutex_;
+    std::condition_variable availableCondition_;
     std::queue<uint32_t> inBufIndexQue_;
+    std::vector<bool> inBufIndexExist;
     std::mutex stateMutex_;
     uint32_t bufferSize_;
     uint32_t metaSize_;
