@@ -132,18 +132,18 @@ static void RunInnerSourceDemuxer(const std::string filePath, const std::string 
     // demuxer run
     innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
     // 测试seek功能
-    // printf("seek to 1s,mode:SEEK_MODE_NEXT_SYNC\n");
-    // innerDemuxerDemo->SeekToTime(g_seekTime, AVSeekMode::SEEK_MODE_NEXT_SYNC);
-    // innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
-    // printf("seek to 1s,mode:SEEK_MODE_PREVIOUS_SYNC\n");
-    // innerDemuxerDemo->SeekToTime(g_seekTime, AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
-    // innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
-    // printf("seek to 1s,mode:SEEK_MODE_CLOSEST_SYNC\n");
-    // innerDemuxerDemo->SeekToTime(g_seekTime, AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
-    // innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
-    // printf("seek to 0s,mode:SEEK_MODE_CLOSEST_SYNC\n");
-    // innerDemuxerDemo->SeekToTime(g_startTime, AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
-    // innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
+    printf("seek to 1s,mode:SEEK_MODE_NEXT_SYNC\n");
+    innerDemuxerDemo->SeekToTime(g_seekTime, AVSeekMode::SEEK_MODE_NEXT_SYNC);
+    innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
+    printf("seek to 1s,mode:SEEK_MODE_PREVIOUS_SYNC\n");
+    innerDemuxerDemo->SeekToTime(g_seekTime, AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
+    innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
+    printf("seek to 1s,mode:SEEK_MODE_CLOSEST_SYNC\n");
+    innerDemuxerDemo->SeekToTime(g_seekTime, AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
+    innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
+    printf("seek to 0s,mode:SEEK_MODE_CLOSEST_SYNC\n");
+    innerDemuxerDemo->SeekToTime(g_startTime, AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
+    innerDemuxerDemo->ReadAllSamples(sharedMemory, trackCount);
     innerDemuxerDemo->Destroy();
 }
 
