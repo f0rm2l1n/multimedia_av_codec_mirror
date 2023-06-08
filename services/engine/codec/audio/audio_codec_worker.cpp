@@ -41,6 +41,7 @@ AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioBaseCodec> &codec,
       codec_(codec),
       inputBufferSize(codec_->GetInputBufferSize()),
       outputBufferSize(codec_->GetOutputBufferSize()),
+      name_(codec->GetCodecType()),
       inputTask_(std::make_unique<TaskThread>(ASYNC_HANDLE_INPUT)),
       outputTask_(std::make_unique<TaskThread>(ASYNC_DECODE_FRAME)),
       callback_(callback),
@@ -53,7 +54,7 @@ AudioCodecWorker::AudioCodecWorker(const std::shared_ptr<AudioBaseCodec> &codec,
 
 AudioCodecWorker::~AudioCodecWorker()
 {
-    AVCODEC_LOGD("release all data of codec worker in destructor.");
+    AVCODEC_LOGD("release all data of %{public}s codec worker in destructor.", name_.data());
     Dispose();
 
     if (inputTask_) {
@@ -66,6 +67,11 @@ AudioCodecWorker::~AudioCodecWorker()
         outputTask_.reset();
         outputTask_ = nullptr;
     }
+    while (!inBufIndexQue_.empty()) {
+        inBufIndexQue_.pop();
+    }
+    inputBuffer_->ReleaseAll();
+    outputBuffer_->ReleaseAll();
 
     if (codec_) {
         codec_ = nullptr;
@@ -79,7 +85,7 @@ AudioCodecWorker::~AudioCodecWorker()
 
 bool AudioCodecWorker::PushInputData(const uint32_t &index)
 {
-    AVCODEC_LOGD("Worker PushInputData enter,index:%{public}u", index);
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "%{public}s Worker PushInputData enter,index:%{public}u", name_.data(), index);
 
     if (!isRunning) {
         return true;
@@ -109,7 +115,7 @@ bool AudioCodecWorker::PushInputData(const uint32_t &index)
 
 bool AudioCodecWorker::Configure()
 {
-    AVCODEC_LOGD("Worker Configure enter");
+    AVCODEC_LOGD("%{public}s Worker Configure enter", name_.data());
     if (!codec_) {
         AVCODEC_LOGE("Configure failed in worker, codec is nullptr, please check the codec.");
         return false;
@@ -163,6 +169,14 @@ bool AudioCodecWorker::Stop()
         AVCODEC_LOGE("Stop failed in worker, outputTask_ is nullptr, please check the outputTask_.");
         return false;
     }
+    {
+        std::unique_lock lock(stateMutex_);
+        while (!inBufIndexQue_.empty()) {
+            inBufIndexQue_.pop();
+        }
+    }
+    inputBuffer_->ReleaseAll();
+    outputBuffer_->ReleaseAll();
     return true;
 }
 
@@ -184,6 +198,14 @@ bool AudioCodecWorker::Pause()
         AVCODEC_LOGE("Pause failed in worker, outputTask_ is nullptr, please check the outputTask_.");
         return false;
     }
+    {
+        std::unique_lock lock(stateMutex_);
+        while (!inBufIndexQue_.empty()) {
+            inBufIndexQue_.pop();
+        }
+    }
+    inputBuffer_->ReleaseAll();
+    outputBuffer_->ReleaseAll();
     return true;
 }
 
@@ -219,6 +241,14 @@ bool AudioCodecWorker::Release()
         outputTask_.reset();
         outputTask_ = nullptr;
     }
+    {
+        std::unique_lock lock(stateMutex_);
+        while (!inBufIndexQue_.empty()) {
+            inBufIndexQue_.pop();
+        }
+    }
+    inputBuffer_->ReleaseAll();
+    outputBuffer_->ReleaseAll();
     if (codec_) {
         codec_ = nullptr;
     }
@@ -263,9 +293,9 @@ void AudioCodecWorker::ProduceInputBuffer()
     if (isProduceInput) {
         isProduceInput = false;
         uint32_t index;
-        if (inputBuffer_->RequestAvialbaleIndex(index)) {
-            AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "produceInputBuffer request success. index:%{public}u", index);
-            auto inputBuffer = GetInputBufferInfo(index);
+        if (inputBuffer_->RequestAvailableIndex(index)) {
+            AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "produceInputBuffer %{public}s request success. index:%{public}u",
+                               name_.data(), index);
             callback_->OnInputBufferAvailable(index);
         } else {
             AVCODEC_LOGD("produceInputBuffer request failed.");
@@ -274,7 +304,7 @@ void AudioCodecWorker::ProduceInputBuffer()
         }
     }
 
-    std::unique_lock lock(inputMuxt_);
+    std::unique_lock lock(inputMutex_);
     inputCondition_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_MS),
                              [this] { return (isProduceInput.load() || !isRunning); });
     AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Worker produceInputBuffer exit");
@@ -282,8 +312,10 @@ void AudioCodecWorker::ProduceInputBuffer()
 
 bool AudioCodecWorker::HandInputBuffer(int32_t &ret)
 {
+    std::unique_lock lock(stateMutex_);
     uint32_t inputIndex = inBufIndexQue_.front();
     inBufIndexQue_.pop();
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "handle input buffer. index:%{public}u", inputIndex);
     auto inputBuffer = GetInputBufferInfo(inputIndex);
     bool isEos = inputBuffer->CheckIsEos();
     ret = codec_->ProcessSendData(inputBuffer);
@@ -307,7 +339,7 @@ void AudioCodecWorker::ConsumerOutputBuffer()
     }
     while (!inBufIndexQue_.empty() && isRunning) {
         uint32_t index;
-        if (outputBuffer_->RequestAvialbaleIndex(index)) {
+        if (outputBuffer_->RequestAvailableIndex(index)) {
             int32_t ret;
             bool isEos = HandInputBuffer(ret);
             if (ret == AVCodecServiceErrCode::AVCS_ERR_NOT_ENOUGH_DATA) {
@@ -316,7 +348,7 @@ void AudioCodecWorker::ConsumerOutputBuffer()
                 continue;
             }
             if (ret != AVCodecServiceErrCode::AVCS_ERR_OK && ret != AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM) {
-                AVCODEC_LOGE("process input buffer error! index:%{public}u", index);
+                AVCODEC_LOGE("process input buffer error!index:%{public}u", index);
                 ReleaseOutputBuffer(index, ret);
                 return;
             }
@@ -340,11 +372,12 @@ void AudioCodecWorker::ConsumerOutputBuffer()
                 ReleaseOutputBuffer(index, ret);
                 return;
             }
-            AVCODEC_LOGD("Work consumerOutputBuffer callback_ index:%{public}u", index);
+            AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Work %{public}s consumerOutputBuffer callback_ index:%{public}u",
+                               name_.data(), index);
             callback_->OnOutputBufferAvailable(index, outBuffer->GetBufferAttr(), outBuffer->GetFlag());
         }
     }
-    std::unique_lock lock(outputMuxt_);
+    std::unique_lock lock(outputMutex_);
     outputCondition_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_MS),
                               [this] { return (inBufIndexQue_.size() > 0 || !isRunning); });
     AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Work consumerOutputBuffer exit");
@@ -356,15 +389,8 @@ void AudioCodecWorker::Dispose()
     isRunning = false;
     isProduceInput = false;
 
-    while (!inBufIndexQue_.empty()) {
-        inBufIndexQue_.pop();
-    }
-
     inputCondition_.notify_all();
     outputCondition_.notify_all();
-
-    inputBuffer_->ReleaseAll();
-    outputBuffer_->ReleaseAll();
 }
 
 bool AudioCodecWorker::Begin()

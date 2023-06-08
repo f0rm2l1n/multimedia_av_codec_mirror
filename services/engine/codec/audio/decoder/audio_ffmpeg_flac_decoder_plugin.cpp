@@ -29,10 +29,11 @@ static const uint32_t FLAC_DECODER_SAMPLE_RATE_TABLE[] = {
     88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
 static const uint32_t FLAC_DECODER_BITS_SAMPLE_TABLE[] = {16, 24, 32};
-}
+} // namespace
 
 namespace OHOS {
 namespace Media {
+constexpr std::string_view AUDIO_CODEC_NAME = "flac";
 AudioFFMpegFlacDecoderPlugin::AudioFFMpegFlacDecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
     channels = 0;
@@ -94,7 +95,7 @@ int32_t AudioFFMpegFlacDecoderPlugin::Init(const Format &format)
         AVCODEC_LOGE("init failed, because AllocateContext failed. ret=%{public}d", ret);
         return ret;
     }
-    
+
     ret = CheckFormat(format);
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         AVCODEC_LOGE("init failed, because CheckFormat failed. ret=%{public}d", ret);
@@ -112,7 +113,7 @@ int32_t AudioFFMpegFlacDecoderPlugin::Init(const Format &format)
         AVCODEC_LOGE("init failed, because OpenContext failed. ret=%{public}d", ret);
         return ret;
     }
-    
+
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
@@ -162,6 +163,11 @@ Format AudioFFMpegFlacDecoderPlugin::GetFormat() const noexcept
     auto format = basePlugin->GetFormat();
     format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC);
     return format;
+}
+
+std::string_view AudioFFMpegFlacDecoderPlugin::GetCodecType() const noexcept
+{
+    return AUDIO_CODEC_NAME;
 }
 } // namespace Media
 } // namespace OHOS

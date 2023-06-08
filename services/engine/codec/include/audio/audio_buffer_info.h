@@ -44,7 +44,7 @@ public:
 
     bool SetBufferOwned();
 
-    bool IsAvilable() const noexcept;
+    bool IsAvailable() const noexcept;
 
     BufferStatus GetStatus() const noexcept;
 
@@ -59,9 +59,9 @@ public:
     AVCodecBufferFlag GetFlag() const noexcept;
 
     bool CheckIsFirstFrame() const noexcept;
-	
+
     void SetFirstFrame() noexcept;
-	
+
 private:
     bool isHasMeta_;
     bool isEos_;

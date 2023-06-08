@@ -30,7 +30,7 @@ AudioBufferInfo::AudioBufferInfo(const uint32_t &bufferSize, const std::string_v
     : isHasMeta_(false),
       isEos_(false),
       isFirstFrame_(false),
-      status_(BufferStatus::IDEL),
+      status_(BufferStatus::IDLE),
       bufferSize_(bufferSize),
       metaSize_(metaSize),
       name_(name),
@@ -61,7 +61,7 @@ AudioBufferInfo::~AudioBufferInfo()
 {
     AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "AudioBufferInfo destructor %{public}s buffer.", name_.data());
     isEos_ = false;
-    status_ = BufferStatus::IDEL;
+    status_ = BufferStatus::IDLE;
 
     if (buffer_) {
         buffer_.reset();
@@ -84,9 +84,9 @@ BufferStatus AudioBufferInfo::GetStatus() const noexcept
     return status_;
 }
 
-bool AudioBufferInfo::IsAvilable() const noexcept
+bool AudioBufferInfo::IsAvailable() const noexcept
 {
-    return status_ == BufferStatus::IDEL;
+    return status_ == BufferStatus::IDLE;
 }
 
 bool AudioBufferInfo::CheckIsEos() const noexcept
@@ -96,11 +96,8 @@ bool AudioBufferInfo::CheckIsEos() const noexcept
 
 bool AudioBufferInfo::SetBufferOwned()
 {
-    if (buffer_) {
-        status_ = BufferStatus::OWNE_BY_CLIENT;
-        return true;
-    }
-    return false;
+    status_ = BufferStatus::OWEN_BY_CLIENT;
+    return true;
 }
 
 void AudioBufferInfo::SetEos(bool eos)
@@ -152,7 +149,7 @@ bool AudioBufferInfo::ResetBuffer()
 {
     isEos_ = false;
     isFirstFrame_ = false;
-    status_ = BufferStatus::IDEL;
+    status_ = BufferStatus::IDLE;
     flag_ = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     if (buffer_) {
         buffer_->ClearUsedSize();

@@ -22,7 +22,8 @@
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFfmpegDecoderPlugin"};
-}
+constexpr uint8_t LOGD_FREQUENCY = 5;
+} // namespace
 
 namespace OHOS {
 namespace Media {
@@ -43,9 +44,11 @@ AudioFfmpegDecoderPlugin::AudioFfmpegDecoderPlugin()
 
 AudioFfmpegDecoderPlugin::~AudioFfmpegDecoderPlugin()
 {
+    AVCODEC_LOGI("AudioFfmpegDecoderPlugin deconstructor running.");
     CloseCtxLocked();
     if (avCodecContext_ != nullptr) {
         avCodecContext_.reset();
+        avCodecContext_ = nullptr;
     }
 }
 
@@ -86,6 +89,15 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
     if (!inputBuffer->CheckIsEos()) {
         auto memory = inputBuffer->GetBuffer();
         const uint8_t *ptr = memory->GetBase();
+        if (attr.size <= 0) {
+            AVCODEC_LOGE("send input buffer is less than 0. size:%{public}zu", attr.size);
+            return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+        }
+        if (attr.size > memory->GetSize()) {
+            AVCODEC_LOGE("send input buffer is > allocate size. size:%{public}zu,allocate size:%{public}d", attr.size,
+                         memory->GetSize());
+            return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+        }
         avPacket_->size = attr.size;
         avPacket_->data = const_cast<uint8_t *>(ptr);
         avPacket_->pts = attr.presentationTimeUs;
@@ -94,6 +106,7 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
         avPacket_->data = nullptr;
         avPacket_->pts = attr.presentationTimeUs;
     }
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "SendBuffer buffer size:%{public}u,name:%{public}s", attr.size, name_.data());
     auto ret = avcodec_send_packet(avCodecContext_.get(), avPacket_.get());
     av_packet_unref(avPacket_.get());
     if (ret == 0) {
@@ -112,6 +125,7 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
 
 int32_t AudioFfmpegDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
+    std::unique_lock l(avMutext_);
     if (!outBuffer) {
         AVCODEC_LOGE("outBuffer is nullptr");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
@@ -120,12 +134,7 @@ int32_t AudioFfmpegDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBuffer
         AVCODEC_LOGE("avCodecContext_ is nullptr");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
-    int32_t status;
-    {
-        std::unique_lock l(avMutext_);
-        status = ReceiveBuffer(outBuffer);
-    }
-    return status;
+    return ReceiveBuffer(outBuffer);
 }
 
 int32_t AudioFfmpegDecoderPlugin::ReceiveBuffer(std::shared_ptr<AudioBufferInfo> &outBuffer)
@@ -133,7 +142,7 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveBuffer(std::shared_ptr<AudioBufferInfo>
     auto ret = avcodec_receive_frame(avCodecContext_.get(), cachedFrame_.get());
     int32_t status;
     if (ret >= 0) {
-        AVCODEC_LOGD("receive one frame");
+        AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "receive one frame");
         if (cachedFrame_->pts != AV_NOPTS_VALUE) {
             preBufferGroupPts_ = curBufferGroupPts_;
             curBufferGroupPts_ = cachedFrame_->pts;
@@ -168,6 +177,7 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveBuffer(std::shared_ptr<AudioBufferInfo>
         status = AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
     av_frame_unref(cachedFrame_.get());
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "end received");
     return status;
 }
 
@@ -179,6 +189,8 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveFrameSucc(std::shared_ptr<AudioBufferIn
     int32_t bytePerSample = av_get_bytes_per_sample(sampleFormat);
     int32_t outputSize = samples * bytePerSample * channels;
     auto ioInfoMem = outBuffer->GetBuffer();
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "ReceiveFrameSucc buffer real size:%{public}u,size:%{public}u, name:%{public}s",
+                       outputSize, ioInfoMem->GetSize(), name_.data());
     if (ioInfoMem->GetSize() < outputSize) {
         AVCODEC_LOGE("output buffer size is not enough,output size:%{public}d", outputSize);
         return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
@@ -210,7 +222,10 @@ int32_t AudioFfmpegDecoderPlugin::ReceiveFrameSucc(std::shared_ptr<AudioBufferIn
 int32_t AudioFfmpegDecoderPlugin::Reset()
 {
     CloseCtxLocked();
-    avCodecContext_.reset();
+    if (avCodecContext_ != nullptr) {
+        avCodecContext_.reset();
+        avCodecContext_ = nullptr;
+    }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
@@ -220,6 +235,7 @@ int32_t AudioFfmpegDecoderPlugin::Release()
     auto ret = CloseCtxLocked();
     if (avCodecContext_ != nullptr) {
         avCodecContext_.reset();
+        avCodecContext_ = nullptr;
     }
     return ret;
 }
@@ -245,7 +261,7 @@ int32_t AudioFfmpegDecoderPlugin::AllocateContext(const std::string &name)
         AVCODEC_LOGE("AllocateContext fail,parameter avcodec is nullptr.");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_OPERATION;
     }
-
+    name_ = name;
     AVCodecContext *context = nullptr;
     {
         std::unique_lock lock(avMutext_);
