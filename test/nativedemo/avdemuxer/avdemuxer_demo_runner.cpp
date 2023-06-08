@@ -99,7 +99,7 @@ static void RunInnerSourceDemuxer(const std::string filePath, const std::string 
     auto innerSourceDemo = std::make_shared<InnerSourceDemo>();
     if (fileMode == "0") {
         int32_t fd = open(filePath.c_str(), O_RDONLY);
-         if (fd < 0) {
+        if (fd < 0) {
             printf("open file failed\n");
             return;
         }

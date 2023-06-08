@@ -90,11 +90,11 @@ int32_t AVDemuxerDemo::ReadSample(uint32_t trackIndex, OH_AVMemory *sample, OH_A
 
 bool AVDemuxerDemo::isEOS(std::map<uint32_t, bool>& countFlag)
 {
-    for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) { 
+    for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) {
         if(!iter->second) {
             return false;
         }
-    } 
+    }
     return true;
 }
 
@@ -115,7 +115,7 @@ int32_t AVDemuxerDemo::ReadAllSamples(OH_AVMemory *sample, int32_t tracks)
             } else if (ret == 0 && bufferInfo.flags == AVCODEC_BUFFER_FLAGS_NONE) {
                 frames_[i]++;
             } else if (ret == 0 && bufferInfo.flags == AVCODEC_BUFFER_FLAGS_EOS) {
-                eosFlag[i] = true; 
+                eosFlag[i] = true;
             } else {
                 printf("the value or flags is error, ret = %d\n", ret);
                 printf("the bufferInfo.flags=%d,bufferInfo.size=%d,bufferInfo.pts=%" PRId64 "\n",

@@ -73,11 +73,11 @@ int32_t InnerDemuxerDemo::PrintInfo(int32_t tracks)
 
 bool InnerDemuxerDemo::isEOS(std::map<uint32_t, bool>& countFlag)
 {
-    for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) { 
+    for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) {
         if(!iter->second) {
             return false;
         }
-    } 
+    }
     return true;
 }
 
@@ -99,7 +99,7 @@ int32_t InnerDemuxerDemo::ReadAllSamples(std::shared_ptr<AVSharedMemory> SampleM
             } else if (ret == 0 && bufferFlag == AVCODEC_BUFFER_FLAG_NONE) {
                 frames_[i]++;
             } else if (ret == 0 && bufferFlag == AVCODEC_BUFFER_FLAG_EOS) {
-                eosFlag[i] = true; 
+                eosFlag[i] = true;
             } else {
                 printf("the flags is error ret=%d\n", ret);
                 printf("the bufferFlag=%d, sampleInfo.size=%d, sampleInfo.pts=%" PRId64 "\n",
