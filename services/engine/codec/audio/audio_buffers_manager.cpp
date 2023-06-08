@@ -120,8 +120,11 @@ bool AudioBuffersManager::ReleaseBuffer(const uint32_t &index)
 {
     if (index < bufferInfo_.size()) {
         std::unique_lock lock(avilableMuxt_);
-        bufferInfo_[index]->ResetBuffer();
-        inBufIndexQue_.push(index);
+        {
+            std::unique_lock sLock(stateMutex_);
+            bufferInfo_[index]->ResetBuffer();
+            inBufIndexQue_.push(index);
+        }
         avilableCondition_.notify_all();
         return true;
     }

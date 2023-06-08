@@ -100,7 +100,7 @@ void AudioFFMpegVorbisDecoderPlugin::PutCommentHeader(int offset) const
 
 int32_t AudioFFMpegVorbisDecoderPlugin::GenExtradata(const Format &format) const
 {
-    AVCODEC_LOGE("gen extradata start");
+    AVCODEC_LOGD("GenExtradata start");
     size_t idSize;
     uint8_t *idHeader;
     if (!format.GetBuffer(MediaDescriptionKey::MD_KEY_IDENTIFICATION_HEADER.data(), &idHeader, idSize)) {

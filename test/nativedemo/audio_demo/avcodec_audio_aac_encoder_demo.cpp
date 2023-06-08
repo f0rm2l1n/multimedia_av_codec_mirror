@@ -110,6 +110,7 @@ void AEncAacDemo::RunCase()
 
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
+    OH_AVFormat_Destroy(format);
 }
 
 AEncAacDemo::AEncAacDemo() : isRunning_(false), audioEnc_(nullptr), signal_(nullptr), frameCount_(0)
@@ -119,7 +120,6 @@ AEncAacDemo::AEncAacDemo() : isRunning_(false), audioEnc_(nullptr), signal_(null
 
 AEncAacDemo::~AEncAacDemo()
 {
-    OH_AudioEncoder_Destroy(audioEnc_);
     if (signal_) {
         delete signal_;
         signal_ = nullptr;
@@ -302,10 +302,6 @@ void AEncAacDemo::OutputFunc()
         if (OH_AudioEncoder_FreeOutputData(audioEnc_, index) != AV_ERR_OK) {
             cout << "Fatal: FreeOutputData fail" << endl;
             break;
-        }
-        if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
-            cout << "decode eos" << endl;
-            isRunning_.store(false);
         }
     }
     outputFile.close();
