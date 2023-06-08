@@ -32,7 +32,6 @@ namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
 constexpr uint32_t BITS_RATE = 320000;
-constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr string_view INPUT_FILE_PATH = "/data/test/media/vorbis_2c_44100hz_320k.dat";
 constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/decode_ogg.pcm";
 constexpr uint32_t TMP_BUFFER_SIZE = 4096;
@@ -49,7 +48,6 @@ void ADecInnerDemo::RunCase()
     format.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, CHANNEL_COUNT);
     format.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, SAMPLE_RATE);
     format.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, BITS_RATE);
-    format.PutIntValue("bits_per_coded_sample", BITS_PER_CODED_RATE);
 
     // extradata for vorbis
     char buffer[TMP_BUFFER_SIZE]; // 临时buffer，仅测试vorbis时需要
@@ -65,9 +63,10 @@ void ADecInnerDemo::RunCase()
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
 
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
-    while (isRunning_.load()) {
-        sleep(1); // start run 1s
-    }
+    
+    unique_lock<mutex> lock(signal_->startMutex_);
+    signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
 }
@@ -244,6 +243,7 @@ void ADecInnerDemo::OutputFunc()
         if (flag == AVCODEC_BUFFER_FLAG_EOS) {
             cout << "decode eos" << endl;
             isRunning_.store(false);
+            signal_->startCond_.notify_all();
         }
         outputFile.write(reinterpret_cast<char *>(buffer->GetBase()), attr.size);
         if (audioDec_->ReleaseOutputBuffer(index) != AVCS_ERR_OK) {

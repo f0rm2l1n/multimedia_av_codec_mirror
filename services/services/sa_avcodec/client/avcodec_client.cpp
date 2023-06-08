@@ -229,12 +229,12 @@ sptr<IStandardAVCodecService> AVCodecClient::GetAVCodecProxy()
 {
     AVCODEC_LOGD("enter");
     sptr<ISystemAbilityManager> samgr = nullptr;
-    COLLIE_LISTEN(samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager(),
-                  "AVCodecClient-GetAVCodecProxy");
+    CLIENT_COLLIE_LISTEN(samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager(),
+        "AVCodecClient GetAVCodecProxy");
     CHECK_AND_RETURN_RET_LOG(samgr != nullptr, nullptr, "system ability manager is nullptr.");
 
     sptr<IRemoteObject> object = nullptr;
-    COLLIE_LISTEN(object = samgr->GetSystemAbility(OHOS::AV_CODEC_SERVICE_ID), "AVCodecClient-GetAVCodecProxy");
+    CLIENT_COLLIE_LISTEN(object = samgr->GetSystemAbility(OHOS::AV_CODEC_SERVICE_ID), "AVCodecClient GetAVCodecProxy");
     CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "avcodec object is nullptr.");
 
     avCodecProxy_ = iface_cast<IStandardAVCodecService>(object);
@@ -259,9 +259,9 @@ sptr<IStandardAVCodecService> AVCodecClient::GetAVCodecProxy()
 
 void AVCodecClient::AVCodecServerDied(pid_t pid)
 {
-    AVCODEC_LOGE("av_codec server is died, pid:%{public}d!", pid);
+    AVCODEC_LOGE("AVCodec service is died, pid:%{public}d!", pid);
     g_avCodecClientInstance.DoAVCodecServerDied();
-    FaultEventWrite(FaultType::FAULT_TYPE_CRASH, "AV_CODEC server is died", "AV_CODEC client");
+    FaultEventWrite(FaultType::FAULT_TYPE_CRASH, "AVCodec service is died", "AVCodecClient");
 }
 
 void AVCodecClient::DoAVCodecServerDied()

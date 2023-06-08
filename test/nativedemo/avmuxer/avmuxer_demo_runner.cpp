@@ -25,7 +25,7 @@ using namespace std;
 using namespace OHOS::Media;
 using namespace OHOS::Media::Plugin;
 
-constexpr int RUN_TIME = 600;
+constexpr int RUN_TIME = 60000;
 constexpr int DEMO_THREAD_COUNT = 10;
 
 static int RunLoopNativeMuxer(const string &out)

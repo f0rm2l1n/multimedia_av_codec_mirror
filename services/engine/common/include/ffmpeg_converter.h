@@ -30,8 +30,10 @@ namespace OHOS {
 namespace Media {
 class FFMpegConverter {
 public:
-    static AudioSampleFormat ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleformate);
+    static AudioSampleFormat ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleFormat);
+    static AVSampleFormat ConvertOHAudioFormatToFFMpeg(AudioSampleFormat sampleFormat);
     static AudioChannelLayout ConvertFFToOHAudioChannelLayout(uint64_t ffChannelLayout);
+    static uint64_t ConvertOHAudioChannelLayoutToFFMpeg(AudioChannelLayout channelLayout);
     static std::string_view ConvertOHAudioChannelLayoutToString(AudioChannelLayout layout);
 
 private:

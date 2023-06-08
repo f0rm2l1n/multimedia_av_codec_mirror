@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Media {
 class CodecListInnerMock : public CodecListMock {
 public:
-    explicit CodecListInnerMock(std::shared_ptr<AVCodecList> codeclist, CapabilityData capabilityData)
+    explicit CodecListInnerMock(std::shared_ptr<AVCodecList> codeclist, CapabilityData *capabilityData)
         : codeclist_(codeclist), capabilityData_(capabilityData) {};
     ~CodecListInnerMock() = default;
     bool IsHardware() override;
@@ -54,7 +54,7 @@ public:
 
 private:
     std::shared_ptr<AVCodecList> codeclist_ = nullptr;
-    CapabilityData capabilityData_;
+    CapabilityData *capabilityData_;
 };
 } // namespace Media
 } // namespace OHOS

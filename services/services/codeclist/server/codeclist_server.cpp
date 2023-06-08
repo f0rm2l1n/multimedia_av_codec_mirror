@@ -58,10 +58,10 @@ std::string CodecListServer::FindEncoder(const Format &format)
     return codecListCore_->FindEncoder(format);
 }
 
-CapabilityData CodecListServer::GetCapability(const std::string &mime, const bool isEncoder,
-                                              const AVCodecCategory &category)
+int32_t CodecListServer::GetCapability(CapabilityData &capabilityData, const std::string &mime, const bool isEncoder,
+                                       const AVCodecCategory &category)
 {
-    return codecListCore_->GetCapability(mime, isEncoder, category);
+    return codecListCore_->GetCapability(capabilityData, mime, isEncoder, category);
 }
 } // namespace Media
 } // namespace OHOS

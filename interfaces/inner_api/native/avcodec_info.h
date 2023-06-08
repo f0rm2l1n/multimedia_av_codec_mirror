@@ -173,7 +173,7 @@ struct LevelParams {
 
 class __attribute__((visibility("default"))) AVCodecInfo {
 public:
-    explicit AVCodecInfo(CapabilityData &capabilityData);
+    explicit AVCodecInfo(CapabilityData *capabilityData);
     ~AVCodecInfo();
 
     /**
@@ -240,12 +240,12 @@ public:
      */
     std::map<int32_t, std::vector<int32_t>> GetSupportedLevelsForProfile();
 private:
-    CapabilityData data_;
+    CapabilityData *data_;
 };
 
 class __attribute__((visibility("default"))) VideoCaps {
 public:
-    explicit VideoCaps(CapabilityData &capabilityData);
+    explicit VideoCaps(CapabilityData *capabilityData);
     ~VideoCaps();
 
     /**
@@ -422,7 +422,7 @@ public:
     Range GetVideoWidthRangeForHeight(int32_t height);
 
 private:
-    CapabilityData data_;
+    CapabilityData *data_;
     int32_t blockWidth_;
     int32_t blockHeight_;
     Range horizontalBlockRange_;
@@ -447,7 +447,7 @@ private:
 
 class __attribute__((visibility("default"))) AudioCaps {
 public:
-    explicit AudioCaps(CapabilityData &capabilityData);
+    explicit AudioCaps(CapabilityData *capabilityData);
     ~AudioCaps();
 
     /**
@@ -517,7 +517,7 @@ public:
     Range GetSupportedComplexity();
 
 private:
-    CapabilityData data_;
+    CapabilityData *data_;
 };
 
 /**

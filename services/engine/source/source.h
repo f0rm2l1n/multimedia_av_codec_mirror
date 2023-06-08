@@ -75,7 +75,6 @@ private:
         bool eof = false;
         uint64_t fileSize = 0;
         AVIOContext* avioContext = nullptr;
-        std::shared_ptr<Buffer> bufMemory;
     };
 
     std::shared_ptr<AVFormatContext> formatContext_;

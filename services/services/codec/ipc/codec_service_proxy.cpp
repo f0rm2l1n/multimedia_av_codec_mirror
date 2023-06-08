@@ -33,6 +33,7 @@ public:
 
     int32_t ReadFromParcel(uint32_t index, MessageParcel &parcel, std::shared_ptr<AVSharedMemory> &memory)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         auto iter = caches_.find(index);
         CacheFlag flag = static_cast<CacheFlag>(parcel.ReadUint8());
         if (flag == CacheFlag::HIT_CACHE) {
@@ -69,6 +70,7 @@ public:
     }
 
 private:
+    std::mutex mutex_;
     enum CacheFlag : uint8_t {
         HIT_CACHE = 1,
         UPDATE_CACHE,
@@ -264,6 +266,9 @@ sptr<OHOS::Surface> CodecServiceProxy::CreateInputSurface()
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr,
         "Send request failed");
 
+    if (reply.ReadInt32() != AVCS_ERR_OK) {
+        return nullptr;
+    }
     sptr<IRemoteObject> object = reply.ReadRemoteObject();
     CHECK_AND_RETURN_RET_LOG(object != nullptr, nullptr, "Read surface object failed");
 
@@ -316,6 +321,9 @@ std::shared_ptr<AVSharedMemory> CodecServiceProxy::GetInputBuffer(uint32_t index
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr,
         "Send request failed");
 
+    if (reply.ReadInt32() != AVCS_ERR_OK) {
+        return nullptr;
+    }
     std::shared_ptr<AVSharedMemory> memory = nullptr;
     if (inputBufferCache_ != nullptr) {
         ret = inputBufferCache_->ReadFromParcel(index, reply, memory);
@@ -360,6 +368,9 @@ std::shared_ptr<AVSharedMemory> CodecServiceProxy::GetOutputBuffer(uint32_t inde
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, nullptr,
         "Send request failed");
 
+    if (reply.ReadInt32() != AVCS_ERR_OK) {
+        return nullptr;
+    }
     std::shared_ptr<AVSharedMemory> memory = nullptr;
     if (outputBufferCache_ != nullptr) {
         ret = outputBufferCache_->ReadFromParcel(index, reply, memory);

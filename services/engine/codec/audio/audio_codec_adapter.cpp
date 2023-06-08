@@ -247,6 +247,10 @@ int32_t AudioCodecAdapter::SetParameter(const Format &format)
 int32_t AudioCodecAdapter::GetOutputFormat(Format &format)
 {
     AVCODEC_SYNC_TRACE;
+    if (audioCodec == nullptr) {
+        AVCODEC_LOGE("Codec not init or nullptr");
+        return AVCodecServiceErrCode::AVCS_ERR_NO_MEMORY;
+    }
     format = audioCodec->GetFormat();
     if (!format.ContainKey(MediaDescriptionKey::MD_KEY_CODEC_NAME)) {
         format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_NAME, name_);

@@ -66,9 +66,9 @@ struct OH_AVCodec : public AVObjectMagic {
 };
 
 struct OH_AVCapability : public OHOS::RefBase {
-    explicit OH_AVCapability(const OHOS::Media::CapabilityData &capabilityData);
+    explicit OH_AVCapability(OHOS::Media::CapabilityData *capabilityData);
     ~OH_AVCapability() override;
-    OHOS::Media::CapabilityData capabilityData_;
+    OHOS::Media::CapabilityData *capabilityData_;
 };
 
 struct OH_AVMuxer : public AVObjectMagic {

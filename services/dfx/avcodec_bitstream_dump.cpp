@@ -78,8 +78,8 @@ static void AddNewBitStream(BitStreamDumpType type, const std::string &name,
     outStream << "[" << name << "] ";
     outStream << "[" << "Index: " << std::to_string(index) << "] ";
     outStream << "[" << "Size: " << std::to_string(size) << "] ";
-    outStream << "[" << std::to_string(hour) << ":" << std::to_string(minute) << ":" << std::to_string(second)
-              << "." << std::to_string(mSecond) << "] ";
+    outStream << "[" << std::to_string(hour) << ":" << std::to_string(minute) << ":" << std::to_string(second) <<
+        "." << std::to_string(mSecond) << "] ";
     outStream << "[" << "pid: " << std::to_string(getpid()) << "] ";
     outStream << "[" << "tid: " << std::to_string(gettid()) << "] ";
     outStream << "[" << "uid: " << std::to_string(getuid()) << "] ";

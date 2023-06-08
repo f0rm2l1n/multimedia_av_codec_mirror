@@ -32,8 +32,6 @@ using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;
 constexpr uint32_t SAMPLE_RATE = 44100;
-constexpr uint32_t BITS_PER_SAMPLE = 16;
-constexpr uint32_t BITS_PER_CODED_RATE = 4;
 constexpr uint32_t DEFAULT_AAC_TYPE = 1;
 constexpr int64_t BITS_RETE[TYPE_MAX] = {199000, 261000, 60000, 320000};
 constexpr string_view INPUT_AAC_FILE_PATH = "/data/test/media/aac_2c_44100hz_199k.dat";
@@ -120,11 +118,6 @@ void ADecDemo::RunCase(AudioFormatType audioType)
     OH_AVFormat *format = OH_AVFormat_Create();
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), CHANNEL_COUNT);
     OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), SAMPLE_RATE);
-    if (audioType == TYPE_FLAC) {
-        OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_SAMPLE);
-    } else {
-        OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_BITS_PER_CODED_SAMPLE.data(), BITS_PER_CODED_RATE);
-    }
     if (audioType == TYPE_AAC) {
         OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_AAC_IS_ADTS.data(), DEFAULT_AAC_TYPE);
     }
@@ -147,9 +140,8 @@ void ADecDemo::RunCase(AudioFormatType audioType)
     DEMO_CHECK_AND_RETURN_LOG(Configure(format) == AVCS_ERR_OK, "Fatal: Configure fail");
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
 
-    while (isRunning_.load()) {
-        sleep(1); // sleep 1s
-    }
+    unique_lock<mutex> lock(signal_->startMutex_);
+    signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
 
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     std::cout << "end stop!\n";
@@ -405,6 +397,7 @@ void ADecDemo::OutputFunc()
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
             cout << "decode eos" << endl;
             isRunning_.store(false);
+            signal_->startCond_.notify_all();
         }
         signal_->outBufferQueue_.pop();
         signal_->attrQueue_.pop();

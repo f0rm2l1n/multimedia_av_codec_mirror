@@ -52,7 +52,7 @@ std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoDecoderCaps()
 {
     std::vector<std::shared_ptr<VideoCaps>> ret;
     for (auto it : videoDecoderList) {
-        auto capabilityCapi = std::shared_ptr<OH_AVCapability>(OH_AVCodec_GetCapability(it.c_str(), false));
+        auto capabilityCapi = OH_AVCodec_GetCapability(it.c_str(), false);
         ret.push_back(std::make_shared<VideoCaps>(capabilityCapi->capabilityData_));
     }
     return ret;
@@ -62,7 +62,7 @@ std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoEncoderCaps()
 {
     std::vector<std::shared_ptr<VideoCaps>> ret;
     for (auto it : videoEncoderList) {
-        auto capabilityCapi = std::shared_ptr<OH_AVCapability>(OH_AVCodec_GetCapability(it.c_str(), true));
+        auto capabilityCapi = OH_AVCodec_GetCapability(it.c_str(), true);
         ret.push_back(std::make_shared<VideoCaps>(capabilityCapi->capabilityData_));
     }
     return ret;
@@ -72,7 +72,7 @@ std::vector<std::shared_ptr<AudioCaps>> CapsUnitTest::GetAudioDecoderCaps()
 {
     std::vector<std::shared_ptr<AudioCaps>> ret;
     for (auto it : audioDecoderList) {
-        auto capabilityCapi = std::shared_ptr<OH_AVCapability>(OH_AVCodec_GetCapability(it.c_str(), false));
+        auto capabilityCapi = OH_AVCodec_GetCapability(it.c_str(), false);
         ret.push_back(std::make_shared<AudioCaps>(capabilityCapi->capabilityData_));
     }
     return ret;
@@ -82,7 +82,7 @@ std::vector<std::shared_ptr<AudioCaps>> CapsUnitTest::GetAudioEncoderCaps()
 {
     std::vector<std::shared_ptr<AudioCaps>> ret;
     for (auto it : audioEncoderList) {
-        auto capabilityCapi = std::shared_ptr<OH_AVCapability>(OH_AVCodec_GetCapability(it.c_str(), true));
+        auto capabilityCapi = OH_AVCodec_GetCapability(it.c_str(), true);
         ret.push_back(std::make_shared<AudioCaps>(capabilityCapi->capabilityData_));
     }
     return ret;
@@ -94,7 +94,7 @@ std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoDecoderCaps()
 {
     std::vector<std::shared_ptr<VideoCaps>> ret;
     for (auto it : videoDecoderList) {
-        CapabilityData capabilityData = avCodecList_->GetCapability(it, false, AVCodecCategory::AVCODEC_NONE);
+        CapabilityData *capabilityData = avCodecList_->GetCapability(it, false, AVCodecCategory::AVCODEC_NONE);
         ret.push_back(std::make_shared<VideoCaps>(capabilityData));
     }
     return ret;
@@ -104,7 +104,7 @@ std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoEncoderCaps()
 {
     std::vector<std::shared_ptr<VideoCaps>> ret;
     for (auto it : videoEncoderList) {
-        CapabilityData capabilityData = avCodecList_->GetCapability(it, true, AVCodecCategory::AVCODEC_NONE);
+        CapabilityData *capabilityData = avCodecList_->GetCapability(it, true, AVCodecCategory::AVCODEC_NONE);
         ret.push_back(std::make_shared<VideoCaps>(capabilityData));
     }
     return ret;
@@ -114,7 +114,7 @@ std::vector<std::shared_ptr<AudioCaps>> CapsUnitTest::GetAudioDecoderCaps()
 {
     std::vector<std::shared_ptr<AudioCaps>> ret;
     for (auto it : audioDecoderList) {
-        CapabilityData capabilityData = avCodecList_->GetCapability(it, false, AVCodecCategory::AVCODEC_NONE);
+        CapabilityData *capabilityData = avCodecList_->GetCapability(it, false, AVCodecCategory::AVCODEC_NONE);
         ret.push_back(std::make_shared<AudioCaps>(capabilityData));
     }
     return ret;
@@ -124,7 +124,7 @@ std::vector<std::shared_ptr<AudioCaps>> CapsUnitTest::GetAudioEncoderCaps()
 {
     std::vector<std::shared_ptr<AudioCaps>> ret;
     for (auto it : audioEncoderList) {
-        CapabilityData capabilityData = avCodecList_->GetCapability(it, true, AVCodecCategory::AVCODEC_NONE);
+        CapabilityData *capabilityData = avCodecList_->GetCapability(it, true, AVCodecCategory::AVCODEC_NONE);
         ret.push_back(std::make_shared<AudioCaps>(capabilityData));
     }
     return ret;

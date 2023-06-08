@@ -62,7 +62,7 @@ const std::map<int32_t, LevelParams> MPEG4_SIMPLE_PARAMS_MAP = {
     {MPEG4_LEVEL_5, LevelParams(40500, 1620, 30, 40, 36)},
 };
 
-VideoCaps::VideoCaps(CapabilityData &capabilityData) : data_(capabilityData)
+VideoCaps::VideoCaps(CapabilityData *capabilityData) : data_(capabilityData)
 {
     InitParams();
     LoadLevelParams();
@@ -84,39 +84,39 @@ std::shared_ptr<AVCodecInfo> VideoCaps::GetCodecInfo()
 
 Range VideoCaps::GetSupportedBitrate()
 {
-    return data_.bitrate;
+    return data_->bitrate;
 }
 
 std::vector<int32_t> VideoCaps::GetSupportedFormats()
 {
-    std::vector<int32_t> pixFormat = data_.pixFormat;
+    std::vector<int32_t> pixFormat = data_->pixFormat;
     CHECK_AND_RETURN_RET_LOG(pixFormat.size() != 0, pixFormat, "GetSupportedFormats failed: format is null");
     return pixFormat;
 }
 
 int32_t VideoCaps::GetSupportedHeightAlignment()
 {
-    return data_.alignment.height;
+    return data_->alignment.height;
 }
 
 int32_t VideoCaps::GetSupportedWidthAlignment()
 {
-    return data_.alignment.width;
+    return data_->alignment.width;
 }
 
 Range VideoCaps::GetSupportedWidth()
 {
-    return data_.width;
+    return data_->width;
 }
 
 Range VideoCaps::GetSupportedHeight()
 {
-    return data_.height;
+    return data_->height;
 }
 
 std::vector<int32_t> VideoCaps::GetSupportedProfiles()
 {
-    std::vector<int32_t> profiles = data_.profiles;
+    std::vector<int32_t> profiles = data_->profiles;
     CHECK_AND_RETURN_RET_LOG(profiles.size() != 0, profiles, "GetSupportedProfiles failed: profiles is null");
     return profiles;
 }
@@ -129,7 +129,7 @@ std::vector<int32_t> VideoCaps::GetSupportedLevels()
 
 Range VideoCaps::GetSupportedEncodeQuality()
 {
-    return data_.encodeQuality;
+    return data_->encodeQuality;
 }
 
 bool VideoCaps::IsSizeSupported(int32_t width, int32_t height)
@@ -137,18 +137,18 @@ bool VideoCaps::IsSizeSupported(int32_t width, int32_t height)
     if (width <= 0 || height <= 0) {
         return false;
     }
-    if (data_.alignment.width == 0 || data_.alignment.height == 0 || width % data_.alignment.width != 0 ||
-        height % data_.alignment.height != 0) {
+    if (data_->alignment.width == 0 || data_->alignment.height == 0 || width % data_->alignment.width != 0 ||
+        height % data_->alignment.height != 0) {
         return false;
     }
-    if (data_.width.minVal > width || data_.width.maxVal < width || data_.height.minVal > height ||
-        data_.height.maxVal < height) {
+    if (data_->width.minVal > width || data_->width.maxVal < width || data_->height.minVal > height ||
+        data_->height.maxVal < height) {
         return false;
     }
-    if (data_.blockSize.width != 0 && data_.blockSize.height != 0) {
-        int64_t blockNum = static_cast<int64_t>(((width + data_.blockSize.width - 1) / data_.blockSize.width)) *
-                           static_cast<int64_t>(((height + data_.blockSize.height - 1) / data_.blockSize.height));
-        if (blockNum < data_.blockPerFrame.minVal || blockNum > data_.blockPerFrame.maxVal) {
+    if (data_->blockSize.width != 0 && data_->blockSize.height != 0) {
+        int64_t blockNum = static_cast<int64_t>(((width + data_->blockSize.width - 1) / data_->blockSize.width)) *
+                           static_cast<int64_t>(((height + data_->blockSize.height - 1) / data_->blockSize.height));
+        if (blockNum < data_->blockPerFrame.minVal || blockNum > data_->blockPerFrame.maxVal) {
             return false;
         }
     }
@@ -160,10 +160,13 @@ Range VideoCaps::GetVideoWidthRangeForHeight(int32_t height)
     if (height <= 0) {
         return Range(0, 0);
     }
-    Range ret = data_.width;
-    if (data_.blockSize.width != 0 && data_.blockSize.height != 0) {
-        int32_t blockNum = ((height + data_.blockSize.height - 1) / data_.blockSize.height);
-        ret.maxVal = (data_.blockPerFrame.maxVal / blockNum) * data_.blockSize.width;
+    Range ret = data_->width;
+    if (data_->blockSize.width != 0 && data_->blockSize.height != 0) {
+        int32_t blockNum = ((height + data_->blockSize.height - 1) / data_->blockSize.height);
+        ret.maxVal = std::min((data_->blockPerFrame.maxVal / blockNum) * data_->blockSize.width, ret.maxVal);
+    }
+    if (ret.minVal > ret.maxVal) {
+        return Range(0, 0);
     }
     return ret;
 }
@@ -173,33 +176,39 @@ Range VideoCaps::GetVideoHeightRangeForWidth(int32_t width)
     if (width <= 0) {
         return Range(0, 0);
     }
-    Range ret = data_.height;
-    if (data_.blockSize.width != 0 && data_.blockSize.height != 0) {
-        int32_t blockNum = ((width + data_.blockSize.width - 1) / data_.blockSize.width);
-        ret.maxVal = (data_.blockPerFrame.maxVal / blockNum) * data_.blockSize.height;
+    Range ret = data_->height;
+    if (data_->blockSize.width != 0 && data_->blockSize.height != 0) {
+        int32_t blockNum = ((width + data_->blockSize.width - 1) / data_->blockSize.width);
+        ret.maxVal = std::min((data_->blockPerFrame.maxVal / blockNum) * data_->blockSize.height, ret.maxVal);
+    }
+    if (ret.minVal > ret.maxVal) {
+        return Range(0, 0);
     }
     return ret;
 }
 
 Range VideoCaps::GetSupportedFrameRate()
 {
-    return data_.frameRate;
+    return data_->frameRate;
 }
 
 Range VideoCaps::GetSupportedFrameRatesFor(int32_t width, int32_t height)
 {
-    Range frameRatesRange;
     if (!IsSizeSupported(width, height)) {
-        AVCODEC_LOGD("The %{public}s can not support of:%{public}d * %{public}d", data_.codecName.c_str(), width,
+        AVCODEC_LOGD("The %{public}s can not support of:%{public}d * %{public}d", data_->codecName.c_str(), width,
                      height);
-        return frameRatesRange;
+        return Range(0, 0);
     }
+    Range frameRatesRange;
     UpdateParams();
     int64_t blockPerFrame = DivCeil(width, blockWidth_) * static_cast<int64_t>(DivCeil(height, blockHeight_));
     if (blockPerFrame != 0) {
         frameRatesRange =
             Range(std::max(static_cast<int32_t>(blockPerSecondRange_.minVal / blockPerFrame), frameRateRange_.minVal),
                   std::min(static_cast<int32_t>(blockPerSecondRange_.maxVal / blockPerFrame), frameRateRange_.maxVal));
+    }
+    if (frameRatesRange.minVal > frameRatesRange.maxVal) {
+        return Range(0, 0);
     }
     return frameRatesRange;
 }
@@ -209,11 +218,11 @@ void VideoCaps::LoadLevelParams()
     if (this->GetCodecInfo()->IsSoftwareOnly()) {
         return;
     }
-    if (data_.mimeType == CodecMimeType::VIDEO_AVC) {
+    if (data_->mimeType == CodecMimeType::VIDEO_AVC) {
         LoadAVCLevelParams();
-    } else if (data_.mimeType == CodecMimeType::VIDEO_MPEG2) {
+    } else if (data_->mimeType == CodecMimeType::VIDEO_MPEG2) {
         LoadMPEG2LevelParams();
-    } else if (data_.mimeType == CodecMimeType::VIDEO_MPEG4) {
+    } else if (data_->mimeType == CodecMimeType::VIDEO_MPEG4) {
         LoadMPEG4LevelParams();
     }
 }
@@ -222,7 +231,7 @@ void VideoCaps::LoadAVCLevelParams()
 {
     int32_t maxBlockPerFrame = BASE_BLOCK_PER_FRAME;
     int32_t maxBlockPerSecond = BASE_BLOCK_PER_SECOND;
-    for (auto iter = data_.profileLevelsMap.begin(); iter != data_.profileLevelsMap.end(); iter++) {
+    for (auto iter = data_->profileLevelsMap.begin(); iter != data_->profileLevelsMap.end(); iter++) {
         for (auto levelIter = iter->second.begin(); levelIter != iter->second.end(); levelIter++) {
             if (AVC_PARAMS_MAP.find(*levelIter) != AVC_PARAMS_MAP.end()) {
                 maxBlockPerFrame = std::max(maxBlockPerFrame, AVC_PARAMS_MAP.at(*levelIter).maxBlockPerFrame);
@@ -243,7 +252,7 @@ void VideoCaps::LoadMPEG2LevelParams()
     int32_t maxFrameRate = 0;
     int32_t maxWidth = 0;
     int32_t maxHeight = 0;
-    for (auto iter = data_.profileLevelsMap.begin(); iter != data_.profileLevelsMap.end(); iter++) {
+    for (auto iter = data_->profileLevelsMap.begin(); iter != data_->profileLevelsMap.end(); iter++) {
         if (iter->first == MPEG2_PROFILE_SIMPLE) {
             PARAMS_MAP = MPEG2_SIMPLE_PARAMS_MAP;
         } else if (iter->first == MPEG2_PROFILE_MAIN) {
@@ -276,7 +285,7 @@ void VideoCaps::LoadMPEG4LevelParams()
     int32_t maxFrameRate = 0;
     int32_t maxWidth = 0;
     int32_t maxHeight = 0;
-    for (auto iter = data_.profileLevelsMap.begin(); iter != data_.profileLevelsMap.end(); iter++) {
+    for (auto iter = data_->profileLevelsMap.begin(); iter != data_->profileLevelsMap.end(); iter++) {
         if (iter->first == MPEG4_PROFILE_SIMPLE) {
             PARAMS_MAP = MPEG4_SIMPLE_PARAMS_MAP;
         } else if (iter->first == MPEG4_PROFILE_ADVANCED_SIMPLE) {
@@ -330,29 +339,29 @@ void VideoCaps::UpdateBlockParams(const int32_t &blockWidth, const int32_t &bloc
 
 void VideoCaps::InitParams()
 {
-    if (data_.blockPerSecond.minVal == 0 || data_.blockPerSecond.maxVal == 0) {
-        data_.blockPerSecond = Range(1, INT32_MAX);
+    if (data_->blockPerSecond.minVal == 0 || data_->blockPerSecond.maxVal == 0) {
+        data_->blockPerSecond = Range(1, INT32_MAX);
     }
-    if (data_.blockPerFrame.minVal == 0 || data_.blockPerFrame.maxVal == 0) {
-        data_.blockPerFrame = Range(1, INT32_MAX);
+    if (data_->blockPerFrame.minVal == 0 || data_->blockPerFrame.maxVal == 0) {
+        data_->blockPerFrame = Range(1, INT32_MAX);
     }
-    if (data_.width.minVal == 0 || data_.width.maxVal == 0) {
-        data_.width = Range(1, INT32_MAX);
+    if (data_->width.minVal == 0 || data_->width.maxVal == 0) {
+        data_->width = Range(1, INT32_MAX);
     }
-    if (data_.height.minVal == 0 || data_.height.maxVal == 0) {
-        data_.height = Range(1, INT32_MAX);
+    if (data_->height.minVal == 0 || data_->height.maxVal == 0) {
+        data_->height = Range(1, INT32_MAX);
     }
-    if (data_.frameRate.maxVal == 0) {
-        data_.frameRate = Range(0, FRAME_RATE_30);
+    if (data_->frameRate.maxVal == 0) {
+        data_->frameRate = Range(0, FRAME_RATE_30);
     }
-    if (data_.blockSize.width == 0 || data_.blockSize.height == 0) {
-        data_.blockSize.width = BLOCK_SIZE_MIN;
-        data_.blockSize.height = BLOCK_SIZE_MIN;
+    if (data_->blockSize.width == 0 || data_->blockSize.height == 0) {
+        data_->blockSize.width = BLOCK_SIZE_MIN;
+        data_->blockSize.height = BLOCK_SIZE_MIN;
     }
 
-    blockWidth_ = data_.blockSize.width;
-    blockHeight_ = data_.blockSize.height;
-    frameRateRange_ = data_.frameRate;
+    blockWidth_ = data_->blockSize.width;
+    blockHeight_ = data_->blockSize.height;
+    frameRateRange_ = data_->frameRate;
     horizontalBlockRange_ = Range(1, INT32_MAX);
     verticalBlockRange_ = Range(1, INT32_MAX);
     blockPerFrameRange_ = Range(1, INT32_MAX);
@@ -363,26 +372,26 @@ void VideoCaps::InitParams()
 
 void VideoCaps::UpdateParams()
 {
-    if (data_.blockSize.width == 0 || data_.blockSize.height == 0 || blockWidth_ == 0 || blockHeight_ == 0 ||
+    if (data_->blockSize.width == 0 || data_->blockSize.height == 0 || blockWidth_ == 0 || blockHeight_ == 0 ||
         verticalBlockRange_.maxVal == 0 || verticalBlockRange_.minVal == 0 || horizontalBlockRange_.maxVal == 0 ||
         horizontalBlockRange_.minVal == 0 || blockPerFrameRange_.minVal == 0 || blockPerFrameRange_.maxVal == 0) {
         AVCODEC_LOGE("Invalid param");
         return;
     }
 
-    int32_t factor = (blockWidth_ * blockHeight_) / (data_.blockSize.width * data_.blockSize.height);
+    int32_t factor = (blockWidth_ * blockHeight_) / (data_->blockSize.width * data_->blockSize.height);
 
-    blockPerFrameRange_ = blockPerFrameRange_.Intersect(DivRange(data_.blockPerFrame, factor));
-    blockPerSecondRange_ = blockPerSecondRange_.Intersect(DivRange(data_.blockPerSecond, factor));
+    blockPerFrameRange_ = blockPerFrameRange_.Intersect(DivRange(data_->blockPerFrame, factor));
+    blockPerSecondRange_ = blockPerSecondRange_.Intersect(DivRange(data_->blockPerSecond, factor));
     horizontalBlockRange_ = horizontalBlockRange_.Intersect(
-        Range(data_.width.minVal / blockWidth_, DivCeil(data_.width.maxVal, blockWidth_)));
+        Range(data_->width.minVal / blockWidth_, DivCeil(data_->width.maxVal, blockWidth_)));
     if (verticalBlockRange_.maxVal != 0 && verticalBlockRange_.minVal != 0) {
         horizontalBlockRange_ =
             horizontalBlockRange_.Intersect(Range(blockPerFrameRange_.minVal / verticalBlockRange_.maxVal,
                                                   blockPerFrameRange_.maxVal / verticalBlockRange_.minVal));
     }
     verticalBlockRange_ = verticalBlockRange_.Intersect(
-        Range(data_.height.minVal / blockHeight_, DivCeil(data_.height.maxVal, blockHeight_)));
+        Range(data_->height.minVal / blockHeight_, DivCeil(data_->height.maxVal, blockHeight_)));
     if (horizontalBlockRange_.maxVal != 0 && horizontalBlockRange_.minVal != 0) {
         verticalBlockRange_ =
             verticalBlockRange_.Intersect(Range(blockPerFrameRange_.minVal / horizontalBlockRange_.maxVal,
@@ -422,13 +431,13 @@ int32_t VideoCaps::DivCeil(const int32_t &dividend, const int32_t &divisor)
 bool VideoCaps::IsSizeAndRateSupported(int32_t width, int32_t height, double frameRate)
 {
     if (!IsSizeSupported(width, height)) {
-        AVCODEC_LOGD("The %{public}s can not support of:%{public}d * %{public}d", data_.codecName.c_str(), width,
+        AVCODEC_LOGD("The %{public}s can not support of:%{public}d * %{public}d", data_->codecName.c_str(), width,
                      height);
         return false;
     }
     const auto &frameRateRange = GetSupportedFrameRatesFor(width, height);
     if (frameRateRange.minVal >= frameRate || frameRate > frameRateRange.maxVal) {
-        AVCODEC_LOGD("The %{public}s can not support frameRate:%{public}lf", data_.codecName.c_str(), frameRate);
+        AVCODEC_LOGD("The %{public}s can not support frameRate:%{public}lf", data_->codecName.c_str(), frameRate);
         return false;
     }
     return true;
@@ -438,24 +447,24 @@ Range VideoCaps::GetPreferredFrameRate(int32_t width, int32_t height)
 {
     Range range;
     if (!IsSizeSupported(width, height)) {
-        AVCODEC_LOGD("The %{public}s can not support of:%{public}d * %{public}d", data_.codecName.c_str(), width,
+        AVCODEC_LOGD("The %{public}s can not support of:%{public}d * %{public}d", data_->codecName.c_str(), width,
                      height);
         return range;
     }
 
-    if (data_.measuredFrameRate.size() == 0) {
-        AVCODEC_LOGD("The measuredFrameRate of %{public}s is null:", data_.codecName.c_str());
+    if (data_->measuredFrameRate.size() == 0) {
+        AVCODEC_LOGD("The measuredFrameRate of %{public}s is null:", data_->codecName.c_str());
         return range;
     }
     ImgSize closestSize = MatchClosestSize(ImgSize(width, height));
-    if (data_.measuredFrameRate.find(closestSize) == data_.measuredFrameRate.end()) {
+    if (data_->measuredFrameRate.find(closestSize) == data_->measuredFrameRate.end()) {
         AVCODEC_LOGD("can not match measuredFrameRate of %{public}d x  %{public}d :", width, width);
         return range;
     }
     int64_t targetBlockNum = DivCeil(width, blockWidth_) * static_cast<int64_t>(DivCeil(height, blockHeight_));
     int64_t closestBlockNum =
         DivCeil(closestSize.width, blockWidth_) * static_cast<int64_t>(DivCeil(closestSize.height, blockHeight_));
-    Range closestFrameRate = data_.measuredFrameRate.at(closestSize);
+    Range closestFrameRate = data_->measuredFrameRate.at(closestSize);
     int64_t minTargetBlockNum = 1;
     double factor = static_cast<double>(closestBlockNum) / std::max(targetBlockNum, minTargetBlockNum);
     return Range(closestFrameRate.minVal * factor, closestFrameRate.maxVal * factor);
@@ -468,7 +477,7 @@ ImgSize VideoCaps::MatchClosestSize(const ImgSize &imgSize)
     int64_t minDiffBlockNum = INT32_MAX;
 
     ImgSize closestSize;
-    for (auto iter = data_.measuredFrameRate.begin(); iter != data_.measuredFrameRate.end(); iter++) {
+    for (auto iter = data_->measuredFrameRate.begin(); iter != data_->measuredFrameRate.end(); iter++) {
         int64_t blockNum =
             DivCeil(iter->first.width, blockWidth_) * static_cast<int64_t>(DivCeil(iter->first.height, blockHeight_));
         int64_t diffBlockNum = abs(targetBlockNum - blockNum);
@@ -478,13 +487,13 @@ ImgSize VideoCaps::MatchClosestSize(const ImgSize &imgSize)
         }
     }
     AVCODEC_LOGD("%{public}s: The ClosestSize of %{public}d x %{public}d is %{public}d x %{public}d:",
-                 data_.codecName.c_str(), imgSize.width, imgSize.height, closestSize.width, closestSize.height);
+                 data_->codecName.c_str(), imgSize.width, imgSize.height, closestSize.width, closestSize.height);
     return closestSize;
 }
 
 std::vector<int32_t> VideoCaps::GetSupportedBitrateMode()
 {
-    std::vector<int32_t> bitrateMode = data_.bitrateMode;
+    std::vector<int32_t> bitrateMode = data_->bitrateMode;
     CHECK_AND_RETURN_RET_LOG(bitrateMode.size() != 0, bitrateMode, "GetSupportedBitrateMode failed: get null");
     return bitrateMode;
 }
@@ -497,7 +506,7 @@ Range VideoCaps::GetSupportedQuality()
 
 Range VideoCaps::GetSupportedComplexity()
 {
-    return data_.complexity;
+    return data_->complexity;
 }
 
 bool VideoCaps::IsSupportDynamicIframe()
@@ -505,7 +514,7 @@ bool VideoCaps::IsSupportDynamicIframe()
     return false;
 }
 
-AudioCaps::AudioCaps(CapabilityData &capabilityData) : data_(capabilityData)
+AudioCaps::AudioCaps(CapabilityData *capabilityData) : data_(capabilityData)
 {
     AVCODEC_LOGD("AudioCaps:0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
 }
@@ -524,31 +533,31 @@ std::shared_ptr<AVCodecInfo> AudioCaps::GetCodecInfo()
 
 Range AudioCaps::GetSupportedBitrate()
 {
-    return data_.bitrate;
+    return data_->bitrate;
 }
 
 Range AudioCaps::GetSupportedChannel()
 {
-    return data_.channels;
+    return data_->channels;
 }
 
 std::vector<int32_t> AudioCaps::GetSupportedFormats()
 {
-    std::vector<int32_t> bitDepth = data_.bitDepth;
+    std::vector<int32_t> bitDepth = data_->bitDepth;
     CHECK_AND_RETURN_RET_LOG(bitDepth.size() != 0, bitDepth, "GetSupportedFormats failed: format is null");
     return bitDepth;
 }
 
 std::vector<int32_t> AudioCaps::GetSupportedSampleRates()
 {
-    std::vector<int32_t> sampleRate = data_.sampleRate;
+    std::vector<int32_t> sampleRate = data_->sampleRate;
     CHECK_AND_RETURN_RET_LOG(sampleRate.size() != 0, sampleRate, "GetSupportedSampleRates failed: sampleRate is null");
     return sampleRate;
 }
 
 std::vector<int32_t> AudioCaps::GetSupportedProfiles()
 {
-    std::vector<int32_t> profiles = data_.profiles;
+    std::vector<int32_t> profiles = data_->profiles;
     CHECK_AND_RETURN_RET_LOG(profiles.size() != 0, profiles, "GetSupportedProfiles failed: profiles is null");
     return profiles;
 }
@@ -561,10 +570,10 @@ std::vector<int32_t> AudioCaps::GetSupportedLevels()
 
 Range AudioCaps::GetSupportedComplexity()
 {
-    return data_.complexity;
+    return data_->complexity;
 }
 
-AVCodecInfo::AVCodecInfo(CapabilityData &capabilityData) : data_(capabilityData)
+AVCodecInfo::AVCodecInfo(CapabilityData *capabilityData) : data_(capabilityData)
 {
     AVCODEC_LOGD("AVCodecInfo:0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
 }
@@ -576,48 +585,48 @@ AVCodecInfo::~AVCodecInfo()
 
 std::string AVCodecInfo::GetName()
 {
-    std::string name = data_.codecName;
+    std::string name = data_->codecName;
     CHECK_AND_RETURN_RET_LOG(name != "", "", "get codec name is null");
     return name;
 }
 
 AVCodecType AVCodecInfo::GetType()
 {
-    AVCodecType codecType = AVCodecType(data_.codecType);
+    AVCodecType codecType = AVCodecType(data_->codecType);
     CHECK_AND_RETURN_RET_LOG(codecType != AVCODEC_TYPE_NONE, AVCODEC_TYPE_NONE, "can not find codec type");
     return codecType;
 }
 
 std::string AVCodecInfo::GetMimeType()
 {
-    std::string mimeType = data_.mimeType;
+    std::string mimeType = data_->mimeType;
     CHECK_AND_RETURN_RET_LOG(mimeType != "", "", "get mimeType is null");
     return mimeType;
 }
 
 bool AVCodecInfo::IsHardwareAccelerated()
 {
-    return data_.isVendor;
+    return data_->isVendor;
 }
 
 int32_t AVCodecInfo::GetMaxSupportedInstances()
 {
-    return data_.maxInstance;
+    return data_->maxInstance;
 }
 
 bool AVCodecInfo::IsSoftwareOnly()
 {
-    return !data_.isVendor;
+    return !data_->isVendor;
 }
 
 bool AVCodecInfo::IsVendor()
 {
-    return data_.isVendor;
+    return data_->isVendor;
 }
 
 std::map<int32_t, std::vector<int32_t>> AVCodecInfo::GetSupportedLevelsForProfile()
 {
-    return data_.profileLevelsMap;
+    return data_->profileLevelsMap;
 }
 } // namespace Media
 } // namespace OHOS

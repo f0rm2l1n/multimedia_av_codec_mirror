@@ -23,13 +23,13 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegMp3DecoderPlugin"};
 constexpr int MIN_CHANNELS = 1;
 constexpr int MAX_CHANNELS = 2;
-constexpr int BIT_RATE_RATIO = 150;
 constexpr int SAMPLE_RATE_RATIO = 31;
 constexpr int MAX_BIT_RATE = 320000;
 constexpr int MIN_BIT_RATE = 32000;
 constexpr int SUPPORT_SAMPLE_RATE = 9;
 constexpr int BUFFER_DIFF = 128;
 constexpr int MIN_OUTBUF_SIZE = 2500;
+constexpr int INPUT_BUFFER_SIZE_DEFAULT = 8192;
 } // namespace
 
 namespace OHOS {
@@ -95,10 +95,9 @@ int32_t AudioFFMpegMp3DecoderPlugin::Flush()
 
 int32_t AudioFFMpegMp3DecoderPlugin::GetInputBufferSize() const
 {
-    auto size = bitRate / BIT_RATE_RATIO;
     int32_t maxSize = basePlugin->GetMaxInputSize();
-    if (maxSize < 0 || maxSize > size) {
-        maxSize = size;
+    if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
+        maxSize = INPUT_BUFFER_SIZE_DEFAULT;
     }
     return maxSize;
 }

@@ -16,6 +16,7 @@
 #include <cmath> // fabs
 #include "codec_ability_singleton.h"
 #include "avcodec_log.h"
+#include "avcodec_errors.h"
 #include "codeclist_core.h"
 
 namespace {
@@ -228,13 +229,12 @@ CodecType CodecListCore::FindCodecType(std::string codecName)
     return CodecType::AVCODEC_INVALID;
 }
 
-CapabilityData CodecListCore::GetCapability(const std::string &mime, const bool isEncoder,
-                                            const AVCodecCategory &category)
+int32_t CodecListCore::GetCapability(CapabilityData &capData, const std::string &mime, const bool isEncoder,
+                                     const AVCodecCategory &category)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    CapabilityData capData;
     if (mime.empty()) {
-        return capData;
+        return AVCS_ERR_INVALID_VAL;
     }
     AVCodecType codecType = AVCODEC_TYPE_NONE;
     bool isVideo = mime.find("video") != std::string::npos;
@@ -248,7 +248,7 @@ CapabilityData CodecListCore::GetCapability(const std::string &mime, const bool 
     std::unordered_map<std::string, std::vector<size_t>> mimeCapIdxMap =
         CodecAbilitySingleton::GetInstance().GetMimeCapIdxMap();
     if (mimeCapIdxMap.find(mime) == mimeCapIdxMap.end()) {
-        return capData;
+        return AVCS_ERR_INVALID_VAL;
     }
     std::vector<size_t> capsIdx = mimeCapIdxMap.at(mime);
     for (auto iter = capsIdx.begin(); iter != capsIdx.end(); iter++) {
@@ -261,7 +261,7 @@ CapabilityData CodecListCore::GetCapability(const std::string &mime, const bool 
             break;
         }
     }
-    return capData;
+    return AVCS_ERR_OK;
 }
 } // namespace Media
 } // namespace OHOS

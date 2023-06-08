@@ -45,6 +45,7 @@ public:
 
 private:
     int32_t CheckFormat(const Format &format);
+    int32_t SetContext(const Format &format);
     int32_t channels;
     std::unique_ptr<AudioFfmpegEncoderPlugin> basePlugin;
 };
