@@ -74,7 +74,7 @@ int32_t InnerDemuxerDemo::PrintInfo(int32_t tracks)
 bool InnerDemuxerDemo::isEOS(std::map<uint32_t, bool>& countFlag)
 {
     for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) {
-        if(!iter->second) {
+        if (!iter->second) {
             return false;
         }
     }

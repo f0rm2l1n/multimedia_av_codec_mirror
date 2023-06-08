@@ -91,7 +91,7 @@ int32_t AVDemuxerDemo::ReadSample(uint32_t trackIndex, OH_AVMemory *sample, OH_A
 bool AVDemuxerDemo::isEOS(std::map<uint32_t, bool>& countFlag)
 {
     for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) {
-        if(!iter->second) {
+        if (!iter->second) {
             return false;
         }
     }
