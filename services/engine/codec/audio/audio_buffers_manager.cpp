@@ -118,8 +118,7 @@ bool AudioBuffersManager::RequestAvailableIndex(uint32_t &index)
         AVCODEC_LOGW("Request %{public}s buffer index is invalidate ,index:%{public}u.", name_.data(), index);
         return false;
     }
-    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Request %{public}s buffer successful,index:%{public}u,size:%{public}u",
-                       name_.data(), index, inBufIndexExist.size());
+    AVCODEC_LOGD_LIMIT(LOGD_FREQUENCY, "Request %{public}s buffer successful,index:%{public}u", name_.data(), index);
     inBufIndexExist[index] = false;
     bufferInfo_[index]->SetBufferOwned();
     return true;

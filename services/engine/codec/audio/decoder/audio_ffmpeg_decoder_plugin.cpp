@@ -90,11 +90,11 @@ int32_t AudioFfmpegDecoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
         auto memory = inputBuffer->GetBuffer();
         const uint8_t *ptr = memory->GetBase();
         if (attr.size <= 0) {
-            AVCODEC_LOGE("send input buffer is less than 0. size:%{public}zu", attr.size);
+            AVCODEC_LOGE("send input buffer is less than 0. size:%{public}d", attr.size);
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
         if (attr.size > memory->GetSize()) {
-            AVCODEC_LOGE("send input buffer is > allocate size. size:%{public}zu,allocate size:%{public}d", attr.size,
+            AVCODEC_LOGE("send input buffer is > allocate size. size:%{public}d,allocate size:%{public}d", attr.size,
                          memory->GetSize());
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
