@@ -1168,7 +1168,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Start_02, TestSize.Le
     {
         unique_lock<mutex> lock(signal_->startMutex_);
         signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
-    }    
+    }
     Release();
 }
 
