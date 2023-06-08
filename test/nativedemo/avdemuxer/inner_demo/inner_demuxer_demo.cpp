@@ -66,39 +66,49 @@ int32_t InnerDemuxerDemo::PrintInfo(int32_t tracks)
 {
     for (int32_t i = 0; i < tracks; i++) {
         printf("streams[%d]==>total frames=%" PRId64 ",KeyFrames=%" PRId64 "\n", i,
-            frames_[i], key_frames_[i]);
+            frames_[i] + key_frames_[i], key_frames_[i]);
     }
     return 0;
+}
+
+bool InnerDemuxerDemo::isEOS(std::map<uint32_t, bool>& countFlag)
+{
+    for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) { 
+        if(!iter->second) {
+            return false;
+        }
+    } 
+    return true;
 }
 
 int32_t InnerDemuxerDemo::ReadAllSamples(std::shared_ptr<AVSharedMemory> SampleMem, int32_t tracks)
 {
     AVCodecBufferFlag bufferFlag = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
+    std::map<uint32_t, bool> eosFlag;
     for (int i = 0;i < tracks; i++) {
         frames_[i] = 0;
         key_frames_[i] = 0;
+        eosFlag[i] = false;
     }
     int32_t ret = -1;
-    bool isEnd = false;
-    while (!isEnd) {
+    while (!isEOS(eosFlag)) {
         for (int32_t i = 0; i < tracks; i++) {
             ret = ReadSample(i, SampleMem, sampleInfo, bufferFlag);
-            if (ret != 0) {
-                printf("read finished\n");
-                PrintInfo(tracks);
-                isEnd = true;
-            }
-            if (bufferFlag == AVCODEC_BUFFER_FLAG_EOS) {
-                frames_[i]++;
-                printf("streams[%d]==>sampleInfo:pts=%" PRId64 ",size=%d,offset=%d\n",
-                    i, sampleInfo.presentationTimeUs, sampleInfo.size, sampleInfo.offset);
-            }
-            if (bufferFlag == AVCODEC_BUFFER_FLAG_SYNC_FRAME) {
-                frames_[i]++;
+            if (ret == 0 && bufferFlag == AVCODEC_BUFFER_FLAG_SYNC_FRAME) {
                 key_frames_[i]++;
+            } else if (ret == 0 && bufferFlag == AVCODEC_BUFFER_FLAG_NONE) {
+                frames_[i]++;
+            } else if (ret == 0 && bufferFlag == AVCODEC_BUFFER_FLAG_EOS) {
+                eosFlag[i] = true; 
+            } else {
+                printf("the flags is error ret=%d\n", ret);
+                printf("the bufferFlag=%d, sampleInfo.size=%d, sampleInfo.pts=%" PRId64 "\n",
+                bufferFlag, sampleInfo.size, sampleInfo.presentationTimeUs);
+                return ret;
             }
         }
     }
+    PrintInfo(tracks);
     return ret;
 }
 
