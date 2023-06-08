@@ -482,10 +482,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_01, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-
-        unique_lock<mutex> lock(signal_->startMutex_);
-        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
-
+        {
+            unique_lock<mutex> lock(signal_->startMutex_);
+            signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+        }
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_MP3_FILE_SOURCE_PATH[i][0] << endl;
@@ -518,10 +518,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_02, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-
-        unique_lock<mutex> lock(signal_->startMutex_);
-        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
-
+        {
+            unique_lock<mutex> lock(signal_->startMutex_);
+            signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+        }
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_FLAC_FILE_SOURCE_PATH[i][0] << endl;
@@ -555,10 +555,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_03, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-
-        unique_lock<mutex> lock(signal_->startMutex_);
-        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
-
+        {
+            unique_lock<mutex> lock(signal_->startMutex_);
+            signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+        }
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_OGG_FILE_SOURCE_PATH[i][0] << endl;
@@ -592,10 +592,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_04, TestSize.Leve
         EXPECT_NE(nullptr, outputLoop_);
 
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-        
-        unique_lock<mutex> lock(signal_->startMutex_);
-        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
-
+        {
+            unique_lock<mutex> lock(signal_->startMutex_);
+            signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+        }
         EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
         result = std::filesystem::file_size(OUTPUT_PCM_FILE_PATH) < 20;
         EXPECT_EQ(result, false) << "error occur, decode fail" << INPUT_AAC_FILE_SOURCE_PATH[i][0] << endl;
