@@ -414,6 +414,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
     int flags = g_seekModeToFFmpegSeekFlags.at(mode);
     if (selectedTrackIds_.empty()) {
         AVCODEC_LOGW("no track has been selected");
+        return AVCS_ERR_INVALID_OPERATION;
     }
     for (size_t i = 0; i < selectedTrackIds_.size(); i++) {
         int trackIndex = static_cast<int>(selectedTrackIds_[i]);
@@ -421,7 +422,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
         int64_t ffTime = ConvertTimeToFFmpeg(millisecond*1000*1000, avStream->time_base);
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             if (ffTime > avStream->duration) {
-                AVCODEC_LOGE("ERROR: Seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
+                AVCODEC_LOGE("seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
                              ffTime, avStream->duration);
                 return AVCS_ERR_INVALID_OPERATION;
             }
