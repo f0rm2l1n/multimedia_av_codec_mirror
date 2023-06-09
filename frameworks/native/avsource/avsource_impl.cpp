@@ -59,7 +59,8 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
         "Create source with fd failed because input size must be greater than zero");
     int32_t flag = fcntl(fd, F_GETFL, 0);
     CHECK_AND_RETURN_RET_LOG(flag >= 0, nullptr, "get fd status failed");
-    CHECK_AND_RETURN_RET_LOG((static_cast<uint32_t>(flag) & static_cast<uint32_t>(O_RDONLY)) == 0,
+    CHECK_AND_RETURN_RET_LOG((
+        static_cast<uint32_t>(flag) & static_cast<uint32_t>(O_WRONLY)) != static_cast<uint32_t>(O_WRONLY),
         nullptr, "the fd not be permitted to read ");
     CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "The fd is not seekable");
     std::shared_ptr<AVSourceImpl> sourceImpl = std::make_shared<AVSourceImpl>();
