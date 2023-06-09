@@ -116,7 +116,7 @@
    int32_t w = 0;
    int32_t h = 0;
    int32_t trackType;
-   for (uint32_t index=0; index<(static_cast<uint32_t>(trackCount)); index++) {
+   for (uint32_t index = 0; index < (static_cast<uint32_t>(trackCount)); index++) {
       // 获取轨道信息
       OH_AVFormat *trackFormat = OH_AVSource_GetTrackFormat(source, index);
       OH_AVFormat_GetIntValue(trackFormat, OH_MD_KEY_TRACK_TYPE, &trackType);
@@ -174,7 +174,7 @@
       // 获取音频帧数据
       if(!audioIsEnd) {
          ret = OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info);
-         if (ret==AV_ERR_OK) {
+         if (ret == AV_ERR_OK) {
             // 可通过 buffer 获取并处理音频帧数据
             printf("audio info.size: %d\n", info.size);
             if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
@@ -184,7 +184,7 @@
       }
       if(!videoIsEnd) {
          ret = OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info);
-         if (ret==AV_ERR_OK) {
+         if (ret == AV_ERR_OK) {
             // 可通过 buffer 获取并处理视频帧数据
             printf("video info.size: %d\n", info.size);
             if (info.flags == OH_AVCodecBufferFlags::AVCODEC_BUFFER_FLAGS_EOS) {
