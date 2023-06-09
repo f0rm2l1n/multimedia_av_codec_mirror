@@ -34,6 +34,7 @@ protected:
     void CheckAVDecMpeg2Video(const std::shared_ptr<VideoCaps> &videoCaps) const;
     void CheckAVDecMpeg4(const std::shared_ptr<VideoCaps> &videoCaps) const;
     void CheckAVDecAVC(const std::shared_ptr<VideoCaps> &videoCaps) const;
+    void CheckAVEncAVC(const std::shared_ptr<VideoCaps> &videoCaps) const;
     void CheckAVEncMpeg4(const std::shared_ptr<VideoCaps> &videoCaps) const;
     void CheckVideoCaps(const std::shared_ptr<VideoCaps> &videoCaps) const;
     void CheckVideoCapsArray(const std::vector<std::shared_ptr<VideoCaps>> &videoCapsArray) const;
@@ -60,6 +61,7 @@ protected:
     std::string frameRateKey_;
     std::string channelCountKey_;
     std::string sampleRateKey_;
+    bool isHardIncluded_ = false;
 };
 } // namespace Media
 } // namespace OHOS

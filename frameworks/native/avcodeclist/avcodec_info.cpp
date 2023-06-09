@@ -157,7 +157,7 @@ bool VideoCaps::IsSizeSupported(int32_t width, int32_t height)
 
 Range VideoCaps::GetVideoWidthRangeForHeight(int32_t height)
 {
-    if (height <= 0) {
+    if (height < data_->height.minVal || height > data_->height.maxVal) {
         return Range(0, 0);
     }
     Range ret = data_->width;
@@ -173,7 +173,7 @@ Range VideoCaps::GetVideoWidthRangeForHeight(int32_t height)
 
 Range VideoCaps::GetVideoHeightRangeForWidth(int32_t width)
 {
-    if (width <= 0) {
+    if (width < data_->width.minVal || width > data_->width.maxVal) {
         return Range(0, 0);
     }
     Range ret = data_->height;

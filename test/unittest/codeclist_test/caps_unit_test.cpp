@@ -43,6 +43,11 @@ void CapsUnitTest::SetUp(void)
     frameRateKey_ = MediaDescriptionKey::MD_KEY_FRAME_RATE;
     channelCountKey_ = MediaDescriptionKey::MD_KEY_CHANNEL_COUNT;
     sampleRateKey_ = MediaDescriptionKey::MD_KEY_SAMPLE_RATE;
+    CapabilityData *capabilityData =
+        avCodecList_->GetCapability(DEFAULT_VIDEO_MIME, false, AVCodecCategory::AVCODEC_NONE);
+    if (capabilityData != nullptr && capabilityData->isVendor) {
+        isHardIncluded_ = true;
+    }
 }
 
 void CapsUnitTest::TearDown(void) {}
@@ -61,9 +66,11 @@ std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoDecoderCaps()
 std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoEncoderCaps()
 {
     std::vector<std::shared_ptr<VideoCaps>> ret;
-    for (auto it : videoEncoderList) {
-        auto capabilityCapi = OH_AVCodec_GetCapability(it.c_str(), true);
-        ret.push_back(std::make_shared<VideoCaps>(capabilityCapi->capabilityData_));
+    if (isHardIncluded_) {
+        for (auto it : videoEncoderList) {
+            auto capabilityCapi = OH_AVCodec_GetCapability(it.c_str(), true);
+            ret.push_back(std::make_shared<VideoCaps>(capabilityCapi->capabilityData_));
+        }
     }
     return ret;
 }
@@ -103,9 +110,11 @@ std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoDecoderCaps()
 std::vector<std::shared_ptr<VideoCaps>> CapsUnitTest::GetVideoEncoderCaps()
 {
     std::vector<std::shared_ptr<VideoCaps>> ret;
-    for (auto it : videoEncoderList) {
-        CapabilityData *capabilityData = avCodecList_->GetCapability(it, true, AVCodecCategory::AVCODEC_NONE);
-        ret.push_back(std::make_shared<VideoCaps>(capabilityData));
+    if (isHardIncluded_) {
+        for (auto it : videoEncoderList) {
+            CapabilityData *capabilityData = avCodecList_->GetCapability(it, true, AVCodecCategory::AVCODEC_NONE);
+            ret.push_back(std::make_shared<VideoCaps>(capabilityData));
+        }
     }
     return ret;
 }
@@ -150,18 +159,10 @@ void CapsUnitTest::CheckVideoCaps(const std::shared_ptr<VideoCaps> &videoCaps) c
     std::string codecName = videoCodecCaps->GetName();
     EXPECT_NE("", codecName);
     cout << "video codecName is : " << codecName << endl;
-    if (codecName.compare("avdec_h264") == 0) {
-        CheckAVDecH264(videoCaps);
-    } else if (codecName.compare("avdec_h263") == 0) {
-        CheckAVDecH263(videoCaps);
-    } else if (codecName.compare("avdec_mpeg2video") == 0) {
-        CheckAVDecMpeg2Video(videoCaps);
-    } else if (codecName.compare("avdec_mpeg4") == 0) {
-        CheckAVDecMpeg4(videoCaps);
-    } else if (codecName.compare("OH.Media.Codec.Decoder.Video.AVC") == 0) {
+    if (codecName.compare(AVCodecCodecName::VIDEO_DECODER_AVC_NAME) == 0) {
         CheckAVDecAVC(videoCaps);
-    } else if (codecName.compare("avenc_mpeg4") == 0) {
-        CheckAVEncMpeg4(videoCaps);
+    } else if (codecName.compare("OMX.hisi.video.encoder.avc") == 0) {
+        CheckAVEncAVC(videoCaps);
     }
 }
 
@@ -335,6 +336,40 @@ void CapsUnitTest::CheckAVDecAVC(const std::shared_ptr<VideoCaps> &videoCaps) co
                                                        videoCaps->GetSupportedFrameRate().maxVal + 1));
 }
 
+void CapsUnitTest::CheckAVEncAVC(const std::shared_ptr<VideoCaps> &videoCaps) const
+{
+    std::shared_ptr<AVCodecInfo> videoCodecCaps = videoCaps->GetCodecInfo();
+    EXPECT_EQ(AVCODEC_TYPE_VIDEO_ENCODER, videoCodecCaps->GetType());
+    EXPECT_EQ(CodecMimeType::VIDEO_AVC, videoCodecCaps->GetMimeType());
+    EXPECT_EQ(1, videoCodecCaps->IsHardwareAccelerated());
+    EXPECT_EQ(0, videoCodecCaps->IsSoftwareOnly());
+    EXPECT_EQ(1, videoCodecCaps->IsVendor());
+    EXPECT_EQ(DEFAULT_BITRATE_RANGE_ENC.minVal, videoCaps->GetSupportedBitrate().minVal);
+    EXPECT_EQ(DEFAULT_BITRATE_RANGE_ENC.maxVal, videoCaps->GetSupportedBitrate().maxVal);
+    EXPECT_EQ(DEFAULT_ALIGNMENT_ENC, videoCaps->GetSupportedWidthAlignment());
+    EXPECT_EQ(DEFAULT_ALIGNMENT_ENC, videoCaps->GetSupportedHeightAlignment());
+    EXPECT_EQ(DEFAULT_WIDTH_RANGE_ENC.minVal, videoCaps->GetSupportedWidth().minVal);
+    EXPECT_EQ(DEFAULT_WIDTH_RANGE_ENC.maxVal, videoCaps->GetSupportedWidth().maxVal);
+    EXPECT_EQ(DEFAULT_HEIGHT_RANGE_ENC.minVal, videoCaps->GetSupportedHeight().minVal);
+    EXPECT_EQ(DEFAULT_HEIGHT_RANGE_ENC.maxVal, videoCaps->GetSupportedHeight().maxVal);
+    EXPECT_EQ(1, videoCaps->GetSupportedFrameRate().minVal);
+    EXPECT_EQ(DEFAULT_FRAMERATE_RANGE.maxVal, videoCaps->GetSupportedFrameRate().maxVal);
+    EXPECT_EQ(0, videoCaps->GetSupportedEncodeQuality().minVal);
+    EXPECT_EQ(0, videoCaps->GetSupportedEncodeQuality().maxVal);
+    EXPECT_EQ(0, videoCaps->GetSupportedQuality().minVal);
+    EXPECT_EQ(0, videoCaps->GetSupportedQuality().maxVal);
+    EXPECT_EQ(0, videoCaps->GetSupportedComplexity().minVal);
+    EXPECT_EQ(0, videoCaps->GetSupportedComplexity().maxVal);
+    EXPECT_EQ(0, videoCaps->GetSupportedFormats().size());
+    EXPECT_EQ(0, videoCaps->GetSupportedProfiles().size());
+    EXPECT_EQ(DEFAULT_BITRATEMODE_ENC, videoCaps->GetSupportedBitrateMode().size());
+    EXPECT_EQ(0, videoCaps->GetSupportedLevels().size());
+    EXPECT_EQ(false, videoCaps->IsSupportDynamicIframe());
+    EXPECT_EQ(false, videoCaps->IsSizeAndRateSupported(videoCaps->GetSupportedWidth().minVal,
+                                                       videoCaps->GetSupportedHeight().maxVal,
+                                                       videoCaps->GetSupportedFrameRate().maxVal + 1));
+}
+
 void CapsUnitTest::CheckAVEncMpeg4(const std::shared_ptr<VideoCaps> &videoCaps) const
 {
     std::shared_ptr<AVCodecInfo> videoCodecCaps = videoCaps->GetCodecInfo();
@@ -385,20 +420,16 @@ void CapsUnitTest::CheckAudioCaps(const std::shared_ptr<AudioCaps> &audioCaps) c
     std::string codecName = audioCodecCaps->GetName();
     EXPECT_NE("", codecName);
     cout << "audio codecName is : " << codecName << endl;
-    if (codecName.compare("avdec_mp3") == 0) {
+    if (codecName.compare(AVCodecCodecName::AUDIO_DECODER_MP3_NAME) == 0) {
         CheckAVDecMP3(audioCaps);
-    } else if (codecName.compare("avdec_aac") == 0) {
+    } else if (codecName.compare(AVCodecCodecName::AUDIO_DECODER_AAC_NAME) == 0) {
         CheckAVDecAAC(audioCaps);
-    } else if (codecName.compare("avdec_vorbis") == 0) {
+    } else if (codecName.compare(AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME) == 0) {
         CheckAVDecVorbis(audioCaps);
-    } else if (codecName.compare("avdec_flac") == 0) {
+    } else if (codecName.compare(AVCodecCodecName::AUDIO_DECODER_FLAC_NAME) == 0) {
         CheckAVDecFlac(audioCaps);
-    } else if (codecName.compare("avdec_opus") == 0) {
-        CheckAVDecOpus(audioCaps);
-    } else if (codecName.compare("avenc_aac") == 0) {
+    } else if (codecName.compare(AVCodecCodecName::AUDIO_ENCODER_AAC_NAME) == 0) {
         CheckAVEncAAC(audioCaps);
-    } else if (codecName.compare("avenc_opus") == 0) {
-        CheckAVEncOpus(audioCaps);
     }
 }
 
@@ -410,10 +441,10 @@ void CapsUnitTest::CheckAVDecMP3(const std::shared_ptr<AudioCaps> &audioCaps) co
     EXPECT_EQ(0, audioCodecCaps->IsHardwareAccelerated());
     EXPECT_EQ(1, audioCodecCaps->IsSoftwareOnly());
     EXPECT_EQ(0, audioCodecCaps->IsVendor());
-    EXPECT_EQ(1, audioCaps->GetSupportedBitrate().minVal);
+    EXPECT_EQ(MIN_AUDIO_BITRATE, audioCaps->GetSupportedBitrate().minVal);
     EXPECT_EQ(MAX_AUDIO_BITRATE, audioCaps->GetSupportedBitrate().maxVal); // 320000: max supported bitrate
     EXPECT_EQ(1, audioCaps->GetSupportedChannel().minVal);
-    EXPECT_EQ(MAX_CHANNEL_COUNT, audioCaps->GetSupportedChannel().maxVal);
+    EXPECT_EQ(MAX_CHANNEL_COUNT_MP3, audioCaps->GetSupportedChannel().maxVal);
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().minVal);
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().maxVal);
     EXPECT_EQ(0, audioCaps->GetSupportedFormats().size());
@@ -433,7 +464,7 @@ void CapsUnitTest::CheckAVDecAAC(const std::shared_ptr<AudioCaps> &audioCaps) co
     EXPECT_EQ(8000, audioCaps->GetSupportedBitrate().minVal);   // 8000: min supported bitrate
     EXPECT_EQ(960000, audioCaps->GetSupportedBitrate().maxVal); // 960000: max supported bitrate
     EXPECT_EQ(1, audioCaps->GetSupportedChannel().minVal);
-    EXPECT_EQ(8, audioCaps->GetSupportedChannel().maxVal);      // 8: max channal count
+    EXPECT_EQ(MAX_CHANNEL_COUNT, audioCaps->GetSupportedChannel().maxVal);      // 8: max channal count
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().minVal);
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().maxVal);
     EXPECT_EQ(0, audioCaps->GetSupportedFormats().size());
@@ -453,7 +484,7 @@ void CapsUnitTest::CheckAVDecVorbis(const std::shared_ptr<AudioCaps> &audioCaps)
     EXPECT_EQ(32000, audioCaps->GetSupportedBitrate().minVal);  // 32000: min supported bitrate
     EXPECT_EQ(500000, audioCaps->GetSupportedBitrate().maxVal); // 500000: max supported bitrate
     EXPECT_EQ(1, audioCaps->GetSupportedChannel().minVal);
-    EXPECT_EQ(8, audioCaps->GetSupportedChannel().maxVal);      // 8: max channal count
+    EXPECT_EQ(MAX_CHANNEL_COUNT, audioCaps->GetSupportedChannel().maxVal);      // 8: max channal count
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().minVal);
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().maxVal);
     EXPECT_EQ(0, audioCaps->GetSupportedFormats().size());
@@ -473,7 +504,7 @@ void CapsUnitTest::CheckAVDecFlac(const std::shared_ptr<AudioCaps> &audioCaps) c
     EXPECT_EQ(1, audioCaps->GetSupportedBitrate().minVal);
     EXPECT_EQ(2100000, audioCaps->GetSupportedBitrate().maxVal); // 2100000: max supported bitrate
     EXPECT_EQ(1, audioCaps->GetSupportedChannel().minVal);
-    EXPECT_EQ(8, audioCaps->GetSupportedChannel().maxVal);       // 8: max channal count
+    EXPECT_EQ(MAX_CHANNEL_COUNT, audioCaps->GetSupportedChannel().maxVal);       // 8: max channal count
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().minVal);
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().maxVal);
     EXPECT_EQ(0, audioCaps->GetSupportedFormats().size());
@@ -511,13 +542,13 @@ void CapsUnitTest::CheckAVEncAAC(const std::shared_ptr<AudioCaps> &audioCaps) co
     EXPECT_EQ(1, audioCodecCaps->IsSoftwareOnly());
     EXPECT_EQ(0, audioCodecCaps->IsVendor());
     EXPECT_EQ(8000, audioCaps->GetSupportedBitrate().minVal); // 8000: supported min bitrate
-    EXPECT_EQ(MAX_AUDIO_BITRATE, audioCaps->GetSupportedBitrate().maxVal);
+    EXPECT_EQ(MAX_AUDIO_BITRATE_AAC, audioCaps->GetSupportedBitrate().maxVal);
     EXPECT_EQ(1, audioCaps->GetSupportedChannel().minVal);
     EXPECT_EQ(MAX_CHANNEL_COUNT, audioCaps->GetSupportedChannel().maxVal);
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().minVal);
     EXPECT_EQ(0, audioCaps->GetSupportedComplexity().maxVal);
-    EXPECT_EQ(1, audioCaps->GetSupportedFormats().size());
-    EXPECT_EQ(11, audioCaps->GetSupportedSampleRates().size()); // 11: supported samplerate count
+    EXPECT_EQ(0, audioCaps->GetSupportedFormats().size());
+    EXPECT_EQ(DEFAULT_SAMPLE_RATE_SIZE, audioCaps->GetSupportedSampleRates().size()); // 11: supported samplerate count
     EXPECT_EQ(0, audioCaps->GetSupportedProfiles().size());
     EXPECT_EQ(0, audioCaps->GetSupportedLevels().size());
 }
@@ -608,7 +639,13 @@ HWTEST_F(CapsUnitTest, AVCaps_GetSupportedFrameRatesFor_001, TestSize.Level1)
         std::shared_ptr<VideoCaps> pVideoCaps = *iter;
         ret = (*iter)->GetSupportedFrameRatesFor(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         EXPECT_GE(ret.minVal, 0);
-        EXPECT_LE(ret.maxVal, 120); // 120: max framerate for video decoder
+        int32_t maxVal;
+        if (isHardIncluded_) {
+            maxVal = 240;
+        } else {
+            maxVal = 120;
+        }
+        EXPECT_LE(ret.maxVal, maxVal); // 120: max framerate for video decoder
     }
     std::vector<std::shared_ptr<VideoCaps>> videoEncoderArray = GetVideoEncoderCaps();
     for (auto iter = videoEncoderArray.begin(); iter != videoEncoderArray.end(); iter++) {
