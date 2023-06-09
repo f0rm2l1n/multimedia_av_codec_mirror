@@ -161,14 +161,19 @@
    ``` c
    // 创建 buffer，用与保存用户解封装得到的数据
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
+   if (buffer == nullptr) {
+      printf("buffer set error");
+      return;
+   }
    OH_AVCodecBufferAttr info;
    bool videoIsEnd = false;
    bool audioIsEnd = false;
+   int32_t ret;
    while (!audioIsEnd||!videoIsEnd) {
       // 在调用 OH_AVDemuxer_ReadSample 接口获取数据前，需要先调用 OH_AVDemuxer_SelectTrackByID 选中需要获取数据的轨道
       // 获取音频帧数据
       if(!audioIsEnd) {
-         int32_t ret = OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info);
+         ret = OH_AVDemuxer_ReadSample(demuxer, audioTrackIndex, buffer, &info);
          if (ret==AV_ERR_OK) {
             // 可通过 buffer 获取并处理音频帧数据
             printf("audio info.size: %d\n", info.size);
@@ -178,7 +183,7 @@
          }
       }
       if(!videoIsEnd) {
-         int32_t ret = OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info);
+         ret = OH_AVDemuxer_ReadSample(demuxer, videoTrackIndex, buffer, &info);
          if (ret==AV_ERR_OK) {
             // 可通过 buffer 获取并处理视频帧数据
             printf("video info.size: %d\n", info.size);
