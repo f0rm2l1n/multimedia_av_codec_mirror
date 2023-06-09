@@ -355,12 +355,12 @@ int32_t Source::GetTrackFormat(Format &format, uint32_t trackIndex)
     return AVCS_ERR_OK;
 }
 
-int32_t Source::Create(std::string& uri)
+int32_t Source::Init(std::string& uri)
 {
-    AVCODEC_LOGI("Source::Create is called");
+    AVCODEC_LOGI("Source::Init is called");
     int32_t ret = LoadDynamicPlugin(uri);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                             "create source failed when load source plugin!");
+                             "init source failed when load source plugin!");
     std::shared_ptr<MediaSource> mediaSource = std::make_shared<MediaSource>(uri);
     AVCODEC_LOGD("mediaSource Init: %{private}s", mediaSource->GetSourceUri().c_str());
     if (sourcePlugin_ == nullptr) {
@@ -372,23 +372,23 @@ int32_t Source::Create(std::string& uri)
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
 
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                             "create source failed when set data source for plugin!");
+                             "init source failed when set data source for plugin!");
     ret = LoadInputFormatList();
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                             "create source failed when load demuxerlist!");
+                             "init source failed when load demuxerlist!");
     ret = SniffInputFormat(uri);
     if (ret != AVCS_ERR_OK) {
         FaultEventWrite(FaultType::FAULT_TYPE_INNER_ERROR, "Sniff failed", "Source");
     }
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                             "create source failed when find input format!");
+                             "init source failed when find input format!");
     CHECK_AND_RETURN_RET_LOG(inputFormat_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                             "create source failed when find input format, cannnot match any input format!");
+                             "init source failed when find input format, cannnot match any input format!");
     ret = InitAVFormatContext();
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                             "create source failed when parse source info!");
+                             "init source failed when parse source info!");
     CHECK_AND_RETURN_RET_LOG(formatContext_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
-                             "create source failed when init AVFormatContext!");
+                             "init source failed when init AVFormatContext!");
     return AVCS_ERR_OK;
 }
 

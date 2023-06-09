@@ -56,9 +56,7 @@ int32_t AVDemuxerImpl::Init(AVSource &source)
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK,
         AVCS_ERR_CREATE_DEMUXER_SUB_SERVICE_FAILED, "Get source address failed when create demuxer service");
     sourceUri_ = source.sourceUri;
-    CHECK_AND_RETURN_RET_LOG(demuxerClient_ != nullptr, AVCS_ERR_INVALID_OPERATION,
-        "demuxer service died when load add sourceTrack!");
-    
+
     return demuxerClient_->Init(sourceAddr);
 }
 

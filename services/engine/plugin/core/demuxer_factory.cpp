@@ -137,15 +137,12 @@ bool DemuxerFactory::RegisterData::IsPluginExist(const std::string& name)
 Status DemuxerFactory::RegisterImpl::AddPlugin(const PluginDefBase& def)
 {
     if (!Verification(def)) {
-        // 插件定义参数校验不合法
         return Status::ERROR_INVALID_DATA;
     }
     if (!VersionMatched(def)) {
-        // 版本不匹配，不给注册
         return Status::ERROR_UNKNOWN;
     }
     if (registerData->IsPluginExist(def.name)) {
-        // 重复注册，且有更合适的版本存在
         return Status::ERROR_PLUGIN_ALREADY_EXISTS;
     }
     auto& pluginDef = (DemuxerPluginDef&)def;

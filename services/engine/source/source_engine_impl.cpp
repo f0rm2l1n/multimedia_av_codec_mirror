@@ -38,13 +38,13 @@ std::shared_ptr<ISourceEngine> ISourceEngineFactory::CreateSourceEngine(int32_t 
     return sourceEngineImpl;
 }
 
-int32_t SourceEngineImpl::Create()
+int32_t SourceEngineImpl::Init()
 {
-    AVCodecTrace trace("SourceEngineImpl::Create");
-    AVCODEC_LOGI("Create");
+    AVCodecTrace trace("SourceEngineImpl::Init");
+    AVCODEC_LOGI("Init");
     std::unique_lock<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED, "source_ is nullptr");
-    return source_->Create(uri_);
+    return source_->Init(uri_);
 }
 
 SourceEngineImpl::SourceEngineImpl(int32_t appUid, int32_t appPid, const std::string& uri)
