@@ -5,7 +5,7 @@
 目前系统API支持的数据输入类型如下：
 
 - 远程连接(http协议)
-- 文件描述符
+- 文件描述符(fd)
 
 目前系统API支持的解封装格式如下：
 
@@ -61,7 +61,7 @@
 
 1. 创建解封装器实例对象
 
-   ``` c
+   ``` c++
    // 以只读方式创建文件操作符 fd，打开时对文件句柄必须有读权限
    std::string fileName = "/data/test/media/test.mp4";
    int32_t fd = open(fileName.c_str(), O_RDONLY);
@@ -80,7 +80,7 @@
       printf("create source error: fd=%d, size=%zu", fd, fileSize);
       return;
    }
-   // 为 uri 资源文件创建 source 资源对象
+   // 为 uri 资源文件创建 source 资源对象(可选)
    // OH_AVSource *source = OH_AVSource_CreateWithURI(uri);
    // 为资源对象创建对应的解封装器
    OH_AVDemuxer *demuxer = OH_AVDemuxer_CreateWithSource(source);
@@ -94,7 +94,7 @@
 
 2. 获取文件轨道数（可选，若用户已知轨道信息，可跳过此步）
 
-   ``` c
+   ``` c++
    // 从文件 source 信息获取文件轨道数
    OH_AVFormat *sourceFormat = OH_AVSource_GetSourceFormat(source);
    int32_t trackCount = 0;
@@ -106,7 +106,7 @@
 
 3. 获取轨道index及信息（可选，若用户已知轨道信息，可跳过此步）
 
-   ``` c
+   ``` c++
    uint32_t audioTrackIndex = 0;
    uint32_t videoTrackIndex = 0;
    int32_t w = 0;
@@ -130,7 +130,7 @@
 
 4. 添加解封装轨道
 
-   ``` c
+   ``` c++
    if(OH_AVDemuxer_SelectTrackByID(demuxer, audioTrackIndex) != AV_ERR_OK){
       printf("select audio track error:%d", audioTrackIndex);
       return;
@@ -147,14 +147,14 @@
 
 5. 调整轨道到指定时间点(可选)
 
-   ``` c
+   ``` c++
    // 调整轨道到指定时间点，后续从该时间点进行解封装
    OH_AVDemuxer_SeekToTime(demuxer, 0, OH_AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
    ```
 
 6. 开始解封装，循环获取帧数据(以含音频、视频两轨的文件为例)
 
-   ``` c
+   ``` c++
    // 创建 buffer，用与保存用户解封装得到的数据
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
    if (buffer == nullptr) {
@@ -196,7 +196,7 @@
 
 7. 销毁解封装实例
 
-   ``` c
+   ``` c++
    // 需要用户调用 OH_AVSource_Destroy 接口成功后，手动将对象置为 NULL，对同一对象重复调用 OH_AVSource_Destroy 会导致程序错误
    if (OH_AVSource_Destroy(source) != AV_ERR_OK) {
       printf("destroy source pointer error");
