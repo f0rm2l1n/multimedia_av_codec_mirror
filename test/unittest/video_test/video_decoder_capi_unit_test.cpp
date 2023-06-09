@@ -83,8 +83,8 @@ const uint32_t ES_H264[] = { // H264_FRAME_SIZE_240
     305,  198,   166,  3641, 297,   172,  148,  3608,  301,  200,  159,  3693, 322,  209,  166,  3453, 318,  206,  162,
     3696, 341,   200,  176,  3386,  320,  192,  176,   3903, 373,  207,  187,  3305, 361,  200,  202,  3110, 367,  220,
     197,  2357,  332,  196,  201,   1827, 377,  187,   199,  860,  472,  173,  223,  238};
-const uint32_t FC_H264[] = {139107, 1114, 474, 253, 282, 146, 197, 90, 108, 3214, 301, 77, 51, 43, 234, 210, 143, 108,
-                            139107, 1114, 474, 253, 282, 146, 197, 90, 108};
+const uint32_t FC_H264[] = {139107, 1114, 474, 253, 282,    146,  197, 90,  108, 3214, 301, 77, 51, 43,
+                            234,    210,  143, 108, 139107, 1114, 474, 253, 282, 146,  197, 90, 108};
 constexpr uint32_t ES_LENGTH_H264 = sizeof(ES_H264) / sizeof(uint32_t);
 constexpr uint32_t FC_LENGTH_H264 = sizeof(FC_H264) / sizeof(uint32_t);
 constexpr uint32_t DEFAULT_WIDTH = 320;
@@ -219,7 +219,6 @@ protected:
     std::unique_ptr<std::ofstream> outFile_;
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
-    int32_t index_;
 
     struct OH_AVCodecAsyncCallback cb_;
     std::shared_ptr<VDecSignal> signal_ = nullptr;
@@ -410,9 +409,15 @@ int32_t VideoCodeCapiDecoderUnitTest::ProceFunc(void)
     return AVCS_ERR_OK;
 }
 
-HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Create, TestSize.Level1)
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Create_01, TestSize.Level1)
 {
     videoDec_ = OH_VideoDecoder_CreateByName("");
+    EXPECT_EQ(nullptr, videoDec_);
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_Create_02, TestSize.Level1)
+{
+    videoDec_ = OH_VideoDecoder_CreateByName("h266");
     EXPECT_EQ(nullptr, videoDec_);
 }
 
@@ -927,6 +932,102 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_statuscase_02, TestSize.Leve
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Flush(videoDec_));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_setcallback_01, TestSize.Level1)
+{
+    videoDec_ = OH_VideoDecoder_CreateByName((AVCodecCodecName::VIDEO_DECODER_AVC_NAME).data());
+    EXPECT_NE(nullptr, videoDec_);
+    cb_ = {nullptr, nullptr, nullptr, nullptr};
+    signal_ = make_shared<VDecSignal>();
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_SetCallback(videoDec_, cb_, signal_.get()));
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_pushInputData_01, TestSize.Level1)
+{
+    OH_AVCodecBufferAttr info = {0, 0, 0, AVCODEC_BUFFER_FLAGS_EOS};
+    int32_t bufferSize = 13571;
+    testFile_ = std::make_unique<std::ifstream>();
+    UNITTEST_CHECK_AND_RETURN_LOG(testFile_ != nullptr, "Fatal: No memory");
+
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+
+    isRunning_.store(true);
+    testFile_->open(inputFilePath, std::ios::in | std::ios::binary);
+    unique_lock<mutex> lock(signal_->inMutex_);
+    signal_->inCond_.wait(lock, [this]() { return (signal_->inQueue_.size() > 0 || !isRunning_.load()); });
+    uint32_t index = signal_->inQueue_.front();
+    auto buffer = signal_->inBufferQueue_.front();
+    info.size = bufferSize;
+    char *fileBuffer = static_cast<char *>(malloc(sizeof(char) * info.size + 1));
+    (void)testFile_->read(fileBuffer, info.size);
+    memcpy_s(OH_AVMemory_GetAddr(buffer), OH_AVMemory_GetSize(buffer), fileBuffer, info.size);
+    free(fileBuffer);
+    info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_PushInputData(videoDec_, index, info));
+    signal_->inQueue_.pop();
+    signal_->inBufferQueue_.pop();
+
+    index = signal_->inQueue_.front();
+    buffer = signal_->inBufferQueue_.front();
+    info.size = 0;
+    info.flags = AVCODEC_BUFFER_FLAGS_EOS;
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_PushInputData(videoDec_, index, info));
+    testFile_->close();
+    isRunning_.store(false);
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_pushInputData_02, TestSize.Level1)
+{
+    OH_AVCodecBufferAttr info = {0, 0, 0, AVCODEC_BUFFER_FLAGS_EOS};
+    int32_t bufferSize = 13571;
+    testFile_ = std::make_unique<std::ifstream>();
+    UNITTEST_CHECK_AND_RETURN_LOG(testFile_ != nullptr, "Fatal: No memory");
+
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+
+    isRunning_.store(true);
+    testFile_->open(inputFilePath, std::ios::in | std::ios::binary);
+    unique_lock<mutex> lock(signal_->inMutex_);
+    signal_->inCond_.wait(lock, [this]() { return (signal_->inQueue_.size() > 0 || !isRunning_.load()); });
+    uint32_t index = 1024;
+    auto buffer = signal_->inBufferQueue_.front();
+    info.size = bufferSize;
+    char *fileBuffer = static_cast<char *>(malloc(sizeof(char) * info.size + 1));
+    (void)testFile_->read(fileBuffer, info.size);
+    memcpy_s(OH_AVMemory_GetAddr(buffer), OH_AVMemory_GetSize(buffer), fileBuffer, info.size);
+    free(fileBuffer);
+    info.flags = AVCODEC_BUFFER_FLAGS_CODEC_DATA;
+    EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_PushInputData(videoDec_, index, info));
+    signal_->inQueue_.pop();
+    signal_->inBufferQueue_.pop();
+
+    testFile_->close();
+    isRunning_.store(false);
+}
+
+HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_getOutputBuffer_01, TestSize.Level1)
+{
+    ProceFunc();
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_WIDTH, DEFAULT_WIDTH);
+    OH_AVFormat_SetIntValue(format_, OH_MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Configure(videoDec_, format_));
+    EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_VideoDecoder_Start(videoDec_));
+    EXPECT_NE(AV_ERR_OK, OH_VideoDecoder_FreeOutputData(videoDec_, 0));
+    EXPECT_NE(AV_ERR_OK, OH_VideoDecoder_FreeOutputData(videoDec_, -1));
+    EXPECT_NE(AV_ERR_OK, OH_VideoDecoder_FreeOutputData(videoDec_, 1024));
+    surface_ = GetSurface();
+    EXPECT_NE(AV_ERR_OK, OH_VideoDecoder_RenderOutputData(videoDec_, 0));
+    EXPECT_NE(AV_ERR_OK, OH_VideoDecoder_RenderOutputData(videoDec_, -1));
+    EXPECT_NE(AV_ERR_OK, OH_VideoDecoder_RenderOutputData(videoDec_, 1024));
 }
 } // namespace VCodecUT
 } // namespace Media
