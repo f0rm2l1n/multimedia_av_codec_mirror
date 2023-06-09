@@ -74,7 +74,7 @@ int32_t AVDemuxerDemo::PrintInfo(int32_t tracks)
 {
     for (int32_t i = 0; i < tracks; i++) {
         printf("streams[%d]==>total frames=%" PRId64 ",KeyFrames=%" PRId64 "\n", i,
-            frames_[i], key_frames_[i]);
+            frames_[i] + key_frames_[i], key_frames_[i]);
     }
     return 0;
 }
@@ -88,33 +88,43 @@ int32_t AVDemuxerDemo::ReadSample(uint32_t trackIndex, OH_AVMemory *sample, OH_A
     return ret;
 }
 
+bool AVDemuxerDemo::isEOS(std::map<uint32_t, bool>& countFlag)
+{
+    for (auto iter = countFlag.begin(); iter != countFlag.end(); ++iter) {
+        if (!iter->second) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int32_t AVDemuxerDemo::ReadAllSamples(OH_AVMemory *sample, int32_t tracks)
 {
     int32_t ret = -1;
-    bool isEnd = false;
+    std::map<uint32_t, bool> eosFlag;
     for (int i = 0; i < tracks; i++) {
         frames_[i] = 0;
         key_frames_[i] = 0;
+        eosFlag[i] = false;
     }
-    while (!isEnd) {
+    while (!isEOS(eosFlag)) {
         for (int32_t i = 0; i < tracks; i++) {
             ret = ReadSample(i, sample, &bufferInfo);
-            if (ret != 0) {
-                printf("read finished\n");
-                PrintInfo(tracks);
-                isEnd = true;
-            }
-            if (bufferInfo.flags == AVCODEC_BUFFER_FLAGS_EOS) {
-                frames_[i]++;
-                printf("streams[%d]==>bufferInfo:pts=%" PRId64 ",size=%d,offset=%d\n",
-                    i, bufferInfo.pts, bufferInfo.size, bufferInfo.offset);
-            }
-            if (bufferInfo.flags == AVCODEC_BUFFER_FLAGS_SYNC_FRAME) {
-                frames_[i]++;
+            if (ret == 0 && bufferInfo.flags == AVCODEC_BUFFER_FLAGS_SYNC_FRAME) {
                 key_frames_[i]++;
+            } else if (ret == 0 && bufferInfo.flags == AVCODEC_BUFFER_FLAGS_NONE) {
+                frames_[i]++;
+            } else if (ret == 0 && bufferInfo.flags == AVCODEC_BUFFER_FLAGS_EOS) {
+                eosFlag[i] = true;
+            } else {
+                printf("the value or flags is error, ret = %d\n", ret);
+                printf("the bufferInfo.flags=%d,bufferInfo.size=%d,bufferInfo.pts=%" PRId64 "\n",
+                bufferInfo.flags, bufferInfo.size, bufferInfo.pts);
+                return ret;
             }
         }
     }
+    PrintInfo(tracks);
     return ret;
 }
 

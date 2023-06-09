@@ -46,6 +46,7 @@ public:
     int32_t SelectTrackByID(uint32_t trackIndex);
     int32_t UnselectTrackByID(uint32_t trackIndex);
     int32_t PrintInfo(int32_t tracks);
+    bool isEOS(std::map<uint32_t, bool>& countFlag);
     int32_t ReadSample(uint32_t trackIndex, OH_AVMemory *sample, OH_AVCodecBufferAttr *bufferAttr);
     int32_t SeekToTime(int64_t millisecond, OH_AVSeekMode mode);
     OH_AVCodecBufferAttr bufferInfo;

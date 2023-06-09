@@ -34,6 +34,7 @@ public:
     int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> mem,
                         AVCodecBufferInfo &bufInfo, AVCodecBufferFlag &bufferFlag);
     int32_t SeekToTime(int64_t millisecond, AVSeekMode mode);
+    bool isEOS(std::map<uint32_t, bool>& countFlag);
     AVCodecBufferInfo sampleInfo;
     std::map<int32_t, int64_t> frames_;
     std::map<int32_t, int64_t> key_frames_;
