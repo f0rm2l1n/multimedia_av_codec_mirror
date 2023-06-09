@@ -1,13 +1,10 @@
-# 音视频解封装能力开发概述
+# 音视频解封装
 
-解封装，简单来说，就是从比特流数据中取出音频、视频等媒体帧数据的过程。
+开发者可以调用本模块的Native API接口，完成音视频解封装，即从比特流数据中取出音频、视频等媒体帧数据。
 
-目前系统API支持的数据输入类型如下：
+当前支持的数据输入类型有：远程连接(http协议)和文件描述符(fd)。
 
-- 远程连接(http协议)
-- 文件描述符(fd)
-
-目前系统API支持的解封装格式如下：
+支持的解封装格式如下：
 
 | 媒体格式  | 封装格式                      |
 | -------- | :----------------------------|
@@ -16,7 +13,7 @@
 
 
 
-**音视频解封装的使用场景**：
+**适用场景**：
 
 - 播放
   
@@ -24,45 +21,25 @@
 
 - 音视频编辑
   
-  编译媒体文件时，需要先对音视频流进行解封装，获取到指定帧进行编辑。
+  编辑媒体文件时，需要先对音视频流进行解封装，获取到指定帧进行编辑。
 
 - 媒体文件格式转换（转封装）
 
   媒体文件格式转换时，需要先对音视频流进行解封装，然后按需将音视频流封装至新的格式文件内。
 
-# 使用avdemuxer开发音视频解封装功能
-
-## 接口说明
-
-**表1 avsource开放能力接口**
-
-| 接口名                                                       | 描述                 |
-| ------------------------------------------------------------ | -------------------- |
-| OH_AVSource *OH_AVSource_CreateWithURI(char *uri);  | 根据 URI 创建 OH_AVSource       |
-| OH_AVSource *OH_AVSource_CreateWithFD(int32_t fd, int64_t offset, int64_t size);   | 根据 FD 创建OH_AVSource       |
-| OH_AVErrCode OH_AVSource_Destroy(OH_AVSource *source);    | 销毁 OH_AVSource       |
-| OH_AVFormat *OH_AVSource_GetSourceFormat(OH_AVSource *source);   | 获取 source 信息       |
-| OH_AVFormat *OH_AVSource_GetTrackFormat(OH_AVSource *source, uint32_t trackIndex);    | 获取 track 信息       |
-
-**表2 avdemuxer开放能力接口**
-| 接口名                                                       | 描述                 |
-| --------------------------------------------------------------- | -------------------- |
-|OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source);    | 根据 source 创建 OH_AVDemuxer       |
-|OH_AVErrCode OH_AVDemuxer_Destroy(OH_AVDemuxer *demuxer);    | 销毁 OH_AVDemuxer       |
-|OH_AVErrCode OH_AVDemuxer_SelectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);    | 选择需要解封装的轨道      |
-|OH_AVErrCode OH_AVDemuxer_UnselectTrackByID(OH_AVDemuxer *demuxer, uint32_t trackIndex);    | 取消选择需要解封装的轨道       |
-|OH_AVErrCode OH_AVDemuxer_ReadSample(OH_AVDemuxer *demuxer, uint32_t trackIndex, OH_AVMemory *sample, OH_AVCodecBufferAttr *info);    | 读取 trackIndex 对应轨道的帧     |
-|OH_AVErrCode OH_AVDemuxer_SeekToTime(OH_AVDemuxer *demuxer, int64_t millisecond, OH_AVSeekMode mode);    | 跳转到指定时间       |
-
-
 ## 开发步骤
+详细的API说明参考[AVDemuxer](../reference/native-apis/_a_v_demuxer.md)和[AVSource](../reference/native-apis/_a_v_source.md)
 
-详细的API说明请参考 avdemuxer native API、avsource native API
+> **说明**
+>
+> - 调用解封装能力解析网络播放路径，需[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.INTERNET
+> - 调用解封装能力解析本地文件，需[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.READ_MEDIA
+> - 如果使用ResourceManager.getRawFd打开HAP资源文件描述符，使用方法请参考[ResourceManager API参考](../reference/apis/js-apis-resource-manager.md#getrawfd9)
 
 1. 创建解封装器实例对象
 
    ``` c++
-   // 以只读方式创建文件操作符 fd，打开时对文件句柄必须有读权限
+   // 创建文件操作符 fd，打开时对文件句柄必须有读权限
    std::string fileName = "/data/test/media/test.mp4";
    int32_t fd = open(fileName.c_str(), O_RDONLY);
    struct stat fileStatus {};
@@ -73,10 +50,9 @@
       printf("get stat failed");
       return;
    }
-   stat(fileName.c_str(), &fileStatus);
    // 为 fd 资源文件创建 source 资源对象, 传入 offset 不为文件起始位置 或 size 不为文件大小时，可能会因不能获取完整数据导致 source 创建失败、或后续解封装失败等问题
    OH_AVSource *source = OH_AVSource_CreateWithFD(fd, 0, fileSize);
-   if(source==nullptr){
+   if (source==nullptr) {
       printf("create source error: fd=%d, size=%zu", fd, fileSize);
       return;
    }
@@ -84,7 +60,7 @@
    // OH_AVSource *source = OH_AVSource_CreateWithURI(uri);
    // 为资源对象创建对应的解封装器
    OH_AVDemuxer *demuxer = OH_AVDemuxer_CreateWithSource(source);
-   if(demuxer==nullptr){
+   if (demuxer == nullptr) {
       printf("create demuxer error");
       return;
    }
@@ -97,6 +73,10 @@
    ``` c++
    // 从文件 source 信息获取文件轨道数
    OH_AVFormat *sourceFormat = OH_AVSource_GetSourceFormat(source);
+   if (sourceFormat == nullptr) {
+      printf("get source format error");
+      return;
+   }
    int32_t trackCount = 0;
    OH_AVFormat_GetIntValue(sourceFormat, OH_MD_KEY_TRACK_COUNT, &trackCount);
    OH_AVFormat_Destroy(sourceFormat);
@@ -115,6 +95,10 @@
    for (uint32_t index = 0; index < (static_cast<uint32_t>(trackCount)); index++) {
       // 获取轨道信息
       OH_AVFormat *trackFormat = OH_AVSource_GetTrackFormat(source, index);
+      if (trackFormat == nullptr) {
+         printf("get track format error");
+         return;
+      }
       OH_AVFormat_GetIntValue(trackFormat, OH_MD_KEY_TRACK_TYPE, &trackType);
       static_cast<OH_MediaType>(trackType) == OH_MediaType::MEDIA_TYPE_AUD ? audioTrackIndex=index : videoTrackIndex=index;
       // 获取视频轨宽高
@@ -158,14 +142,14 @@
    // 创建 buffer，用与保存用户解封装得到的数据
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
    if (buffer == nullptr) {
-      printf("buffer set error");
+      printf("build buffer error");
       return;
    }
    OH_AVCodecBufferAttr info;
    bool videoIsEnd = false;
    bool audioIsEnd = false;
    int32_t ret;
-   while (!audioIsEnd||!videoIsEnd) {
+   while (!audioIsEnd || !videoIsEnd) {
       // 在调用 OH_AVDemuxer_ReadSample 接口获取数据前，需要先调用 OH_AVDemuxer_SelectTrackByID 选中需要获取数据的轨道
       // 获取音频帧数据
       if(!audioIsEnd) {
