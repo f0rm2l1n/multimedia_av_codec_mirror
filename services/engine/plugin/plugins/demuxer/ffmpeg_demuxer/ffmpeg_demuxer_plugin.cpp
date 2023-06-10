@@ -134,7 +134,6 @@ int32_t FFmpegDemuxerPlugin::Create(uintptr_t sourceAddr)
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::Create");
     if (std::is_object<decltype(sourceAddr)>::value) {
-        formatContext_ = std::shared_ptr<AVFormatContext>((AVFormatContext*)sourceAddr);
         // Do not automatically release the source object whose address is sourceAddr when the shared_ptr
         // formatContext_ is released. Because this responsibility belongs to manually calling source deconstruction
         // function. Otherwise, the main service will crash.
