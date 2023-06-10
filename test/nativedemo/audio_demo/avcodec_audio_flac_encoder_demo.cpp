@@ -64,7 +64,6 @@ static void OnInputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemor
 {
     (void)codec;
     AEncSignal *signal = static_cast<AEncSignal *>(userData);
-    cout << "OnInputBufferAvailable received, index:" << index << endl;
     unique_lock<mutex> lock(signal->inMutex_);
     signal->inQueue_.push(index);
     signal->inBufferQueue_.push(data);
@@ -76,13 +75,10 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
 {
     (void)codec;
     AEncSignal *signal = static_cast<AEncSignal *>(userData);
-    cout << "OnOutputBufferAvailable received, index:" << index << endl;
     unique_lock<mutex> lock(signal->outMutex_);
     signal->outQueue_.push(index);
     signal->outBufferQueue_.push(data);
     if (attr) {
-        cout << "OnOutputBufferAvailable received, index:" << index << ", attr->size:" << attr->size
-             << ", attr->flags:" << attr->flags << endl;
         signal->attrQueue_.push(*attr);
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
@@ -92,7 +88,6 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
 
 void AEncFlacDemo::RunCase()
 {
-    std::cout << "RunCase enter" << std::endl;
     DEMO_CHECK_AND_RETURN_LOG(CreateEnc() == AVCS_ERR_OK, "Fatal: CreateEnc fail");
 
     OH_AVFormat *format = OH_AVFormat_Create();
@@ -275,9 +270,7 @@ void AEncFlacDemo::OutputFunc()
         }
 
         unique_lock<mutex> lock(signal_->outMutex_);
-        cout << "lock, before" << endl;
         signal_->outCond_.wait(lock, [this]() { return (signal_->outQueue_.size() > 0 || !isRunning_.load()); });
-        cout << "lock, after" << endl;
 
         if (!isRunning_.load()) {
             cout << "wait to stop, exit" << endl;
@@ -289,10 +282,8 @@ void AEncFlacDemo::OutputFunc()
         OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
         OH_AVMemory *data = signal_->outBufferQueue_.front();
         if (data != nullptr) {
-            cout << "OutputFunc write file,buffer index" << index << ", data size = :" << attr.size << endl;
             outputFile.write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
         }
-        cout << "attr.flags: " << attr.flags << endl;
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS || attr.size == 0) {
             cout << "encode eos" << endl;
             isRunning_.store(false);
