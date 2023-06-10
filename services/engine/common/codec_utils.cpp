@@ -232,23 +232,23 @@ GraphicTransformType TranslateSurfaceRotation(const VideoRotation &rotation)
     }
 }
 
-PixelFormat TranslateSurfaceFormat(const VideoPixelFormat &surfaceFormat)
+GraphicPixelFormat TranslateSurfaceFormat(const VideoPixelFormat &surfaceFormat)
 {
     switch (surfaceFormat) {
         case VideoPixelFormat::YUV420P: {
-            return PixelFormat::PIXEL_FMT_YCBCR_420_P;
+            return GraphicPixelFormat::GRAPHIC_PIXEL_FMT_YCRCB_420_P;
         }
         case VideoPixelFormat::RGBA: {
-            return PixelFormat::PIXEL_FMT_RGBA_8888;
+            return GraphicPixelFormat::GRAPHIC_PIXEL_FMT_RGBA_8888;
         }
         case VideoPixelFormat::NV12: {
-            return PixelFormat::PIXEL_FMT_YCBCR_420_SP;
+            return GraphicPixelFormat::GRAPHIC_PIXEL_FMT_YCBCR_420_SP;
         }
         case VideoPixelFormat::NV21: {
-            return PixelFormat::PIXEL_FMT_YCRCB_420_SP;
+            return GraphicPixelFormat::GRAPHIC_PIXEL_FMT_YCRCB_420_SP;
         }
         default:
-            return PixelFormat::PIXEL_FMT_BUTT;
+            return GraphicPixelFormat::GRAPHIC_PIXEL_FMT_BUTT;
     }
 }
 

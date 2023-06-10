@@ -49,7 +49,7 @@ private:
     ScalePara scalePara_;
     std::shared_ptr<SwsContext> swsCtx_ = nullptr;
 };
-PixelFormat TranslateSurfaceFormat(const VideoPixelFormat &surfaceFormat);
+GraphicPixelFormat TranslateSurfaceFormat(const VideoPixelFormat &surfaceFormat);
 VideoPixelFormat ConvertPixelFormatFromFFmpeg(int32_t ffmpegPixelFormat);
 AVPixelFormat ConvertPixelFormatToFFmpeg(VideoPixelFormat pixelFormat);
 GraphicTransformType TranslateSurfaceRotation(const VideoRotation &rotation);

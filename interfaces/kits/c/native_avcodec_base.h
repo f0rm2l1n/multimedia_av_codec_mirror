@@ -252,6 +252,12 @@ extern const char *OH_MD_KEY_COMPLIANCE_LEVEL;
 extern const char *OH_MD_KEY_IDENTIFICATION_HEADER;
 /* Key for vorbis setup header, value type is uint8_t*, supported only for vorbis decoder. */
 extern const char *OH_MD_KEY_SETUP_HEADER;
+/* key for video scale type, value type is int32_t, see @OH_ScalingMode */
+extern const char *OH_MD_KEY_SCALING_MODE;
+/* key for max input buffer count, value type is int32_t */
+extern const char *OH_MD_MAX_INPUT_BUFFER_COUNT;
+/* key for max output buffer count, value type is int32_t */
+extern const char *OH_MD_MAX_OUTPUT_BUFFER_COUNT;
 
 /* source format Key for title, value type is string */
 extern const char *OH_MD_KEY_TITLE;
@@ -410,6 +416,16 @@ typedef enum OH_MatrixCoefficient {
     MATRIX_COEFFICIENT_CHROMATICITY_CL = 13,
     MATRIX_COEFFICIENT_ICTCP = 14,
 } OH_MatrixCoefficient;
+
+/**
+ * @brief Scaling Mode
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ */
+typedef enum OH_ScalingMode {
+    SCALING_MODE_SCALE_TO_WINDOW = 1,
+    SCALING_MODE_SCALE_CROP = 2,
+} OH_ScalingMode;
 
 /**
  * @brief enum Audio Bits Per Coded Sample
