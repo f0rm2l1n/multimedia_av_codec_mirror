@@ -52,7 +52,7 @@
    }
    // 为 fd 资源文件创建 source 资源对象, 传入 offset 不为文件起始位置 或 size 不为文件大小时，可能会因不能获取完整数据导致 source 创建失败、或后续解封装失败等问题
    OH_AVSource *source = OH_AVSource_CreateWithFD(fd, 0, fileSize);
-   if (source==nullptr) {
+   if (source == nullptr) {
       printf("create source error: fd=%d, size=%zu", fd, fileSize);
       return;
    }
