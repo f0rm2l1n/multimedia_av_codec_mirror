@@ -571,7 +571,7 @@ int64_t Source::AVSeek(void *opaque, int64_t offset, int whence)
             break;
         }
         default:
-            AVCODEC_LOGW("AVSeek unexpected whence: %{oublic}d", whence);
+            AVCODEC_LOGW("AVSeek unexpected whence: %{public}d", whence);
             break;
     }
     if (whence != AVSEEK_SIZE) {
