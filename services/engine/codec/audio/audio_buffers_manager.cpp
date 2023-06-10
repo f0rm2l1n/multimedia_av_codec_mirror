@@ -47,6 +47,7 @@ AudioBuffersManager::AudioBuffersManager(const uint32_t &bufferSize, const std::
 
 std::shared_ptr<AudioBufferInfo> AudioBuffersManager::getMemory(const uint32_t &index) const noexcept
 {
+    std::unique_lock lock(stateMutex_);
     if (index >= bufferInfo_.size()) {
         return nullptr;
     }
