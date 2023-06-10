@@ -31,7 +31,7 @@ class SourceEngineImpl : public ISourceEngine {
 public:
     SourceEngineImpl(int32_t appUid, int32_t appPid, const std::string& uri);
     ~SourceEngineImpl() override;
-    int32_t Create() override;
+    int32_t Init() override;
     int32_t GetTrackCount(uint32_t &trackCount) override;
     int32_t GetSourceFormat(Format &format) override;
     int32_t GetTrackFormat(Format &format, uint32_t trackIndex) override;
