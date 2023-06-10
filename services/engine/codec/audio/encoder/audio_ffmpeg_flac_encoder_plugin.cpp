@@ -28,7 +28,8 @@ constexpr int32_t MIN_CHANNELS = 1;
 constexpr int32_t MAX_CHANNELS = 8;
 constexpr int32_t MIN_COMPLIANCE_LEVEL = -2;
 constexpr int32_t MAX_COMPLIANCE_LEVEL = 2;
-constexpr int32_t SAMPLES = 4608;
+constexpr int32_t MAX_BITS_PER_SAMPLE = 4;
+constexpr int32_t SAMPLES = 9216;
 static const int32_t FLAC_ENCODER_SAMPLE_RATE_TABLE[] = {
     88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
 };
@@ -205,7 +206,7 @@ int32_t AudioFFMpegFlacEncoderPlugin::Flush()
 
 int32_t AudioFFMpegFlacEncoderPlugin::GetInputBufferSize() const
 {
-    int32_t inputBufferSize = SAMPLES * channels * sizeof(short);
+    int32_t inputBufferSize = SAMPLES * channels * MAX_BITS_PER_SAMPLE;
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > inputBufferSize) {
         maxSize = inputBufferSize;
@@ -215,7 +216,7 @@ int32_t AudioFFMpegFlacEncoderPlugin::GetInputBufferSize() const
 
 int32_t AudioFFMpegFlacEncoderPlugin::GetOutputBufferSize() const
 {
-    int32_t outputBufferSize = SAMPLES * channels * sizeof(short);
+    int32_t outputBufferSize = SAMPLES * channels * MAX_BITS_PER_SAMPLE;
     return outputBufferSize;
 }
 

@@ -350,7 +350,7 @@ void ADecDemo::InputFunc()
         auto buffer = signal_->inBufferQueue_.front();
         DEMO_CHECK_AND_BREAK_LOG(buffer != nullptr, "Fatal: GetInputBuffer fail");
         inputFile_.read(reinterpret_cast<char *>(&size), sizeof(size));
-        if (inputFile_.eof() || inputFile_.gcount() == 0) {
+        if (inputFile_.eof() || inputFile_.gcount() == 0 || size == 0) {
             HandleInputEOS(index);
             std::cout << "end buffer\n";
             break;
@@ -390,7 +390,7 @@ void ADecDemo::OutputFunc()
         uint32_t index = signal_->outQueue_.front();
         OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
         OH_AVMemory *data = signal_->outBufferQueue_.front();
-        if (data != nullptr) {
+        if (attr.flags != AVCODEC_BUFFER_FLAGS_EOS && data != nullptr) {
             pcmOutputFile_.write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
         }
 
