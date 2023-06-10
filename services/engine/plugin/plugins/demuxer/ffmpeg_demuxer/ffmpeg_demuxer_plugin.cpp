@@ -332,7 +332,11 @@ int32_t FFmpegDemuxerPlugin::GetNextPacket(uint32_t trackIndex, std::shared_ptr<
         ffmpegRet = av_read_frame(formatContext_.get(), pkt);
         CHECK_AND_RETURN_RET_LOG(pkt->stream_index >= 0, AVCS_ERR_DEMUXER_FAILED, "the stream_index must be positive");
         uint32_t streamIndex = static_cast<uint32_t>(pkt->stream_index);
-        if (ffmpegRet >= 0 && IsInSelectedTrack(streamIndex)) {
+        if (ffmpegRet < 0) {
+            av_packet_free(&pkt);
+            break;
+        }
+        if (IsInSelectedTrack(streamIndex)) {
             std::shared_ptr<SamplePacket> cacheSamplePacket = std::make_shared<SamplePacket>();
             cacheSamplePacket->offset = 0;
             cacheSamplePacket->pkt = pkt;
@@ -375,7 +379,6 @@ int32_t FFmpegDemuxerPlugin::ReadSample(uint32_t trackIndex, std::shared_ptr<AVS
     }
     if (ffmpegRet < 0) {
         AVCODEC_LOGE("read frame failed, ffmpeg error:%{public}d", ffmpegRet);
-        av_packet_free(&(samplePacket->pkt));
         return AVCS_ERR_DEMUXER_FAILED;
     }
     int32_t ret = ConvertAVPacketToSample(avStream, sample, info, flag, samplePacket);
