@@ -281,7 +281,10 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
         return AVCS_ERR_INVALID_OPERATION;
     }
     uint64_t frameSize = 0;
-    if (avStream->duration <= (samplePacket->pkt->pts + samplePacket->pkt->duration)) {
+    if (avStream->start_time == AV_NOPTS_VALUE) {
+        avStream->start_time = 0;
+    }
+    if (avStream->duration + avStream->start_time <= (samplePacket->pkt->pts + samplePacket->pkt->duration)) {
         SetEndStatus(samplePacket->pkt->stream_index);
     }
     bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt->pts, avStream->time_base));
@@ -303,7 +306,6 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
         AVCODEC_LOGE("unsupport stream type");
         return AVCS_ERR_UNSUPPORT_VID_PARAMS;
     }
-  
     bufferInfo.size = static_cast<int32_t>(frameSize);
     bufferInfo.offset = 0;
     auto copyFrameSize = static_cast<uint64_t>(frameSize) - samplePacket->offset;
@@ -315,7 +317,6 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     CHECK_AND_RETURN_RET_LOG(rs == EOK, AVCS_ERR_UNKNOWN, "memset_s failed");
     errno_t rc = memcpy_s(sample->GetBase(), copySize, samplePacket->pkt->data+samplePacket->offset, copySize);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
-
     if (copySize != copyFrameSize) {
         samplePacket->offset += copySize;
         return AVCS_ERR_NO_MEMORY;
