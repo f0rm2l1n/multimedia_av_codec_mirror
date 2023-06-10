@@ -315,7 +315,6 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
             cout << "decode eos" << endl;
             isRunning_.store(false);
-            signal_->startCond_.notify_all();
         }
         signal_->outBufferQueue_.pop();
         signal_->attrQueue_.pop();
@@ -324,6 +323,7 @@ void AudioCodeCapiDecoderUnitTest::OutputFunc()
     }
 
     pcmOutputFile_.close();
+    signal_->startCond_.notify_all();
 }
 
 int32_t AudioCodeCapiDecoderUnitTest::Start()
@@ -347,6 +347,9 @@ int32_t AudioCodeCapiDecoderUnitTest::Start()
 int32_t AudioCodeCapiDecoderUnitTest::Stop()
 {
     isRunning_.store(false);
+    if (signal_) {
+        signal_->startCond_.notify_all();
+    }
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         {
             unique_lock<mutex> lock(signal_->inMutex_);
@@ -476,12 +479,16 @@ int32_t AudioCodeCapiDecoderUnitTest::Configure(const string &codecName)
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_CreateByMime_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG.data()));
+    audioDec_ = OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG.data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_CreateByName_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data()));
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_MP3_NAME).data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Configure_01, TestSize.Level1)
@@ -535,8 +542,10 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Start_02, TestSize.Level
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Start());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Stop());
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Start(audioDec_));
-
-
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+    }
     Release();
 }
 
@@ -571,6 +580,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Reset_01, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_MP3_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_Reset_02, TestSize.Level1)
@@ -683,12 +693,16 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Mp3_ReleaseOutputBuffer_01, 
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_CreateByMime_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC.data()));
+    audioDec_ = OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_FLAC.data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_CreateByName_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_FLAC_NAME).data()));
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_FLAC_NAME).data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Configure_01, TestSize.Level1)
@@ -780,6 +794,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Reset_01, TestSize.Leve
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_FLAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_Reset_02, TestSize.Level1)
@@ -892,12 +907,16 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Flac_ReleaseOutputBuffer_01,
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_CreateByMime_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC.data()));
+    audioDec_ = OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC.data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_CreateByName_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_AAC_NAME).data()));
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_AAC_NAME).data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Configure_01, TestSize.Level1)
@@ -989,6 +1008,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Reset_01, TestSize.Level
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_AAC_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_Reset_02, TestSize.Level1)
@@ -1101,12 +1121,16 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Aac_ReleaseOutputBuffer_01, 
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_CreateByMime_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_VORBIS.data()));
+    audioDec_ = OH_AudioDecoder_CreateByMime(AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_VORBIS.data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_CreateByName_01, TestSize.Level1)
 {
-    EXPECT_NE(nullptr, OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME).data()));
+    audioDec_ = OH_AudioDecoder_CreateByName((AVCodecCodecName::AUDIO_DECODER_VORBIS_NAME).data());
+    EXPECT_NE(nullptr, audioDec_);
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Configure_01, TestSize.Level1)
@@ -1201,6 +1225,7 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Reset_01, TestSize.Le
     ASSERT_EQ(OH_AVErrCode::AV_ERR_OK, CreateCodecFunc(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, Configure(CODEC_VORBIS_NAME));
     EXPECT_EQ(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_Reset(audioDec_));
+    Release();
 }
 
 HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_Reset_02, TestSize.Level1)
