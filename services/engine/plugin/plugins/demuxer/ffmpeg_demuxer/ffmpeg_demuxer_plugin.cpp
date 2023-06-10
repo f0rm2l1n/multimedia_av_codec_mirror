@@ -87,6 +87,11 @@ inline int64_t AvTime2Ms(int64_t hTime)
     return hTime / AV_CODEC_MSECOND;
 }
 
+inline int64_t AvTime2Us(int64_t hTime)
+{
+    return hTime / AV_CODEC_USECOND;
+}
+
 int64_t ConvertTimeToFFmpeg(int64_t timestampUs, AVRational base)
 {
     int64_t result;
@@ -287,7 +292,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     if (avStream->duration + avStream->start_time <= (samplePacket->pkt->pts + samplePacket->pkt->duration)) {
         SetEndStatus(samplePacket->pkt->stream_index);
     }
-    bufferInfo.presentationTimeUs = AvTime2Ms(ConvertTimeFromFFmpeg(samplePacket->pkt->pts, avStream->time_base));
+    bufferInfo.presentationTimeUs = AvTime2Us(ConvertTimeFromFFmpeg(samplePacket->pkt->pts, avStream->time_base));
     flag = ConvertFlagsFromFFmpeg(samplePacket->pkt, avStream);
     CHECK_AND_RETURN_RET_LOG(samplePacket->pkt->size >= 0, AVCS_ERR_DEMUXER_FAILED,
         "the sample size is must be positive");
