@@ -58,7 +58,7 @@ private:
     std::condition_variable availableCondition_;
     std::queue<uint32_t> inBufIndexQue_;
     std::vector<bool> inBufIndexExist;
-    std::mutex stateMutex_;
+    mutable std::mutex stateMutex_;
     uint32_t bufferSize_;
     uint32_t metaSize_;
     size_t align_;
