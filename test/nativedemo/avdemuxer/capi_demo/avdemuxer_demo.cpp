@@ -132,7 +132,7 @@ int32_t AVDemuxerDemo::SeekToTime(int64_t millisecond, OH_AVSeekMode mode)
 {
     int32_t ret = OH_AVDemuxer_SeekToTime(this->avdemxuer_, millisecond, mode);
     if (ret != 0) {
-        printf("OH_AVDemuxer_CopyNextSample is faild \n");
+        printf("OH_AVDemuxer_SeekToTime is faild \n");
     }
     return ret;
 }
