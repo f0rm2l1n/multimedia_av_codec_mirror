@@ -657,9 +657,10 @@ int32_t Source::InitAVFormatContext()
             if (ptr->pb != nullptr) {
                 delete static_cast<AVIOContext*>(ptr->pb->opaque);
                 ptr->pb->opaque = nullptr;
-                av_freep(&ptr->pb->buffer);
+                av_freep(&(ptr->pb)->buffer);
                 av_opt_free(ptr->pb);
-                avio_context_free(&ptr->pb);
+                avio_context_free(&(ptr->pb));
+                ptr->pb = nullptr;
             }
             avformat_free_context(ptr);
         }
