@@ -139,7 +139,11 @@ int32_t FFmpegDemuxerPlugin::Create(uintptr_t sourceAddr)
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::Create");
     if (std::is_object<decltype(sourceAddr)>::value) {
-        formatContext_ = std::shared_ptr<AVFormatContext>((AVFormatContext*)sourceAddr);
+        // Do not automatically release the source object whose address is sourceAddr when the shared_ptr
+        // formatContext_ is released. Because this responsibility belongs to manually calling source deconstruction
+        // function. Otherwise, the main service will crash.
+        formatContext_ = std::shared_ptr<AVFormatContext>((AVFormatContext*)sourceAddr,
+                                                          [](AVFormatContext* p) { (void)p; });
         SetBitStreamFormat();
         AVCODEC_LOGD("create FFmpegDemuxerPlugin successful.");
     } else {
@@ -188,6 +192,15 @@ int32_t FFmpegDemuxerPlugin::SelectTrackByID(uint32_t trackIndex)
 
     if (trackIndex >= static_cast<uint32_t>(formatContext_.get()->nb_streams)) {
         AVCODEC_LOGE("trackIndex is invalid! Just have %{public}d tracks in file", formatContext_.get()->nb_streams);
+        return AVCS_ERR_INVALID_VAL;
+    }
+    AVStream* avStream = formatContext_->streams[trackIndex];
+    if (avStream->codecpar->codec_type != AVMEDIA_TYPE_AUDIO && avStream->codecpar->codec_type != AVMEDIA_TYPE_VIDEO) {
+        AVCODEC_LOGE("unsupport stream type");
+        return AVCS_ERR_INVALID_VAL;
+    }
+    if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && avStream->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
+        AVCODEC_LOGE("unsupport raw video");
         return AVCS_ERR_INVALID_VAL;
     }
     auto index = std::find_if(selectedTrackIds_.begin(), selectedTrackIds_.end(),
@@ -299,17 +312,10 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
         frameSize = static_cast<uint64_t>(samplePacket->pkt->size);
     } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-        if (avStream->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
-            AVCODEC_LOGE("unsupport raw video");
-            return AVCS_ERR_UNSUPPORT_STREAM;
-        }
         if (avbsfContext_) {
             ConvertAvcOrHevcToAnnexb(*(samplePacket->pkt));
         }
         frameSize = static_cast<uint64_t>(samplePacket->pkt->size);
-    } else {
-        AVCODEC_LOGE("unsupport stream type");
-        return AVCS_ERR_UNSUPPORT_VID_PARAMS;
     }
     bufferInfo.size = static_cast<int32_t>(frameSize);
     bufferInfo.offset = 0;

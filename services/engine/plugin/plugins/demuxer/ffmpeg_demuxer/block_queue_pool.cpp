@@ -124,7 +124,6 @@ bool BlockQueuePool::Push(uint32_t trackIndex, std::shared_ptr<SamplePacket> blo
     AVCODEC_LOGD("all queue of trackIndex: %{public}u is full, will auto expend one queue", trackIndex);
     uint32_t queIndex = GetValidQueue();
     queMap_[trackIndex].push_back(queIndex);
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, false, "add new queue error: %{public}d", ret);
     if (quePool_[queIndex].blockQue == nullptr) {
         AVCODEC_LOGD("block queue %{public}d is nullptr, will find next", queIndex);
         return false;

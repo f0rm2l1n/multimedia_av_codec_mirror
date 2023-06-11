@@ -118,19 +118,19 @@ namespace {
         return ret;
     }
 
-    RegisterFunc OpenFilePlugin(const std::string& path, const std::string& name, void* handler)
+    RegisterFunc OpenFilePlugin(const std::string& path, const std::string& name, void** handler)
     {
         AVCODEC_LOGD("OpenFilePlugin, input: path=%{private}s, name=%{private}s", path.c_str(), name.c_str());
         if (FileIsExists(path.c_str())) {
-            handler = ::dlopen(path.c_str(), RTLD_NOW);
-            if (handler == nullptr) {
+            *handler = ::dlopen(path.c_str(), RTLD_NOW);
+            if (*handler == nullptr) {
                 AVCODEC_LOGE("dlopen failed due to %{private}s", ::dlerror());
             }
         }
-        if (handler) {
+        if (*handler) {
             std::string registerFuncName = "register_" + name;
             RegisterFunc registerFunc = nullptr;
-            registerFunc = (RegisterFunc)(::dlsym(handler, registerFuncName.c_str()));
+            registerFunc = (RegisterFunc)(::dlsym(*handler, registerFuncName.c_str()));
             if (registerFunc) {
                 return registerFunc;
             } else {
@@ -203,7 +203,10 @@ Source::~Source()
     sourcePlugin_ = nullptr;
     register_ = nullptr;
     avioContext_ = nullptr;
-    ::dlclose(handler_);
+    if (handler_ != nullptr && ::dlclose(handler_) != 0) {
+        AVCODEC_LOGE("Faild to close source plugin %{public}s", ::dlerror());
+    }
+    handler_ = nullptr;
     AVCODEC_LOGI("Source::~Source is on call");
 }
 
@@ -436,7 +439,7 @@ int32_t Source::LoadDynamicPlugin(const std::string& path)
     std::string filePluginPath = OH_FILE_PLUGIN_PATH + g_fileSeparator + libFileName;
     std::string pluginName =
         libFileName.substr(g_libFileHead.size(), libFileName.size() - g_libFileHead.size() - g_libFileTail.size());
-    RegisterFunc registerFunc = OpenFilePlugin(filePluginPath, pluginName, handler_);
+    RegisterFunc registerFunc = OpenFilePlugin(filePluginPath, pluginName, &handler_);
     if (registerFunc) {
         register_ = std::make_shared<SourceRegister>();
         registerFunc(register_);
@@ -571,7 +574,7 @@ int64_t Source::AVSeek(void *opaque, int64_t offset, int whence)
             break;
         }
         default:
-            AVCODEC_LOGW("AVSeek unexpected whence: %{oublic}d", whence);
+            AVCODEC_LOGW("AVSeek unexpected whence: %{public}d", whence);
             break;
     }
     if (whence != AVSEEK_SIZE) {
@@ -651,11 +654,15 @@ int32_t Source::InitAVFormatContext()
 
     formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
         if (ptr) {
-            auto ctx = ptr->pb;
-            if (ctx) {
-                av_freep(&ctx->buffer);
-                av_free(ctx);
+            if (ptr->pb != nullptr) {
+                delete static_cast<AVIOContext*>(ptr->pb->opaque);
+                ptr->pb->opaque = nullptr;
+                av_freep(&(ptr->pb)->buffer);
+                av_opt_free(ptr->pb);
+                avio_context_free(&(ptr->pb));
+                ptr->pb = nullptr;
             }
+            avformat_free_context(ptr);
         }
     });
 
