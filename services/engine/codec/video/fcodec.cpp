@@ -80,9 +80,9 @@ FCodec::~FCodec()
         avcodec_close(avCodecContext_.get());
         ResetContext();
     }
+    ReleaseBuffers();
     surface_ = nullptr;
     callback_ = nullptr;
-    ReleaseBuffers();
 }
 
 int32_t FCodec::Init()
@@ -410,7 +410,7 @@ void FCodec::SetSurfaceParameter(const Format &format, const std::string_view &f
             vpf == VideoPixelFormat::NV21) {
             outputPixelFmt_ = vpf;
             format_.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, val);
-            PixelFormat surfacePixelFmt = TranslateSurfaceFormat(vpf);
+            GraphicPixelFormat surfacePixelFmt = TranslateSurfaceFormat(vpf);
             std::lock_guard<std::mutex> oLock(outputMutex_);
             SurfaceMemory::SetConfig(width_, height_, surfacePixelFmt);
         }
@@ -538,8 +538,8 @@ int32_t FCodec::AllocateOutputBuffer(int32_t bufferCnt, int32_t outBufferSize)
         }
         int32_t val32 = 0;
         format_.GetIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, val32);
-        PixelFormat surfacePixelFmt = TranslateSurfaceFormat(static_cast<VideoPixelFormat>(val32));
-        CHECK_AND_RETURN_RET_LOG(surfacePixelFmt != PixelFormat::PIXEL_FMT_BUTT, AVCS_ERR_UNSUPPORT,
+        GraphicPixelFormat surfacePixelFmt = TranslateSurfaceFormat(static_cast<VideoPixelFormat>(val32));
+        CHECK_AND_RETURN_RET_LOG(surfacePixelFmt != GraphicPixelFormat::GRAPHIC_PIXEL_FMT_BUTT, AVCS_ERR_UNSUPPORT,
                                  "Failed to allocate output buffer: unsupported surface format");
         SurfaceMemory::SetSurface(surface_);
         SurfaceMemory::SetConfig(static_cast<int32_t>(width_), static_cast<int32_t>(height_), surfacePixelFmt);
@@ -648,7 +648,7 @@ int32_t FCodec::CheckFormatChange(uint32_t index, int width, int height)
         if (surface_) {
             int32_t val32 = 0;
             format_.GetIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, val32);
-            PixelFormat surfacePixelFmt = TranslateSurfaceFormat(static_cast<VideoPixelFormat>(val32));
+            GraphicPixelFormat surfacePixelFmt = TranslateSurfaceFormat(static_cast<VideoPixelFormat>(val32));
             SurfaceMemory::SetConfig(static_cast<int32_t>(width_), static_cast<int32_t>(height_), surfacePixelFmt);
         }
         callback_->OnOutputFormatChanged(format_);
