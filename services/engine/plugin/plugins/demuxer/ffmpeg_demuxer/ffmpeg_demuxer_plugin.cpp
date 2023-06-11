@@ -289,7 +289,10 @@ void FFmpegDemuxerPlugin::ConvertAvcOrHevcToAnnexb(AVPacket& pkt)
 {
     (void)av_bsf_send_packet(avbsfContext_.get(), &pkt);
     (void)av_packet_unref(&pkt);
-    (void)av_bsf_receive_packet(avbsfContext_.get(), &pkt);
+    int ret = 1;
+    while (ret >= 0) {
+        ret = av_bsf_receive_packet(avbsfContext_.get(), &pkt);
+    }
 }
 
 int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::shared_ptr<AVSharedMemory> sample,
