@@ -203,9 +203,6 @@ Source::~Source()
     sourcePlugin_ = nullptr;
     register_ = nullptr;
     avioContext_ = nullptr;
-    if (handler_ != nullptr && ::dlclose(handler_) != 0) {
-        AVCODEC_LOGE("Faild to close source plugin %{public}s", ::dlerror());
-    }
     handler_ = nullptr;
     AVCODEC_LOGI("Source::~Source is on call");
 }
@@ -653,9 +650,8 @@ int32_t Source::InitAVFormatContext()
     }
 
     formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
-        if (ptr) {
+        if (ptr != nullptr) {
             if (ptr->pb != nullptr) {
-                delete static_cast<AVIOContext*>(ptr->pb->opaque);
                 ptr->pb->opaque = nullptr;
                 av_freep(&(ptr->pb)->buffer);
                 av_opt_free(ptr->pb);
