@@ -115,8 +115,8 @@ ohos_shared_library("native_av_codec_codec") {
   deps = [
     "$av_codec_root_dir/interfaces/inner_api/native:av_codec_client",
     "$av_codec_root_dir/interfaces/kits/c:native_av_codec_core",
-    "$av_codec_root_dir/services/utils:av_codec_format",
     "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
+    "$av_codec_root_dir/services/utils:av_codec_format",
   ]
 
   external_deps = [
