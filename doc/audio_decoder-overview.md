@@ -50,11 +50,9 @@
 
 详细API说明请参考[avcodec native API](https://gitee.com/openharmony/multimedia_av_codec/blob/master/test/nativedemo/audio_demo/avcodec_audio_decoder_demo.h)
 
-### 异步模式
-
 1. 创建解码器实例对象
 
-   ```c++
+```c++
    //通过 codecname 创建解码器
    OH_AVCapability *capability = OH_AVCodec_GetCapability(OH_AVCODEC_MIMETYPE_AUDIO_MPEG, false);
    const char *name = OH_AVCapability_GetName(capability);
@@ -78,7 +76,8 @@
        std::queue<OH_AVCodecBufferAttr> attrQueue_;
    };
    ADecSignal *signal_;
-   ```
+```
+
 2. 设置回调函数(必须)
 
    ```c++
