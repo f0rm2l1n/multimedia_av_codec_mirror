@@ -46,8 +46,8 @@ struct VideoDecoderObject : public OH_AVCodec {
     std::atomic<bool> isStop_ = false;
     std::atomic<bool> isEOS_ = false;
     bool isOutputSurfaceMode_ = false;
-    std::atomic<bool> isFirstFrameIn = true;
-    std::atomic<bool> isFirstFrameOut = true;
+    std::atomic<bool> isFirstFrameIn_ = true;
+    std::atomic<bool> isFirstFrameOut_ = true;
 };
 
 class NativeVideoDecoderCallback : public AVCodecCallback {
@@ -125,15 +125,17 @@ public:
         }
         callback_.onNeedOutputData(codec_, index, data, &bufferAttr, userData_);
 
-        if (videoDecObj->isFirstFrameOut) {
-            AVCodecTrace::TraceEnd("OH::FirstFrame", info.presentationTimeUs);
-            videoDecObj->isFirstFrameOut = false;
-        } else {
-            AVCodecTrace::TraceEnd("OH::Frame", info.presentationTimeUs);
+        if (flag != AVCODEC_BUFFER_FLAG_CODEC_DATA) {
+            if (videoDecObj->isFirstFrameOut_) {
+                AVCodecTrace::TraceEnd("OH::FirstFrame", info.presentationTimeUs);
+                videoDecObj->isFirstFrameOut_ = false;
+            } else {
+                AVCodecTrace::TraceEnd("OH::Frame", info.presentationTimeUs);
+            }
         }
         if (flag == AVCODEC_BUFFER_FLAG_EOS) {
-            videoDecObj->isFirstFrameIn = true;
-            videoDecObj->isFirstFrameOut = true;
+            videoDecObj->isFirstFrameIn_ = true;
+            videoDecObj->isFirstFrameOut_ = true;
         }
     }
 
@@ -395,11 +397,13 @@ OH_AVErrCode OH_VideoDecoder_PushInputData(struct OH_AVCodec *codec, uint32_t in
     struct VideoDecoderObject *videoDecObj = reinterpret_cast<VideoDecoderObject *>(codec);
     CHECK_AND_RETURN_RET_LOG(videoDecObj->videoDecoder_ != nullptr, AV_ERR_INVALID_VAL, "Video decoder is nullptr!");
 
-    if (videoDecObj->isFirstFrameIn) {
-        AVCodecTrace::TraceBegin("OH::FirstFrame", attr.pts);
-        videoDecObj->isFirstFrameIn = false;
-    } else {
-        AVCodecTrace::TraceBegin("OH::Frame", attr.pts);
+    if (attr.flags != AVCODEC_BUFFER_FLAGS_CODEC_DATA) {
+        if (videoDecObj->isFirstFrameIn_) {
+            AVCodecTrace::TraceBegin("OH::FirstFrame", attr.pts);
+            videoDecObj->isFirstFrameIn_ = false;
+        } else {
+            AVCodecTrace::TraceBegin("OH::Frame", attr.pts);
+        }
     }
 
     struct AVCodecBufferInfo bufferInfo;
