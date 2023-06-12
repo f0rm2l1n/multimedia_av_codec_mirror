@@ -65,7 +65,7 @@ private:
     size_t singleQueSize_;
     uint32_t GetValidQueue();
     bool InnerQueueIsFull(uint32_t queueIndex);
-    bool IsInQueue(uint32_t trackIndex);
+    bool HasQueue(uint32_t trackIndex);
 };
 } // namespace Media
 } // namespace OHOS

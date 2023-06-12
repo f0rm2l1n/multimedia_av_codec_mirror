@@ -36,13 +36,13 @@ BlockQueuePool::~BlockQueuePool()
 int32_t BlockQueuePool::AddTrackQueue(uint32_t trackIndex)
 {
     AVCODEC_LOGD("block queue %{public}s AddTrackQueue enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
-    if (!IsInQueue(trackIndex)) {
+    if (!HasQueue(trackIndex)) {
         uint32_t queIndex = GetValidQueue();
         queMap_[trackIndex] = std::vector<uint32_t>({ queIndex });
         AVCODEC_LOGD("block queue %{public}s AddTrackQueue finish, add track %{public}u, get queue %{public}u",
                      name_.c_str(), trackIndex, queIndex);
     } else {
-        AVCODEC_LOGD("block queue %{public}s AddTrackQueue finish, trackIndex %{public}u is already in queue",
+        AVCODEC_LOGD("block queue %{public}s AddTrackQueue finish, track %{public}u is already in queue",
                      name_.c_str(), trackIndex);
     }
     return AVCS_ERR_OK;
@@ -51,12 +51,14 @@ int32_t BlockQueuePool::AddTrackQueue(uint32_t trackIndex)
 int32_t BlockQueuePool::RemoveTrackQueue(uint32_t trackIndex)
 {
     AVCODEC_LOGD("block queue %{public}s RemoveTrackQueue enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
-    if (!IsInQueue(trackIndex)) {
+    if (!HasQueue(trackIndex)) {
         AVCODEC_LOGD("block queue %{public}s RemoveTrackQueue finish, track %{public}u is not in queue",
                      name_.c_str(), trackIndex);
     } else {
         for (auto queIndex : queMap_[trackIndex]) {
-            FreeQueue(queIndex);
+            ResetQueue(queIndex);
+            queMap_[trackIndex].clear();
+            queMap_.erase(trackIndex);
         }
     }
     AVCODEC_LOGD("block queue %{public}s RemoveTrackQueue finish", name_.c_str());
@@ -107,34 +109,36 @@ bool BlockQueuePool::Push(uint32_t trackIndex, std::shared_ptr<SamplePacket> blo
 {
     AVCODEC_LOGD("block queue %{public}s Push enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
     int32_t ret;
-    if (!IsInQueue(trackIndex)) {
-        AVCODEC_LOGW("trackIndex: %{public}u has not beed added, will auto add first", trackIndex);
+    if (!HasQueue(trackIndex)) {
+        AVCODEC_LOGW("trackIndex has not beed added, auto add first");
         ret = AddTrackQueue(trackIndex);
         CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, false, "add new queue error: %{public}d", ret);
     }
-    for (auto queIndex : queMap_[trackIndex]) {
-        if (!InnerQueueIsFull(queIndex)) {
-            if (quePool_[queIndex].blockQue == nullptr) {
-                AVCODEC_LOGD("block queue %{public}d is nullptr, will find next", queIndex);
-                continue;
-            }
-            return quePool_[queIndex].blockQue->Push(block);
-        }
+    auto& queVector = queMap_[trackIndex];
+    uint32_t pushIndex;
+    if (queVector.size() > 0) {
+        pushIndex = queVector[queVector.size() - 1];
+    } else {
+        pushIndex = GetValidQueue();
+        queMap_[trackIndex].push_back(pushIndex);
+        AVCODEC_LOGD("track has no queue, will get que %{public}d from pool", pushIndex);
     }
-    AVCODEC_LOGD("all queue of trackIndex: %{public}u is full, will auto expend one queue", trackIndex);
-    uint32_t queIndex = GetValidQueue();
-    queMap_[trackIndex].push_back(queIndex);
-    if (quePool_[queIndex].blockQue == nullptr) {
-        AVCODEC_LOGD("block queue %{public}d is nullptr, will find next", queIndex);
+    if (InnerQueueIsFull(pushIndex)) {
+        pushIndex = GetValidQueue();
+        queMap_[trackIndex].push_back(pushIndex);
+        AVCODEC_LOGD("track que is full, will get que %{public}d from pool", pushIndex);
+    }
+    if (quePool_[pushIndex].blockQue == nullptr) {
+        AVCODEC_LOGD("block queue %{public}d is nullptr, failed to push data", pushIndex);
         return false;
     }
-    return quePool_[queIndex].blockQue->Push(block);
+    return quePool_[pushIndex].blockQue->Push(block);
 }
 
 std::shared_ptr<SamplePacket> BlockQueuePool::Pop(uint32_t trackIndex)
 {
     AVCODEC_LOGD("block queue %{public}s Pop enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
-    if (!IsInQueue(trackIndex)) {
+    if (!HasQueue(trackIndex)) {
         AVCODEC_LOGE("trackIndex: %{public}u has not cache queue", trackIndex);
         return nullptr;
     }
@@ -149,6 +153,7 @@ std::shared_ptr<SamplePacket> BlockQueuePool::Pop(uint32_t trackIndex)
             auto block = quePool_[queIndex].blockQue->Pop();
             if (quePool_[queIndex].blockQue->Empty()) {
                 ResetQueue(queIndex);
+                AVCODEC_LOGD("track %{public}u queue %{public}d is empty, will return to pool.", trackIndex, queIndex);
                 queVector.erase(queVector.begin() + index);
             }
             AVCODEC_LOGD("block queue %{public}s Pop finish, trackIndex: %{public}u.", name_.c_str(), trackIndex);
@@ -162,7 +167,7 @@ std::shared_ptr<SamplePacket> BlockQueuePool::Pop(uint32_t trackIndex)
 std::shared_ptr<SamplePacket> BlockQueuePool::Front(uint32_t trackIndex)
 {
     AVCODEC_LOGD("block queue %{public}s Pop enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
-    if (!IsInQueue(trackIndex)) {
+    if (!HasQueue(trackIndex)) {
         AVCODEC_LOGE("trackIndex: %{public}u has not cache queue", trackIndex);
         return nullptr;
     }
@@ -206,15 +211,15 @@ bool BlockQueuePool::InnerQueueIsFull(uint32_t queueIndex)
 {
     AVCODEC_LOGD("block queue %{public}s InnerQueueIsFull enter, queueIndex: %{public}u.", name_.c_str(), queueIndex);
     if (quePool_[queueIndex].blockQue == nullptr) {
-        AVCODEC_LOGD("block queue %{public}d is nullptr, will find next", queueIndex);
-        return false;
+        AVCODEC_LOGD("block queue %{public}d is nullptr", queueIndex);
+        return true;
     }
     return quePool_[queueIndex].blockQue->Size() >= quePool_[queueIndex].blockQue->Capacity();
 }
 
-bool BlockQueuePool::IsInQueue(uint32_t trackIndex)
+bool BlockQueuePool::HasQueue(uint32_t trackIndex)
 {
-    AVCODEC_LOGD("block queue %{public}s IsInQueue enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
+    AVCODEC_LOGD("block queue %{public}s HasQueue enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
     return queMap_.count(trackIndex) > 0;
 }
 } // namespace Media
