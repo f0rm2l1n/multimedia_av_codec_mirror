@@ -261,10 +261,7 @@ void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
     if (codecID == AV_CODEC_ID_H264) {
         AVCODEC_LOGI("codec_id is H264, will convert to annexb");
         avBitStreamFilter = av_bsf_get_by_name("h264_mp4toannexb");
-    } else if (codecID == AV_CODEC_ID_HEVC) {
-        AVCODEC_LOGI("codec_id is HEVC, will convert to annexb");
-        avBitStreamFilter = av_bsf_get_by_name("hevc_mp4toannexb");
-    } else {
+    else {
         AVCODEC_LOGW("Can not find valid bit stream filter for %{public}s, stream will not be converted",
                      avcodec_get_name(codecID));
         return;
