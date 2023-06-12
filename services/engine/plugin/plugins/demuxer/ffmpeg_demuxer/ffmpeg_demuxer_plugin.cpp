@@ -257,16 +257,17 @@ void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
 {
     AVCODEC_LOGI("FFmpegDemuxerPlugin::InitBitStreamContext");
     const AVBitStreamFilter* avBitStreamFilter {nullptr};
-    char codeTag[AV_FOURCC_MAX_STRING_SIZE] {0};
-    av_fourcc_make_string(codeTag, avStream.codecpar->codec_tag);
-    if (strncmp(codeTag, "avc1", strlen("avc1")) == 0) {
-        AVCODEC_LOGD("codeTag is avc1, will convert avc1 to annexb");
+    AVCodecID codecID = avStream.codecpar->codec_id;
+    if (codecID == AV_CODEC_ID_H264) {
+        AVCODEC_LOGI("codec_id is H264, will convert to annexb");
         avBitStreamFilter = av_bsf_get_by_name("h264_mp4toannexb");
-    } else if (strncmp(codeTag, "hevc", strlen("hevc")) == 0) {
-        AVCODEC_LOGD("codeTag is hevc, will convert hevc to annexb");
+    } else if (codecID == AV_CODEC_ID_HEVC) {
+        AVCODEC_LOGI("codec_id is HEVC, will convert to annexb");
         avBitStreamFilter = av_bsf_get_by_name("hevc_mp4toannexb");
     } else {
-        AVCODEC_LOGW("Can not find valid bit stream filter for %{public}s, stream will not be converted", codeTag);
+        AVCODEC_LOGW("Can not find valid bit stream filter for %{public}s, stream will not be converted",
+                     avcodec_get_name(codecID));
+        return;
     }
     if (avBitStreamFilter && !avbsfContext_) {
         AVBSFContext* avbsfContext {nullptr};
@@ -280,8 +281,8 @@ void FFmpegDemuxerPlugin::InitBitStreamContext(const AVStream& avStream)
         });
     }
     if (avbsfContext_ == nullptr) {
-        AVCODEC_LOGW("the video bit stream not support %{public}s convert to annexb format, \
-                     stream will not be converted", codeTag);
+        AVCODEC_LOGW("bit stream not support %{public}s convert to annexb format, stream will not be converted",
+                     avcodec_get_name(codecID));
     }
 }
 
