@@ -57,9 +57,9 @@ int32_t BlockQueuePool::RemoveTrackQueue(uint32_t trackIndex)
     } else {
         for (auto queIndex : queMap_[trackIndex]) {
             ResetQueue(queIndex);
-            queMap_[trackIndex].clear();
-            queMap_.erase(trackIndex);
         }
+        queMap_[trackIndex].clear();
+        queMap_.erase(trackIndex);
     }
     AVCODEC_LOGD("block queue %{public}s RemoveTrackQueue finish", name_.c_str());
     return AVCS_ERR_OK;
