@@ -193,4 +193,5 @@
       printf("destroy demuxer pointer error");
    }
    demuxer = NULL;
+   close(fd);
    ```
