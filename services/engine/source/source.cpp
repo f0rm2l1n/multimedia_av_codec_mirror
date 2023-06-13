@@ -658,7 +658,7 @@ int32_t Source::InitAVFormatContext()
                 av_freep(&(p->buffer));
                 av_opt_free(p);
                 avio_context_free(&p);
-                ptr->pb = nullptr;
+                p = nullptr;
             }
         }
     });
