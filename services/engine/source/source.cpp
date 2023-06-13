@@ -651,14 +651,15 @@ int32_t Source::InitAVFormatContext()
 
     formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
         if (ptr != nullptr) {
-            if (ptr->pb != nullptr) {
-                ptr->pb->opaque = nullptr;
-                av_freep(&(ptr->pb)->buffer);
-                av_opt_free(ptr->pb);
-                avio_context_free(&(ptr->pb));
-                ptr->pb = nullptr;
+            auto p = ptr->pb;
+            avformat_close_input(&ptr);
+            if (p != nullptr) {
+                p->opaque = nullptr;
+                av_freep(&(p->buffer));
+                av_opt_free(p);
+                avio_context_free(&p);
+                p = nullptr;
             }
-            avformat_free_context(ptr);
         }
     });
 
