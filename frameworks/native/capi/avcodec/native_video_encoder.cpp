@@ -23,6 +23,7 @@
 #include "avsharedmemory.h"
 #include "avcodec_log.h"
 #include "avcodec_errors.h"
+#include "avcodec_dfx.h"
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeVideoEncoder"};
@@ -45,6 +46,8 @@ struct VideoEncoderObject : public OH_AVCodec {
     std::atomic<bool> isStop_ = false;
     std::atomic<bool> isEOS_ = false;
     bool isInputSurfaceMode_ = false;
+    std::atomic<bool> isFirstFrameIn_ = true;
+    std::atomic<bool> isFirstFrameOut_ = true;
 };
 
 class NativeVideoEncoderCallback : public AVCodecCallback {
@@ -120,6 +123,19 @@ public:
         // The bufferInfo lifecycle is controlled by the current function stack
         OH_AVMemory *data = GetOutputData(codec_, index);
         callback_.onNeedOutputData(codec_, index, data, &bufferAttr, userData_);
+
+        if (flag != AVCODEC_BUFFER_FLAG_CODEC_DATA) {
+            if (videoEncObj->isFirstFrameOut_) {
+                AVCodecTrace::TraceEnd("OH::FirstFrame", info.presentationTimeUs);
+                videoEncObj->isFirstFrameOut_ = false;
+            } else {
+                AVCodecTrace::TraceEnd("OH::Frame", info.presentationTimeUs);
+            }
+        }
+        if (flag == AVCODEC_BUFFER_FLAG_EOS) {
+            videoEncObj->isFirstFrameIn_ = true;
+            videoEncObj->isFirstFrameOut_ = true;
+        }
     }
 
     void StopCallback()
@@ -478,6 +494,15 @@ OH_AVErrCode OH_VideoEncoder_PushInputData(struct OH_AVCodec *codec, uint32_t in
 
     struct VideoEncoderObject *videoEncObj = reinterpret_cast<VideoEncoderObject *>(codec);
     CHECK_AND_RETURN_RET_LOG(videoEncObj->videoEncoder_ != nullptr, AV_ERR_INVALID_VAL, "Video encoder is nullptr!");
+
+    if (attr.flags != AVCODEC_BUFFER_FLAGS_CODEC_DATA) {
+        if (videoEncObj->isFirstFrameIn_) {
+            AVCodecTrace::TraceBegin("OH::FirstFrame", attr.pts);
+            videoEncObj->isFirstFrameIn_ = false;
+        } else {
+            AVCodecTrace::TraceBegin("OH::Frame", attr.pts);
+        }
+    }
 
     struct AVCodecBufferInfo bufferInfo;
     bufferInfo.presentationTimeUs = attr.pts;

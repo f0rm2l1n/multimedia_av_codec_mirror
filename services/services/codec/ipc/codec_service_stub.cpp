@@ -197,9 +197,9 @@ int CodecServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
             auto itFuncName = CODEC_FUNC_NAME.find(code);
             std::string funcName =
                 itFuncName != CODEC_FUNC_NAME.end() ? itFuncName->second : "CodecServiceStub OnRemoteRequest";
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
+            ret = (this->*memberFunc)(data, reply);
             if (ret != AVCS_ERR_OK) {
-                AVCODEC_LOGE("Calling member func failed.");
+                AVCODEC_LOGE("Calling member func %{public}s failed.", funcName.c_str());
             }
             return AVCS_ERR_OK;
         }

@@ -92,10 +92,9 @@ int AVCodecServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             int32_t ret = -1;
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply),
-                "AVCodecServiceStub GetSystemAbility");
+            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), "AVCodecServiceStub GetSystemAbility");
             if (ret != AVCS_ERR_OK) {
-                AVCODEC_LOGE("Calling memberFunc is failed.");
+                AVCODEC_LOGE("Calling member func %{public}s failed.", "AVCodecServiceStub GetSystemAbility");
             }
             return AVCS_ERR_OK;
         }
