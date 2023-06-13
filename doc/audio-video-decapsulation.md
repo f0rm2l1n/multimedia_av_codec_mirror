@@ -41,7 +41,7 @@
    ``` c++
    // 创建文件操作符 fd，打开时对文件句柄必须有读权限
    std::string fileName = "test.mp4";
-   int32_t fd = open(fileName.c_str(), O_RDONLY);
+   int fd = open(fileName.c_str(), O_RDONLY);
    struct stat fileStatus {};
    size_t fileSize = 0;
    if (stat(fileName.c_str(), &fileStatus) == 0) {
