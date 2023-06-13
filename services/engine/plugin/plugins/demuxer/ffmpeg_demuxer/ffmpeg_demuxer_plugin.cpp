@@ -433,8 +433,6 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
 
 int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
 {
-    AVCODEC_LOGI("FFmpegDemuxerPlugin::SeekToTime: millisecond=%{public}" PRId64 ", mode=%{public}d",
-        millisecond, mode);
     std::unique_lock<std::mutex> lock(mutex_);
     if (!g_seekModeToFFmpegSeekFlags.count(mode)) {
         AVCODEC_LOGE("unsupported seek mode: %{public}d", static_cast<uint32_t>(mode));
