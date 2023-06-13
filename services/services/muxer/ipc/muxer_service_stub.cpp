@@ -92,8 +92,9 @@ int MuxerServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
             auto itFuncName = MUXER_FUNC_NAME.find(code);
             std::string funcName =
                 itFuncName != MUXER_FUNC_NAME.end() ? itFuncName->second : "MuxerServiceStub OnRemoteRequest";
-            COLLIE_LISTEN(ret = (this->*memberFunc)(data, reply), funcName);
-            CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call memberFunc");
+            ret = (this->*memberFunc)(data, reply);
+            CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret,
+                "Failed to call member func %{public}s", funcName.c_str());
             return AVCS_ERR_OK;
         }
     }
