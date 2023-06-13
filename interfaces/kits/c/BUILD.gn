@@ -239,6 +239,7 @@ ohos_shared_library("native_media_adec") {
     "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_codecbase",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_core",
+    "//foundation/multimedia/av_codec/services/dfx:av_codec_service_dfx",
   ]
 
   external_deps = [
@@ -262,6 +263,7 @@ ohos_shared_library("native_media_aenc") {
     "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_codecbase",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_core",
+    "//foundation/multimedia/av_codec/services/dfx:av_codec_service_dfx",
   ]
 
   external_deps = [
@@ -289,6 +291,7 @@ ohos_shared_library("native_media_vdec") {
     "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_codecbase",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_core",
+    "//foundation/multimedia/av_codec/services/dfx:av_codec_service_dfx",
   ]
 
   external_deps = [
@@ -316,6 +319,7 @@ ohos_shared_library("native_media_venc") {
     "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_codecbase",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_core",
+    "//foundation/multimedia/av_codec/services/dfx:av_codec_service_dfx",
   ]
 
   external_deps = [
