@@ -14,17 +14,17 @@
 import("//build/ohos.gni")
 import("//build/ohos/ndk/ndk.gni")
 
-ohos_ndk_headers("native_av_codec_avsource_header") {
+ohos_ndk_headers("native_media_avsource_header") {
   dest_dir = "$ndk_headers_out_dir/multimedia"
   sources = [ "//foundation/multimedia/av_codec/interfaces/kits/c/native_avsource.h" ]
 }
 
-ohos_ndk_library("libnative_av_codec_avsource") {
-  ndk_description_file = "./libnative_av_codec_avsource.ndk.json"
+ohos_ndk_library("libnative_media_avsource") {
+  ndk_description_file = "./libnative_media_avsource.ndk.json"
   min_compact_version = "1"
-  output_name = "native_av_codec_avsource"
+  output_name = "native_media_avsource"
   output_extension = "so"
 
   system_capability = "SystemCapability.Multimedia.Media.Spliter"
-  system_capability_headers = [ "native_av_codec_avsource/native_avsource.h" ]
+  system_capability_headers = [ "native_media_avsource/native_avsource.h" ]
 }

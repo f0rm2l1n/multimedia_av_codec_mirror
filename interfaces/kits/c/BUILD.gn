@@ -18,9 +18,9 @@ group("capi_packages") {
   deps = []
   if (multimedia_av_codec_support_capi) {
     deps += [
-      "$av_codec_root_dir/interfaces/kits/c:native_av_codec_avdemuxer",
-      "$av_codec_root_dir/interfaces/kits/c:native_av_codec_avmuxer",
-      "$av_codec_root_dir/interfaces/kits/c:native_av_codec_avsource",
+      "$av_codec_root_dir/interfaces/kits/c:native_media_avdemuxer",
+      "$av_codec_root_dir/interfaces/kits/c:native_media_avmuxer",
+      "$av_codec_root_dir/interfaces/kits/c:native_media_avsource",
       "$av_codec_root_dir/interfaces/kits/c:native_av_codec_codec",
       "$av_codec_root_dir/interfaces/kits/c:native_media_core",
       "$av_codec_root_dir/interfaces/kits/c:native_media_adec",
@@ -135,7 +135,7 @@ ohos_shared_library("native_av_codec_codec") {
   part_name = "av_codec"
 }
 
-ohos_shared_library("native_av_codec_avmuxer") {
+ohos_shared_library("native_media_avmuxer") {
   install_enable = true
   sources = [
     "$av_codec_root_dir/frameworks/native/capi/avcodec/native_avcodec_base.cpp",
@@ -160,7 +160,7 @@ ohos_shared_library("native_av_codec_avmuxer") {
   part_name = "av_codec"
 }
 
-ohos_shared_library("native_av_codec_avdemuxer") {
+ohos_shared_library("native_media_avdemuxer") {
   install_enable = true
   sources = [
     "$av_codec_root_dir/frameworks/native/capi/avdemuxer/native_avdemuxer.cpp",
@@ -185,7 +185,7 @@ ohos_shared_library("native_av_codec_avdemuxer") {
   part_name = "av_codec"
 }
 
-ohos_shared_library("native_av_codec_avsource") {
+ohos_shared_library("native_media_avsource") {
   install_enable = true
   sources = [
     "$av_codec_root_dir/frameworks/native/capi/avsource/native_avsource.cpp",
