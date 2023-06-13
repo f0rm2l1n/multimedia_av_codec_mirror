@@ -308,7 +308,8 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     if (avStream->duration + avStream->start_time <= (samplePacket->pkt->pts + samplePacket->pkt->duration)) {
         SetEndStatus(samplePacket->pkt->stream_index);
     }
-    bufferInfo.presentationTimeUs = AvTime2Us(ConvertTimeFromFFmpeg(samplePacket->pkt->pts, avStream->time_base));
+    bufferInfo.presentationTimeUs = AvTime2Us(ConvertTimeFromFFmpeg(samplePacket->pkt->pts - avStream->start_time,
+                                                                    avStream->time_base));
     flag = ConvertFlagsFromFFmpeg(samplePacket->pkt, avStream);
     CHECK_AND_RETURN_RET_LOG(samplePacket->pkt->size >= 0, AVCS_ERR_DEMUXER_FAILED,
         "the sample size is must be positive");
@@ -450,7 +451,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
         if (avStream->start_time != AV_NOPTS_VALUE) {
             startTime = avStream->start_time;
         }
-        int64_t ffTime = ConvertTimeToFFmpeg(millisecond * 1000 * 1000, avStream->time_base);
+        int64_t ffTime = ConvertTimeToFFmpeg(millisecond * 1000 * 1000, avStream->time_base) + startTime;
         if (ffTime > avStream->duration + startTime) {
             AVCODEC_LOGE("seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
                          ffTime, avStream->duration);
