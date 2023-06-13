@@ -59,7 +59,7 @@
    // 为 uri 资源文件创建 source 资源对象(可选)
    // OH_AVSource *source = OH_AVSource_CreateWithURI(uri);
    ```
-   ```c
+   ```c++
    // 为资源对象创建对应的解封装器
    OH_AVDemuxer *demuxer = OH_AVDemuxer_CreateWithSource(source);
    if (demuxer == nullptr) {
