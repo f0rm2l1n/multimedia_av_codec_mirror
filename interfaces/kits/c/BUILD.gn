@@ -287,7 +287,6 @@ ohos_shared_library("native_media_vdec") {
   ]
 
   deps = [
-    "//foundation/graphic/graphic_2d/frameworks/surface:surface",
     "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_codecbase",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_core",
@@ -295,6 +294,7 @@ ohos_shared_library("native_media_vdec") {
   ]
 
   external_deps = [
+    "graphic_standard:surface",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
@@ -315,7 +315,6 @@ ohos_shared_library("native_media_venc") {
   ]
 
   deps = [
-    "//foundation/graphic/graphic_2d/frameworks/surface:surface",
     "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_codecbase",
     "//foundation/multimedia/av_codec/interfaces/kits/c:native_media_core",
@@ -323,6 +322,7 @@ ohos_shared_library("native_media_venc") {
   ]
 
   external_deps = [
+    "graphic_standard:surface",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
