@@ -367,8 +367,6 @@ int32_t Source::Init(std::string& uri)
         AVCODEC_LOGE("load sourcePlugin_ fail !");
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
-    SourceCallback cb;
-    sourcePlugin_->SetCallback(&cb);
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
 
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
