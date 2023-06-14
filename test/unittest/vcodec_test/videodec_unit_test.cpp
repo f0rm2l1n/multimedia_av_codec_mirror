@@ -239,7 +239,7 @@ HWTEST_P(VideoDecUnitTest, videoDecoder_configure_004, TestSize.Level1)
 HWTEST_P(VideoDecUnitTest, videoDecoder_configure_005, TestSize.Level1)
 {
     CreateByNameWithParam();
-    EXPECT_NE(AV_ERR_OK, videoDec_->Configure(format_));
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
 }
 
 /**
