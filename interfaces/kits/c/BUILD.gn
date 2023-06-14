@@ -127,7 +127,6 @@ ohos_shared_library("native_av_codec_codec") {
   external_deps = [
     "c_utils:utils",
     "graphic_standard:surface",
-    "graphic_standard:surface",
     "hiviewdfx_hilog_native:libhilog",
   ]
   output_extension = "so"
@@ -177,7 +176,6 @@ ohos_shared_library("native_media_avdemuxer") {
   external_deps = [
     "c_utils:utils",
     "graphic_standard:surface",
-    "graphic_standard:surface",
     "hiviewdfx_hilog_native:libhilog",
   ]
   output_extension = "so"
@@ -202,16 +200,12 @@ ohos_shared_library("native_media_avsource") {
   external_deps = [
     "c_utils:utils",
     "graphic_standard:surface",
-    "graphic_standard:surface",
     "hiviewdfx_hilog_native:libhilog",
   ]
   output_extension = "so"
   subsystem_name = "multimedia"
   part_name = "av_codec"
 }
-
-
-
 
 ohos_shared_library("native_media_codecbase") {
   install_enable = true
