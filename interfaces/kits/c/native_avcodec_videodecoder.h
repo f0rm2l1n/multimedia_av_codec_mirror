@@ -231,10 +231,10 @@ OH_AVErrCode OH_VideoDecoder_FreeOutputData(OH_AVCodec *codec, uint32_t index);
 
 /**
  * @brief Check whether the current codec instance is valid. It can be used fault recovery or app
- * switchback from the background
+ * switchback from the background.
  * @syscap SystemCapability.Multimedia.Media.VideoDecoder
  * @param codec Pointer to an OH_AVCodec instance
- * @param isVaild Output Parameter. A pointer to a boolean instance, it is true if the codec instance is valid,
+ * @param isValid Output parameter. A pointer to a boolean instance, it is true if the codec instance is valid,
  * false if the codec instance is invalid
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}

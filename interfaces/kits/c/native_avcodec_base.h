@@ -48,18 +48,6 @@ typedef enum OH_AVCodecBufferFlags {
 } OH_AVCodecBufferFlags;
 
 /**
- * @brief Enumerates the muxer ouputfile format
- *
- * @since 10
- * @version 1.0
- */
-typedef enum OH_AVOutputFormat {
-    AV_OUTPUT_FORMAT_DEFAULT = 0,
-    AV_OUTPUT_FORMAT_MPEG_4 = 2,
-    AV_OUTPUT_FORMAT_M4A = 6,
-} OH_AVOutputFormat;
-
-/**
  * @brief Define the Buffer description information of OH_AVCodec
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 9
@@ -222,36 +210,34 @@ extern const char *OH_MD_KEY_AUD_SAMPLE_RATE;
 extern const char *OH_MD_KEY_I_FRAME_INTERVAL;
 /* Key of the surface rotation angle. value type is int32_t: should be {0, 90, 180, 270}, default is 0. */
 extern const char *OH_MD_KEY_ROTATION;
-/* Key of the codec specific data. value type is uint8_t*. */
-extern const char *OH_MD_KEY_CODEC_CONFIG;
-/* Key for the desired encoding channel layout. value type is int64_t, this key is only supported for encoders. */
-extern const char *OH_MD_KEY_CHANNEL_LAYOUT;
-/* Key for bits per coded sample, value type is uint32_t, supported for flac encoder, see @OH_BitsPerSample. */
-extern const char *OH_MD_KEY_BITS_PER_CODED_SAMPLE;
-/* Key for the aac format, value type is uint32_t, supported for aac decoder. */
-extern const char *OH_MD_KEY_AAC_IS_ADTS;
-/* Key for aac sbr mode, value type is uint32_t, supported for aac encoder. */
-extern const char *OH_MD_KEY_SBR;
-/* Key for flac compliance level, value type is int32_t. */
-extern const char *OH_MD_KEY_COMPLIANCE_LEVEL;
-/* Key for vorbis identification header, value type is uint8_t*, supported only for vorbis decoder. */
-extern const char *OH_MD_KEY_IDENTIFICATION_HEADER;
-/* Key for vorbis setup header, value type is uint8_t*, supported only for vorbis decoder. */
-extern const char *OH_MD_KEY_SETUP_HEADER;
-/* key for video scale type, value type is int32_t, see @OH_ScalingMode */
-extern const char *OH_MD_KEY_SCALING_MODE;
-/* key for max input buffer count, value type is int32_t */
-extern const char *OH_MD_MAX_INPUT_BUFFER_COUNT;
-/* key for max output buffer count, value type is int32_t */
-extern const char *OH_MD_MAX_OUTPUT_BUFFER_COUNT;
 
+/**
+ * @brief Provides the uniform container for storing the media description.
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ */
+/* Key for video YUV value range flag, value type is boolean */
+extern const char *OH_MD_KEY_RANGE_FLAG;
+/* Key for video color primaries, value type is int32_t, see @OH_ColorPrimary */
+extern const char *OH_MD_KEY_COLOR_PRIMARIES;
+/* Key for video transfer characteristics, value type is int32_t, see @OH_TransferCharacteristic */
+extern const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS;
+/* Key for video matrix coefficients, value type is int32_t, see @OH_MatrixCoefficient */
+extern const char *OH_MD_KEY_MATRIX_COEFFICIENTS;
+/* Key for the request an I-Frame immediately, value type is boolean */
+extern const char *OH_MD_KEY_REQUEST_I_FRAME;
+/* Key for the desired encoding quality, value type is uint32_t, this key is only
+ * supported for encoders that are configured in constant quality mode */
+extern const char *OH_MD_KEY_QUALITY;
+/* Key of the codec specific data. value type is a uint8_t pointer */
+extern const char *OH_MD_KEY_CODEC_CONFIG;
 /* source format Key for title, value type is string */
 extern const char *OH_MD_KEY_TITLE;
 /* source format Key for artist, value type is string */
 extern const char *OH_MD_KEY_ARTIST;
 /* source format Key for album, value type is string */
 extern const char *OH_MD_KEY_ALBUM;
-/* source format Key for album_artist, value type is string */
+/* source format Key for album artist, value type is string */
 extern const char *OH_MD_KEY_ALBUM_ARTIST;
 /* source format Key for date, value type is string */
 extern const char *OH_MD_KEY_DATE;
@@ -269,25 +255,26 @@ extern const char *OH_MD_KEY_DESCRIPTION;
 extern const char *OH_MD_KEY_LYRICS;
 /* source format Key for track count, value type is uint32_t */
 extern const char *OH_MD_KEY_TRACK_COUNT;
-
-/**
- * @brief Provides the uniform container for storing the media description.
- * @syscap SystemCapability.Multimedia.Media.CodecBase
- * @since 10
- */
-/* Key for video YUV value range flag, value type is boolean */
-extern const char *OH_MD_KEY_RANGE_FLAG;
-/* Key for video color primaries, value type is int32_t, see @OH_ColorPrimary */
-extern const char *OH_MD_KEY_COLOR_PRIMARIES;
-/* Key for video transfer characteristics, value type is int32_t, see @OH_TransferCharacteristic */
-extern const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS;
-/* Key for video maxtrix coefficients, value type is int32_t, see @OH_MatrixCoefficient */
-extern const char *OH_MD_KEY_MATRIX_COEFFICIENTS;
-/* Key for the request a I-Frame immediately. value type is boolean */
-extern const char *OH_MD_KEY_REQUEST_I_FRAME;
-/* Key for the desired encoding quality. value type is uint32_t, this key is only
- * supported for encoders that are configured in constant quality mode */
-extern const char *OH_MD_KEY_QUALITY;
+/* Key for the desired encoding channel layout, value type is int64_t, this key is only supported for encoders */
+extern const char *OH_MD_KEY_CHANNEL_LAYOUT;
+/* Key for bits per coded sample, value type is uint32_t, supported for flac encoder, see @OH_BitsPerSample */
+extern const char *OH_MD_KEY_BITS_PER_CODED_SAMPLE;
+/* Key for the aac format, value type is uint32_t, supported for aac decoder */
+extern const char *OH_MD_KEY_AAC_IS_ADTS;
+/* Key for aac sbr mode, value type is uint32_t, supported for aac encoder */
+extern const char *OH_MD_KEY_SBR;
+/* Key for flac compliance level, value type is int32_t */
+extern const char *OH_MD_KEY_COMPLIANCE_LEVEL;
+/* Key for vorbis identification header, value type is a uint8_t pointer, supported only for vorbis decoder */
+extern const char *OH_MD_KEY_IDENTIFICATION_HEADER;
+/* Key for vorbis setup header, value type is a uint8_t pointer, supported only for vorbis decoder */
+extern const char *OH_MD_KEY_SETUP_HEADER;
+/* Key for video scale type, value type is int32_t, see @OH_ScalingMode */
+extern const char *OH_MD_KEY_SCALING_MODE;
+/* Key for max input buffer count, value type is int32_t */
+extern const char *OH_MD_MAX_INPUT_BUFFER_COUNT;
+/* Key for max output buffer count, value type is int32_t */
+extern const char *OH_MD_MAX_OUTPUT_BUFFER_COUNT;
 
 /**
  * @brief Media type.
@@ -303,6 +290,16 @@ typedef enum OH_MediaType {
 } OH_MediaType;
 
 /**
+ * @brief AAC Profile
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 9
+ * @version 1.0
+ */
+typedef enum OH_AACProfile {
+    AAC_PROFILE_LC = 0,
+} OH_AACProfile;
+
+/**
  * @brief AVC Profile
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 9
@@ -315,34 +312,20 @@ typedef enum OH_AVCProfile {
 } OH_AVCProfile;
 
 /**
- * @brief HEVC Profile
+ * @brief Enumerates the muxer output file format
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
- * @version 4.0
  */
-typedef enum OH_HEVCProfile {
-    HEVC_PROFILE_MAIN = 0,
-    HEVC_PROFILE_MAIN_10 = 1,
-    HEVC_PROFILE_MAIN_STILL = 2,
-    HEVC_PROFILE_MAIN_10_HDR10 = 3,
-    HEVC_PROFILE_MAIN_10_HDR10_PLUS = 4,
-} OH_HEVCProfile;
-
-/**
- * @brief AAC Profile
- * @syscap SystemCapability.Multimedia.Media.CodecBase
- * @since 9
- * @version 1.0
- */
-typedef enum OH_AACProfile {
-    AAC_PROFILE_LC = 0,
-} OH_AACProfile;
+typedef enum OH_AVOutputFormat {
+    AV_OUTPUT_FORMAT_DEFAULT = 0,
+    AV_OUTPUT_FORMAT_MPEG_4 = 2,
+    AV_OUTPUT_FORMAT_M4A = 6,
+} OH_AVOutputFormat;
 
 /**
  * @brief Seek Mode
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
- * @version 4.0
  */
 typedef enum OH_AVSeekMode {
     /* seek to sync sample after the time */
@@ -352,6 +335,19 @@ typedef enum OH_AVSeekMode {
     /* seek to sync sample closest to time */
     SEEK_MODE_CLOSEST_SYNC,
 } OH_AVSeekMode;
+
+/**
+ * @brief HEVC Profile
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ */
+typedef enum OH_HEVCProfile {
+    HEVC_PROFILE_MAIN = 0,
+    HEVC_PROFILE_MAIN_10 = 1,
+    HEVC_PROFILE_MAIN_STILL = 2,
+    HEVC_PROFILE_MAIN_10_HDR10 = 3,
+    HEVC_PROFILE_MAIN_10_HDR10_PLUS = 4,
+} OH_HEVCProfile;
 
 /**
  * @brief Color Primary
