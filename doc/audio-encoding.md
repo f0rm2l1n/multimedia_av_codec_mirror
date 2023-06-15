@@ -71,12 +71,12 @@ AEncSignal *signal_ = new AEncSignal();
 
    注册回调函数指针集合OH_AVCodecAsyncCallback，包括：
 
-   - 解码器运行错误
+   - 编码器运行错误
    - 码流信息变化，如声道变化等。
    - 运行过程中需要新的输入数据，即编码器已准备好，可以输入PCM数据。
    - 运行过程中产生了新的输出数据，即编码完成。
 
-   开发者可以通过处理该回调报告的信息，确保解码器正常运转。
+   开发者可以通过处理该回调报告的信息，确保编码器正常运转。
 
 ```cpp
 // 设置 OnError 回调函数
@@ -133,8 +133,7 @@ int32_t ret = OH_AudioEncoder_SetCallback(audioEnc, cb, userData);
 enum AudioFormatType : int32_t {
     TYPE_AAC = 0,
     TYPE_FLAC = 1,
-};  
-// 设置解码分辨率
+};
 int32_t ret;
 // 配置音频采样率（必须）
 constexpr uint32_t DEFAULT_SMAPLERATE = 44100; 
@@ -231,7 +230,7 @@ if (ret != AV_ERR_OK) {
 OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
 OH_AVMemory *data = signal_->outBufferQueue_.front();
 uint32_t index = signal_->outQueue_.front();
-// 将解码完成数据data写入到对应输出文件中
+// 将编码完成数据data写入到对应输出文件中
 outFile_->write(reinterpret_cast<char *>(OH_AVMemory_GetAdd(data)), attr.size);
 // 释放已完成写入的数据
 ret = OH_AudioEncoder_FreeOutputData(audioEnc, index);
@@ -258,7 +257,7 @@ if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS) {
    if (ret != AV_ERR_OK) {
        // 异常处理
    }
-   // 重新开始解码
+   // 重新开始编码
    ret = OH_AudioEncoder_Start(audioEnc);
    if (ret != AV_ERR_OK) {
        // 异常处理
