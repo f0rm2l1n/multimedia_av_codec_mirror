@@ -143,7 +143,7 @@ std::shared_ptr<SamplePacket> BlockQueuePool::Pop(uint32_t trackIndex)
         return nullptr;
     }
     auto& queVector = queMap_[trackIndex];
-    for (auto index = 0; index < queVector.size(); ++index) {
+    for (auto index = 0; index < static_cast<int32_t>(queVector.size()); ++index) {
         auto queIndex = queVector[index];
         if (quePool_[queIndex].blockQue == nullptr) {
             AVCODEC_LOGD("block queue %{public}d is nullptr, will find next", queIndex);
@@ -172,7 +172,7 @@ std::shared_ptr<SamplePacket> BlockQueuePool::Front(uint32_t trackIndex)
         return nullptr;
     }
     auto queVector = queMap_[trackIndex];
-    for (int i = 0; i < queVector.size(); ++i) {
+    for (int i = 0; i < static_cast<int32_t>(queVector.size()); ++i) {
         auto queIndex = queVector[i];
         if (quePool_[queIndex].blockQue == nullptr) {
             AVCODEC_LOGD("block queue %{public}d is nullptr, will find next", queIndex);
