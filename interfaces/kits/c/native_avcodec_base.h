@@ -163,16 +163,15 @@ extern const char *OH_AVCODEC_MIMETYPE_AUDIO_AAC;
  * @brief Enumerates the MIME types of audio and video codecs
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
- * @version 1.0
  */
-extern const char *OH_AVCODEC_MIMETYPE_VIDEO_MPEG4;
-extern const char *OH_AVCODEC_MIMETYPE_VIDEO_HEVC;
+extern const char *OH_AVCODEC_MIMETYPE_AUDIO_FLAC;
+extern const char *OH_AVCODEC_MIMETYPE_AUDIO_VORBIS;
 extern const char *OH_AVCODEC_MIMETYPE_AUDIO_MPEG;
+extern const char *OH_AVCODEC_MIMETYPE_VIDEO_HEVC;
+extern const char *OH_AVCODEC_MIMETYPE_VIDEO_MPEG4;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_JPG;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_PNG;
 extern const char *OH_AVCODEC_MIMETYPE_IMAGE_BMP;
-extern const char *OH_AVCODEC_MIMETYPE_AUDIO_FLAC;
-extern const char *OH_AVCODEC_MIMETYPE_AUDIO_VORBIS;
 
 /**
  * @brief The extra data's key of surface Buffer
@@ -207,14 +206,6 @@ extern const char *OH_MD_KEY_WIDTH;
 extern const char *OH_MD_KEY_HEIGHT;
 /* Key for video pixel format, value type is int32_t, see @OH_AVPixelFormat */
 extern const char *OH_MD_KEY_PIXEL_FORMAT;
-/* Key for video YUV value range flag, value type is bool */
-extern const char *OH_MD_KEY_RANGE_FLAG;
-/* Key for video color primaries, value type is int32_t */
-extern const char *OH_MD_KEY_COLOR_PRIMARIES;
-/* Key for video transfer characteristics, value type is int32_t  */
-extern const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS;
-/* Key for video maxtrix coefficients, value type is int32_t */
-extern const char *OH_MD_KEY_MATRIX_COEFFICIENTS;
 /* key for audio raw format, value type is uint32_t , see @AudioSampleFormat */
 extern const char *OH_MD_KEY_AUDIO_SAMPLE_FORMAT;
 /* Key for video frame rate, value type is double. */
@@ -233,11 +224,6 @@ extern const char *OH_MD_KEY_I_FRAME_INTERVAL;
 extern const char *OH_MD_KEY_ROTATION;
 /* Key of the codec specific data. value type is uint8_t*. */
 extern const char *OH_MD_KEY_CODEC_CONFIG;
-/* Key for the request a I-Frame immediately. value type is boolean */
-extern const char *OH_MD_KEY_REQUEST_I_FRAME;
-/* Key for the desired encoding quality. value type is uint32_t, this key is only supported for encoders that
- * are configured in constant quality mode */
-extern const char *OH_MD_KEY_QUALITY;
 /* Key for the desired encoding channel layout. value type is int64_t, this key is only supported for encoders. */
 extern const char *OH_MD_KEY_CHANNEL_LAYOUT;
 /* Key for bits per coded sample, value type is uint32_t, supported for flac encoder, see @OH_BitsPerSample. */
@@ -283,6 +269,25 @@ extern const char *OH_MD_KEY_DESCRIPTION;
 extern const char *OH_MD_KEY_LYRICS;
 /* source format Key for track count, value type is uint32_t */
 extern const char *OH_MD_KEY_TRACK_COUNT;
+
+/**
+ * @brief Provides the uniform container for storing the media description.
+ * @syscap SystemCapability.Multimedia.Media.CodecBase
+ * @since 10
+ */
+/* Key for video YUV value range flag, value type is boolean */
+extern const char *OH_MD_KEY_RANGE_FLAG;
+/* Key for video color primaries, value type is int32_t, see @OH_ColorPrimary */
+extern const char *OH_MD_KEY_COLOR_PRIMARIES;
+/* Key for video transfer characteristics, value type is int32_t, see @OH_TransferCharacteristic */
+extern const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS;
+/* Key for video maxtrix coefficients, value type is int32_t, see @OH_MatrixCoefficient */
+extern const char *OH_MD_KEY_MATRIX_COEFFICIENTS;
+/* Key for the request a I-Frame immediately. value type is boolean */
+extern const char *OH_MD_KEY_REQUEST_I_FRAME;
+/* Key for the desired encoding quality. value type is uint32_t, this key is only
+ * supported for encoders that are configured in constant quality mode */
+extern const char *OH_MD_KEY_QUALITY;
 
 /**
  * @brief Media type.
@@ -352,7 +357,6 @@ typedef enum OH_AVSeekMode {
  * @brief Color Primary
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
- * @version 4.0
  */
 typedef enum OH_ColorPrimary {
     COLOR_PRIMARY_BT709 = 1,
@@ -372,7 +376,6 @@ typedef enum OH_ColorPrimary {
  * @brief Transfer Characteristic
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
- * @version 4.0
  */
 typedef enum OH_TransferCharacteristic {
     TRANSFER_CHARACTERISTIC_BT709 = 1,
@@ -398,7 +401,6 @@ typedef enum OH_TransferCharacteristic {
  * @brief Matrix Coefficient
  * @syscap SystemCapability.Multimedia.Media.CodecBase
  * @since 10
- * @version 4.0
  */
 typedef enum OH_MatrixCoefficient {
     MATRIX_COEFFICIENT_IDENTITY = 0,

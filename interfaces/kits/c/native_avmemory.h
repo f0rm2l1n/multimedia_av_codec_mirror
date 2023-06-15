@@ -31,7 +31,6 @@ typedef struct OH_AVMemory OH_AVMemory;
  * @param size the memory's size, bytes.
  * @return Returns a pointer to an OH_AVMemory instance, needs to be freed by OH_AVMemory_Destroy.
  * @since 10
- * @version 1.0
  */
 OH_AVMemory *OH_AVMemory_Create(int32_t size);
 
@@ -62,7 +61,6 @@ int32_t OH_AVMemory_GetSize(struct OH_AVMemory *mem);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 1.0
  */
 OH_AVErrCode OH_AVMemory_Destroy(struct OH_AVMemory *mem);
 
