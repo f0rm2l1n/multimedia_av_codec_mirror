@@ -228,6 +228,11 @@ public:
      */
     static constexpr std::string_view MD_KEY_SETUP_HEADER = "setup_header";
 
+    /**
+     * Key for audio frame size, means samples per frame, value type is int32_t*
+     */
+    static constexpr std::string_view MD_KEY_AUDIO_SAMPLES_PER_FRAME = "audio_samples_per_frame";
+
 private:
     MediaDescriptionKey() = delete;
     ~MediaDescriptionKey() = delete;

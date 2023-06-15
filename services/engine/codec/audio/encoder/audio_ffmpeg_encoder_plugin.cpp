@@ -27,7 +27,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 namespace OHOS {
 namespace Media {
 AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin()
-    : maxInputSize_(-1), avCodec_(nullptr), avCodecContext_(nullptr), cachedFrame_(nullptr), avPacket_(nullptr)
+    : maxInputSize_(-1), avCodec_(nullptr), avCodecContext_(nullptr), cachedFrame_(nullptr), avPacket_(nullptr),
+      prevPts_(0)
 {
 }
 
@@ -187,6 +188,8 @@ int32_t AudioFfmpegEncoderPlugin::ReceivePacketSucc(std::shared_ptr<AudioBufferI
 
     auto attr = outBuffer->GetBufferAttr();
     attr.size = avPacket_->size + headerSize;
+    prevPts_ += avPacket_->duration;
+    attr.presentationTimeUs = FFMpegConverter::ConvertAudioPtsToUs(prevPts_, avCodecContext_->time_base);
     outBuffer->SetBufferAttr(attr);
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
@@ -195,6 +198,7 @@ int32_t AudioFfmpegEncoderPlugin::Reset()
 {
     auto ret = CloseCtxLocked();
     avCodecContext_.reset();
+    prevPts_ = 0;
     return ret;
 }
 
@@ -212,6 +216,7 @@ int32_t AudioFfmpegEncoderPlugin::Flush()
     if (avCodecContext_ != nullptr) {
         avcodec_flush_buffers(avCodecContext_.get());
     }
+    prevPts_ = 0;
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
@@ -242,6 +247,7 @@ int32_t AudioFfmpegEncoderPlugin::AllocateContext(const std::string &name)
 
 int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
 {
+    format_ = format;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, avCodecContext_->channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, avCodecContext_->sample_rate);
     format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, avCodecContext_->bit_rate);
@@ -280,6 +286,10 @@ int32_t AudioFfmpegEncoderPlugin::OpenContext()
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
     }
+    if (avCodecContext_->frame_size <= 0) {
+        AVCODEC_LOGE("frame size invalid");
+    }
+    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLES_PER_FRAME, avCodecContext_->frame_size);
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 

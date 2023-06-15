@@ -67,6 +67,7 @@ private:
     mutable std::mutex avMutext_;
     std::mutex parameterMutex_;
     Format format_;
+    int64_t prevPts_;
 
 private:
     int32_t SendBuffer(const std::shared_ptr<AudioBufferInfo> &inputBuffer);
