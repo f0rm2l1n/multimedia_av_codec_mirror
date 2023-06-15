@@ -31,20 +31,20 @@ static const uint64_t AAC_CHANNEL_LAYOUT_TABLE[] = {
     AV_CH_LAYOUT_5POINT1_BACK,
     AV_CH_LAYOUT_7POINT1,
 };
-}
-
-namespace OHOS {
-namespace Media {
 constexpr std::string_view AUDIO_CODEC_NAME = "aac";
 constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
 constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 8192;
 constexpr uint32_t ADTS_HEADER_SIZE = 7;
-
 constexpr uint8_t SAMPLE_FREQUENCY_INDEX_DEFAULT = 4;
+constexpr int32_t MIN_CHANNELS = 1;
+constexpr int32_t MAX_CHANNELS = 8;
 static std::map<int32_t, uint8_t> sampleFreqMap = {{96000, 0},  {88200, 1}, {64000, 2}, {48000, 3}, {44100, 4},
                                                    {32000, 5},  {24000, 6}, {22050, 7}, {16000, 8}, {12000, 9},
                                                    {11025, 10}, {8000, 11}, {7350, 12}};
+}
 
+namespace OHOS {
+namespace Media {
 AudioFFMpegAacEncoderPlugin::AudioFFMpegAacEncoderPlugin() : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>()) {}
 
 AudioFFMpegAacEncoderPlugin::~AudioFFMpegAacEncoderPlugin()
@@ -78,14 +78,7 @@ static int32_t GetAdtsHeader(std::string &adtsHeader, uint32_t &headerSize, std:
 
 static bool CheckSampleRate(const std::shared_ptr<AVCodec> &codec, const int sampleRate)
 {
-    const int *p = codec->supported_samplerates;
-    while (*p != 0) { // 0作为退出条件，比如libfdk-aacenc.c的aac_sample_rates
-        if (*p == sampleRate) {
-            return true;
-        }
-        p++;
-    }
-    return false;
+    return sampleFreqMap.find(sampleRate) != sampleFreqMap.end() ? true : false;
 }
 
 static bool CheckChannelLayout(const uint64_t channelLayout)
@@ -102,7 +95,8 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
 {
     if (!format.ContainKey(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT) ||
         !format.ContainKey(MediaDescriptionKey::MD_KEY_CHANNEL_LAYOUT) ||
-        !format.ContainKey(MediaDescriptionKey::MD_KEY_SAMPLE_RATE)) {
+        !format.ContainKey(MediaDescriptionKey::MD_KEY_SAMPLE_RATE) ||
+        !format.ContainKey(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT)) {
         AVCODEC_LOGE("Format parameter missing");
         return false;
     }
@@ -121,6 +115,12 @@ bool AudioFFMpegAacEncoderPlugin::CheckFormat(const Format &format) const
         FFMpegConverter::ConvertOHAudioChannelLayoutToFFMpeg(static_cast<AudioChannelLayout>(channelLayout));
     if (!CheckChannelLayout(ffChannelLayout)) {
         AVCODEC_LOGE("Channel layout not supported");
+        return false;
+    }
+
+    int channels;
+    format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
+    if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
         return false;
     }
 
