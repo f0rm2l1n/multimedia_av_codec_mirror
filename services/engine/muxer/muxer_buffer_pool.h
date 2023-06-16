@@ -23,13 +23,9 @@
 
 namespace OHOS {
 namespace Media {
-namespace {
-constexpr size_t DEFAULT_POOL_SIZE = 16;
-}
-
 class MuxerBufferPool {
 public:
-    explicit MuxerBufferPool(std::string name, size_t capacity = DEFAULT_POOL_SIZE);
+    explicit MuxerBufferPool(std::string name, size_t capacity = defaultPoolSize);
     ~MuxerBufferPool();
     std::shared_ptr<uint8_t> AcquireBuffer(int32_t size);
     void ReleaseBuffer(std::shared_ptr<uint8_t> buffer);
@@ -40,8 +36,9 @@ private:
     std::list<MuxerBuffer> idleList_;
     std::list<MuxerBuffer> busyList_;
     std::string name_;
-    size_t capacity_;
+    const size_t capacity_;
     std::mutex mutex_;
+    static const size_t defaultPoolSize = 16;
 };
 }
 }
