@@ -210,8 +210,8 @@ Status FFmpegMuxerPlugin::AddAudioTrack(int32_t &trackIndex, const MediaDescript
     st->codecpar->sample_rate = sampleRate;
     st->codecpar->channels = channels;
     int32_t frameSize = 0;
-    if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_PER_FRAME) &&
-        trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_PER_FRAME, frameSize) &&
+    if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLES_PER_FRAME) &&
+        trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLES_PER_FRAME, frameSize) &&
         frameSize > 0) {
         st->codecpar->frame_size = frameSize;
     }

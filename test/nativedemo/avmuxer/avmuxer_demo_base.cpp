@@ -430,7 +430,7 @@ int AVMuxerDemoBase::AddAudioTrack(const AudioTrackParam *param)
     audioParams.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, param->mimeType);
     audioParams.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, param->sampleRate);
     audioParams.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, param->channels);
-    audioParams.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_PER_FRAME, param->frameSize);
+    audioParams.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLES_PER_FRAME, param->frameSize);
 
     int extSize = 0;
     char buffer[CONFIG_BUFFER_SZIE] {0};

@@ -86,7 +86,7 @@ int AddTrackAudio(OH_AVMuxer *muxer, const AudioTrackParam *param, int fdInput)
         printf("audio format failed!\n");
         return AV_ERR_NO_MEMORY;
     }
-    OH_AVFormat_SetIntValue(formatAudio, "audio_sample_per_frame", param->frameSize);
+    OH_AVFormat_SetIntValue(formatAudio, "audio_samples_per_frame", param->frameSize);
     int extraSize = 0;
     unsigned char buffer[CONFIG_BUFFER_SIZE] = {0};
     read(fdInput, (void*)&extraSize, sizeof(extraSize));

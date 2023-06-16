@@ -155,7 +155,6 @@ int32_t MuxerEngineImpl::SetRotation(int32_t rotation)
         AVCODEC_LOGW("Invalid rotation: %{public}d, keep default 0", rotation);
         return AVCS_ERR_INVALID_VAL;
     }
-    AVCodecTrace tracePlugin("Plugin::SetRotation");
     Plugin::Status ret = muxer_->SetRotation(rotation);
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "SetRotation failed");
     return AVCS_ERR_OK;
@@ -177,7 +176,7 @@ int32_t MuxerEngineImpl::AddTrack(int32_t &trackIndex, const MediaDescription &t
         "track mime is unsupported: %{public}s", mimeType.c_str());
     CHECK_AND_RETURN_RET_LOG(CheckKeys(mimeType, trackDesc), AVCS_ERR_INVALID_VAL,
         "track format keys not contained");
-    AVCodecTrace tracePlugin("Plugin::AddTrack");
+
     int32_t trackId = -1;
     Plugin::Status ret = muxer_->AddTrack(trackId, trackDesc);
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "AddTrack failed");
@@ -199,7 +198,6 @@ int32_t MuxerEngineImpl::Start()
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
     CHECK_AND_RETURN_RET_LOG(tracksDesc_.size() > 0, AVCS_ERR_INVALID_OPERATION,
         "The track count is error, count is %{public}zu", tracksDesc_.size());
-    AVCodecTrace tracePlugin("Plugin::Start");
     Plugin::Status ret = muxer_->Start();
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "Start failed");
     state_ = State::STARTED;
@@ -219,12 +217,11 @@ int32_t MuxerEngineImpl::WriteSample(uint32_t trackIndex, std::shared_ptr<AVShar
         "The track index does not exist");
     CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.offset >= 0 && info.size >= 0 &&
         sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
-    AVCodecTrace traceMalloc("Malloc::NewBuffer");
+
     std::shared_ptr<uint8_t> buffer = pool_.AcquireBuffer(info.size);
-    AVCodecTrace traceCopy("Memcpy::CopyBuffer");
     errno_t rc = memcpy_s(buffer.get(), info.size, sample->GetBase() + info.offset, info.size);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
-    AVCodecTrace tracePush("Queue::QueueBuffer");
+
     std::shared_ptr<BlockBuffer> blockBuffer = std::make_shared<BlockBuffer>();
     blockBuffer->trackIndex_ = trackIndex;
     blockBuffer->buffer_ = buffer;
@@ -345,7 +342,6 @@ void MuxerEngineImpl::ThreadProcessor()
         }
         auto buffer = que_.Pop();
         if (buffer != nullptr) {
-            AVCodecTrace traceWrite("Plugin::WriteSample");
             (void)muxer_->WriteSample(buffer->trackIndex_, buffer->buffer_.get(), buffer->info_, buffer->flag_);
             pool_.ReleaseBuffer(buffer->buffer_);
         }

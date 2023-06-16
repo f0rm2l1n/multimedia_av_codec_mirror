@@ -229,9 +229,9 @@ public:
     static constexpr std::string_view MD_KEY_SETUP_HEADER = "setup_header";
 
     /**
-     * Key for audio sample per frame, value type is uint32_t
+     * Key for audio frame size, means samples per frame, value type is int32_t*
      */
-    static constexpr std::string_view MD_KEY_AUDIO_SAMPLE_PER_FRAME = "audio_sample_per_frame";
+    static constexpr std::string_view MD_KEY_AUDIO_SAMPLES_PER_FRAME = "audio_samples_per_frame";
 
     /**
      * Key for Number of delayed video frames, value type is uint32_t
