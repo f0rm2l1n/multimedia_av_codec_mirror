@@ -61,12 +61,12 @@ int32_t AVMuxerInnerMock::WriteSample(uint32_t trackIndex,
             std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sampleData");
         (void)avSample->Init();
         (void)memcpy_s(avSample->GetBase(), avSample->GetSize(), sample, info.size);
-        TrackSampleInfo sampleInfo;
-        sampleInfo.trackIndex = trackIndex;
-        sampleInfo.timeUs = info.pts;
+        AVCodecBufferInfo sampleInfo;
+        sampleInfo.presentationTimeUs = info.pts;
         sampleInfo.size = info.size;
-        sampleInfo.flags = info.flags;
-        return muxer_->WriteSample(avSample, sampleInfo);
+        sampleInfo.offset = info.offset;
+        AVCodecBufferFlag flag = static_cast<AVCodecBufferFlag>(info.flags);
+        return muxer_->WriteSample(trackIndex, avSample, sampleInfo, flag);
     }
     return AV_ERR_UNKNOWN;
 }

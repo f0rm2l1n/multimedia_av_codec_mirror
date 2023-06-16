@@ -102,14 +102,13 @@ OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer *muxer,
     struct AVMuxerObject *object = reinterpret_cast<AVMuxerObject *>(muxer);
     CHECK_AND_RETURN_RET_LOG(object->muxer_ != nullptr, AV_ERR_INVALID_VAL, "muxer_ is nullptr!");
 
-    TrackSampleInfo sampleInfo;
-    sampleInfo.trackIndex = trackIndex;
-    sampleInfo.timeUs = info.pts;
+    AVCodecBufferInfo sampleInfo;
+    sampleInfo.presentationTimeUs = info.pts;
     sampleInfo.size = info.size;
     sampleInfo.offset = info.offset;
-    sampleInfo.flags = info.flags;
+    AVCodecBufferFlag flag = static_cast<AVCodecBufferFlag>(info.flags);
 
-    int32_t ret = object->muxer_->WriteSample(sample->memory_, sampleInfo);
+    int32_t ret = object->muxer_->WriteSample(trackIndex, sample->memory_, sampleInfo, flag);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCSErrorToOHAVErrCode(static_cast<AVCodecServiceErrCode>(ret)),
                              "muxer_ WriteSample failed!");
 

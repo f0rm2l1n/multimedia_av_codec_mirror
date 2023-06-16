@@ -100,7 +100,8 @@ int32_t MuxerServiceProxy::Start()
     return reply.ReadInt32();
 }
 
-int32_t MuxerServiceProxy::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
+int32_t MuxerServiceProxy::WriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -110,11 +111,11 @@ int32_t MuxerServiceProxy::WriteSample(std::shared_ptr<AVSharedMemory> sample, c
     CHECK_AND_RETURN_RET_LOG(token, AVCS_ERR_INVALID_OPERATION, "Write descriptor failed!!");
 
     WriteAVSharedMemoryToParcel(sample, data);
-    CHECK_AND_RETURN_RET_LOG(data.WriteUint32(info.trackIndex), AVCS_ERR_UNKNOWN, "Write track index failed!");
-    CHECK_AND_RETURN_RET_LOG(data.WriteInt64(info.timeUs), AVCS_ERR_UNKNOWN, "Write timeUs failed!");
+    CHECK_AND_RETURN_RET_LOG(data.WriteUint32(trackIndex), AVCS_ERR_UNKNOWN, "Write track index failed!");
+    CHECK_AND_RETURN_RET_LOG(data.WriteInt64(info.presentationTimeUs), AVCS_ERR_UNKNOWN, "Write timeUs failed!");
     CHECK_AND_RETURN_RET_LOG(data.WriteInt32(info.size), AVCS_ERR_UNKNOWN, "Write size failed!");
     CHECK_AND_RETURN_RET_LOG(data.WriteInt32(info.offset), AVCS_ERR_UNKNOWN, "Write offset failed!");
-    CHECK_AND_RETURN_RET_LOG(data.WriteUint32(info.flags), AVCS_ERR_UNKNOWN, "Write flags failed!");
+    CHECK_AND_RETURN_RET_LOG(data.WriteUint32(flag), AVCS_ERR_UNKNOWN, "Write flags failed!");
 
     int32_t ret = Remote()->SendRequest(WRITE_SAMPLE, data, reply, option);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "WriteSample failed, error: %{public}d", ret);

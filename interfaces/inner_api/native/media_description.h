@@ -194,7 +194,7 @@ public:
     static constexpr std::string_view MD_KEY_CHANNEL_LAYOUT = "channel_layout";
 
     /**
-     * Key for audio sample format, value type is uint32_t
+     * Key for audio sample frame size, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_AUDIO_SAMPLE_FORMAT = "audio_sample_format";
 
@@ -227,6 +227,16 @@ public:
      * Key for vorbis setup header, value type is uint8_t*
      */
     static constexpr std::string_view MD_KEY_SETUP_HEADER = "setup_header";
+
+    /**
+     * Key for audio sample per frame, value type is uint32_t
+     */
+    static constexpr std::string_view MD_KEY_AUDIO_SAMPLE_PER_FRAME = "audio_sample_per_frame";
+
+    /**
+     * Key for Number of delayed video frames, value type is uint32_t
+     */
+    static constexpr std::string_view MD_KEY_VIDEO_DELAY = "video_delay";
 
 private:
     MediaDescriptionKey() = delete;

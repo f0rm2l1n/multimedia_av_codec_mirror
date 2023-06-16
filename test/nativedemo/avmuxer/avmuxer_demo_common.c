@@ -22,6 +22,7 @@ struct AudioTrackParam g_audioMpegPar = {
     .mimeType = "audio/mpeg",
     .sampleRate = 44100,
     .channels = 2,
+    .frameSize = 1152,
 };
 
 struct AudioTrackParam g_audioAacPar = {
@@ -29,6 +30,7 @@ struct AudioTrackParam g_audioAacPar = {
     .mimeType = "audio/mp4a-latm",
     .sampleRate = 44100,
     .channels = 2,
+    .frameSize = 1024,
 };
 
 struct VideoTrackParam g_videoH264Par = {
@@ -36,6 +38,8 @@ struct VideoTrackParam g_videoH264Par = {
     .mimeType = "video/avc",
     .width = 720,
     .height = 480,
+    .frameRate = 60,
+    .videoDelay = 0,
 };
 
 struct VideoTrackParam g_videoMpeg4Par = {
@@ -43,6 +47,17 @@ struct VideoTrackParam g_videoMpeg4Par = {
     .mimeType = "video/mp4v-es",
     .width = 720,
     .height = 480,
+    .frameRate = 60,
+    .videoDelay = 0,
+};
+
+struct VideoTrackParam g_videoH265Par = {
+    .fileName = "h265_720_480.dat",
+    .mimeType = "video/hevc",
+    .width = 720,
+    .height = 480,
+    .frameRate = 60,
+    .videoDelay = 2,
 };
 
 struct VideoTrackParam g_jpegCoverPar = {
