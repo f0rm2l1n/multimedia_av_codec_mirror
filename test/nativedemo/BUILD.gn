@@ -49,7 +49,7 @@ ohos_executable("av_codec_demo") {
     av_codec_plugin_path = "\"/system/lib/media/av_codec_plugins\""
   }
 
-  defines = ["AV_CODEC_PLUGIN_PATH=${av_codec_plugin_path}"]
+  defines = [ "AV_CODEC_PLUGIN_PATH=${av_codec_plugin_path}" ]
 
   cflags = [
     "-Wall",
