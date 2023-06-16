@@ -90,7 +90,7 @@ av_codec部件提供了以下常用功能：
 ## 说明
 
 ### 使用说明
-使用说明参考[开发指导](./doc/avmuxer-overview.md)
+使用说明参考[开发指导](./doc/Readme-CN.md)
 
 
 ## Changelog
