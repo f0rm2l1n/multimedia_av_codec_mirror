@@ -30,14 +30,14 @@ using namespace OHOS::Media;
 using namespace OHOS::Media::AudioFlacDemo;
 using namespace std;
 namespace {
-constexpr uint32_t CHANNEL_COUNT = 2;
-constexpr uint32_t SAMPLE_RATE = 44100;
+constexpr uint32_t CHANNEL_COUNT = 1;
+constexpr uint32_t SAMPLE_RATE = 8000;
 constexpr uint32_t BITS_RATE = 261000;
 constexpr uint32_t BITS_PER_CODED_SAMPLE = AudioSampleFormat::SAMPLE_S16LE;
 constexpr uint32_t FRAME_DURATION_US = 33000;
-constexpr uint32_t CHANNEL_LAYOUT = AudioChannelLayout::STEREO;
+constexpr uint32_t CHANNEL_LAYOUT = AudioChannelLayout::MONO;
 constexpr int32_t SAMPLE_FORMAT = AudioSampleFormat::SAMPLE_S16LE;
-constexpr uint32_t FRAME_BYTES = 18432;
+constexpr uint32_t FRAME_BYTES = 1152;
 constexpr int32_t COMPLIANCE_LEVEL = 0;
 
 constexpr string_view INPUT_FILE_PATH = "/data/test/media/flac_2c_44100hz_261k.pcm";

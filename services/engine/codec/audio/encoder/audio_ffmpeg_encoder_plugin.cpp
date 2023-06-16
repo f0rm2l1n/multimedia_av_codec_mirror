@@ -59,14 +59,13 @@ int32_t AudioFfmpegEncoderPlugin::PcmFillFrame(const std::shared_ptr<AudioBuffer
     auto memory = inputBuffer->GetBuffer();
     auto bytesPerSample = av_get_bytes_per_sample(avCodecContext_->sample_fmt);
     auto usedSize = inputBuffer->GetBufferAttr().size;
-    AVCODEC_LOGI("usedSize : %{public}d ", usedSize);
     auto frameSize = avCodecContext_->frame_size;
-    AVCODEC_LOGI("frameSize : %{public}d ", frameSize);
     cachedFrame_->nb_samples = usedSize / channelsBytesPerSample_;
-    AVCODEC_LOGI("cachedFrame_->nb_samples: %{public}d ", cachedFrame_->nb_samples);
     if (!av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
         if (cachedFrame_->nb_samples > frameSize) {
             AVCODEC_LOGE("cachedFrame_->nb_samples is greater than frameSize, please enter a correct frameBytes");
+            AVCODEC_LOGI("hint: cachedFrame_->nb_samples is %{public}d, frameSize is %{public}d",
+                cachedFrame_->nb_samples, frameSize);
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
         cachedFrame_->data[0] = memory->GetBase();
