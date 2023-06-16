@@ -194,7 +194,7 @@ public:
     static constexpr std::string_view MD_KEY_CHANNEL_LAYOUT = "channel_layout";
 
     /**
-     * Key for audio sample frame size, value type is uint32_t
+     * Key for audio sample format, value type is uint32_t
      */
     static constexpr std::string_view MD_KEY_AUDIO_SAMPLE_FORMAT = "audio_sample_format";
 

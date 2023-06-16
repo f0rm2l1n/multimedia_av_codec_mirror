@@ -330,7 +330,7 @@ Status FFmpegMuxerPlugin::Stop()
 }
 
 Status FFmpegMuxerPlugin::WriteSample(uint32_t trackIndex, const uint8_t *sample,
-        AVCodecBufferInfo info, AVCodecBufferFlag flag)
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     CHECK_AND_RETURN_RET_LOG(isWriteHeader_, Status::ERROR_WRONG_STATE, "WriteSample failed! Did not write header!");
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, Status::ERROR_NULL_POINTER,

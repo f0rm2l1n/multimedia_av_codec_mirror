@@ -19,7 +19,6 @@
 #include <list>
 #include <string>
 #include <memory>
-#include <functional>
 #include <mutex>
 
 namespace OHOS {
