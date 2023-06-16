@@ -59,19 +59,19 @@ int32_t AudioFfmpegEncoderPlugin::PcmFillFrame(const std::shared_ptr<AudioBuffer
     auto memory = inputBuffer->GetBuffer();
     auto bytesPerSample = av_get_bytes_per_sample(avCodecContext_->sample_fmt);
     auto usedSize = inputBuffer->GetBufferAttr().size;
-
+    AVCODEC_LOGI("usedSize : %{public}d ", usedSize);
+    auto frameSize = avCodecContext_->frame_size;
+    AVCODEC_LOGI("frameSize : %{public}d ", frameSize);
+    cachedFrame_->nb_samples = usedSize / channelsBytesPerSample_;
     AVCODEC_LOGI("cachedFrame_->nb_samples: %{public}d ", cachedFrame_->nb_samples);
     if (!av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
-        /* auto ret = av_samples_fill_arrays(cachedFrame_->data, cachedFrame_->linesize, ptr, cachedFrame_->channels,
-                                          cachedFrame_->nb_samples, (AVSampleFormat)cachedFrame_->format, 0);
-        if (ret < 0) {
-            AVCODEC_LOGE("Samples fill arrays failed: %{public}s", AVStrError(ret).c_str());
+        if (cachedFrame_->nb_samples > frameSize) {
+            AVCODEC_LOGE("cachedFrame_->nb_samples is greater than frameSize, please enter a correct frameBytes");
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
-        } */
+        }
         cachedFrame_->data[0] = memory->GetBase();
         cachedFrame_->extended_data = cachedFrame_->data;
         cachedFrame_->linesize[0] = usedSize;
-        
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     }
     const uint8_t *ptr = memory->GetBase();
