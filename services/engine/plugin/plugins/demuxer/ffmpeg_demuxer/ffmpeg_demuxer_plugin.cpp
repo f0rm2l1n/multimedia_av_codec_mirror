@@ -126,12 +126,9 @@ int64_t FFmpegDemuxerPlugin::GetTotalStreamFrames(int streamIndex)
 AVCodecBufferFlag FFmpegDemuxerPlugin::ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream)
 {
     AVCodecBufferFlag flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
-    if (pkt->flags == 0x0001) {
+    if (pkt->flags & AV_PKT_FLAG_KEY) {
         flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_SYNC_FRAME;
-    } else {
-        flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
     }
-
     return flags;
 }
 
@@ -426,7 +423,7 @@ int64_t FFmpegDemuxerPlugin::CalculateTimeByFrameIndex(AVStream* avStream, int k
     return avStream->index_entries[keyFrameIdx].timestamp;
 #endif
 #else
-    return avStream->index_entries[keyFrameIdx].timestamp
+    return avStream->index_entries[keyFrameIdx].timestamp;
 #endif
 }
 
