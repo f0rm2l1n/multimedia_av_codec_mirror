@@ -47,7 +47,7 @@ constexpr uint32_t FRAME_DURATION_US = 33000;
 constexpr string_view inputFilePath = "/data/test/media/out_320_240_10s.h264";
 constexpr string_view outputFilePath = "/data/test/media/out_320_240_10s.yuv";
 constexpr string_view outputSurfacePath = "/data/test/media/out_320_240_10s.rgba";
-constexpr uint32_t SLEEP_TIME = 10;
+constexpr uint32_t SLEEP_TIME = 1;
 uint32_t outFrameCount = 0;
 } // namespace
 
@@ -83,19 +83,17 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
 {
     (void)codec;
     VDecSignal *signal_ = static_cast<VDecSignal *>(userData);
-    unique_lock<mutex> lock(signal_->outMutex_);
-    signal_->outQueue_.push(index);
-    signal_->outBufferQueue_.push(data);
     if (attr) {
         cout << "OnOutputBufferAvailable received, index:" << index << ", attr->size:" << attr->size << endl;
+        unique_lock<mutex> lock(signal_->outMutex_);
+        signal_->outQueue_.push(index);
+        signal_->outBufferQueue_.push(data);
         signal_->attrQueue_.push(*attr);
+        outFrameCount += attr->size > 0 ? 1 : 0;
+        signal_->outCond_.notify_all();
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
     }
-    if (attr->size > 0) {
-        outFrameCount++;
-    }
-    signal_->outCond_.notify_all();
 }
 
 void VDecDemo::RunCase(std::string &mode)
@@ -346,6 +344,7 @@ void VDecDemo::InputFunc()
 
         uint32_t index = signal_->inQueue_.front();
         auto buffer = signal_->inBufferQueue_.front();
+        lock.unlock();
         if (!file_end_ && (ExtractPacket() != AVCS_ERR_OK || pkt_->size == 0)) {
             continue;
         }
@@ -409,6 +408,7 @@ void VDecDemo::OutputFunc()
         uint32_t index = signal_->outQueue_.front();
         OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
         OH_AVMemory *data = signal_->outBufferQueue_.front();
+        lock.unlock();
         if (outFile_ != nullptr && attr.size != 0 && data != nullptr && OH_AVMemory_GetAddr(data) != nullptr) {
             cout << "OutputFunc write file,buffer index" << index << ", data size = :" << attr.size << endl;
             outFile_->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);

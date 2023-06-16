@@ -41,7 +41,7 @@ constexpr string_view inputFilePath = "/data/test/media/out_320_240_10s.h264";
 constexpr string_view outputFilePath = "/data/test/media/out_320_240_10s.yuv";
 constexpr string_view outputSurfacePath = "/data/test/media/out_320_240_10s.rgba";
 uint32_t outFrameCount = 0;
-constexpr uint32_t SLEEP_TIME = 10;
+constexpr uint32_t SLEEP_TIME = 1;
 } // namespace
 
 TestConsumerListener::TestConsumerListener(sptr<Surface> cs, std::string_view name) : cs_(cs)
@@ -333,6 +333,7 @@ void VDecInnerDemo::InputFunc()
             break;
         }
         uint32_t index = signal_->inQueue_.front();
+        lock.unlock();
         std::shared_ptr<AVSharedMemory> buffer = videoDec_->GetInputBuffer(index);
         if (buffer == nullptr) {
             isRunning_.store(false);
@@ -379,9 +380,10 @@ void VDecInnerDemo::OutputFunc()
         }
 
         uint32_t index = signal_->outQueue_.front();
-        auto buffer = mode_ != "0" ? nullptr : videoDec_->GetOutputBuffer(index);
         auto attr = signal_->infoQueue_.front();
         auto flag = signal_->flagQueue_.front();
+        lock.unlock();
+        auto buffer = mode_ != "0" ? nullptr : videoDec_->GetOutputBuffer(index);
         if (flag == AVCODEC_BUFFER_FLAG_EOS) {
             cout << "decode eos, write frame:" << outFrameCount << endl;
             isRunning_.store(false);
