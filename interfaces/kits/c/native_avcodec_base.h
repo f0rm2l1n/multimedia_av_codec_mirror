@@ -226,8 +226,8 @@ extern const char *OH_MD_KEY_TRANSFER_CHARACTERISTICS;
 extern const char *OH_MD_KEY_MATRIX_COEFFICIENTS;
 /* Key for the request an I-Frame immediately, value type is boolean */
 extern const char *OH_MD_KEY_REQUEST_I_FRAME;
-/* Key for the desired encoding quality, value type is uint32_t, this key is
- * only supported for encoders that are configured in constant quality mode */
+/* Key for the desired encoding quality, value type is uint32_t, this key is only
+ * supported for encoders that are configured in constant quality mode */
 extern const char *OH_MD_KEY_QUALITY;
 /* Key of the codec specific data. value type is a uint8_t pointer */
 extern const char *OH_MD_KEY_CODEC_CONFIG;

@@ -216,14 +216,13 @@ OH_AVErrCode OH_VideoEncoder_NotifyEndOfStream(OH_AVCodec *codec);
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 4.0
  */
 OH_AVErrCode OH_VideoEncoder_PushInputData(OH_AVCodec *codec, uint32_t index, OH_AVCodecBufferAttr attr);
 
 /**
- * @brief Get the description information that accepted by the video encoder, call this after configure, refer to {@link
- * OH_AVFormat} for details. It should be noted that the life cycle of the OH_AVFormat instance pointed to by the return
- * value * needs to be manually released by the caller.
+ * @brief Get the input data description of the encoder after call {@OH_VideoEncoder_Configure},
+ * refer to {@link OH_AVFormat} for details. It should be noted that the life cycle of the OH_AVFormat
+ * instance pointed to by the return value needs to be manually released by the caller.
  * @syscap SystemCapability.Multimedia.Media.VideoEncoder
  * @param codec Pointer to an OH_AVCodec instance
  * @return Returns a pointer to an OH_AVFormat instance
@@ -236,12 +235,11 @@ OH_AVFormat *OH_VideoEncoder_GetInputDescription(OH_AVCodec *codec);
  * switchback from the background
  * @syscap SystemCapability.Multimedia.Media.VideoEncoder
  * @param codec Pointer to an OH_AVCodec instance
- * @param isValid Pointer to an bool instance, true: the codec instance is valid, false: the codec
- * instance is invalid
+ * @param isValid Output Parameter. A pointer to a boolean instance, it is true if the codec instance is valid,
+ * false if the codec instance is invalid
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 4.0
  */
 OH_AVErrCode OH_VideoEncoder_IsValid(OH_AVCodec *codec, bool *isValid);
 
