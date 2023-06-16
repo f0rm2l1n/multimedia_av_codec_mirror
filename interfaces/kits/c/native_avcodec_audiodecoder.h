@@ -23,8 +23,6 @@
 #include "native_avmemory.h"
 #include "native_avcodec_base.h"
 
-namespace OHOS {
-namespace Media {
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -224,6 +222,5 @@ OH_AVErrCode OH_AudioDecoder_IsValid(OH_AVCodec *codec, bool *isValid);
 #ifdef __cplusplus
 }
 #endif
-} // namespace Media
-} // namespace OHOS
+
 #endif // NATIVE_AVCODEC_AUDIODECODER_H

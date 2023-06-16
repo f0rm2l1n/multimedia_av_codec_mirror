@@ -14,6 +14,9 @@
  */
 #include "ffmpeg_converter.h"
 #include <vector>
+namespace {
+    constexpr int US_PER_SECOND = 1000000;
+}
 namespace OHOS {
 namespace Media {
 // ffmpeg channel layout to histreamer channel layout
@@ -141,6 +144,15 @@ std::string_view FFMpegConverter::ConvertOHAudioChannelLayoutToString(AudioChann
         return g_ChannelLayoutToString[0].second;
     }
     return ite->second;
+}
+
+int64_t FFMpegConverter::ConvertAudioPtsToUs(int64_t pts, AVRational base)
+{
+    if (pts == AV_NOPTS_VALUE) {
+        return -1;
+    }
+    AVRational us = {1, US_PER_SECOND};
+    return av_rescale_q(pts, base, us);
 }
 } // namespace Media
 } // namespace OHOS

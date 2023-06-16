@@ -80,7 +80,7 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
     signal->outBufferQueue_.push(data);
     if (attr) {
         cout << "OnOutputBufferAvailable received, index:" << index << ", attr->size:" << attr->size
-             << ", attr->flags:" << attr->flags << endl;
+             << ", attr->flags:" << attr->flags << ", pts " << attr->pts << endl;
         signal->attrQueue_.push(*attr);
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;

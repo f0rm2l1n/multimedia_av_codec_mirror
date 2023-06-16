@@ -121,6 +121,7 @@ uint64_t AVCodecXCollie::SetTimer(const std::string &name, bool isService, bool 
     dfxDumper_[tempIndex].first = id;
     return tempIndex;
 #else
+    (void)dumperIndex_;
     return COLLIE_INVALID_INDEX;
 #endif
 }

@@ -238,8 +238,8 @@ HWTEST_P(VideoDecUnitTest, videoDecoder_configure_004, TestSize.Level1)
  */
 HWTEST_P(VideoDecUnitTest, videoDecoder_configure_005, TestSize.Level1)
 {
-    ASSERT_TRUE(CreateVideoCodecByMime(std::string(CodecMimeType::VIDEO_AVC)));
-    EXPECT_NE(AV_ERR_OK, videoDec_->Configure(format_));
+    CreateByNameWithParam();
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
 }
 
 /**

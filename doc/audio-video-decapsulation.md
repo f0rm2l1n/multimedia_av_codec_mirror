@@ -32,16 +32,16 @@
 
 > **说明**
 >
-> - 调用解封装能力解析网络播放路径，需[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.INTERNET
-> - 调用解封装能力解析本地文件，需[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.READ_MEDIA
+> - 调用解封装能力解析网络播放路径，需要[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.INTERNET
+> - 调用解封装能力解析本地文件，需要[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.READ_MEDIA
 > - 如果使用ResourceManager.getRawFd打开HAP资源文件描述符，使用方法请参考[ResourceManager API参考](../reference/apis/js-apis-resource-manager.md#getrawfd9)
 
 1. 创建解封装器实例对象
 
    ``` c++
    // 创建文件操作符 fd，打开时对文件句柄必须有读权限
-   std::string fileName = "/data/test/media/test.mp4";
-   int32_t fd = open(fileName.c_str(), O_RDONLY);
+   std::string fileName = "test.mp4";
+   int fd = open(fileName.c_str(), O_RDONLY);
    struct stat fileStatus {};
    size_t fileSize = 0;
    if (stat(fileName.c_str(), &fileStatus) == 0) {
@@ -53,15 +53,17 @@
    // 为 fd 资源文件创建 source 资源对象, 传入 offset 不为文件起始位置 或 size 不为文件大小时，可能会因不能获取完整数据导致 source 创建失败、或后续解封装失败等问题
    OH_AVSource *source = OH_AVSource_CreateWithFD(fd, 0, fileSize);
    if (source == nullptr) {
-      printf("create source error: fd=%d, size=%zu", fd, fileSize);
+      printf("create source failed");
       return;
    }
    // 为 uri 资源文件创建 source 资源对象(可选)
    // OH_AVSource *source = OH_AVSource_CreateWithURI(uri);
+   ```
+   ```c++
    // 为资源对象创建对应的解封装器
    OH_AVDemuxer *demuxer = OH_AVDemuxer_CreateWithSource(source);
    if (demuxer == nullptr) {
-      printf("create demuxer error");
+      printf("create demuxer failed");
       return;
    }
    ```
@@ -74,7 +76,7 @@
    // 从文件 source 信息获取文件轨道数
    OH_AVFormat *sourceFormat = OH_AVSource_GetSourceFormat(source);
    if (sourceFormat == nullptr) {
-      printf("get source format error");
+      printf("get source format failed");
       return;
    }
    int32_t trackCount = 0;
@@ -96,11 +98,11 @@
       // 获取轨道信息
       OH_AVFormat *trackFormat = OH_AVSource_GetTrackFormat(source, index);
       if (trackFormat == nullptr) {
-         printf("get track format error");
+         printf("get track format failed");
          return;
       }
       OH_AVFormat_GetIntValue(trackFormat, OH_MD_KEY_TRACK_TYPE, &trackType);
-      static_cast<OH_MediaType>(trackType) == OH_MediaType::MEDIA_TYPE_AUD ? audioTrackIndex=index : videoTrackIndex=index;
+      static_cast<OH_MediaType>(trackType) == OH_MediaType::MEDIA_TYPE_AUD ? audioTrackIndex = index : videoTrackIndex = index;
       // 获取视频轨宽高
       if (trackType == OH_MediaType::MEDIA_TYPE_VID) {
          OH_AVFormat_GetIntValue(trackFormat, OH_MD_KEY_WIDTH, &w);
@@ -116,11 +118,11 @@
 
    ``` c++
    if(OH_AVDemuxer_SelectTrackByID(demuxer, audioTrackIndex) != AV_ERR_OK){
-      printf("select audio track error:%d", audioTrackIndex);
+      printf("select audio track failed: %d", audioTrackIndex);
       return;
    }
    if(OH_AVDemuxer_SelectTrackByID(demuxer, videoTrackIndex) != AV_ERR_OK){
-      printf("select video track error:%d", videoTrackIndex);
+      printf("select video track failed: %d", videoTrackIndex);
       return;
    }
    // 取消选择轨道(可选)
@@ -142,7 +144,7 @@
    // 创建 buffer，用与保存用户解封装得到的数据
    OH_AVMemory *buffer = OH_AVMemory_Create(w * h * 3 >> 1);
    if (buffer == nullptr) {
-      printf("build buffer error");
+      printf("build buffer failed");
       return;
    }
    OH_AVCodecBufferAttr info;
@@ -191,4 +193,5 @@
       printf("destroy demuxer pointer error");
    }
    demuxer = NULL;
+   close(fd);
    ```
