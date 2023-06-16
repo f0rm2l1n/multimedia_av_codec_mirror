@@ -58,17 +58,22 @@ static std::string AVStrError(int errnum)
 int32_t AudioFfmpegEncoderPlugin::PcmFillFrame(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     auto memory = inputBuffer->GetBuffer();
-    const uint8_t *ptr = memory->GetBase();
     auto bytesPerSample = av_get_bytes_per_sample(avCodecContext_->sample_fmt);
+    auto usedSize = inputBuffer->GetBufferAttr().size;
+    auto frameSize = avCodecContext_->frame_size;
+    cachedFrame_->nb_samples = usedSize / channelsBytesPerSample_;
     if (!av_sample_fmt_is_planar(avCodecContext_->sample_fmt)) {
-        auto ret = av_samples_fill_arrays(cachedFrame_->data, cachedFrame_->linesize, ptr, cachedFrame_->channels,
-                                          cachedFrame_->nb_samples, (AVSampleFormat)cachedFrame_->format, 0);
-        if (ret < 0) {
-            AVCODEC_LOGE("Samples fill arrays failed: %{public}s", AVStrError(ret).c_str());
+        if (cachedFrame_->nb_samples > frameSize) {
+            AVCODEC_LOGE("cachedFrame_->nb_samples is greater than frameSize, please enter a correct frameBytes."
+                "hint: nb_samples is %{public}d. frameSize is %{public}d.", cachedFrame_->nb_samples, frameSize);
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
+        cachedFrame_->data[0] = memory->GetBase();
+        cachedFrame_->extended_data = cachedFrame_->data;
+        cachedFrame_->linesize[0] = usedSize;
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     }
+    const uint8_t *ptr = memory->GetBase();
     for (int i = 0; i < cachedFrame_->nb_samples; i++) {
         for (int j = 0; j < cachedFrame_->channels; j++) {
             auto ret = memcpy_s((void *)(&cachedFrame_->data[j][i * bytesPerSample]), bytesPerSample,
@@ -95,7 +100,24 @@ int32_t AudioFfmpegEncoderPlugin::SendBuffer(const std::shared_ptr<AudioBufferIn
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
 
-    if (!inputBuffer->CheckIsEos()) {
+    auto attr = inputBuffer->GetBufferAttr();
+    bool isEos = inputBuffer->CheckIsEos();
+    if (!isEos) {
+        AVCODEC_LOGD("SendBuffer buffer size:%{public}d", attr.size);
+    } else {
+        AVCODEC_LOGD("SendBuffer EOS buffer size:%{public}d", attr.size);
+    }
+    if (!isEos) {
+        auto memory = inputBuffer->GetBuffer();
+        if (attr.size < 0) {
+            AVCODEC_LOGE("SendBuffer buffer size is less than 0. size : %{public}d", attr.size);
+            return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+        }
+        if (attr.size > memory->GetSize()) {
+            AVCODEC_LOGE("send input buffer is > allocate size. size : %{public}d, allocate size : %{public}d",
+                attr.size, memory->GetSize());
+            return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+        }
         auto errCode = PcmFillFrame(inputBuffer);
         if (errCode != AVCodecServiceErrCode::AVCS_ERR_OK) {
             return errCode;
@@ -271,7 +293,7 @@ int32_t AudioFfmpegEncoderPlugin::InitContext(const Format &format)
         return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
     }
     avCodecContext_->sample_fmt = ffSampleFormat;
-
+    channelsBytesPerSample_ = av_get_bytes_per_sample(ffSampleFormat) * avCodecContext_->channels;
     AVCODEC_LOGI("avcodec name: %{public}s", avCodec_->name);
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
