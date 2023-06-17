@@ -79,12 +79,13 @@ int32_t MuxerClient::Start()
     return muxerProxy_->Start();
 }
 
-int32_t MuxerClient::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
+int32_t MuxerClient::WriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_INVALID_VAL, "sample is nullptr");
     CHECK_AND_RETURN_RET_LOG(muxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
-    return muxerProxy_->WriteSample(sample, info);
+    return muxerProxy_->WriteSample(trackIndex, sample, info, flag);
 }
 
 int32_t MuxerClient::Stop()

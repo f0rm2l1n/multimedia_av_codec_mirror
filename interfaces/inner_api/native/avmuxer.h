@@ -19,6 +19,7 @@
 #include "avsharedmemory.h"
 #include "media_description.h"
 #include "av_common.h"
+#include "avcodec_common.h"
 
 namespace OHOS {
 namespace Media {
@@ -63,14 +64,16 @@ public:
      * Note: This interface can only be called after Start and before Stop. The application needs to
      * make sure that the samples are written to the right tacks. Also, it needs to make sure the samples
      * for each track are written in chronological order.
+     * @param trackIndex The track index for this sample
      * @param sample The encoded or demuxer sample
-     * @param info The buffer information related to this sample {@link TrackSampleInfo}
+     * @param info The buffer information related to this sample {@link AVCodecBufferInfo}
+     * @param flag The buffer flag related to this sample {@link AVCodecBufferFlag}
      * @return Returns AVCS_ERR_OK if the execution is successful,
      * otherwise returns a specific error code, refer to {@link AVCodecServiceErrCode}
      * @since 10
      */
-    virtual int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample,
-        const TrackSampleInfo &info) = 0;
+    virtual int32_t WriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo info, AVCodecBufferFlag flag) = 0;
 
     /**
      * @brief Stop the muxer.

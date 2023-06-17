@@ -22,7 +22,7 @@
 namespace {
     const char *FFMPEG_REGISTER_FUNC_NAME = "register_FFmpegMuxer";
     const char *FFMPEG_UNREGISTER_FUNC_NAME =  "unregister_FFmpegMuxer";
-    const char *FFMPEG_LIB_PATH =  "/system/lib/media/av_codec_plugins/libav_codec_plugin_FFmpegMuxer.z.so";
+    const char *FFMPEG_LIB_PATH =  "/libav_codec_plugin_FFmpegMuxer.z.so";
 }
 
 namespace OHOS {
@@ -119,10 +119,11 @@ void AVMuxerFFmpegDemo::DoRunMultiThreadCase()
     return;
 }
 
-int AVMuxerFFmpegDemo::DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info)
+int AVMuxerFFmpegDemo::DoWriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     if (ffmpegMuxer_ != nullptr &&
-        ffmpegMuxer_->WriteSample(sample->GetBase(), info) == Status::NO_ERROR) {
+        ffmpegMuxer_->WriteSample(trackIndex, sample->GetBase(), info, flag) == Status::NO_ERROR) {
         return 0;
     }
     return -1;
@@ -130,7 +131,9 @@ int AVMuxerFFmpegDemo::DoWriteSample(std::shared_ptr<AVSharedMemory> sample, Tra
 
 int AVMuxerFFmpegDemo::GetFfmpegRegister()
 {
-    dlHandle_ = ::dlopen(FFMPEG_LIB_PATH, RTLD_NOW | RTLD_LOCAL);
+    std::string libPath = AV_CODEC_PLUGIN_PATH;
+    libPath += FFMPEG_LIB_PATH;
+    dlHandle_ = ::dlopen(libPath.c_str(), RTLD_NOW | RTLD_LOCAL);
     if (dlHandle_ == nullptr) {
         std::cout<<"AVMuxerFFmpegDemo::GetFfmpegRegister dlHandle_ is nullptr!"<<std::endl;
         return -1;

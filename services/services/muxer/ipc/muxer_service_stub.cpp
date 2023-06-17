@@ -130,10 +130,11 @@ int32_t MuxerServiceStub::Start()
     return muxerServer_->Start();
 }
 
-int32_t MuxerServiceStub::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
+int32_t MuxerServiceStub::WriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     CHECK_AND_RETURN_RET_LOG(muxerServer_ != nullptr, AVCS_ERR_NO_MEMORY, "Muxer Service does not exist");
-    return muxerServer_->WriteSample(sample, info);
+    return muxerServer_->WriteSample(trackIndex, sample, info, flag);
 }
 
 int32_t MuxerServiceStub::Stop()
@@ -201,14 +202,14 @@ int32_t MuxerServiceStub::Start(MessageParcel &data, MessageParcel &reply)
 int32_t MuxerServiceStub::WriteSample(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<AVSharedMemory> sample = ReadAVSharedMemoryFromParcel(data);
+    uint32_t trackIndex = data.ReadUint32();
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, AVCS_ERR_UNKNOWN, "Read sample from parcel failed!");
-    TrackSampleInfo info;
-    info.trackIndex = data.ReadUint32();
-    info.timeUs = data.ReadInt64();
+    AVCodecBufferInfo info;
+    info.presentationTimeUs = data.ReadInt64();
     info.size = data.ReadInt32();
     info.offset = data.ReadInt32();
-    info.flags = data.ReadUint32();
-    int32_t ret = WriteSample(sample, info);
+    AVCodecBufferFlag flag = static_cast<AVCodecBufferFlag>(data.ReadUint32());
+    int32_t ret = WriteSample(trackIndex, sample, info, flag);
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply WriteSample failed!");
     return AVCS_ERR_OK;
 }

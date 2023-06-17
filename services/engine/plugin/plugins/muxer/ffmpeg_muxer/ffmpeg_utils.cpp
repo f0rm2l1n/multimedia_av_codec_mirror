@@ -40,6 +40,7 @@ std::unordered_map<std::string_view, AVCodecID> g_mimeToCodecId = {
     {CodecMimeType::AUDIO_AMR_WB, AV_CODEC_ID_AMR_WB},
     {CodecMimeType::VIDEO_AVC, AV_CODEC_ID_H264},
     {CodecMimeType::VIDEO_MPEG4, AV_CODEC_ID_MPEG4},
+    {CodecMimeType::VIDEO_HEVC, AV_CODEC_ID_HEVC},
     {CodecMimeType::IMAGE_JPG, AV_CODEC_ID_MJPEG},
     {CodecMimeType::IMAGE_PNG, AV_CODEC_ID_PNG},
     {CodecMimeType::IMAGE_BMP, AV_CODEC_ID_BMP},

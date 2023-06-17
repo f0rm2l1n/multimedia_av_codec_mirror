@@ -42,7 +42,8 @@ private:
 
     void DoRunMuxer() override;
     int GetFfmpegRegister();
-    int DoWriteSample(std::shared_ptr<AVSharedMemory> sample, TrackSampleInfo &info) override;
+    int DoWriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
     int DoAddTrack(int32_t &trackIndex, MediaDescription &trackDesc) override;
     void DoRunMultiThreadCase() override;
 

@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <malloc.h>
 #include "securec.h"
 #include "ffmpeg_utils.h"
 #include "avcodec_log.h"
@@ -133,6 +134,8 @@ FFmpegMuxerPlugin::FFmpegMuxerPlugin(std::string name, int32_t fd)
     if (lseek(fd_, 0, SEEK_SET) < 0) {
         AVCODEC_LOGE("The fd is not seekable");
     }
+    mallopt(M_SET_THREAD_CACHE, M_THREAD_CACHE_DISABLE);
+    mallopt(M_DELAYED_FREE, M_DELAYED_FREE_DISABLE);
     auto pkt = av_packet_alloc();
     cachePacket_ = std::shared_ptr<AVPacket> (pkt, [] (AVPacket *packet) {av_packet_free(&packet);});
     outputFormat_ = g_pluginOutputFmt[pluginName_];
@@ -158,6 +161,7 @@ FFmpegMuxerPlugin::~FFmpegMuxerPlugin()
     formatContext_.reset();
     CloseFd();
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
+    mallopt(M_FLUSH_THREAD_CACHE, 0);
 }
 
 Status FFmpegMuxerPlugin::SetRotation(int32_t rotation)
@@ -205,6 +209,12 @@ Status FFmpegMuxerPlugin::AddAudioTrack(int32_t &trackIndex, const MediaDescript
     st->codecpar->codec_id = codeID;
     st->codecpar->sample_rate = sampleRate;
     st->codecpar->channels = channels;
+    int32_t frameSize = 0;
+    if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLES_PER_FRAME) &&
+        trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLES_PER_FRAME, frameSize) &&
+        frameSize > 0) {
+        st->codecpar->frame_size = frameSize;
+    }
     trackIndex = st->index;
     return SetCodecParameterOfTrack(st, trackDesc);
 }
@@ -229,9 +239,22 @@ Status FFmpegMuxerPlugin::AddVideoTrack(int32_t &trackIndex, const MediaDescript
     st->codecpar->codec_id = codeID;
     st->codecpar->width = width;
     st->codecpar->height = height;
+    int32_t videoDelay = 0;
+    if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_VIDEO_DELAY) &&
+        trackDesc.GetIntValue(MediaDescriptionKey::MD_KEY_VIDEO_DELAY, videoDelay) &&
+        videoDelay > 0) {
+        st->codecpar->video_delay = videoDelay;
+    }
+
     trackIndex = st->index;
     if (isCover) {
         st->disposition = AV_DISPOSITION_ATTACHED_PIC;
+    }
+    double frameRate = 0;
+    if (trackDesc.ContainKey(MediaDescriptionKey::MD_KEY_FRAME_RATE) &&
+        trackDesc.GetDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, frameRate) &&
+        frameRate > 0) {
+        st->avg_frame_rate = {static_cast<int>(frameRate), 1};
     }
     return SetCodecParameterOfTrack(st, trackDesc);
 }
@@ -306,21 +329,24 @@ Status FFmpegMuxerPlugin::Stop()
     return Status::NO_ERROR;
 }
 
-Status FFmpegMuxerPlugin::WriteSample(const uint8_t *sample, const TrackSampleInfo &info)
+Status FFmpegMuxerPlugin::WriteSample(uint32_t trackIndex, const uint8_t *sample,
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     CHECK_AND_RETURN_RET_LOG(isWriteHeader_, Status::ERROR_WRONG_STATE, "WriteSample failed! Did not write header!");
     CHECK_AND_RETURN_RET_LOG(sample != nullptr, Status::ERROR_NULL_POINTER,
         "av_write_frame sample is null!");
-    CHECK_AND_RETURN_RET_LOG(info.trackIndex < formatContext_->nb_streams,
+    CHECK_AND_RETURN_RET_LOG(trackIndex < formatContext_->nb_streams,
         Status::ERROR_INVALID_PARAMETER, "track index is invalid!");
-    (void)memset_s(cachePacket_.get(), sizeof(AVPacket), 0, sizeof(AVPacket));
+    av_init_packet(cachePacket_.get());
     cachePacket_->data = const_cast<uint8_t *>(sample);
     cachePacket_->size = info.size;
-    cachePacket_->stream_index = static_cast<int>(info.trackIndex);
-    cachePacket_->pts = ConvertTimeToFFmpeg(info.timeUs, formatContext_->streams[info.trackIndex]->time_base);
-    cachePacket_->dts = cachePacket_->pts;
+    cachePacket_->stream_index = static_cast<int>(trackIndex);
+    cachePacket_->pts = ConvertTimeToFFmpeg(info.presentationTimeUs, formatContext_->streams[trackIndex]->time_base);
+    if (formatContext_->streams[trackIndex]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+        cachePacket_->dts = cachePacket_->pts;
+    }
     cachePacket_->flags = 0;
-    if (info.flags & AVCODEC_BUFFER_FLAG_SYNC_FRAME) {
+    if (flag & AVCODEC_BUFFER_FLAG_SYNC_FRAME) {
         AVCODEC_LOGD("It is key frame");
         cachePacket_->flags = AV_PKT_FLAG_KEY;
     }

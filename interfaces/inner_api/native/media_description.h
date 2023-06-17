@@ -233,6 +233,11 @@ public:
      */
     static constexpr std::string_view MD_KEY_AUDIO_SAMPLES_PER_FRAME = "audio_samples_per_frame";
 
+    /**
+     * Key for Number of delayed video frames, value type is uint32_t
+     */
+    static constexpr std::string_view MD_KEY_VIDEO_DELAY = "video_delay";
+
 private:
     MediaDescriptionKey() = delete;
     ~MediaDescriptionKey() = delete;
