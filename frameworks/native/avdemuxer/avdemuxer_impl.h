@@ -34,7 +34,7 @@ public:
     int32_t ReadSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag) override;
     int32_t SeekToTime(int64_t millisecond, const AVSeekMode mode) override;
-    int32_t Init(AVSource &source);
+    int32_t Init(std::shared_ptr<AVSource> source);
 
 private:
     std::shared_ptr<IDemuxerService> demuxerClient_ = nullptr;

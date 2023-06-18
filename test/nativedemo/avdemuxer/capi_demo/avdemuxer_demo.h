@@ -53,8 +53,8 @@ public:
     std::map<int32_t, int64_t> frames_;
     std::map<int32_t, int64_t> key_frames_;
 private:
-    OH_AVSource* avsource_;
-    OH_AVDemuxer* avdemxuer_;
+    OH_AVSource* avsource_ = nullptr;
+    OH_AVDemuxer* avdemxuer_ = nullptr;
 };
 }  // namespace MediaAVCodec
 }  // namespace OHOS

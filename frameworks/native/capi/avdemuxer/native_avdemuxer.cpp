@@ -44,7 +44,7 @@ struct OH_AVDemuxer *OH_AVDemuxer_CreateWithSource(OH_AVSource *source)
     CHECK_AND_RETURN_RET_LOG(sourceObj != nullptr, nullptr,
         "Create demuxer failed because new sourceObj is nullptr!");
 
-    std::shared_ptr<AVDemuxer> demuxer = AVDemuxerFactory::CreateWithSource(*(sourceObj->source_));
+    std::shared_ptr<AVDemuxer> demuxer = AVDemuxerFactory::CreateWithSource(sourceObj->source_);
     CHECK_AND_RETURN_RET_LOG(demuxer != nullptr, nullptr, "New demuxer with source by AVDemuxerFactory failed!");
 
     struct DemuxerObject *object = new(std::nothrow) DemuxerObject(demuxer);

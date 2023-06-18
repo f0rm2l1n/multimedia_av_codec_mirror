@@ -110,7 +110,7 @@ static void RunInnerSourceDemuxer(const std::string filePath, const std::string 
         innerSourceDemo->CreateWithURI(filePath);
     }
     auto innerDemuxerDemo = std::make_shared<InnerDemuxerDemo>();
-    innerDemuxerDemo->CreateWithSource(*(innerSourceDemo->avsource_));
+    innerDemuxerDemo->CreateWithSource(innerSourceDemo->avsource_);
     int32_t trackCount = 0;
     int64_t duration = 0;
     Format source_format = innerSourceDemo->GetSourceFormat();

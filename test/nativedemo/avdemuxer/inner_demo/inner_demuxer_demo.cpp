@@ -30,7 +30,7 @@ InnerDemuxerDemo::~InnerDemuxerDemo()
     printf("~InnerDemuxerDemo is called\n");
 }
 
-int32_t InnerDemuxerDemo::CreateWithSource(AVSource &source)
+int32_t InnerDemuxerDemo::CreateWithSource(std::shared_ptr<AVSource> source)
 {
     this->demuxer_ = AVDemuxerFactory::CreateWithSource(source);
     if (!demuxer_) {
