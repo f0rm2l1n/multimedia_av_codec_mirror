@@ -18,7 +18,7 @@
 #include "demuxer_plugin.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 Demuxer::Demuxer(uint32_t pkgVer, uint32_t apiVer, std::shared_ptr<DemuxerPlugin> plugin)
     : pkgVersion_(pkgVer), apiVersion_(apiVer), demuxer_(std::move(plugin)) {}
@@ -45,5 +45,5 @@ int32_t Demuxer::SeekToTime(int64_t millisecond, AVSeekMode mode)
     return ret;
 }
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

@@ -22,7 +22,7 @@
 #include "avsharedmemory.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class IDemuxerEngine {
 public:
     virtual ~IDemuxerEngine() = default;
@@ -41,6 +41,6 @@ private:
     IDemuxerEngineFactory() = default;
     ~IDemuxerEngineFactory() = default;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // IDEMUXER_ENGINE_H

@@ -34,8 +34,8 @@ extern "C" {
 }
 
 using namespace OHOS;
-using namespace OHOS::Media;
-using namespace OHOS::Media::InnerAudioDemo;
+using namespace OHOS::MediaAVCodec;
+using namespace OHOS::MediaAVCodec::InnerAudioDemo;
 using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;

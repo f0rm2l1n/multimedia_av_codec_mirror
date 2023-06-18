@@ -21,7 +21,7 @@
 #include "i_source_engine.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class SourceServer : public std::enable_shared_from_this<SourceServer>, public ISourceService, public NoCopyable {
 public:
     static std::shared_ptr<ISourceService> Create();
@@ -44,6 +44,6 @@ private:
     int32_t appPid_ = 0;
     int fd_ = -1;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 #endif // SOURCE_SERVER_H

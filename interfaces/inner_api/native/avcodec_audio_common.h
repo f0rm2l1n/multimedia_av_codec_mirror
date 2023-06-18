@@ -18,7 +18,7 @@
 
 #include <cstdint>
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 /**
  * @enum Audio sample formats
  * @since 3.1
@@ -54,6 +54,6 @@ enum AACProfile : int32_t {
     AAC_PROFILE_LD = 5,
     AAC_PROFILE_MAIN = 6,
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif

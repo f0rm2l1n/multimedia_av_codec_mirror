@@ -17,13 +17,13 @@
 #include "native_avcapability.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecListDemo {
 public:
     CodecListDemo() = default;
     ~CodecListDemo() = default;
     void RunCase();
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif

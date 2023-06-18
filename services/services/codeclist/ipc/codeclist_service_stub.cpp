@@ -27,19 +27,19 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListServiceStub"};
 
     const std::map<uint32_t, std::string> CODECLIST_FUNC_NAME = {
-        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_DECODER),
+        { static_cast<uint32_t>(OHOS::MediaAVCodec::CodecListServiceStub::AVCodecListServiceMsg::FIND_DECODER),
             "CodecListServiceStub DoFindDecoder" },
-        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::FIND_ENCODER),
+        { static_cast<uint32_t>(OHOS::MediaAVCodec::CodecListServiceStub::AVCodecListServiceMsg::FIND_ENCODER),
             "CodecListServiceStub DoFindEncoder" },
-        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::GET_CAPABILITY),
+        { static_cast<uint32_t>(OHOS::MediaAVCodec::CodecListServiceStub::AVCodecListServiceMsg::GET_CAPABILITY),
             "CodecListServiceStub DoGetCapability" },
-        { static_cast<uint32_t>(OHOS::Media::CodecListServiceStub::AVCodecListServiceMsg::DESTROY),
+        { static_cast<uint32_t>(OHOS::MediaAVCodec::CodecListServiceStub::AVCodecListServiceMsg::DESTROY),
             "CodecListServiceStub DoDestroyStub" },
     };
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 sptr<CodecListServiceStub> CodecListServiceStub::Create()
 {
     sptr<CodecListServiceStub> codecListStub = new (std::nothrow) CodecListServiceStub();
@@ -163,5 +163,5 @@ int32_t CodecListServiceStub::DoDestroyStub(MessageParcel &data, MessageParcel &
     reply.WriteInt32(DestroyStub());
     return AVCS_ERR_OK;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

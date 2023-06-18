@@ -23,7 +23,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 CodecListenerStub::CodecListenerStub()
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
@@ -110,5 +110,5 @@ void CodecListenerStub::SetCallback(const std::shared_ptr<AVCodecCallback> &call
 {
     callback_ = callback;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

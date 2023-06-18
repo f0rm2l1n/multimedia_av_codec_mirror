@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AudioFfmpegDecoderPlugin : public NoCopyable {
 public:
     AudioFfmpegDecoderPlugin();
@@ -89,7 +89,7 @@ private:
     int32_t ReceiveBuffer(std::shared_ptr<AudioBufferInfo> &outBuffer);
     int32_t ReceiveFrameSucc(std::shared_ptr<AudioBufferInfo> &outBuffer);
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 #endif

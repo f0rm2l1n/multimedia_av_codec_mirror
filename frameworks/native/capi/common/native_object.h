@@ -22,11 +22,11 @@
 #include "native_avmagic.h"
 
 struct AVSourceObject : public OH_AVSource {
-    explicit AVSourceObject(const std::shared_ptr<OHOS::Media::AVSource> &source)
+    explicit AVSourceObject(const std::shared_ptr<OHOS::MediaAVCodec::AVSource> &source)
         : OH_AVSource(AVMagic::AVCODEC_MAGIC_AVSOURCE), source_(source) {}
     ~AVSourceObject() = default;
 
-    const std::shared_ptr<OHOS::Media::AVSource> source_;
+    const std::shared_ptr<OHOS::MediaAVCodec::AVSource> source_;
 };
 
 #endif // NATIVE_OBJECT_H

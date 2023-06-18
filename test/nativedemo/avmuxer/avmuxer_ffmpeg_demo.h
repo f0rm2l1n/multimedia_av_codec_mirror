@@ -23,7 +23,7 @@
 #include "plugin_definition.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 class AVMuxerFFmpegDemo : public AVMuxerDemoBase {
 public:
@@ -54,6 +54,6 @@ private:
     UnregisterFunc unregisterFunc_ {nullptr};
 };
 }  // Plugin
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 #endif  // AVMUXER_FFMPEG_DEMO_H

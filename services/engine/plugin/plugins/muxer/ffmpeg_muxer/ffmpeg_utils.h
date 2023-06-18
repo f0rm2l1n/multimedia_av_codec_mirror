@@ -31,7 +31,7 @@ extern "C" {
 
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 namespace Ffmpeg {
 bool Mime2CodecId(const std::string_view &mime, AVCodecID &codecId);
@@ -59,6 +59,6 @@ int64_t ConvertTimeFromFFmpeg(int64_t pts, AVRational base);
 int64_t ConvertTimeToFFmpeg(int64_t timestampUs, AVRational base);
 } // namespace Ffmpeg
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // FFMPEG_UTILS_H

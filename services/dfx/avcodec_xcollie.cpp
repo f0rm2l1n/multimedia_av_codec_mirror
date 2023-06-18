@@ -33,7 +33,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 AVCodecXCollie &AVCodecXCollie::GetInstance()
 {
     static AVCodecXCollie instance;
@@ -145,5 +145,5 @@ void AVCodecXCollie::CancelTimer(uint64_t index)
     return;
 #endif
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

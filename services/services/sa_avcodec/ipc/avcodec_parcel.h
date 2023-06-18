@@ -20,7 +20,7 @@
 #include "message_parcel.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVCodecParcel {
 public:
     AVCodecParcel() = delete;
@@ -28,6 +28,6 @@ public:
     static bool Marshalling(MessageParcel &parcel, const Format &format);
     static bool Unmarshalling(MessageParcel &parcel, Format &format);
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_PARCEL_H

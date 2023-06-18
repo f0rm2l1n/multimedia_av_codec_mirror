@@ -34,7 +34,7 @@
 #include "native_averrors.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class VDecSignal {
 public:
     std::mutex inMutex_;
@@ -115,7 +115,7 @@ private:
 
     bool isFirstFrame_ = true;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 void VdecError(OH_AVCodec *codec, int32_t errorCode, void *userData);

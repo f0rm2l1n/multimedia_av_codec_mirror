@@ -16,7 +16,7 @@
 #include "file_server_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace {
 constexpr int32_t SERVERPORT = 46666;
 constexpr int32_t BUFFER_LNE = 4096;
@@ -140,13 +140,13 @@ void FileServerMock::ServerLoopFunc()
         fileLoop_->detach();
     }
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 int main()
 {
-    std::shared_ptr<OHOS::Media::FileServerMock> server = nullptr;
-    server = std::make_shared<OHOS::Media::FileServerMock>();
+    std::shared_ptr<OHOS::MediaAVCodec::FileServerMock> server = nullptr;
+    server = std::make_shared<OHOS::MediaAVCodec::FileServerMock>();
     server->StartServer();
     std::cout << "start" << std::endl;
     int32_t i = 0;

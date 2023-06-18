@@ -20,7 +20,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 /**
  * @brief Media type
  *
@@ -160,6 +160,6 @@ enum OutputFormat : uint32_t {
     */
     OUTPUT_FORMAT_M4A = 6,
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AV_COMMOM_H

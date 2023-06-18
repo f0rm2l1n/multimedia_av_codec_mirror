@@ -24,7 +24,7 @@
 #include "avcodec_common.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class IMuxerService {
 public:
     virtual ~IMuxerService() = default;
@@ -38,6 +38,6 @@ public:
     virtual int32_t Stop() = 0;
     virtual void Release() = 0;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // I_MUXER_SERVICE_H

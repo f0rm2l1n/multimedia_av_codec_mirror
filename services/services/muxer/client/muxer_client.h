@@ -21,7 +21,7 @@
 #include "i_standard_muxer_service.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class MuxerClient : public IMuxerService, public NoCopyable {
 public:
     static std::shared_ptr<MuxerClient> Create(const sptr<IStandardMuxerService> &ipcProxy);
@@ -42,6 +42,6 @@ private:
     std::mutex mutex_;
     sptr<IStandardMuxerService> muxerProxy_ = nullptr;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 #endif  // MUXER_CLIENT_H

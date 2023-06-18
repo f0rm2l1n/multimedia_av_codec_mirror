@@ -26,7 +26,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<IDemuxerEngine> IDemuxerEngineFactory::CreateDemuxerEngine(
     int32_t appUid, int32_t appPid, uintptr_t sourceAddr)
 {
@@ -95,5 +95,5 @@ int32_t DemuxerEngineImpl::SeekToTime(int64_t millisecond, AVSeekMode mode)
     std::unique_lock<std::mutex> lock(mutex_);
     return demuxer_->SeekToTime(millisecond, mode);
 }
-} // Media
+} // MediaAVCodec
 } // OHOS

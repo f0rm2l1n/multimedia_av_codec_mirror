@@ -29,7 +29,7 @@ namespace {
 }
 
 namespace {
-using namespace OHOS::Media;
+using namespace OHOS::MediaAVCodec;
 using namespace Plugin;
 using namespace Ffmpeg;
 
@@ -117,7 +117,7 @@ void ResetCodecParameter(AVCodecParameters *par)
 
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 namespace Ffmpeg {
 FFmpegMuxerPlugin::FFmpegMuxerPlugin(std::string name, int32_t fd)
@@ -481,5 +481,5 @@ void FFmpegMuxerPlugin::IoClose(AVFormatContext *s, AVIOContext *pb)
 }
 } // Ffmpeg
 } // Plugin
-} // Media
+} // MediaAVCodec
 } // OHOS

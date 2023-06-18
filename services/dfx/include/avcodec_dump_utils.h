@@ -22,7 +22,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class __attribute__((visibility("default"))) AVCodecDumpControler {
 public:
     int32_t AddInfo(const uint32_t dumpIdx, const std::string &name, const std::string &value = "");
@@ -38,5 +38,5 @@ private:
     std::vector<uint32_t> length_ = std::vector<uint32_t>(4, 0);
 };
 } // namespace OHOS
-} // namespace Media
+} // namespace MediaAVCodec
 #endif // AVCODEC_DUMP_UTILS_H

@@ -20,7 +20,7 @@
 #include "plugin_tags.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 /// Indicates that the available capability type is an fixed value.
 template <typename T> using FixedCapability = T;
@@ -146,6 +146,6 @@ struct Capability {
 /// A collection of multiple capabilities
 using CapabilitySet = std::vector<Capability>;
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_COMMON_CAPS_H

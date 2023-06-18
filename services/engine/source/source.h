@@ -35,7 +35,7 @@ extern "C" {
 #include "sourcebase.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 struct SourceRegister : PackageRegister {
 public:
@@ -91,6 +91,6 @@ private:
     void GetAudioTrackFormat(Format &format, AVStream *avStream);
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVSOURCE_H

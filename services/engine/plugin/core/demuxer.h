@@ -21,7 +21,7 @@
 #include "demuxer_plugin.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 class Demuxer {
 public:
@@ -42,6 +42,6 @@ private:
     std::shared_ptr<DemuxerPlugin> demuxer_;
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // PLUGIN_CORE_DEMUXER_H

@@ -20,7 +20,7 @@
 #include "avcodec_common.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecListenerStub : public IRemoteStub<IStandardCodecListener> {
 public:
     CodecListenerStub();
@@ -35,6 +35,6 @@ public:
 private:
     std::shared_ptr<AVCodecCallback> callback_ = nullptr;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODEC_LISTENER_STUB_H

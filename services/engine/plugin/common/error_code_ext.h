@@ -19,7 +19,7 @@
 #include "avcodec_errors.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 int32_t TranslatePluginStatus(Plugin::Status error)
 {
     const static std::map<Plugin::Status, int32_t> g_transTable = {
@@ -53,7 +53,7 @@ int32_t TranslatePluginStatus(Plugin::Status error)
     }
     return ite->second;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 #endif // ERROR_CODE_EXT_H

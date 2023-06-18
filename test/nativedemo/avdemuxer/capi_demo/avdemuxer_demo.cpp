@@ -17,7 +17,7 @@
 #include "avdemuxer_demo.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 AVDemuxerDemo::AVDemuxerDemo()
 {
     printf("AVDemuxerDemo constructor \n");
@@ -136,5 +136,5 @@ int32_t AVDemuxerDemo::SeekToTime(int64_t millisecond, OH_AVSeekMode mode)
     }
     return ret;
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

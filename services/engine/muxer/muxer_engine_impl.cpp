@@ -37,39 +37,39 @@ namespace {
     constexpr uint32_t DUMP_OUTPUT_FORMAT_INDEX = 0x01010200;
     constexpr uint32_t DUMP_OFFSET_8 = 8;
 
-    const std::map<OHOS::Media::OutputFormat, const std::string> OutputFormatStringMap = {
-        { OHOS::Media::OutputFormat::OUTPUT_FORMAT_M4A, "m4a" },
-        { OHOS::Media::OutputFormat::OUTPUT_FORMAT_MPEG_4, "mp4" },
+    const std::map<OHOS::MediaAVCodec::OutputFormat, const std::string> OutputFormatStringMap = {
+        { OHOS::MediaAVCodec::OutputFormat::OUTPUT_FORMAT_M4A, "m4a" },
+        { OHOS::MediaAVCodec::OutputFormat::OUTPUT_FORMAT_MPEG_4, "mp4" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> VIDEO_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> IMAGE_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
     };
 
-    const std::map<OHOS::Media::MuxerEngineImpl::TrackMimeType,
+    const std::map<OHOS::MediaAVCodec::MuxerEngineImpl::TrackMimeType,
         std::vector<std::pair<std::string_view, const std::string>>> MUXER_DUMP_TABLE = {
-        { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_AUDIO, AUDIO_DUMP_TABLE },
-        { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_VIDEO, VIDEO_DUMP_TABLE },
-        { OHOS::Media::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_IMAGE, IMAGE_DUMP_TABLE },
+        { OHOS::MediaAVCodec::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_AUDIO, AUDIO_DUMP_TABLE },
+        { OHOS::MediaAVCodec::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_VIDEO, VIDEO_DUMP_TABLE },
+        { OHOS::MediaAVCodec::MuxerEngineImpl::TrackMimeType::TRACK_MIME_TYPE_IMAGE, IMAGE_DUMP_TABLE },
     };
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 const std::map<uint32_t, std::set<std::string_view>> MUX_FORMAT_INFO = {
     {OUTPUT_FORMAT_MPEG_4, {CodecMimeType::AUDIO_MPEG, CodecMimeType::AUDIO_AAC,
                             CodecMimeType::VIDEO_AVC, CodecMimeType::VIDEO_MPEG4, CodecMimeType::VIDEO_HEVC,
@@ -446,5 +446,5 @@ MuxerEngineImpl::TrackMimeType MuxerEngineImpl::GetTrackMimeType(const std::stri
 
     return type;
 }
-} // Media
+} // MediaAVCodec
 } // OHOS

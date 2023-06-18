@@ -16,7 +16,7 @@
 #include "codeclist_inner_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<CodecListMock> CodecListMockFactory::GetCapability(const std::string &mime, bool isEncoder)
 {
     auto codeclist = AVCodecListFactory::CreateAVCodecList();
@@ -37,5 +37,5 @@ std::shared_ptr<CodecListMock> CodecListMockFactory::GetCapabilityByCategory(con
     }
     return nullptr;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

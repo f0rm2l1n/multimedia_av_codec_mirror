@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListS
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 CodecListServiceProxy::CodecListServiceProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IStandardCodecListService>(impl)
 {
@@ -96,5 +96,5 @@ int32_t CodecListServiceProxy::DestroyStub()
                              "Destroy codeclist stub failed, send request error");
     return reply.ReadInt32();
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

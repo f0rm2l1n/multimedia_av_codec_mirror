@@ -21,7 +21,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class ISourceService {
 public:
     virtual ~ISourceService() = default;
@@ -34,6 +34,6 @@ public:
     virtual int32_t GetSourceFormat(Format &format) = 0;
     virtual int32_t GetSourceAddr(uintptr_t &addr) = 0;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // I_SOURCE_SERVICE_H

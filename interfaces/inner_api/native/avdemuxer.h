@@ -23,7 +23,7 @@
 #include "avsource.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVDemuxer {
 public:
     ~AVDemuxer() = default;
@@ -93,6 +93,6 @@ private:
     AVDemuxerFactory() = default;
     ~AVDemuxerFactory() = default;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVDEMUXER_H

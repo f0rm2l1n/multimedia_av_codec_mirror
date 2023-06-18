@@ -16,7 +16,7 @@
 #include "codeclist_inner_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 bool CodecListInnerMock::IsHardware()
 {
     if (codeclist_ != nullptr) {
@@ -272,5 +272,5 @@ bool CodecListInnerMock::AreProfileAndLevelSupported(int32_t profile, int32_t le
     std::cout << "codeclist_ is nullptr" << std::endl;
     return false;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

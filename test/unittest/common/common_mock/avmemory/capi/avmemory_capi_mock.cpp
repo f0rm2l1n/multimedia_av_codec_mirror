@@ -16,7 +16,7 @@
 #include "avmemory_capi_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 uint8_t *AVMemoryCapiMock::GetAddr() const
 {
     if (memory_ != nullptr) {
@@ -37,5 +37,5 @@ uint32_t AVMemoryCapiMock::GetFlags() const
 {
     return 0;
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

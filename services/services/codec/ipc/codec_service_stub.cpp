@@ -28,36 +28,36 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecServiceStub"};
 
     const std::map<int32_t, std::string> CODEC_FUNC_NAME = {
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_LISTENER_OBJ, "CodecServiceStub SetListenerObject" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::INIT, "CodecServiceStub Init" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::CONFIGURE, "CodecServiceStub Configure" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::START, "CodecServiceStub Start" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::STOP, "CodecServiceStub Stop" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::FLUSH, "CodecServiceStub Flush" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::RESET, "CodecServiceStub Reset" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::RELEASE, "CodecServiceStub Release" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::NOTIFY_EOS, "CodecServiceStub NotifyEos" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::CREATE_INPUT_SURFACE,
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::SET_LISTENER_OBJ, "CodecServiceStub SetListenerObject" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::INIT, "CodecServiceStub Init" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::CONFIGURE, "CodecServiceStub Configure" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::START, "CodecServiceStub Start" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::STOP, "CodecServiceStub Stop" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::FLUSH, "CodecServiceStub Flush" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::RESET, "CodecServiceStub Reset" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::RELEASE, "CodecServiceStub Release" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::NOTIFY_EOS, "CodecServiceStub NotifyEos" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::CREATE_INPUT_SURFACE,
             "CodecServiceStub CreateInputSurface" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_OUTPUT_SURFACE, "CodecServiceStub SetOutputSurface" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::GET_INPUT_BUFFER, "CodecServiceStub GetInputBuffer" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::QUEUE_INPUT_BUFFER, "CodecServiceStub QueueInputBuffer" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::GET_OUTPUT_BUFFER, "CodecServiceStub GetOutputBuffer" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::GET_OUTPUT_FORMAT, "CodecServiceStub GetOutputFormat" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::RELEASE_OUTPUT_BUFFER,
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::SET_OUTPUT_SURFACE, "CodecServiceStub SetOutputSurface" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::GET_INPUT_BUFFER, "CodecServiceStub GetInputBuffer" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::QUEUE_INPUT_BUFFER, "CodecServiceStub QueueInputBuffer" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::GET_OUTPUT_BUFFER, "CodecServiceStub GetOutputBuffer" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::GET_OUTPUT_FORMAT, "CodecServiceStub GetOutputFormat" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::RELEASE_OUTPUT_BUFFER,
             "CodecServiceStub ReleaseOutputBuffer" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_PARAMETER, "CodecServiceStub SetParameter" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::SET_INPUT_SURFACE, "CodecServiceStub SetInputSurface" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::DEQUEUE_INPUT_BUFFER,
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::SET_PARAMETER, "CodecServiceStub SetParameter" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::SET_INPUT_SURFACE, "CodecServiceStub SetInputSurface" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::DEQUEUE_INPUT_BUFFER,
             "CodecServiceStub DequeueInputBuffer" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::DEQUEUE_OUTPUT_BUFFER,
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::DEQUEUE_OUTPUT_BUFFER,
             "CodecServiceStub DequeueOutputBuffer" },
-        { OHOS::Media::CodecServiceStub::CodecServiceMsg::DESTROY_STUB, "CodecServiceStub DestroyStub" },
+        { OHOS::MediaAVCodec::CodecServiceStub::CodecServiceMsg::DESTROY_STUB, "CodecServiceStub DestroyStub" },
     };
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecServiceStub::CodecBufferCache : public NoCopyable {
 public:
     CodecBufferCache() = default;
@@ -570,5 +570,5 @@ int32_t CodecServiceStub::GetInputFormat(MessageParcel &data, MessageParcel &rep
     (void)AVCodecParcel::Marshalling(reply, format);
     return AVCS_ERR_OK;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

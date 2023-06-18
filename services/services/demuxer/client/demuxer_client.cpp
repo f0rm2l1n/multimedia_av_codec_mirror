@@ -21,7 +21,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<DemuxerClient> DemuxerClient::Create(const sptr<IStandardDemuxerService> &ipcProxy)
 {
     std::shared_ptr<DemuxerClient> demuxer = std::make_shared<DemuxerClient>(ipcProxy);
@@ -84,5 +84,5 @@ int32_t DemuxerClient::SeekToTime(int64_t millisecond, const AVSeekMode mode)
     CHECK_AND_RETURN_RET_LOG(demuxerProxy_ != nullptr, AVCS_ERR_NO_MEMORY, "demuxer service does not exist.");
     return demuxerProxy_->SeekToTime(millisecond, mode);
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

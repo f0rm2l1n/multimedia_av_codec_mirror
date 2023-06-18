@@ -24,7 +24,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 MuxerServiceProxy::MuxerServiceProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IStandardMuxerService>(impl)
 {
@@ -162,5 +162,5 @@ void MuxerServiceProxy::Release()
     int ret = Remote()->SendRequest(RELEASE, data, reply, option);
     CHECK_AND_RETURN_LOG(ret == AVCS_ERR_OK, " Call Release failed, error: %{public}d", ret);
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

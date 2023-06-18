@@ -28,13 +28,13 @@
 #include "avcodec_video_decoder_inner_demo.h"
 
 using namespace OHOS;
-using namespace OHOS::Media;
-using namespace OHOS::Media::AudioDemo;
-using namespace OHOS::Media::AudioFlacDemo;
-using namespace OHOS::Media::AudioAacDemo;
-using namespace OHOS::Media::InnerAudioDemo;
-using namespace OHOS::Media::VideoDemo;
-using namespace OHOS::Media::InnerVideoDemo;
+using namespace OHOS::MediaAVCodec;
+using namespace OHOS::MediaAVCodec::AudioDemo;
+using namespace OHOS::MediaAVCodec::AudioFlacDemo;
+using namespace OHOS::MediaAVCodec::AudioAacDemo;
+using namespace OHOS::MediaAVCodec::InnerAudioDemo;
+using namespace OHOS::MediaAVCodec::VideoDemo;
+using namespace OHOS::MediaAVCodec::InnerVideoDemo;
 using namespace std;
 
 static int RunAudioDecoder()

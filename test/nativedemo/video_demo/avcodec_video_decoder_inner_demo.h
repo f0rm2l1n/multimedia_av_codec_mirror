@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace InnerVideoDemo {
 class TestConsumerListener : public IBufferConsumerListener {
 public:
@@ -122,6 +122,6 @@ private:
     std::string mode_ = "0";
 };
 } // namespace InnerVideoDemo
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_VIDEO_DECODER_INNER_DEMO_H

@@ -24,7 +24,7 @@
 #include "avcodec_errors.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 int AVMuxerEngineDemo::DoWriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
     AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
@@ -113,5 +113,5 @@ void AVMuxerEngineDemo::DoRunMultiThreadCase()
 {
     DoRunMuxer(std::string(RUN_MUL_THREAD));
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

@@ -20,7 +20,7 @@
 #include "native_avmemory.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVMemoryCapiMock : public AVMemoryMock {
 public:
     explicit AVMemoryCapiMock(OH_AVMemory *mem) : memory_(mem) {}
@@ -31,6 +31,6 @@ public:
 private:
     OH_AVMemory *memory_ = nullptr;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 #endif // AVMEMORY_CAPI_MOCK_H

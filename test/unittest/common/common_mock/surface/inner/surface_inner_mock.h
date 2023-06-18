@@ -20,7 +20,7 @@
 #include "window.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class SurfaceInnerMock : public SurfaceMock {
 public:
     explicit SurfaceInnerMock(sptr<Surface> &surface) : surface_(surface) {}
@@ -32,6 +32,6 @@ private:
     sptr<Surface> surface_ = nullptr;
     sptr<Rosen::Window> window_ = nullptr;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // SURFACE_INNER_MOCK_H

@@ -20,7 +20,7 @@
 #include "i_avcodec_service.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVCodecVideoEncoderImpl : public AVCodecVideoEncoder, public NoCopyable {
 public:
     AVCodecVideoEncoderImpl();
@@ -49,6 +49,6 @@ private:
     std::shared_ptr<ICodecService> codecService_ = nullptr;
     sptr<Surface> surface_ = nullptr;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_VIDEO_ENCODER_IMPL_H

@@ -17,7 +17,7 @@
 #include "native_avformat.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 AVFormatCapiMock::AVFormatCapiMock() : format_(nullptr)
 {
 }
@@ -170,5 +170,5 @@ const char *AVFormatCapiMock::DumpInfo()
     }
     return nullptr;
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

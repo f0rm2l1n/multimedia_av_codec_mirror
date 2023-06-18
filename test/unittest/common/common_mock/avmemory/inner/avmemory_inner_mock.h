@@ -20,7 +20,7 @@
 #include "avsharedmemory.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVMemoryInnerMock : public AVMemoryMock {
 public:
     explicit AVMemoryInnerMock(std::shared_ptr<AVSharedMemory> mem) : memory_(mem) {}
@@ -31,6 +31,6 @@ public:
 private:
     std::shared_ptr<AVSharedMemory> memory_ = nullptr;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 #endif // AVMEMORY_INNER_MOCK_H

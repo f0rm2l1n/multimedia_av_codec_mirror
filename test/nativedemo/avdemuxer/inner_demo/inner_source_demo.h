@@ -20,7 +20,7 @@
 #include "avsource.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class InnerSourceDemo {
 public:
     InnerSourceDemo();
@@ -37,7 +37,7 @@ private:
     Format source_format_;
     Format track_format_;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 
 #endif

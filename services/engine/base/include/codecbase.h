@@ -21,7 +21,7 @@
 #include "surface.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecBase {
 public:
     CodecBase() = default;
@@ -47,6 +47,6 @@ public:
     virtual int32_t SignalRequestIDRFrame();
     virtual int32_t GetInputFormat(Format& format);
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODECBASE_H

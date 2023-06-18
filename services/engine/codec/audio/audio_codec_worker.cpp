@@ -25,7 +25,7 @@ constexpr uint8_t LOGD_FREQUENCY = 5;
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 constexpr short DEFAULT_TRY_DECODE_TIME = 10;
 constexpr int TIMEOUT_MS = 1000;
 const std::string_view INPUT_BUFFER = "inputBuffer";
@@ -416,5 +416,5 @@ bool AudioCodecWorker::Begin()
     outputCondition_.notify_all();
     return true;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

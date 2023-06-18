@@ -21,7 +21,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 DemuxerServiceProxy::DemuxerServiceProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IStandardDemuxerService>(impl)
 {
@@ -124,5 +124,5 @@ int32_t DemuxerServiceProxy::SeekToTime(int64_t millisecond, const AVSeekMode mo
     CHECK_AND_RETURN_RET_LOG(error == AVCS_ERR_OK, error, "Failed to call SeekToTime, error: %{public}d", error);
     return reply.ReadInt32();
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

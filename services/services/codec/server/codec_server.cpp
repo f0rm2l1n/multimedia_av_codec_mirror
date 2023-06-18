@@ -31,58 +31,58 @@ namespace {
     constexpr uint32_t DUMP_LAST_ERROR_INDEX = 0x01010200;
     constexpr uint32_t DUMP_OFFSET_8 = 8;
 
-    const std::map<OHOS::Media::CodecServer::CodecStatus, std::string> CODEC_STATE_MAP = {
-        {OHOS::Media::CodecServer::UNINITIALIZED, "uninitialized"},
-        {OHOS::Media::CodecServer::INITIALIZED, "initialized"},
-        {OHOS::Media::CodecServer::CONFIGURED, "configured"},
-        {OHOS::Media::CodecServer::RUNNING, "running"},
-        {OHOS::Media::CodecServer::FLUSHED, "flushed"},
-        {OHOS::Media::CodecServer::END_OF_STREAM, "end of stream"},
-        {OHOS::Media::CodecServer::ERROR, "error"},
+    const std::map<OHOS::MediaAVCodec::CodecServer::CodecStatus, std::string> CODEC_STATE_MAP = {
+        {OHOS::MediaAVCodec::CodecServer::UNINITIALIZED, "uninitialized"},
+        {OHOS::MediaAVCodec::CodecServer::INITIALIZED, "initialized"},
+        {OHOS::MediaAVCodec::CodecServer::CONFIGURED, "configured"},
+        {OHOS::MediaAVCodec::CodecServer::RUNNING, "running"},
+        {OHOS::MediaAVCodec::CodecServer::FLUSHED, "flushed"},
+        {OHOS::MediaAVCodec::CodecServer::END_OF_STREAM, "end of stream"},
+        {OHOS::MediaAVCodec::CodecServer::ERROR, "error"},
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> DEFAULT_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
     };
             
     const std::vector<std::pair<std::string_view, const std::string>> VIDEO_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_FRAME_RATE, "Frame_Rate" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, "Pixel_Format" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_SCALE_TYPE, "Scale_Type" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, "Rotation_Angle" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT, "Max_Input_Buffer_Count" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT, "Max_Output_Buffer_Count" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_FRAME_RATE, "Frame_Rate" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, "Pixel_Format" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_SCALE_TYPE, "Scale_Type" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, "Rotation_Angle" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_MAX_INPUT_BUFFER_COUNT, "Max_Input_Buffer_Count" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_MAX_OUTPUT_BUFFER_COUNT, "Max_Output_Buffer_Count" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_DUMP_TABLE = {
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
-        { OHOS::Media::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_NAME, "Codec_Name" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_BITRATE, "Bit_Rate" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
+        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_MAX_INPUT_SIZE, "Max_Input_Size" },
     };
 
-    const std::map<OHOS::Media::CodecServer::CodecType,
+    const std::map<OHOS::MediaAVCodec::CodecServer::CodecType,
         std::vector<std::pair<std::string_view, const std::string>>> CODEC_DUMP_TABLE = {
-        { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_DEFAULT, DEFAULT_DUMP_TABLE },
-        { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_VIDEO, VIDEO_DUMP_TABLE },
-        { OHOS::Media::CodecServer::CodecType::CODEC_TYPE_AUDIO, AUDIO_DUMP_TABLE },
+        { OHOS::MediaAVCodec::CodecServer::CodecType::CODEC_TYPE_DEFAULT, DEFAULT_DUMP_TABLE },
+        { OHOS::MediaAVCodec::CodecServer::CodecType::CODEC_TYPE_VIDEO, VIDEO_DUMP_TABLE },
+        { OHOS::MediaAVCodec::CodecServer::CodecType::CODEC_TYPE_AUDIO, AUDIO_DUMP_TABLE },
     };
 
     const std::map<int32_t, const std::string> PIXEL_FORMAT_STRING_MAP = {
-        { OHOS::Media::VideoPixelFormat::YUV420P, "YUV420P" },
-        { OHOS::Media::VideoPixelFormat::YUVI420, "YUVI420" },
-        { OHOS::Media::VideoPixelFormat::NV12, "NV12" },
-        { OHOS::Media::VideoPixelFormat::NV21, "NV21" },
-        { OHOS::Media::VideoPixelFormat::SURFACE_FORMAT, "SURFACE_FORMAT" },
-        { OHOS::Media::VideoPixelFormat::RGBA, "RGBA" },
-        { OHOS::Media::VideoPixelFormat::UNKNOWN_FORMAT, "UNKNOWN_FORMAT" },
+        { OHOS::MediaAVCodec::VideoPixelFormat::YUV420P, "YUV420P" },
+        { OHOS::MediaAVCodec::VideoPixelFormat::YUVI420, "YUVI420" },
+        { OHOS::MediaAVCodec::VideoPixelFormat::NV12, "NV12" },
+        { OHOS::MediaAVCodec::VideoPixelFormat::NV21, "NV21" },
+        { OHOS::MediaAVCodec::VideoPixelFormat::SURFACE_FORMAT, "SURFACE_FORMAT" },
+        { OHOS::MediaAVCodec::VideoPixelFormat::RGBA, "RGBA" },
+        { OHOS::MediaAVCodec::VideoPixelFormat::UNKNOWN_FORMAT, "UNKNOWN_FORMAT" },
     };
 
     const std::map<int32_t, const std::string> SCALE_TYPE_STRING_MAP = {
@@ -94,7 +94,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<ICodecService> CodecServer::Create()
 {
     std::shared_ptr<CodecServer> server = std::make_shared<CodecServer>();
@@ -390,11 +390,11 @@ int32_t CodecServer::DumpInfo(int32_t fd)
     return AVCS_ERR_OK;
 }
 
-const std::string &CodecServer::GetStatusDescription(OHOS::Media::CodecServer::CodecStatus status)
+const std::string &CodecServer::GetStatusDescription(OHOS::MediaAVCodec::CodecServer::CodecStatus status)
 {
     static const std::string ILLEGAL_STATE = "CODEC_STATUS_ILLEGAL";
-    if (status < OHOS::Media::CodecServer::UNINITIALIZED ||
-        status > OHOS::Media::CodecServer::ERROR) {
+    if (status < OHOS::MediaAVCodec::CodecServer::UNINITIALIZED ||
+        status > OHOS::MediaAVCodec::CodecServer::ERROR) {
         return ILLEGAL_STATE;
     }
 
@@ -506,5 +506,5 @@ CodecServer::CodecType CodecServer::GetCodecType()
 
     return codecType;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

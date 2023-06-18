@@ -16,7 +16,7 @@
 #ifndef CODECLIST_UTILS_H
 #define CODECLIST_UTILS_H
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 /**
  * @brief Codec Type
  *
@@ -29,6 +29,6 @@ enum class CodecType : int32_t {
     AVCODEC_VIDEO_CODEC,
     AVCODEC_AUDIO_CODEC,
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODECLIST_UTILS_H

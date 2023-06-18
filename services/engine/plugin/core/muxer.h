@@ -19,7 +19,7 @@
 #include "muxer_plugin.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 class Muxer {
 public:
@@ -44,6 +44,6 @@ private:
     std::shared_ptr<MuxerPlugin> muxer_;
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // PLUGIN_CORE_MUXER_H

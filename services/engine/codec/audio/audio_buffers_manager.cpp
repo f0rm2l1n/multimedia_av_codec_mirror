@@ -22,7 +22,7 @@ constexpr uint8_t LOGD_FREQUENCY = 5;
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 constexpr short DEFAULT_BUFFER_LENGTH = 8;
 constexpr short DEFAULT_SLEEP_TIME = 500;
 constexpr short MAX_WAIT_TIMES = 20;
@@ -169,5 +169,5 @@ std::shared_ptr<AudioBufferInfo> AudioBuffersManager::createNewBuffer()
     bufferInfo_.emplace_back(buffer);
     return buffer;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

@@ -21,7 +21,7 @@
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AudioFFMpegFlacEncoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegFlacEncoderPlugin> {
 public:
     AudioFFMpegFlacEncoderPlugin();
@@ -49,6 +49,6 @@ private:
     int32_t channels;
     std::unique_ptr<AudioFfmpegEncoderPlugin> basePlugin;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif

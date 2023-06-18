@@ -22,7 +22,7 @@
 #include "codeclist_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecListCapiMock : public CodecListMock {
 public:
     explicit CodecListCapiMock(OH_AVCapability *codeclist) : codeclist_(codeclist) {};
@@ -55,6 +55,6 @@ private:
     OH_AVCapability *codeclist_ = nullptr;
     CapabilityData capabilityData_;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODECLIST_CAPI_MOCK_H

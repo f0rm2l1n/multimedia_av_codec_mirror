@@ -28,7 +28,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 struct AVSharedMemoryBaseImpl : public AVSharedMemoryBase {
 public:
     AVSharedMemoryBaseImpl(int32_t fd, int32_t size, uint32_t flags, const std::string &name)
@@ -199,5 +199,5 @@ int32_t AVSharedMemoryBase::GetUsedSize() const
 {
     return size_;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

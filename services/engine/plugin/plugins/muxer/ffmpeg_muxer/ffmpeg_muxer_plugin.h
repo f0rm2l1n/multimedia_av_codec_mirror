@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 namespace Ffmpeg {
 class FFmpegMuxerPlugin : public MuxerPlugin {
@@ -71,6 +71,6 @@ private:
 };
 } // Ffmpeg
 } // Plugin
-} // Media
+} // MediaAVCodec
 } // OHOS
 #endif // FFMPEG_MUXER_PLUGIN_H

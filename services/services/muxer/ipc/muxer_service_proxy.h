@@ -19,7 +19,7 @@
 #include "i_standard_muxer_service.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class MuxerServiceProxy : public IRemoteProxy<IStandardMuxerService>, public NoCopyable {
 public:
     explicit MuxerServiceProxy(const sptr<IRemoteObject> &impl);
@@ -37,6 +37,6 @@ public:
 private:
     static inline BrokerDelegator<MuxerServiceProxy> delegator_;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 #endif  // MUXER_SERVICE_PROXY_H

@@ -21,7 +21,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 /**
  * @brief Error type of AVCodec
  *
@@ -142,6 +142,6 @@ enum VideoBitStreamFormat {
     HVCC,
     ANNEXB
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_COMMOM_H

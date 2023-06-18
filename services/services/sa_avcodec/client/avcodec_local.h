@@ -20,7 +20,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVCodecLocal : public IAVCodecService, public NoCopyable {
 public:
     AVCodecLocal() = default;
@@ -29,6 +29,6 @@ public:
     std::shared_ptr<IAVDemuxer> CreateDemuxerService() override;
     int32_t DestroyDemuxerService(std::shared_ptr<IAVDemuxer> demuxer) override;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_LOCAL_H

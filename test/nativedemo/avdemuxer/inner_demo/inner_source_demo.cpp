@@ -18,10 +18,10 @@
 #include "inner_source_demo.h"
 
 using namespace std;
-using namespace OHOS::Media;
+using namespace OHOS::MediaAVCodec;
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 InnerSourceDemo::InnerSourceDemo()
 {
     printf("SourceDemo ()\n");
@@ -87,5 +87,5 @@ uintptr_t InnerSourceDemo::GetSourceAddr()
     uintptr_t ret = this->avsource_->GetSourceAddr(this->addr_);
     return ret;
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

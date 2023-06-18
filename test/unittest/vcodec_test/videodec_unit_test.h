@@ -21,7 +21,7 @@
 #include "vdec_sample.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class VideoDecUnitTest : public testing::TestWithParam<std::string> {
 public:
     // SetUpTestCase: Called before all test cases
@@ -44,6 +44,6 @@ protected:
     std::shared_ptr<FormatMock> format_ = nullptr;
     std::shared_ptr<VDecCallbackTest> vdecCallback_ = nullptr;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // VIDEODEC_UNIT_TEST_H

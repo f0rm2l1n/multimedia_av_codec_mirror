@@ -26,7 +26,7 @@ constexpr int32_t BASE_BLOCK_PER_FRAME = 99;
 constexpr int32_t BASE_BLOCK_PER_SECOND = 1485;
 } // namespace
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 const std::map<int32_t, LevelParams> AVC_PARAMS_MAP = {
     {AVC_LEVEL_1, LevelParams(1485, 99)},      {AVC_LEVEL_1b, LevelParams(1485, 99)},
     {AVC_LEVEL_11, LevelParams(3000, 396)},    {AVC_LEVEL_12, LevelParams(6000, 396)},
@@ -628,5 +628,5 @@ std::map<int32_t, std::vector<int32_t>> AVCodecInfo::GetSupportedLevelsForProfil
 {
     return data_->profileLevelsMap;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

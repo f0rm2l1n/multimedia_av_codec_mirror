@@ -22,7 +22,7 @@
 
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecServer : public std::enable_shared_from_this<CodecServer>, public ICodecService, public NoCopyable {
 public:
     static std::shared_ptr<ICodecService> Create();
@@ -73,7 +73,7 @@ public:
 private:
     int32_t InitServer();
     void ExitProcessor();
-    const std::string &GetStatusDescription(OHOS::Media::CodecServer::CodecStatus status);
+    const std::string &GetStatusDescription(OHOS::MediaAVCodec::CodecServer::CodecStatus status);
     CodecType GetCodecType();
 
     CodecStatus status_ = UNINITIALIZED;
@@ -102,6 +102,6 @@ public:
 private:
     std::shared_ptr<CodecServer> codec_ = nullptr;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODEC_SERVER_H

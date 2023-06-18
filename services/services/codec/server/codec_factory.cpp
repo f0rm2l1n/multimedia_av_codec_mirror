@@ -31,7 +31,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecFacto
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 CodecFactory &CodecFactory::Instance()
 {
     static CodecFactory inst;
@@ -81,5 +81,5 @@ std::shared_ptr<CodecBase> CodecFactory::CreateCodecByName(const std::string &na
     AVCODEC_LOGI("Create codec %{public}s successful", name.c_str());
     return codec;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

@@ -16,7 +16,7 @@
 #include "surface_capi_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<SurfaceMock> SurfaceMockFactory::CreateSurface()
 {
     return std::make_shared<SurfaceCapiMock>();
@@ -32,5 +32,5 @@ OHNativeWindow *SurfaceCapiMock::GetSurface()
 {
     return nativeWindow_;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
