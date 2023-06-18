@@ -92,16 +92,22 @@ inline int64_t AvTime2Us(int64_t hTime)
     return hTime / AV_CODEC_USECOND;
 }
 
-int32_t CheckStartTime(int64_t startTime, int64_t ffTime)
+bool CheckStartTime(AVStream *stream, int64_t &timeStamp)
 {
-    if (startTime != AV_NOPTS_VALUE) {
-        if (ffTime > 0 && startTime > INT64_MAX - ffTime) {
-            AVCODEC_LOGE("seek value overflow with start time: %{public}" PRId64 " ffTime: %{public}" PRId64 "",
-                startTime, ffTime);
-            return AVCS_ERR_INVALID_OPERATION;
+    if (stream->start_time != AV_NOPTS_VALUE) {
+        if (timeStamp > 0 && stream->start_time > INT64_MAX - timeStamp) {
+            AVCODEC_LOGE("seek value overflow with start time: %{public}" PRId64 " timeStamp: %{public}" PRId64 "",
+                stream->start_time, timeStamp);
+            return false;
         }
+        timeStamp += stream->start_time;
     }
-    return AVCS_ERR_OK;
+    if (timeStamp > (stream->duration + stream->start_time)) {
+        AVCODEC_LOGE("seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
+                        timeStamp, stream->start_time);
+        return false;
+    }
+    return true;
 }
 
 int64_t ConvertTimeToFFmpeg(int64_t timestampUs, AVRational base)
@@ -455,12 +461,7 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
         int trackIndex = static_cast<int>(selectedTrackIds_[i]);
         auto avStream = formatContext_->streams[trackIndex];
         int64_t ffTime = ConvertTimeToFFmpeg(millisecond * 1000 * 1000, avStream->time_base);
-        int64_t startTime = avStream->start_time;
-        CheckStartTime(startTime, ffTime);
-        ffTime += avStream->start_time;
-        if (ffTime > (avStream->duration + avStream->start_time)) {
-            AVCODEC_LOGE("seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
-                         ffTime, avStream->duration);
+        if (!CheckStartTime(avStream, ffTime)) {
             return AVCS_ERR_INVALID_OPERATION;
         }
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
