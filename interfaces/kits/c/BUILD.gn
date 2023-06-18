@@ -239,7 +239,6 @@ ohos_shared_library("native_media_vdec") {
 
   public_configs = [
     ":av_codec_capi_config",
-    "//foundation/graphic/graphic_2d/frameworks/surface:surface_public_config",
   ]
 
   deps = [
@@ -267,7 +266,6 @@ ohos_shared_library("native_media_venc") {
 
   public_configs = [
     ":av_codec_capi_config",
-    "//foundation/graphic/graphic_2d/frameworks/surface:surface_public_config",
   ]
 
   deps = [
