@@ -94,10 +94,10 @@ inline int64_t AvTime2Us(int64_t hTime)
 
 bool CheckStartTime(AVStream *stream, int64_t &timeStamp)
 {
-    int64 startTime = 0;
+    int64_t startTime = 0;
     if (stream->start_time != AV_NOPTS_VALUE) {
         startTime = stream->start_time;
-        if (timeStamp > 0 && stream->start_time > INT64_MAX - timeStamp) {
+        if (timeStamp > 0 && startTime > INT64_MAX - timeStamp) {
             AVCODEC_LOGE("seek value overflow with start time: %{public}" PRId64 " timeStamp: %{public}" PRId64 "",
                 startTime, timeStamp);
             return false;
@@ -459,36 +459,41 @@ int32_t FFmpegDemuxerPlugin::SeekToTime(int64_t millisecond, AVSeekMode mode)
         AVCODEC_LOGW("no track has been selected");
         return AVCS_ERR_INVALID_OPERATION;
     }
-    for (size_t i = 0; i < selectedTrackIds_.size(); i++) {
-        int trackIndex = static_cast<int>(selectedTrackIds_[i]);
-        auto avStream = formatContext_->streams[trackIndex];
-        int64_t ffTime = ConvertTimeToFFmpeg(millisecond * 1000 * 1000, avStream->time_base);
-        if (!CheckStartTime(avStream, ffTime)) {
+    int trackIndex = static_cast<int>(selectedTrackIds_[0]);
+    for (size_t i = 1; i < selectedTrackIds_.size(); i++) {
+        int index = static_cast<int>(selectedTrackIds_[i]);
+        if (formatContext_->streams[index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            trackIndex = index;
+            break;
+        }
+    }
+    auto avStream = formatContext_->streams[trackIndex];
+    int64_t ffTime = ConvertTimeToFFmpeg(millisecond * 1000 * 1000, avStream->time_base);
+    if (!CheckStartTime(avStream, ffTime)) {
+        return AVCS_ERR_INVALID_OPERATION;
+    }
+    if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+        if (ffTime < 0) {
+            AVCODEC_LOGW("invalid ffmpeg time: %{public}" PRId64 " ms", ffTime);
             return AVCS_ERR_INVALID_OPERATION;
         }
-        if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            if (ffTime < 0) {
-                AVCODEC_LOGW("invalid ffmpeg time: %{public}" PRId64 " ms", ffTime);
-                return AVCS_ERR_INVALID_OPERATION;
-            }
-            if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - millisecond) <= TIME_INTERNAL
-                && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
-                flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
-            }
-            int keyFrameIdx = av_index_search_timestamp(avStream, ffTime, flags);
-            if (keyFrameIdx < 0) {
-                flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
-                keyFrameIdx = av_index_search_timestamp(avStream, ffTime, flags);
-            }
-            if (keyFrameIdx >= 0) {
-                ffTime = CalculateTimeByFrameIndex(avStream, keyFrameIdx);
-            }
+        if (AvTime2Ms(ConvertTimeFromFFmpeg(avStream->duration, avStream->time_base) - millisecond) <= TIME_INTERNAL
+            && mode == AVSeekMode::SEEK_MODE_NEXT_SYNC) {
+            flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_PREVIOUS_SYNC);
         }
-        auto rtv = av_seek_frame(formatContext_.get(), trackIndex, ffTime, flags);
-        if (rtv < 0) {
-            AVCODEC_LOGE("seek failed, return value: ffmpeg error:%{public}d", rtv);
-            return AVCS_ERR_SEEK_FAILED;
+        int keyFrameIdx = av_index_search_timestamp(avStream, ffTime, flags);
+        if (keyFrameIdx < 0) {
+            flags = g_seekModeToFFmpegSeekFlags.at(AVSeekMode::SEEK_MODE_CLOSEST_SYNC);
+            keyFrameIdx = av_index_search_timestamp(avStream, ffTime, flags);
         }
+        if (keyFrameIdx >= 0) {
+            ffTime = CalculateTimeByFrameIndex(avStream, keyFrameIdx);
+        }
+    }
+    auto rtv = av_seek_frame(formatContext_.get(), trackIndex, ffTime, flags);
+    if (rtv < 0) {
+        AVCODEC_LOGE("seek failed, return value: ffmpeg error:%{public}d", rtv);
+        return AVCS_ERR_SEEK_FAILED;
     }
     ResetStatus();
     return AVCS_ERR_OK;
