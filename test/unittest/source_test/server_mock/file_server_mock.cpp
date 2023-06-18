@@ -23,7 +23,6 @@ constexpr int32_t BUFFER_LNE = 4096;
 constexpr int32_t DEFAULT_LISTEN = 5;
 constexpr int32_t START_INDEX = 1;
 constexpr int32_t END_INDEX = 2;
-constexpr int32_t DEFAULT_LISTEN = 5;
 const std::string SERVER_FILE_PATH = "/data/test/media";
 } // namespace
 FileServerMock::FileServerMock() {}
@@ -93,7 +92,7 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
     }
     std::cout << pathBuff << std::endl;
     std::string fileName = std::string(pathBuff);
-    GetRange(filename, startPos, endPos);
+    GetRange(fileName, startPos, endPos);
     int32_t findIndex = fileName.find_first_of("/");
     if (findIndex < 0 || findIndex >= 10) { // 10: expect less than 10
         close(connFd);
@@ -115,7 +114,7 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
         close(fileFd);
         return;
     }
-    int32_t FileSize = lseek(fileFd, 0, SEEK_END);
+    int32_t fileSize = lseek(fileFd, 0, SEEK_END);
     int32_t requestDataSize = std::min(endPos, fileSize) - std::max(startPos, 0) + 1;
     int32_t size = requestDataSize;
     if (startPos == 0 && endPos == 0) {
