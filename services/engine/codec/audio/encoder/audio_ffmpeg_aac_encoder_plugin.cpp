@@ -44,7 +44,7 @@ static std::map<int32_t, uint8_t> sampleFreqMap = {{96000, 0},  {88200, 1}, {640
 }
 
 namespace OHOS {
-namespace MediaAVcodec {
+namespace MediaAVCodec {
 AudioFFMpegAacEncoderPlugin::AudioFFMpegAacEncoderPlugin() : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>()) {}
 
 AudioFFMpegAacEncoderPlugin::~AudioFFMpegAacEncoderPlugin()
