@@ -1,49 +1,39 @@
-# 音视频封装能力开发概述
+# 音视频封装
 
-封装，简单来说，就是把音频、视频等编码后的媒体数据，按一定的格式存储到文件里。
+开发者可以调用本模块的Native API接口，完成音视频封装，即将音频、视频等编码后的媒体数据，按一定的格式存储到文件里。
 
-一般来说，不同的封装格式，支持封装的编解码类型不同。目前系统API支持的封装能力如下：
+当前支持的封装能力如下：
 
 | 封装格式 | 视频编解码类型        | 音频编解码类型   | 封面类型       |
 | -------- | --------------------- | ---------------- | -------------- |
 | mp4      | MPEG-4、 AVC（H.264） | AAC、MPEG（MP3） | jpeg、png、bmp |
 | m4a      | MPEG-4、 AVC（H.264） | AAC              | jpeg、png、bmp |
 
-**音视频封装的使用场景**：
+**适用场景**
 
 - 录像、录音
   
-  保存录像、录音文件时，需要先对音视频流进行编码，然后封装
+  保存录像、录音文件时，需要先对音视频流进行编码，再封装为文件。
 
 - 音视频编辑
   
-  保存编辑后的音视频文件，需要封装
+  完成编辑后的音视频，需要封装为文件。
 
 - 音视频转码
 
-  转码后，保存文件时需要封装
-
-# 使用avmuxer开发音视频封装功能
-
-## 接口说明
-
-**表1** avmuxer开放能力接口
-
-| 接口名                                                       | 描述             |
-| ------------------------------------------------------------ | ---------------- |
-| OH_AVMuxer \*OH_AVMuxer_Create(int32_t fd, OH_AVOutputFormat format); | 创建OH_AVMuxer   |
-| OH_AVErrCode OH_AVMuxer_SetRotation(OH_AVMuxer \*muxer, int32_t rotation); | 设置视频旋转角度 |
-| OH_AVErrCode OH_AVMuxer_AddTrack(OH_AVMuxer \*muxer, int32_t \*trackIndex, OH_AVFormat \*trackFormat); | 添加媒体轨       |
-| OH_AVErrCode OH_AVMuxer_Start(OH_AVMuxer \*muxer);           | 开始封装         |
-| OH_AVErrCode OH_AVMuxer_WriteSample(OH_AVMuxer *muxer, uint32_t trackIndex, OH_AVMemory *sample, OH_AVCodecBufferAttr info); | 将数据写入封装器 |
-| OH_AVErrCode OH_AVMuxer_Stop(OH_AVMuxer \*muxer);            | 停止封装         |
-| OH_AVErrCode OH_AVMuxer_Destroy(OH_AVMuxer \*muxer);         | 销毁OH_AVMuxer   |
+  转码后，保存文件时需要封装。
 
 ## 开发步骤
 
-详细的API说明请参考avmuxer native API
+详细的API说明请参考[API文档](../reference/native-apis/_a_v_muxer.md)。
 
-1. 创建封装器实例对象
+> **说明：**
+> 
+> 如果调用封装能力写本地文件，需要[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.WRITE_MEDIA
+
+参考以下示例代码，完成音视频封装的全流程。以封装mp4格式的音视频文件为例。
+
+1. 调用OH_AVMuxer_Create()创建封装器实例对象。
 
    ``` c++
    // 设置封装格式为mp4
@@ -53,20 +43,16 @@
    OH_AVMuxer *muxer = OH_AVMuxer_Create(fd, OH_AVOutputFormat format);
    ```
 
-
-
-2. 设置旋转角度（非必须）
-
+2. （可选）调用OH_AVMuxer_SetRotation()设置旋转角度。
+   
    ``` c++
-   // 旋转角度
+   // 旋转角度，视频画面需要旋转的时候设置
    OH_AVMuxer_SetRotation(muxer, 0);
    ```
 
-
-
-3. 添加音频轨
-
-   - **方法一：**
+3. 添加音频轨。
+   
+   **方法一：用OH_AVFormat_Create创建format**
 
    ``` c++
    int audioTrackId = -1;
@@ -82,9 +68,9 @@
    OH_AVFormat_Destroy(formatAudio); // 销毁
    ```
    
-   - **方法二:**
+   **方法二：用OH_AVFormat_CreateAudioFormat创建format**
    
-   ``` cpp
+   ``` c++
    int audioTrackId = -1;
    OH_AVFormat *formatAudio = OH_AVFormat_CreateAudioFormat(OH_AVCODEC_MIMETYPE_AUDIO_AAC, 44100, 2);
    
@@ -94,12 +80,10 @@
    }
    OH_AVFormat_Destroy(formatAudio); // 销毁
    ```
-   
-   
-   
-4. 添加视频轨
 
-   - **方法一**
+4. 添加视频轨。
+
+   **方法一：用OH_AVFormat_Create创建format**
 
    ``` c++
    int videoTrackId = -1;
@@ -118,9 +102,9 @@
    OH_AVFormat_Destroy(formatVideo); // 销毁
    ```
    
-   - **方法二**
+   **方法二：用OH_AVFormat_CreateVideoFormat创建format**
    
-   ``` cpp
+   ``` c++
    int videoTrackId = -1;
    char *buffer = ...; // 编码config data，如果没有可以不传
    size_t size = ...;  // 编码config data的长度，根据实际情况配置
@@ -133,14 +117,12 @@
    }
    OH_AVFormat_Destroy(formatVideo); // 销毁
    ```
-   
-   
-   
-5. 添加封面轨
 
-   - **方法一**
+5. 添加封面轨。
 
-   ``` cpp
+   **方法一：用OH_AVFormat_Create创建format**
+
+   ``` c++
    int coverTrackId = -1;
    OH_AVFormat *formatCover = OH_AVFormat_Create();
    OH_AVFormat_SetStringValue(formatCover, OH_MD_KEY_CODEC_MIME, OH_AVCODEC_MIMETYPE_IMAGE_JPG);
@@ -154,9 +136,9 @@
    OH_AVFormat_Destroy(formatCover); // 销毁
    ```
    
-   - **方法二**
+   **方法二：用OH_AVFormat_CreateVideoFormat创建format**
 
-   ``` cpp
+   ``` c++
    int coverTrackId = -1;
    OH_AVFormat *formatCover = OH_AVFormat_CreateVideoFormat(OH_AVCODEC_MIMETYPE_IMAGE_JPG, 1280, 720);
    
@@ -166,11 +148,9 @@
    }
    OH_AVFormat_Destroy(formatCover); // 销毁
    ```
-   
-   
-   
-5. 封装开始
 
+6. 调用OH_AVMuxer_Start()开始封装。
+   
    ``` c++
    // 调用start，写封装文件头。start后，不能设置媒体参数、不能添加媒体轨
    if (OH_AVMuxer_Start(muxer) != AV_ERR_OK) {
@@ -178,18 +158,15 @@
    }
    ```
 
+7. 调用OH_AVMuxer_WriteSample()，写入封装数据。
    
-
-7. 写入封装数据
-
-   - **写入视频、音频、封面数据:**
+   包括视频、音频、封面数据。
 
    ``` c++
    // start后，才能开始写入数据
    int size = ...;
    OH_AVMemory *sample = OH_AVMemory_Create(size); // 创建AVMemory
-   // 获取AVMemory内buffer地址，往里面写入封装的数据，写入数据长度不大于size
-   uint8_t *buffer = OH_AVMemory_GetAddr(sample);
+   // 往sampleBuffer里写入数据参考OH_AVMemory的使用方法
    // 封装封面，必须一次写完一张图片
    
    // 创建buffer info
@@ -204,12 +181,9 @@
    if (ret != AV_ERR_OK) {
        // 异常处理
    }
-   OH_AVMemory_Destroy(sample); // 销毁
    ```
 
-   
-
-7. 封装停止
+8. 调用OH_AVMuxer_Stop()，停止封装。
 
    ``` c++
    // 调用stop，写封装文件尾。stop后不能写入媒体数据
@@ -218,16 +192,12 @@
    }
    ```
 
-   
+9. 调用OH_AVMuxer_Destroy()销毁实例，释放资源。
 
-8. 销毁封装实例
-
-   ``` cpp
+   ``` c++
    if (OH_AVMuxer_Destroy(muxer) != AV_ERR_OK) {
        // 异常处理
    }
    muxer = NULL;
    close(fd); // 关闭文件描述符
    ```
-
-   

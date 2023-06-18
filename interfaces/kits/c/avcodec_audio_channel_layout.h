@@ -16,8 +16,7 @@
 #ifndef AVCODEC_AUDIO_CHANNEL_LAYOUT_H
 #define AVCODEC_AUDIO_CHANNEL_LAYOUT_H
 #include <cstdint>
-namespace OHOS {
-namespace Media {
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -160,6 +159,4 @@ enum AudioChannelLayout : uint64_t {
 #ifdef __cplusplus
 }
 #endif
-} // namespace Media
-} // namespace OHOS
 #endif

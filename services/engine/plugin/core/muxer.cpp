@@ -36,9 +36,9 @@ Status Muxer::Start()
     return muxer_->Start();
 }
 
-Status Muxer::WriteSample(uint8_t *sample, const TrackSampleInfo &info)
+Status Muxer::WriteSample(uint32_t trackIndex, const uint8_t *sample, AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
-    return muxer_->WriteSample(sample, info);
+    return muxer_->WriteSample(trackIndex, sample, info, flag);
 }
 
 Status Muxer::Stop()

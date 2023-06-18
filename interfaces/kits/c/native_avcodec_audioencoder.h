@@ -22,8 +22,7 @@
 #include "native_avformat.h"
 #include "native_avmemory.h"
 #include "native_avcodec_base.h"
-namespace OHOS {
-namespace Media {
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -206,18 +205,16 @@ OH_AVErrCode OH_AudioEncoder_FreeOutputData(OH_AVCodec *codec, uint32_t index);
  * switchback from the background
  * @syscap SystemCapability.Multimedia.Media.AudioEncoder
  * @param codec Pointer to an OH_AVCodec instance
- * @param isValid Pointer to an bool instance, true: the codec instance is valid, false: the codec
- * instance is invalid
+ * @param isValid Output Parameter. A pointer to a boolean instance, it is true if the codec instance is valid,
+ * false if the codec instance is invalid
  * @return Returns AV_ERR_OK if the execution is successful,
  * otherwise returns a specific error code, refer to {@link OH_AVErrCode}
  * @since 10
- * @version 4.0
  */
 OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec *codec, bool *isValid);
 
 #ifdef __cplusplus
 }
 #endif
-} // namespace Media
-} // namespace OHOS
+
 #endif // NATIVE_AVCODEC_AUDIOENCODER_H

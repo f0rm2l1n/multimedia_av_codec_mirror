@@ -347,9 +347,10 @@ int32_t AudioCodeCapiDecoderUnitTest::Start()
 int32_t AudioCodeCapiDecoderUnitTest::Stop()
 {
     isRunning_.store(false);
-    if (signal_) {
-        signal_->startCond_.notify_all();
+    if (!signal_) {
+        return OH_AVErrCode::AV_ERR_UNKNOWN;
     }
+    signal_->startCond_.notify_all();
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         {
             unique_lock<mutex> lock(signal_->inMutex_);

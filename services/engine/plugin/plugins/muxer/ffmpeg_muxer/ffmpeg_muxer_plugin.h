@@ -39,7 +39,8 @@ public:
     Status SetRotation(int32_t rotation) override;
     Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     Status Start() override;
-    Status WriteSample(const uint8_t *sample, const TrackSampleInfo &info) override;
+    Status WriteSample(uint32_t trackIndex, const uint8_t *sample,
+        AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
     Status Stop() override;
 
 private:

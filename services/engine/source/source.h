@@ -47,15 +47,6 @@ private:
     std::shared_ptr<PackageDef> packageDef;
 };
 
-struct SourceCallback : Callback {
-    SourceCallback() = default;
-    ~SourceCallback() = default;
-    void OnEvent(const PluginEvent &event)
-    {
-        (void)event;
-    }
-};
-
 class Source : public SourceBase {
 public:
     Source();

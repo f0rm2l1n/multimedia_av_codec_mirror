@@ -76,10 +76,11 @@ int32_t MuxerServer::Start()
     return AVCS_ERR_OK;
 }
 
-int32_t MuxerServer::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
+int32_t MuxerServer::WriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     CHECK_AND_RETURN_RET_LOG(muxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "muxer engine does not exist");
-    int32_t ret = muxerEngine_->WriteSample(sample, info);
+    int32_t ret = muxerEngine_->WriteSample(trackIndex, sample, info, flag);
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call WriteSample");
     return AVCS_ERR_OK;
 }

@@ -39,7 +39,7 @@ public:
 
     size_t Size()
     {
-        std::unique_lock<std::mutex> lock(mutex_);
+        std::lock_guard<std::mutex> lock(mutex_);
         return que_.size();
     }
 
@@ -50,7 +50,7 @@ public:
 
     size_t Empty()
     {
-        std::unique_lock<std::mutex> lock(mutex_);
+        std::lock_guard<std::mutex> lock(mutex_);
         return que_.empty();
     }
 
@@ -124,13 +124,13 @@ public:
 
     void Clear()
     {
-        std::unique_lock<std::mutex> lock(mutex_);
+        std::lock_guard<std::mutex> lock(mutex_);
         ClearUnprotected();
     }
 
     void SetActive(bool active, bool cleanData = true)
     {
-        std::unique_lock<std::mutex> lock(mutex_);
+        std::lock_guard<std::mutex> lock(mutex_);
         AVCODEC_LOGD("SetActive %{public}s: %{public}d.", name_.c_str(), isActive_.load());
         isActive_ = active;
         if (!active) {

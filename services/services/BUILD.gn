@@ -99,17 +99,6 @@ config("av_codec_service_config") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
-
-  if (target_cpu == "arm64") {
-    av_codec_plugin_path = "\"/system/lib64/media/av_codec_plugins\""
-  } else {
-    av_codec_plugin_path = "\"/system/lib/media/av_codec_plugins\""
-  }
-
-  defines += [
-    "AV_CODEC_PLUGIN_PATH=${av_codec_plugin_path}",
-    "AV_CODEC_PLUGIN_FILE_TAIL=\".z.so\"",
-  ]
 }
 
 ohos_shared_library("av_codec_service") {
@@ -128,10 +117,6 @@ ohos_shared_library("av_codec_service") {
 
   sources = [
     "$av_codec_root_dir/frameworks/native/common/avcodec_errors.cpp",
-    "$av_codec_root_dir/services/engine/muxer/muxer_engine_impl.cpp",
-    "$av_codec_root_dir/services/engine/plugin/core/muxer.cpp",
-    "$av_codec_root_dir/services/engine/plugin/core/muxer_factory.cpp",
-    "$av_codec_root_dir/services/engine/plugin/core/plugin_loader.cpp",
     "common/avsharedmemory_ipc.cpp",
     "sa_avcodec/ipc/avcodec_listener_proxy.cpp",
     "sa_avcodec/ipc/avcodec_parcel.cpp",
@@ -157,6 +142,11 @@ ohos_shared_library("av_codec_service") {
   }
   if (multimedia_av_codec_support_muxer) {
     sources += [
+      "$av_codec_root_dir/services/engine/muxer/muxer_buffer_pool.cpp",
+      "$av_codec_root_dir/services/engine/muxer/muxer_engine_impl.cpp",
+      "$av_codec_root_dir/services/engine/plugin/core/muxer.cpp",
+      "$av_codec_root_dir/services/engine/plugin/core/muxer_factory.cpp",
+      "$av_codec_root_dir/services/engine/plugin/core/plugin_loader.cpp",
       "muxer/ipc/muxer_service_stub.cpp",
       "muxer/server/muxer_server.cpp",
     ]

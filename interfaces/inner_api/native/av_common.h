@@ -160,36 +160,6 @@ enum OutputFormat : uint32_t {
     */
     OUTPUT_FORMAT_M4A = 6,
 };
-
-/**
- * @brief Description information of a sample associated a media track.
- *
- * @since 10
- * @version 4.0
- */
-struct TrackSampleInfo {
-    /**
-     * @brief the id of track that this sample belongs to.
-     */
-    uint32_t trackIndex;
-    /**
-     * @brief the presentation timestamp in microseconds.
-     */
-    int64_t timeUs;
-    /**
-     * @brief the size in bytes.
-     */
-    int32_t size;
-    /**
-     * @brief the starting offset of valid data in bytes
-     */
-    int32_t offset;
-    /**
-     * @brief the flags associated with the sample, this
-     * maybe be a combination of multiple {@link AVCodecBufferFlag}.
-     */
-    uint32_t flags;
-};
 } // namespace Media
 } // namespace OHOS
 #endif // AV_COMMOM_H

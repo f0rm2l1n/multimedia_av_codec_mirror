@@ -367,8 +367,6 @@ int32_t Source::Init(std::string& uri)
         AVCODEC_LOGE("load sourcePlugin_ fail !");
         return AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED;
     }
-    SourceCallback cb;
-    sourcePlugin_->SetCallback(&cb);
     Status pluginRet = sourcePlugin_->SetSource(mediaSource);
 
     CHECK_AND_RETURN_RET_LOG(pluginRet == Status::OK, AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
@@ -651,14 +649,15 @@ int32_t Source::InitAVFormatContext()
 
     formatContext_ = std::shared_ptr<AVFormatContext>(formatContext, [](AVFormatContext* ptr) {
         if (ptr != nullptr) {
-            if (ptr->pb != nullptr) {
-                ptr->pb->opaque = nullptr;
-                av_freep(&(ptr->pb)->buffer);
-                av_opt_free(ptr->pb);
-                avio_context_free(&(ptr->pb));
-                ptr->pb = nullptr;
+            auto p = ptr->pb;
+            avformat_close_input(&ptr);
+            if (p != nullptr) {
+                p->opaque = nullptr;
+                av_freep(&(p->buffer));
+                av_opt_free(p);
+                avio_context_free(&p);
+                p = nullptr;
             }
-            avformat_free_context(ptr);
         }
     });
 
