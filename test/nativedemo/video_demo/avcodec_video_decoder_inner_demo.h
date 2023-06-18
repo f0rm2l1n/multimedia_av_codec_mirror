@@ -99,13 +99,13 @@ private:
     int32_t ExtractPacket();
 
     std::atomic<bool> isRunning_ = false;
-    std::unique_ptr<std::ifstream> inputFile_;
-    std::unique_ptr<std::ofstream> outFile_;
-    std::unique_ptr<std::thread> inputLoop_;
-    std::unique_ptr<std::thread> outputLoop_;
-    std::shared_ptr<AVCodecVideoDecoder> videoDec_;
-    std::shared_ptr<VDecSignal> signal_;
-    std::shared_ptr<VDecDemoCallback> cb_;
+    std::unique_ptr<std::ifstream> inputFile_ = nullptr;
+    std::unique_ptr<std::ofstream> outFile_ = nullptr;
+    std::unique_ptr<std::thread> inputLoop_ = nullptr;
+    std::unique_ptr<std::thread> outputLoop_ = nullptr;
+    std::shared_ptr<AVCodecVideoDecoder> videoDec_ = nullptr;
+    std::shared_ptr<VDecSignal> signal_ = nullptr;
+    std::shared_ptr<VDecDemoCallback> cb_ = nullptr;
 
     // Extract packet
     static constexpr int32_t VIDEO_INBUF_SIZE = 10240;
@@ -116,7 +116,7 @@ private:
     AVPacket *pkt_ = nullptr;
     size_t data_size_ = 0;
     uint8_t *data_ = nullptr;
-    uint8_t inbuf_[VIDEO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+    uint8_t inbuf_[VIDEO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE] = {0};
     bool file_end_ = false;
 
     std::string mode_ = "0";

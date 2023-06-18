@@ -143,16 +143,16 @@ static void OnOutputBufferAvailable(OH_AVCodec *codec, uint32_t index, OH_AVMemo
 {
     (void)codec;
     VDecSignal *signal = static_cast<VDecSignal *>(userData);
-    unique_lock<mutex> lock(signal->outMutex_);
-    signal->outQueue_.push(index);
-    signal->outBufferQueue_.push(data);
     if (attr) {
+        unique_lock<mutex> lock(signal->outMutex_);
+        signal->outQueue_.push(index);
+        signal->outBufferQueue_.push(data);
         signal->attrQueue_.push(*attr);
         writeFrameCount += attr->size > 0 ? 1 : 0;
+        signal->outCond_.notify_all();
     } else {
         cout << "OnOutputBufferAvailable error, attr is nullptr!" << endl;
     }
-    signal->outCond_.notify_all();
 }
 
 class TestConsumerListener : public IBufferConsumerListener {

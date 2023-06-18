@@ -73,12 +73,12 @@ private:
     void OutputFunc();
 
     std::atomic<bool> isRunning_ = false;
-    std::unique_ptr<std::ifstream> inputFile_;
-    std::unique_ptr<std::ofstream> outFile_;
-    std::unique_ptr<std::thread> inputLoop_;
-    std::unique_ptr<std::thread> outputLoop_;
-    OH_AVCodec *videoDec_;
-    VDecSignal *signal_;
+    std::unique_ptr<std::ifstream> inputFile_ = nullptr;
+    std::unique_ptr<std::ofstream> outFile_ = nullptr;
+    std::unique_ptr<std::thread> inputLoop_ = nullptr;
+    std::unique_ptr<std::thread> outputLoop_ = nullptr;
+    OH_AVCodec *videoDec_ = nullptr;
+    VDecSignal *signal_ = nullptr;
     struct OH_AVCodecAsyncCallback cb_;
     bool isFirstFrame_ = true;
     int64_t timeStamp_ = 0;
@@ -92,7 +92,7 @@ private:
     AVPacket *pkt_ = nullptr;
     size_t data_size_ = 0;
     uint8_t *data_ = nullptr;
-    uint8_t inbuf_[VIDEO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+    uint8_t inbuf_[VIDEO_INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE] = {0};
     bool file_end_ = false;
     std::string mode_ = "0";
 };

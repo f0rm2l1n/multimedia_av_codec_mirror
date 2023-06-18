@@ -248,7 +248,7 @@ std::vector<int32_t> CodecListInnerMock::GetSupportedLevelsForProfile(int32_t pr
         auto profileLevelsMap = codecInfo->GetSupportedLevelsForProfile();
         auto levelsmatch = profileLevelsMap.find(profile);
         if (levelsmatch == profileLevelsMap.end()) {
-            return levelsmatch->second;
+            return std::vector<int32_t>();
         }
         std::sort(levelsmatch->second.begin(), levelsmatch->second.end());
         return levelsmatch->second;
