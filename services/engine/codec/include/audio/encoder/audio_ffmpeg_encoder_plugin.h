@@ -67,6 +67,7 @@ private:
     mutable std::mutex avMutext_;
     std::mutex parameterMutex_;
     Format format_;
+    int64_t prevPts_;
 
 private:
     int32_t SendBuffer(const std::shared_ptr<AudioBufferInfo> &inputBuffer);
@@ -75,6 +76,7 @@ private:
     int32_t PcmFillFrame(const std::shared_ptr<AudioBufferInfo> &inputBuffer);
     HeaderFunc GetHeaderFunc_;
     bool headerFuncValid_ = false;
+    uint32_t channelsBytesPerSample_ {1};
 };
 } // namespace Media
 } // namespace OHOS

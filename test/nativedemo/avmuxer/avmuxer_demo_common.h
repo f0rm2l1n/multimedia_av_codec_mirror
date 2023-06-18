@@ -24,6 +24,7 @@ struct AudioTrackParam {
     const char *mimeType;
     int sampleRate;
     int channels;
+    int frameSize;
 };
 
 struct VideoTrackParam {
@@ -31,6 +32,8 @@ struct VideoTrackParam {
     const char *mimeType;
     int width;
     int height;
+    double frameRate;
+    int videoDelay;
 };
 
 struct FdListStr {
@@ -45,6 +48,7 @@ extern struct AudioTrackParam g_audioMpegPar;
 extern struct AudioTrackParam g_audioAacPar;
 extern struct VideoTrackParam g_videoH264Par;
 extern struct VideoTrackParam g_videoMpeg4Par;
+extern struct VideoTrackParam g_videoH265Par;
 extern struct VideoTrackParam g_jpegCoverPar;
 extern struct VideoTrackParam g_pngCoverPar;
 extern struct VideoTrackParam g_bmpCoverPar;

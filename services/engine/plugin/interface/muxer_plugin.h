@@ -18,6 +18,7 @@
 
 #include "media_description.h"
 #include "av_common.h"
+#include "avcodec_common.h"
 #include "plugin_base.h"
 #include "plugin_definition.h"
 
@@ -29,7 +30,8 @@ struct MuxerPlugin : public PluginBase {
     virtual Status SetRotation(int32_t rotation) = 0;
     virtual Status AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) = 0;
     virtual Status Start() = 0;
-    virtual Status WriteSample(const uint8_t *sample, const TrackSampleInfo &info) = 0;
+    virtual Status WriteSample(uint32_t trackIndex, const uint8_t *sample,
+        AVCodecBufferInfo info, AVCodecBufferFlag flag) = 0;
     virtual Status Stop() = 0;
     Status SetCallback(Callback* cb)
     {

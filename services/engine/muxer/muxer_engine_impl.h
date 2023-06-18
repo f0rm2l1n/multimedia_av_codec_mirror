@@ -24,6 +24,7 @@
 #include "i_muxer_engine.h"
 #include "muxer.h"
 #include "block_queue.h"
+#include "muxer_buffer_pool.h"
 
 namespace OHOS {
 namespace Media {
@@ -35,7 +36,8 @@ public:
     int32_t SetRotation(int32_t rotation) override;
     int32_t AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc) override;
     int32_t Start() override;
-    int32_t WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info) override;
+    int32_t WriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+        AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
     int32_t Stop() override;
     int32_t DumpInfo(int32_t fd) override;
 
@@ -63,8 +65,10 @@ private:
     TrackMimeType GetTrackMimeType(const std::string &mime);
 
     struct BlockBuffer {
-        std::shared_ptr<AVSharedMemory> buffer_;
-        TrackSampleInfo info_;
+        uint32_t trackIndex_;
+        std::shared_ptr<uint8_t> buffer_;
+        AVCodecBufferInfo info_;
+        AVCodecBufferFlag flag_;
     };
 
     int32_t appUid_ = -1;
@@ -73,9 +77,9 @@ private:
     OutputFormat format_;
     std::atomic<State> state_ = State::UNINITIALIZED;
     std::shared_ptr<Plugin::Muxer> muxer_ = nullptr;
-    std::map<int32_t, std::string> tracks_;
-    std::map<int32_t, MediaDescription> mediaDescMap_;
+    std::map<int32_t, MediaDescription> tracksDesc_;
     BlockQueue<std::shared_ptr<BlockBuffer>> que_;
+    MuxerBufferPool pool_;
     std::string threadName_;
     std::mutex mutex_;
     std::condition_variable cond_;

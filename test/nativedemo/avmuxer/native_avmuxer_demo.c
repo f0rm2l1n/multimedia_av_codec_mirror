@@ -36,7 +36,7 @@
 #define MODE_TWO 2
 #define MODE_THREE 3
 #define TYPE_BUFFER_SIZE 20
-#define CONFIG_BUFFER_SIZE 100
+#define CONFIG_BUFFER_SIZE 0x1FFF
 
 typedef struct AudioTrackParam AudioTrackParam;
 typedef struct VideoTrackParam VideoTrackParam;
@@ -86,6 +86,7 @@ int AddTrackAudio(OH_AVMuxer *muxer, const AudioTrackParam *param, int fdInput)
         printf("audio format failed!\n");
         return AV_ERR_NO_MEMORY;
     }
+    OH_AVFormat_SetIntValue(formatAudio, "audio_samples_per_frame", param->frameSize);
     int extraSize = 0;
     unsigned char buffer[CONFIG_BUFFER_SIZE] = {0};
     read(fdInput, (void*)&extraSize, sizeof(extraSize));
@@ -117,6 +118,8 @@ int AddTrackVideo(OH_AVMuxer *muxer, const VideoTrackParam *param, int fdInput)
         printf("video format failed!\n");
         return AV_ERR_NO_MEMORY;
     }
+    OH_AVFormat_SetDoubleValue(formatVideo, OH_MD_KEY_FRAME_RATE, param->frameRate);
+    OH_AVFormat_SetIntValue(formatVideo, "video_delay", param->videoDelay); // 不对外key
     int extraSize = 0;
     unsigned char buffer[CONFIG_BUFFER_SIZE] = {0};
     read(fdInput, (void*)&extraSize, sizeof(extraSize));
@@ -162,51 +165,47 @@ int AddTrackCover(OH_AVMuxer *muxer, const VideoTrackParam *param, int fdInput)
     return trackIndex;
 }
 
-static int UpDateWriteBufferInfo(int fd, OH_AVMemory **buffer, int *curSize, OH_AVCodecBufferAttr *info)
+static bool UpdateWriteBufferInfo(int fd, OH_AVMemory **buffer, OH_AVCodecBufferAttr *info)
 {
-    if (fd < 0 || buffer == NULL || curSize == NULL || info == NULL) {
-        return -1;
+    if (fd < 0 || buffer == NULL || info == NULL) {
+        return false;
     }
 
-    int ret;
-    int flags = 0;
-    int dataSize = 0;
-
-    ret = read(fd, (void*)&flags, sizeof(flags));
+    int ret = read(fd, (void*)&info->pts, sizeof(info->pts));
     if (ret <= 0) {
-        return -1;
+        return false;
+    }
+    
+    ret = read(fd, (void*)&info->flags, sizeof(info->flags));
+    if (ret <= 0) {
+        return false;
     }
 
-    info->flags = 0;
-    if (flags != 0) {
-        info->flags |= AVCODEC_BUFFER_FLAGS_SYNC_FRAME;
+    if (info->flags & 0x01) {
+        info->flags = AVCODEC_BUFFER_FLAGS_SYNC_FRAME;
     }
 
-    ret = read(fd, (void*)&dataSize, sizeof(dataSize));
-    if (ret <= 0 || dataSize < 0) {
-        return -1;
+    ret = read(fd, (void*)&info->size, sizeof(info->size));
+    if (ret <= 0 || info->size < 0) {
+        return false;
     }
 
-    if (*buffer != NULL && dataSize > *curSize) {
+    if (*buffer != NULL && OH_AVMemory_GetSize(*buffer) < info->size) {
         OH_AVMemory_Destroy(*buffer);
-        *curSize = 0;
         *buffer = NULL;
     }
     if (*buffer == NULL) {
-        *buffer = OH_AVMemory_Create(dataSize);
-        *curSize = dataSize;
-        if (*buffer == NULL) {
-            printf("error create OH_AVMemory! %d\n", dataSize);
-            return -1;
-        }
+        *buffer = OH_AVMemory_Create(info->size);
     }
-
-    ret = read(fd, (void*)OH_AVMemory_GetAddr(*buffer), dataSize);
+    if (*buffer == NULL) {
+        printf("error create OH_AVMemory! %d\n", info->size);
+        return false;
+    }
+    ret = read(fd, (void*)OH_AVMemory_GetAddr(*buffer), info->size);
     if (ret <= 0) {
-        return -1;
+        return false;
     }
-    info->size = dataSize;
-    return 0;
+    return true;
 }
 
 void WriteSingleTrackSample(OH_AVMuxer *muxer, int trackId, int fd)
@@ -215,29 +214,20 @@ void WriteSingleTrackSample(OH_AVMuxer *muxer, int trackId, int fd)
         printf("WriteSingleTrackSample muxer is null or fd < 0, fd:%d\n", fd);
         return;
     }
-    int ret = 0;
-    OH_AVMemory *avMemBuffer = NULL;
-    int avMemBufferSize = 0;
+    OH_AVMemory *buffer = NULL;
     OH_AVCodecBufferAttr info;
     memset_s(&info, sizeof(info), 0, sizeof(info));
-    while (1) {
-        ret = read(fd, (void*)&info.pts, sizeof(info.pts));
-        if (ret <= 0) {
-            break;
-        }
-
-        if (UpDateWriteBufferInfo(fd, &avMemBuffer, &avMemBufferSize, &info) != 0) {
-            break;
-        }
-
-        if (OH_AVMuxer_WriteSample(muxer, trackId, avMemBuffer, info) != AV_ERR_OK) {
+    bool ret = UpdateWriteBufferInfo(fd, &buffer, &info);
+    while (ret) {
+        if (OH_AVMuxer_WriteSample(muxer, trackId, buffer, info) != AV_ERR_OK) {
             printf("OH_AVMuxer_WriteSample error!\n");
             break;
         }
+        ret = UpdateWriteBufferInfo(fd, &buffer, &info);
     }
 
-    if (avMemBuffer != NULL) {
-        OH_AVMemory_Destroy(avMemBuffer);
+    if (buffer != NULL) {
+        OH_AVMemory_Destroy(buffer);
     }
 }
 
@@ -248,27 +238,6 @@ void *ThreadWriteTrackSample(void *param)
     return NULL;
 }
 
-static int UpdatePtsByFd(int curFd, FdListStr *fdStr, int64_t *audioPts, int64_t *videoPts)
-{
-    if (curFd < 0 || fdStr == NULL || audioPts == NULL || videoPts == NULL) {
-        return -1;
-    }
-
-    int ret;
-    if (curFd == fdStr->inVideoFd) {
-        ret = read(fdStr->inVideoFd, (void*)videoPts, sizeof(*videoPts));
-        if (ret <= 0) {
-            return -1;
-        }
-    } else {
-        ret = read(fdStr->inAudioFd, (void*)audioPts, sizeof(*audioPts));
-        if (ret <= 0) {
-            return -1;
-        }
-    }
-    return 0;
-}
-
 void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackIndex, FdListStr *fdStr)
 {
     if (fdStr == NULL || fdStr->inAudioFd < 0 || fdStr->inVideoFd < 0) {
@@ -276,50 +245,41 @@ void WriteTrackSample(OH_AVMuxer *muxer, int audioTrackIndex, int videoTrackInde
         return;
     }
     printf("WriteTrackSample\n");
-    int ret = 0;
-    int trackId = 0;
-    int curFd = 0;
-    int64_t audioPts = 0;
-    int64_t videoPts = 0;
-    OH_AVCodecBufferAttr info;
-    memset_s(&info, sizeof(info), 0, sizeof(info));
-    OH_AVMemory *avMemBuffer = NULL;
-    int avMemBufferSize = 0;
-
-    ret = read(fdStr->inAudioFd, (void*)&audioPts, sizeof(audioPts));
-    if (ret <= 0) {
-        return;
-    }
-    ret = read(fdStr->inVideoFd, (void*)&videoPts, sizeof(videoPts));
-    if (ret <= 0) {
-        return;
-    }
-    while (1) {
-        if (audioPts > videoPts) { // write video
-            info.pts = videoPts;
-            trackId =  videoTrackIndex;
-            curFd = fdStr->inVideoFd;
-        } else { // write audio
-            info.pts = audioPts;
-            trackId = audioTrackIndex;
-            curFd = fdStr->inAudioFd;
+    OH_AVMemory *audioBuffer = NULL;
+    OH_AVMemory *videoBuffer = NULL;
+    OH_AVCodecBufferAttr audioInfo;
+    OH_AVCodecBufferAttr videoInfo;
+    memset_s(&audioInfo, sizeof(audioInfo), 0, sizeof(audioInfo));
+    memset_s(&videoInfo, sizeof(videoInfo), 0, sizeof(videoInfo));
+    bool audioRet = UpdateWriteBufferInfo(fdStr->inAudioFd, &audioBuffer, &audioInfo);
+    bool videoRet = UpdateWriteBufferInfo(fdStr->inVideoFd, &videoBuffer, &videoInfo);
+    bool isOver = false;
+   
+    while ((audioRet || videoRet) && !isOver) {
+        int ret = AV_ERR_OK;
+        if (audioRet && videoRet && audioInfo.pts <= videoInfo.pts) {
+            ret = OH_AVMuxer_WriteSample(muxer, audioTrackIndex, audioBuffer, audioInfo);
+            audioRet = UpdateWriteBufferInfo(fdStr->inAudioFd, &audioBuffer, &audioInfo);
+        } else if (audioRet && videoRet) {
+            ret = OH_AVMuxer_WriteSample(muxer, videoTrackIndex, videoBuffer, videoInfo);
+            videoRet = UpdateWriteBufferInfo(fdStr->inVideoFd, &videoBuffer, &videoInfo);
+        } else if (audioRet) {
+            ret = OH_AVMuxer_WriteSample(muxer, audioTrackIndex, audioBuffer, audioInfo);
+            isOver = true;
+        } else {
+            ret = OH_AVMuxer_WriteSample(muxer, videoTrackIndex, videoBuffer, videoInfo);
+            isOver = true;
         }
-        if (UpDateWriteBufferInfo(curFd, &avMemBuffer, &avMemBufferSize, &info) != 0) {
-            break;
-        }
-
-        if (OH_AVMuxer_WriteSample(muxer, trackId, avMemBuffer, info) != AV_ERR_OK) {
+        if (ret != AV_ERR_OK) {
             printf("OH_AVMuxer_WriteSample error!\n");
             break;
         }
-
-        if (UpdatePtsByFd(curFd, fdStr, &audioPts, &videoPts) != 0) {
-            break;
-        }
     }
-
-    if (avMemBuffer != NULL) {
-        OH_AVMemory_Destroy(avMemBuffer);
+    if (audioBuffer != NULL) {
+        OH_AVMemory_Destroy(audioBuffer);
+    }
+    if (videoBuffer != NULL) {
+        OH_AVMemory_Destroy(videoBuffer);
     }
 }
 
@@ -434,7 +394,7 @@ void NativeSelectAudio(void)
 
 void NativeSelectVideo(void)
 {
-    printf("\nplese select video mode: 0.noVideo 1.h264 2.mpeg4\n");
+    printf("\nplese select video mode: 0.noVideo 1.h264 2.mpeg4 3.h265\n");
     int num = GetInputNum(1);
     switch (num) {
         case MODE_ONE:
@@ -444,6 +404,10 @@ void NativeSelectVideo(void)
         case MODE_TWO:
             g_muxerParam.videoParams = &g_videoMpeg4Par;
             (void)snprintf_s(g_muxerParam.videoType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "mpeg4");
+            break;
+        case MODE_THREE:
+            g_muxerParam.videoParams = &g_videoH265Par;
+            (void)snprintf_s(g_muxerParam.videoType, TYPE_BUFFER_SIZE, TYPE_BUFFER_SIZE - 1, "%s", "h265");
             break;
         default:
             g_muxerParam.videoParams = NULL;

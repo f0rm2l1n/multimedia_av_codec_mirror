@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "securec.h"
 #include "avcodec_log.h"
 #include "muxer_factory.h"
@@ -71,7 +72,7 @@ namespace OHOS {
 namespace Media {
 const std::map<uint32_t, std::set<std::string_view>> MUX_FORMAT_INFO = {
     {OUTPUT_FORMAT_MPEG_4, {CodecMimeType::AUDIO_MPEG, CodecMimeType::AUDIO_AAC,
-                            CodecMimeType::VIDEO_AVC, CodecMimeType::VIDEO_MPEG4,
+                            CodecMimeType::VIDEO_AVC, CodecMimeType::VIDEO_MPEG4, CodecMimeType::VIDEO_HEVC,
                             CodecMimeType::IMAGE_JPG, CodecMimeType::IMAGE_PNG, CodecMimeType::IMAGE_BMP}},
     {OUTPUT_FORMAT_M4A, {CodecMimeType::AUDIO_AAC,
                          CodecMimeType::VIDEO_AVC, CodecMimeType::VIDEO_MPEG4,
@@ -83,6 +84,7 @@ const std::map<std::string_view, std::set<std::string_view>> MUX_MIME_INFO = {
     {CodecMimeType::AUDIO_AAC, {MediaDescriptionKey::MD_KEY_SAMPLE_RATE, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT}},
     {CodecMimeType::VIDEO_AVC, {MediaDescriptionKey::MD_KEY_WIDTH, MediaDescriptionKey::MD_KEY_HEIGHT}},
     {CodecMimeType::VIDEO_MPEG4, {MediaDescriptionKey::MD_KEY_WIDTH, MediaDescriptionKey::MD_KEY_HEIGHT}},
+    {CodecMimeType::VIDEO_HEVC, {MediaDescriptionKey::MD_KEY_WIDTH, MediaDescriptionKey::MD_KEY_HEIGHT}},
     {CodecMimeType::IMAGE_JPG, {MediaDescriptionKey::MD_KEY_WIDTH, MediaDescriptionKey::MD_KEY_HEIGHT}},
     {CodecMimeType::IMAGE_PNG, {MediaDescriptionKey::MD_KEY_WIDTH, MediaDescriptionKey::MD_KEY_HEIGHT}},
     {CodecMimeType::IMAGE_BMP, {MediaDescriptionKey::MD_KEY_WIDTH, MediaDescriptionKey::MD_KEY_HEIGHT}},
@@ -103,7 +105,7 @@ std::shared_ptr<IMuxerEngine> IMuxerEngineFactory::CreateMuxerEngine(
 }
 
 MuxerEngineImpl::MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, OutputFormat format)
-    : appUid_(appUid), appPid_(appPid), fd_(fd), format_(format), que_("muxer_write_queue")
+    : appUid_(appUid), appPid_(appPid), fd_(fd), format_(format), que_("muxer_write_q"), pool_("muxer_buffer_p")
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
 }
@@ -120,7 +122,7 @@ MuxerEngineImpl::~MuxerEngineImpl()
     appUid_ = -1;
     appPid_ = -1;
     muxer_ = nullptr;
-    tracks_.clear();
+    tracksDesc_.clear();
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
 
@@ -144,7 +146,7 @@ int32_t MuxerEngineImpl::SetRotation(int32_t rotation)
 {
     AVCodecTrace trace("MuxerEngine::SetRotation");
     AVCODEC_LOGI("SetRotation");
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
         "The state is not INITIALIZED, the interface must be called after constructor and before Start(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
@@ -153,15 +155,16 @@ int32_t MuxerEngineImpl::SetRotation(int32_t rotation)
         AVCODEC_LOGW("Invalid rotation: %{public}d, keep default 0", rotation);
         return AVCS_ERR_INVALID_VAL;
     }
-
-    return TranslatePluginStatus(muxer_->SetRotation(rotation));
+    Plugin::Status ret = muxer_->SetRotation(rotation);
+    CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "SetRotation failed");
+    return AVCS_ERR_OK;
 }
 
 int32_t MuxerEngineImpl::AddTrack(int32_t &trackIndex, const MediaDescription &trackDesc)
 {
     AVCodecTrace trace("MuxerEngine::AddTrack");
     AVCODEC_LOGI("AddTrack");
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     trackIndex = ERR_TRACK_INDEX;
     CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
         "The state is not INITIALIZED, the interface must be called after constructor and before Start(). "
@@ -178,10 +181,9 @@ int32_t MuxerEngineImpl::AddTrack(int32_t &trackIndex, const MediaDescription &t
     Plugin::Status ret = muxer_->AddTrack(trackId, trackDesc);
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "AddTrack failed");
     CHECK_AND_RETURN_RET_LOG(trackId >= 0, AVCS_ERR_INVALID_OPERATION,
-        "The track index is greater than or equal to 0, less than 99");
+        "The track index is greater than or equal to 0.");
     trackIndex = trackId;
-    tracks_[trackIndex] = mimeType;
-    mediaDescMap_.emplace(trackIndex, MediaDescription(trackDesc));
+    tracksDesc_.emplace(trackIndex, MediaDescription(trackDesc));
 
     return AVCS_ERR_OK;
 }
@@ -190,12 +192,12 @@ int32_t MuxerEngineImpl::Start()
 {
     AVCodecTrace trace("MuxerEngine::Start");
     AVCODEC_LOGI("Start");
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(state_ == State::INITIALIZED, AVCS_ERR_INVALID_OPERATION,
         "The state is not INITIALIZED, the interface must be called after AddTrack() and before WriteSample(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
-    CHECK_AND_RETURN_RET_LOG(tracks_.size() > 0, AVCS_ERR_INVALID_OPERATION,
-        "The track count is error, count is %{public}zu", tracks_.size());
+    CHECK_AND_RETURN_RET_LOG(tracksDesc_.size() > 0, AVCS_ERR_INVALID_OPERATION,
+        "The track count is error, count is %{public}zu", tracksDesc_.size());
     Plugin::Status ret = muxer_->Start();
     CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "Start failed");
     state_ = State::STARTED;
@@ -203,28 +205,28 @@ int32_t MuxerEngineImpl::Start()
     return AVCS_ERR_OK;
 }
 
-int32_t MuxerEngineImpl::WriteSample(std::shared_ptr<AVSharedMemory> sample, const TrackSampleInfo &info)
+int32_t MuxerEngineImpl::WriteSample(uint32_t trackIndex, std::shared_ptr<AVSharedMemory> sample,
+    AVCodecBufferInfo info, AVCodecBufferFlag flag)
 {
     AVCodecTrace trace("MuxerEngine::WriteSample");
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     CHECK_AND_RETURN_RET_LOG(state_ == State::STARTED, AVCS_ERR_INVALID_OPERATION,
         "The state is not STARTED, the interface must be called after Start() and before Stop(). "
         "The current state is %{public}s", ConvertStateToString(state_).c_str());
-    CHECK_AND_RETURN_RET_LOG(tracks_.find(info.trackIndex) != tracks_.end(), AVCS_ERR_INVALID_VAL,
+    CHECK_AND_RETURN_RET_LOG(tracksDesc_.find(trackIndex) != tracksDesc_.end(), AVCS_ERR_INVALID_VAL,
         "The track index does not exist");
     CHECK_AND_RETURN_RET_LOG(sample != nullptr && info.offset >= 0 && info.size >= 0 &&
         sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
 
-    std::shared_ptr<AVSharedMemoryBase> buffer =
-        std::make_shared<AVSharedMemoryBase>(info.size, AVSharedMemory::FLAGS_READ_ONLY, "sample");
-    int32_t ret = buffer->Init();
-    CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_NO_MEMORY, "Failed to create AVSharedMemoryBase");
-    errno_t rc = memcpy_s(buffer->GetBase(), buffer->GetSize(), sample->GetBase() + info.offset, info.size);
+    std::shared_ptr<uint8_t> buffer = pool_.AcquireBuffer(info.size);
+    errno_t rc = memcpy_s(buffer.get(), info.size, sample->GetBase() + info.offset, info.size);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
     std::shared_ptr<BlockBuffer> blockBuffer = std::make_shared<BlockBuffer>();
+    blockBuffer->trackIndex_ = trackIndex;
     blockBuffer->buffer_ = buffer;
     blockBuffer->info_ = info;
+    blockBuffer->flag_ = flag;
     que_.Push(blockBuffer);
 
     return AVCS_ERR_OK;
@@ -245,7 +247,9 @@ int32_t MuxerEngineImpl::Stop()
     que_.SetActive(false, false);
     cond_.wait(lock, [this] { return que_.Empty(); });
     StopThread();
-    return TranslatePluginStatus(muxer_->Stop());
+    Plugin::Status ret = muxer_->Stop();
+    CHECK_AND_RETURN_RET_LOG(ret == Plugin::Status::NO_ERROR, TranslatePluginStatus(ret), "Stop failed");
+    return AVCS_ERR_OK;
 }
 
 int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
@@ -258,7 +262,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
 
     int32_t dumpTrackIndex = 3;
     int mediaDescIdx = 0;
-    for (auto it = mediaDescMap_.begin(); it != mediaDescMap_.end(); ++it) {
+    for (auto it = tracksDesc_.begin(); it != tracksDesc_.end(); ++it) {
         auto mediaDesc = it->second;
         int32_t dumpInfoIndex = 1;
         std::string codecMime;
@@ -288,6 +292,7 @@ int32_t MuxerEngineImpl::DumpInfo(int32_t fd)
 
 int32_t MuxerEngineImpl::StartThread(const std::string &name)
 {
+    AVCodecTrace trace("MuxerEngine::StartThread");
     threadName_ = name;
     if (thread_ != nullptr) {
         AVCODEC_LOGW("Started already! [%{public}s]", threadName_.c_str());
@@ -337,7 +342,8 @@ void MuxerEngineImpl::ThreadProcessor()
         }
         auto buffer = que_.Pop();
         if (buffer != nullptr) {
-            (void)muxer_->WriteSample(buffer->buffer_->GetBase(), buffer->info_);
+            (void)muxer_->WriteSample(buffer->trackIndex_, buffer->buffer_.get(), buffer->info_, buffer->flag_);
+            pool_.ReleaseBuffer(buffer->buffer_);
         }
         if (que_.Empty()) {
             cond_.notify_all();
@@ -395,7 +401,7 @@ std::string MuxerEngineImpl::ConvertStateToString(State state)
 
 int32_t MuxerEngineImpl::TranslatePluginStatus(Plugin::Status error)
 {
-    const static std::map<Plugin::Status, int32_t> g_transTable = {
+    const static std::unordered_map<Plugin::Status, int32_t> g_transTable = {
         {Plugin::Status::END_OF_STREAM, AVCodecServiceErrCode::AVCS_ERR_OK},
         {Plugin::Status::OK, AVCodecServiceErrCode::AVCS_ERR_OK},
         {Plugin::Status::NO_ERROR, AVCodecServiceErrCode::AVCS_ERR_OK},
