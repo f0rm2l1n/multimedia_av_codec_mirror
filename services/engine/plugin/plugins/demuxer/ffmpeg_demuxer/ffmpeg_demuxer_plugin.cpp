@@ -300,7 +300,7 @@ int32_t FFmpegDemuxerPlugin::ConvertAVPacketToSample(AVStream* avStream, std::sh
     if (avStream->start_time == AV_NOPTS_VALUE) {
         avStream->start_time = 0;
     }
-    if (avStream->duration + avStream->start_time <= (samplePacket->pkt->pts + samplePacket->pkt->duration)) {
+    if (avStream->duration + avStream->start_time <= samplePacket->pkt->pts) {
         SetEndStatus(samplePacket->pkt->stream_index);
     }
     bufferInfo.presentationTimeUs = AvTime2Us(ConvertTimeFromFFmpeg(samplePacket->pkt->pts - avStream->start_time,
