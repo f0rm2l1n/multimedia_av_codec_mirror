@@ -22,7 +22,7 @@
 #include <mutex>
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class MuxerBufferPool {
 public:
     explicit MuxerBufferPool(std::string name, size_t capacity = defaultPoolSize);
