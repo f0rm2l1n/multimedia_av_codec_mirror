@@ -33,7 +33,7 @@ public:
     uintptr_t GetSourceAddr();
     std::shared_ptr<AVSource> avsource_ = nullptr;
 private:
-    uintptr_t addr_;
+    uintptr_t addr_ = 0;
     Format source_format_;
     Format track_format_;
 };
