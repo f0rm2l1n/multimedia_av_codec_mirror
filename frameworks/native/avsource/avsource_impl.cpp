@@ -51,18 +51,6 @@ std::shared_ptr<AVSource> AVSourceFactory::CreateWithFD(int32_t fd, int64_t offs
     AVCODEC_LOGI("create source with fd: fd=%{private}d, offset=%{public}" PRId64 ", size=%{public}" PRId64,
         fd, offset, size);
 
-    CHECK_AND_RETURN_RET_LOG(fd > STDERR_FILENO, nullptr,
-        "Create source with uri failed because input fd is illegal, fd must be greater than 2!");
-    CHECK_AND_RETURN_RET_LOG(offset >= 0, nullptr,
-        "Create source with fd failed because input offset is negative");
-    CHECK_AND_RETURN_RET_LOG(size > 0, nullptr,
-        "Create source with fd failed because input size must be greater than zero");
-    int32_t flag = fcntl(fd, F_GETFL, 0);
-    CHECK_AND_RETURN_RET_LOG(flag >= 0, nullptr, "get fd status failed");
-    CHECK_AND_RETURN_RET_LOG(
-        (static_cast<uint32_t>(flag) & static_cast<uint32_t>(O_WRONLY)) != static_cast<uint32_t>(O_WRONLY),
-        nullptr, "the fd not be permitted to read ");
-    CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, nullptr, "The fd is not seekable");
     std::shared_ptr<AVSourceImpl> sourceImpl = std::make_shared<AVSourceImpl>();
     CHECK_AND_RETURN_RET_LOG(sourceImpl != nullptr, nullptr, "New AVSourceImpl failed when create source with fd");
 
@@ -96,6 +84,19 @@ int32_t AVSourceImpl::InitWithFD(int32_t fd, int64_t offset, int64_t size)
 {
     AVCodecTrace trace("AVSource::InitWithFD");
 
+    CHECK_AND_RETURN_RET_LOG(fd > STDERR_FILENO, AVCS_ERR_INVALID_VAL,
+        "Create source with uri failed because input fd is illegal, fd must be greater than 2!");
+    CHECK_AND_RETURN_RET_LOG(offset >= 0, AVCS_ERR_INVALID_VAL,
+        "Create source with fd failed because input offset is negative");
+    CHECK_AND_RETURN_RET_LOG(size > 0, AVCS_ERR_INVALID_VAL,
+        "Create source with fd failed because input size must be greater than zero");
+    int32_t flag = fcntl(fd, F_GETFL, 0);
+    CHECK_AND_RETURN_RET_LOG(flag >= 0, AVCS_ERR_INVALID_VAL, "get fd status failed");
+    CHECK_AND_RETURN_RET_LOG(
+        (static_cast<uint32_t>(flag) & static_cast<uint32_t>(O_WRONLY)) != static_cast<uint32_t>(O_WRONLY),
+        AVCS_ERR_INVALID_VAL, "the fd not be permitted to read ");
+    CHECK_AND_RETURN_RET_LOG(lseek(fd, 0, SEEK_CUR) != -1, AVCS_ERR_INVALID_VAL, "The fd is not seekable");
+    
     sourceClient_ = AVCodecServiceFactory::GetInstance().CreateSourceService();
     CHECK_AND_RETURN_RET_LOG(sourceClient_ != nullptr,  AVCS_ERR_CREATE_SOURCE_SUB_SERVICE_FAILED,
         "Create source service failed when init sourceImpl with fd");
