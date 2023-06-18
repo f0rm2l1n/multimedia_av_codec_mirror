@@ -21,9 +21,7 @@ group("plugin_muxer_ffmpeg") {
 # standard
 import("//build/ohos.gni")
 ohos_shared_library("av_codec_plugin_FFmpegMuxer") {
-  cflags = [
-    "-Wno-deprecated-declarations",
-  ]
+  cflags = [ "-Wno-deprecated-declarations" ]
 
   sources = [
     "ffmpeg_muxer_plugin.cpp",
