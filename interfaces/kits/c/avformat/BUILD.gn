@@ -28,7 +28,7 @@ ohos_ndk_library("libnative_media_avformat") {
   output_extension = "so"
 
   system_capability = "SystemCapability.Multimedia.Media.Spliter"
-  system_capability_headers = [ "native_media_avformat/native_avdemuxer.h",
-    "native_media_avformat/native_avmuxer.h",
-    "native_media_avformat/native_avsource.h" ]
+  system_capability_headers = [ "multimedia/native_avdemuxer.h",
+    "multimedia/native_avmuxer.h",
+    "multimedia/native_avsource.h" ]
 }

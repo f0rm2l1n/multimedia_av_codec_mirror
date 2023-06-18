@@ -27,6 +27,7 @@ ohos_ndk_library("libnative_media_codecbase") {
   output_extension = "so"
 
   system_capability = "SystemCapability.Multimedia.Media.CodecBase"
-  system_capability_headers = [ "native_media_codecbase/native_avcodec_base.h",
-    "native_media_core/native_avcapability.h"]
+  system_capability_headers = [ "multimedia/player_framework/native_avcodec_base.h",
+    "multimedia/player_framework/native_avcapability.h",
+    "multimedia/player_framework/avcodec_audio_channel_layout.h"]
 }

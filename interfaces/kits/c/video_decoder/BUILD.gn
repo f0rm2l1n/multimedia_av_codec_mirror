@@ -27,5 +27,5 @@ ohos_ndk_library("libnative_media_vdec") {
 
   system_capability = "SystemCapability.Multimedia.Media.VideoDecoder"
   system_capability_headers =
-      [ "native_media_vdec/native_avcodec_videodecoder.h" ]
+      [ "multimedia/player_framework/native_avcodec_videodecoder.h" ]
 }
