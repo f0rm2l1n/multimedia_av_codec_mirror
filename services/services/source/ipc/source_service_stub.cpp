@@ -29,11 +29,15 @@ namespace {
     const std::map<int32_t, std::string> SOURCE_FUNC_NAME = {
         { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::INIT_WITH_URI, "SourceServiceStub InitWithURI" },
         { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::INIT_WITH_FD, "SourceServiceStub InitWithFD" },
-        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_TRACK_COUNT, "SourceServiceStub GetTrackCount" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_TRACK_COUNT,
+            "SourceServiceStub GetTrackCount" },
         { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::DESTROY, "SourceServiceStub Destroy" },
-        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_TRACK_FORMAT, "SourceServiceStub GetTrackFormat" },
-        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_SOURCE_FORMAT, "SourceServiceStub GetSourceFormat" },
-        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_SOURCE_ADDR, "SourceServiceStub GetSourceAddr" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_TRACK_FORMAT,
+            "SourceServiceStub GetTrackFormat" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_SOURCE_FORMAT,
+            "SourceServiceStub GetSourceFormat" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_SOURCE_ADDR,
+            "SourceServiceStub GetSourceAddr" },
         { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::DESTROY_STUB, "SourceServiceStub DestroyStub" },
     };
 }
