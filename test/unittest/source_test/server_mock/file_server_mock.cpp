@@ -91,7 +91,7 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
     }
     std::cout << pathBuff << std::endl;
     std::string fileName = std::string(pathBuff);
-    GetRange(filename. startPos, endPos);
+    GetRange(filename, startPos, endPos);
     int32_t findIndex = fileName.find_first_of("/");
     if (findIndex < 0 || findIndex >= 10) { // 10: expect less than 10
         close(connFd);
