@@ -14,17 +14,21 @@
 import("//build/ohos.gni")
 import("//build/ohos/ndk/ndk.gni")
 
-ohos_ndk_headers("native_media_avmuxer_header") {
+ohos_ndk_headers("native_media_avformat_header") {
   dest_dir = "$ndk_headers_out_dir/multimedia"
-  sources = [ "//foundation/multimedia/av_codec/interfaces/kits/c/native_avmuxer.h" ]
+  sources = [ "//foundation/multimedia/av_codec/interfaces/kits/c/native_avdemuxer.h",
+    "//foundation/multimedia/av_codec/interfaces/kits/c/native_avmuxer.h",
+    "//foundation/multimedia/av_codec/interfaces/kits/c/native_avsource.h" ]
 }
 
-ohos_ndk_library("libnative_media_avmuxer") {
-  ndk_description_file = "./libnative_media_avmuxer.ndk.json"
+ohos_ndk_library("libnative_media_avformat") {
+  ndk_description_file = "./libnative_media_avformat.ndk.json"
   min_compact_version = "1"
-  output_name = "native_media_avmuxer"
+  output_name = "native_media_avformat"
   output_extension = "so"
 
-  system_capability = "SystemCapability.Multimedia.Media.Muxer"
-  system_capability_headers = [ "native_media_avmuxer/native_avmuxer.h" ]
+  system_capability = "SystemCapability.Multimedia.Media.Spliter"
+  system_capability_headers = [ "native_media_avformat/native_avdemuxer.h",
+    "native_media_avformat/native_avmuxer.h",
+    "native_media_avformat/native_avsource.h" ]
 }

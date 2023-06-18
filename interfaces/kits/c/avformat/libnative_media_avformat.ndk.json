@@ -1,0 +1,20 @@
+[
+    { "name": "OH_AVDemuxer_CreateWithSource" },
+    { "name": "OH_AVDemuxer_Destroy" },
+    { "name": "OH_AVDemuxer_SelectTrackByID" },
+    { "name": "OH_AVDemuxer_UnselectTrackByID" },
+    { "name": "OH_AVDemuxer_ReadSample" },
+    { "name": "OH_AVDemuxer_SeekToTime" },
+    { "name": "OH_AVMuxer_Create" },
+    { "name": "OH_AVMuxer_SetRotation" },
+    { "name": "OH_AVMuxer_AddTrack" },
+    { "name": "OH_AVMuxer_Start" },
+    { "name": "OH_AVMuxer_WriteSample" },
+    { "name": "OH_AVMuxer_Stop" },
+    { "name": "OH_AVMuxer_Destroy" },
+    { "name": "OH_AVSource_CreateWithURI" },
+    { "name": "OH_AVSource_CreateWithFD" },
+    { "name": "OH_AVSource_Destroy" },
+    { "name": "OH_AVSource_GetSourceFormat" },
+    { "name": "OH_AVSource_GetTrackFormat" }
+]
