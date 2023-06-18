@@ -75,7 +75,7 @@ public:
 class __attribute__((visibility("default"))) AVDemuxerFactory {
 public:
 #ifdef UNSUPPORT_DEMUXER
-    static std::shared_ptr<AVDemuxer> CreateWithSource(AVSource& source)
+    static std::shared_ptr<AVDemuxer> CreateWithSource(std::shared_ptr<AVSource> source)
     {
         return nullptr;
     }
@@ -87,7 +87,7 @@ public:
      * @since 4.0
      * @version 4.0
      */
-    static std::shared_ptr<AVDemuxer> CreateWithSource(AVSource& source);
+    static std::shared_ptr<AVDemuxer> CreateWithSource(std::shared_ptr<AVSource> source);
 #endif
 private:
     AVDemuxerFactory() = default;

@@ -25,7 +25,7 @@ class InnerDemuxerDemo {
 public:
     InnerDemuxerDemo();
     ~InnerDemuxerDemo();
-    int32_t CreateWithSource(AVSource &source);
+    int32_t CreateWithSource(std::shared_ptr<AVSource> source);
     void Destroy();
     int32_t SelectTrackByID(uint32_t trackIndex);
     int32_t UnselectTrackByID(uint32_t trackIndex);
