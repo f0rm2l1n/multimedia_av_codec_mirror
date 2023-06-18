@@ -20,7 +20,6 @@ ohos_ndk_headers("native_media_core_header") {
     "//foundation/multimedia/av_codec/interfaces/kits/c/native_averrors.h",
     "//foundation/multimedia/av_codec/interfaces/kits/c/native_avformat.h",
     "//foundation/multimedia/av_codec/interfaces/kits/c/native_avmemory.h",
-    "//foundation/multimedia/av_codec/interfaces/kits/c/native_avcapability.h",
   ]
 }
 
@@ -34,7 +33,6 @@ ohos_ndk_library("libnative_media_core") {
   system_capability_headers = [
     "native_media_core/native_averrors.h",
     "native_media_core/native_avformat.h",
-    "native_media_core/native_avmemory.h",
-    "native_media_core/native_avcapability.h",
+    "native_media_core/native_avmemory.h"
   ]
 }
