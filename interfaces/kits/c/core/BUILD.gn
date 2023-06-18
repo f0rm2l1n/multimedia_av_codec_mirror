@@ -33,6 +33,6 @@ ohos_ndk_library("libnative_media_core") {
   system_capability_headers = [
     "multimedia/player_framework/native_averrors.h",
     "multimedia/player_framework/native_avformat.h",
-    "multimedia/player_framework/native_avmemory.h"
+    "multimedia/player_framework/native_avmemory.h",
   ]
 }
