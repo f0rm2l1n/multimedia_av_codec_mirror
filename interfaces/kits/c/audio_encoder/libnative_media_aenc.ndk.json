@@ -12,5 +12,6 @@
     { "name": "OH_AudioEncoder_GetOutputDescription" },
     { "name": "OH_AudioEncoder_SetParameter" },
     { "name": "OH_AudioEncoder_PushInputData" },
-    { "name": "OH_AudioEncoder_FreeOutputData" }
+    { "name": "OH_AudioEncoder_FreeOutputData" },
+    { "name": "OH_AudioEncoder_IsValid" }
 ]
