@@ -48,7 +48,7 @@ public:
 
 private:
     static void FileLoopFunc(int32_t connFd);
-    stati void GetRange(std::string &fileName,int32_t &startPos, int32_t &endPos);
+    stati void GetRange(std::string &fileName, int32_t &startPos, int32_t &endPos);
     void ServerLoopFunc();
     std::atomic<bool> isRunning_ = false;
     std::unique_ptr<std::thread> serverLoop_ = nullptr;

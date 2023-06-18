@@ -21,6 +21,9 @@ namespace {
 constexpr int32_t SERVERPORT = 46666;
 constexpr int32_t BUFFER_LNE = 4096;
 constexpr int32_t DEFAULT_LISTEN = 5;
+constexpr int32_t START_INDEX = 1;
+constexpr int32_t END_INDEX = 2;
+constexpr int32_t DEFAULT_LISTEN = 5;
 const std::string SERVER_FILE_PATH = "/data/test/media";
 } // namespace
 FileServerMock::FileServerMock() {}
@@ -65,14 +68,14 @@ void FileServerMock::StopServer()
     listenFd_ = 0;
 }
 
-void FileServerDemo::GetRange(std::string &fileName,int32_t &startPos, int32_t &endPos)
+void FileServerMock::GetRange(std::string &fileName, int32_t &startPos, int32_t &endPos)
 {
     std::regex regexRange("Range:\\sbytes=(\\d+)-(\\d+)?");
     std::smatch matchRange;
     if(std::regex_search(fileName, matchRange, regexRange))
     {
-        startPos = std::stoi(matchRange[1].str());
-        endPos = std::stoi(matchRange[2].str());
+        startPos = std::stoi(matchRange[START_INDEX].str());
+        endPos = std::stoi(matchRange[END_INDEX].str());
     } else {
         std::cout<< "range not found" <<std::endl;
         endPos = 0;
@@ -81,8 +84,7 @@ void FileServerDemo::GetRange(std::string &fileName,int32_t &startPos, int32_t &
 
 void FileServerMock::FileLoopFunc(int32_t connFd)
 {
-    int32_t startPos = 0;
-    int32_t endPos = 0;
+    int32_t startPos = 0, endPos = 0;
     char pathBuff[BUFFER_LNE] = {0};
     int32_t ret = recv(connFd, pathBuff, BUFFER_LNE - 1, 0);
     if (ret <= 0) {
@@ -103,11 +105,9 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
         close(connFd);
         return;
     }
-
     std::string path = SERVER_FILE_PATH;
     std::cout << "File path: " << path << std::endl;
     path += fileName;
-
     int32_t fileFd = open(path.c_str(), O_RDONLY);
     if (fileFd == -1) {
         send(connFd, "File does not exist", 20, 0); // 20: string len
@@ -115,7 +115,6 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
         close(fileFd);
         return;
     }
-
     int32_t FileSize = lseek(fileFd, 0, SEEK_END);
     int32_t requestDataSize = std::min(endPos, fileSize) - std::max(startPos, 0) + 1;
     int32_t size = requestDataSize;
@@ -133,12 +132,10 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
         printf("lseek is failed,ret=%d\n", ret);
         return;
     }
-    std::string httpContext = "HTTP/1.1 200 OK\r\n";
-    httpContext += "Serve:testhttp\r\n";
+    std::string httpContext = "HTTP/1.1 200 OK\r\nServe:testhttp\r\n";
     httpContext += "Content-Length: " + std::to_string(size) + "\r\n\r\n";
     std::cout << httpContext << std::endl;
     send(connFd, httpContext.c_str(), httpContext.size(), 0);
-
     char fileBuff[BUFFER_LNE] = {0};
     while (requestDataSize > 0) {
         ret = read(fileFd, fileBuff, BUFFER_LNE);
@@ -151,7 +148,6 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
             break;
         }
     }
-
     close(connFd);
     close(fileFd);
 }
