@@ -71,8 +71,7 @@ void FileServerMock::GetRange(std::string &fileName, int32_t &startPos, int32_t 
 {
     std::regex regexRange("Range:\\sbytes=(\\d+)-(\\d+)?");
     std::smatch matchRange;
-    if(std::regex_search(fileName, matchRange, regexRange))
-    {
+    if (std::regex_search(fileName, matchRange, regexRange)) {
         startPos = std::stoi(matchRange[START_INDEX].str());
         endPos = std::stoi(matchRange[END_INDEX].str());
     } else {
