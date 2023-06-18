@@ -50,7 +50,7 @@ private:
     std::atomic<bool> isRunning_ = false;
     std::unique_ptr<std::thread> serverLoop_ = nullptr;
     std::unique_ptr<std::thread> fileLoop_ = nullptr;
-    int32_t listenFd_;
+    int32_t listenFd_ = 0;
 };
 } // namespace Media
 } // namespace OHOS
