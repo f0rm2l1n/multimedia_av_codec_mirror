@@ -65,8 +65,24 @@ void FileServerMock::StopServer()
     listenFd_ = 0;
 }
 
+void FileServerDemo::GetRange(std::string &fileName,int32_t &startPos, int32_t &endPos)
+{
+    std::regex regexRange("Range:\\sbytes=(\\d+)-(\\d+)?");
+    std::smatch matchRange;
+    if(std::regex_search(fileName, matchRange, regexRange))
+    {
+        startPos = std::stoi(matchRange[1].str());
+        endPos = std::stoi(matchRange[2].str());
+    } else {
+        std::cout<< "range not found" <<std::endl;
+        endPos = 0;
+    }
+}
+
 void FileServerMock::FileLoopFunc(int32_t connFd)
 {
+    int32_t startPos = 0;
+    int32_t endPos = 0;
     char pathBuff[BUFFER_LNE] = {0};
     int32_t ret = recv(connFd, pathBuff, BUFFER_LNE - 1, 0);
     if (ret <= 0) {
@@ -75,6 +91,7 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
     }
     std::cout << pathBuff << std::endl;
     std::string fileName = std::string(pathBuff);
+    GetRange(filename. startPos, endPos);
     int32_t findIndex = fileName.find_first_of("/");
     if (findIndex < 0 || findIndex >= 10) { // 10: expect less than 10
         close(connFd);
@@ -99,8 +116,23 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
         return;
     }
 
-    int32_t size = lseek(fileFd, 0, SEEK_END);
-    lseek(fileFd, 0, SEEK_SET);
+    int32_t FileSize = lseek(fileFd, 0, SEEK_END);
+    int32_t requestDataSize = std::min(endPos, fileSize) - std::max(startPos, 0) + 1;
+    int32_t size = requestDataSize;
+    if (startPos == 0 && endPos == 0) {
+        size = fileSize;
+    } else if (endPos < startPos) {
+        size = 0;
+    }
+    if (startPos) {
+        ret = lseek(fileFd, startPos, SEEK_SET);
+    } else {
+        ret = lseek(fileFd, 0, SEEK_SET);
+    }
+    if (ret < 0) {
+        printf("lseek is failed,ret=%d\n", ret);
+        return;
+    }
     std::string httpContext = "HTTP/1.1 200 OK\r\n";
     httpContext += "Serve:testhttp\r\n";
     httpContext += "Content-Length: " + std::to_string(size) + "\r\n\r\n";
@@ -108,11 +140,12 @@ void FileServerMock::FileLoopFunc(int32_t connFd)
     send(connFd, httpContext.c_str(), httpContext.size(), 0);
 
     char fileBuff[BUFFER_LNE] = {0};
-    while (true) {
+    while (requestDataSize > 0) {
         ret = read(fileFd, fileBuff, BUFFER_LNE);
         if (ret <= 0) {
             break;
         }
+        requestDataSize -= ret;
         ret = send(connFd, fileBuff, ret, 0);
         if (ret < 0) {
             break;
