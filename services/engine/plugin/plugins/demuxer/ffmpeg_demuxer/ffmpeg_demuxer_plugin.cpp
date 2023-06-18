@@ -94,17 +94,19 @@ inline int64_t AvTime2Us(int64_t hTime)
 
 bool CheckStartTime(AVStream *stream, int64_t &timeStamp)
 {
+    int64 startTime = 0;
     if (stream->start_time != AV_NOPTS_VALUE) {
+        startTime = stream->start_time;
         if (timeStamp > 0 && stream->start_time > INT64_MAX - timeStamp) {
             AVCODEC_LOGE("seek value overflow with start time: %{public}" PRId64 " timeStamp: %{public}" PRId64 "",
-                stream->start_time, timeStamp);
+                startTime, timeStamp);
             return false;
         }
-        timeStamp += stream->start_time;
+        timeStamp += startTime;
     }
-    if (timeStamp > (stream->duration + stream->start_time)) {
+    if (timeStamp > (stream->duration + startTime)) {
         AVCODEC_LOGE("seek to timestamp = %{public}" PRId64 " failed, max = %{public}" PRId64,
-                        timeStamp, stream->start_time);
+                        timeStamp, stream->duration);
         return false;
     }
     return true;
