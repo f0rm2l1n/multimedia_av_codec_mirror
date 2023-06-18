@@ -76,9 +76,9 @@ ohos_unittest("swdecoder_native_module_test") {
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native:av_codec_client",
     "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_adec",
     "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_aenc",
-    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_vdec",
-    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_venc",    
     "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_core",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_vdec",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_venc",
   ]
 
   resource_config_file =
