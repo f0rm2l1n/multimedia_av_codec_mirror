@@ -70,7 +70,6 @@ ohos_shared_library("hcodec") {
   ]
 
   deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//base/startup/init/interfaces/innerkits:libbegetutil",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/multimedia/av_codec/services/utils:av_codec_format",
@@ -80,6 +79,7 @@ ohos_shared_library("hcodec") {
 
   external_deps = [
     "hdf_core:libhdi",
+    "hiviewdfx_hilog_native:libhilog",
     "drivers_interface_codec:codec_idl_headers",
     "drivers_interface_codec:libcodec_proxy_1.0",
   ]
