@@ -74,6 +74,8 @@ private:
     int32_t ReceiveBuffer(std::shared_ptr<AudioBufferInfo> &outBuffer);
     int32_t ReceivePacketSucc(std::shared_ptr<AudioBufferInfo> &outBuffer);
     int32_t PcmFillFrame(const std::shared_ptr<AudioBufferInfo> &inputBuffer);
+    int32_t ReAllocateContext();
+    bool codecContextValid_;
     HeaderFunc GetHeaderFunc_;
     bool headerFuncValid_ = false;
     uint32_t channelsBytesPerSample_ {1};

@@ -103,8 +103,10 @@ void AEncFlacDemo::RunCase()
 
     DEMO_CHECK_AND_RETURN_LOG(Start() == AVCS_ERR_OK, "Fatal: Start fail");
 
-    unique_lock<mutex> lock(signal_->startMutex_);
-    signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+    {
+        unique_lock<mutex> lock(signal_->startMutex_);
+        signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
+    }
 
     DEMO_CHECK_AND_RETURN_LOG(Stop() == AVCS_ERR_OK, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_LOG(Release() == AVCS_ERR_OK, "Fatal: Release fail");
@@ -113,6 +115,7 @@ void AEncFlacDemo::RunCase()
 AEncFlacDemo::AEncFlacDemo() : isRunning_(false), audioEnc_(nullptr), signal_(nullptr), frameCount_(0)
 {
     inputFile_ = std::make_unique<std::ifstream>(INPUT_FILE_PATH, std::ios::binary);
+    outputFile_ = std::make_unique<std::ofstream>(OUTPUT_FILE_PATH, std::ios::binary);
 }
 
 AEncFlacDemo::~AEncFlacDemo()
@@ -166,6 +169,13 @@ int32_t AEncFlacDemo::Stop()
             signal_->inCond_.notify_all();
         }
         inputLoop_->join();
+        inputLoop_ = nullptr;
+        while (!signal_->inQueue_.empty()) {
+            signal_->inQueue_.pop();
+        }
+        while (!signal_->inBufferQueue_.empty()) {
+            signal_->inBufferQueue_.pop();
+        }
     }
 
     if (outputLoop_ != nullptr && outputLoop_->joinable()) {
@@ -174,6 +184,16 @@ int32_t AEncFlacDemo::Stop()
             signal_->outCond_.notify_all();
         }
         outputLoop_->join();
+        outputLoop_ = nullptr;
+        while (!signal_->outQueue_.empty()) {
+            signal_->outQueue_.pop();
+        }
+        while (!signal_->attrQueue_.empty()) {
+            signal_->attrQueue_.pop();
+        }
+        while (!signal_->outBufferQueue_.empty()) {
+            signal_->outBufferQueue_.pop();
+        }
     }
 
     return OH_AudioEncoder_Stop(audioEnc_);
@@ -181,6 +201,40 @@ int32_t AEncFlacDemo::Stop()
 
 int32_t AEncFlacDemo::Flush()
 {
+    if (inputLoop_ != nullptr && inputLoop_->joinable()) {
+        {
+            unique_lock<mutex> lock(signal_->inMutex_);
+            signal_->inCond_.notify_all();
+        }
+        inputLoop_->join();
+        inputLoop_ = nullptr;
+        while (!signal_->inQueue_.empty()) {
+            signal_->inQueue_.pop();
+        }
+        while (!signal_->inBufferQueue_.empty()) {
+            signal_->inBufferQueue_.pop();
+        }
+        std::cout << "clear input buffer!\n";
+    }
+
+    if (outputLoop_ != nullptr && outputLoop_->joinable()) {
+        {
+            unique_lock<mutex> lock(signal_->outMutex_);
+            signal_->outCond_.notify_all();
+        }
+        outputLoop_->join();
+        outputLoop_ = nullptr;
+        while (!signal_->outQueue_.empty()) {
+            signal_->outQueue_.pop();
+        }
+        while (!signal_->attrQueue_.empty()) {
+            signal_->attrQueue_.pop();
+        }
+        while (!signal_->outBufferQueue_.empty()) {
+            signal_->outBufferQueue_.pop();
+        }
+        std::cout << "clear output buffer!\n";
+    }
     return OH_AudioEncoder_Flush(audioEnc_);
 }
 
@@ -257,12 +311,7 @@ void AEncFlacDemo::InputFunc()
 
 void AEncFlacDemo::OutputFunc()
 {
-    std::ofstream outputFile;
-    outputFile.open(OUTPUT_FILE_PATH.data(), std::ios::out | std::ios::binary);
-    if (!outputFile.is_open()) {
-        std::cout << "open " << OUTPUT_FILE_PATH << " failed!" << std::endl;
-    }
-
+    DEMO_CHECK_AND_RETURN_LOG(outputFile_ != nullptr && outputFile_->is_open(), "Fatal: open output file fail");
     while (true) {
         if (!isRunning_.load()) {
             cout << "stop, exit" << endl;
@@ -282,7 +331,7 @@ void AEncFlacDemo::OutputFunc()
         OH_AVCodecBufferAttr attr = signal_->attrQueue_.front();
         OH_AVMemory *data = signal_->outBufferQueue_.front();
         if (data != nullptr) {
-            outputFile.write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
+            outputFile_->write(reinterpret_cast<char *>(OH_AVMemory_GetAddr(data)), attr.size);
         }
         if (attr.flags == AVCODEC_BUFFER_FLAGS_EOS || attr.size == 0) {
             cout << "encode eos" << endl;
@@ -298,5 +347,5 @@ void AEncFlacDemo::OutputFunc()
             break;
         }
     }
-    outputFile.close();
+    outputFile_->close();
 }

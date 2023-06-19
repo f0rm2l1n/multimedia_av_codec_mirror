@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Media {
 AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin()
     : maxInputSize_(-1), avCodec_(nullptr), avCodecContext_(nullptr), cachedFrame_(nullptr), avPacket_(nullptr),
-      prevPts_(0)
+      prevPts_(0), codecContextValid_(false)
 {
 }
 
@@ -239,7 +239,7 @@ int32_t AudioFfmpegEncoderPlugin::Flush()
         avcodec_flush_buffers(avCodecContext_.get());
     }
     prevPts_ = 0;
-    return AVCodecServiceErrCode::AVCS_ERR_OK;
+    return ReAllocateContext();
 }
 
 int32_t AudioFfmpegEncoderPlugin::AllocateContext(const std::string &name)
@@ -307,11 +307,41 @@ int32_t AudioFfmpegEncoderPlugin::OpenContext()
             AVCODEC_LOGE("avcodec open error %{public}s", AVStrError(res).c_str());
             return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
         }
+        codecContextValid_ = true;
     }
     if (avCodecContext_->frame_size <= 0) {
         AVCODEC_LOGE("frame size invalid");
     }
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLES_PER_FRAME, avCodecContext_->frame_size);
+    return AVCodecServiceErrCode::AVCS_ERR_OK;
+}
+
+int32_t AudioFfmpegEncoderPlugin::ReAllocateContext()
+{
+    if (!codecContextValid_) {
+        AVCODEC_LOGD("Old avcodec context not valid, no need to reallocate");
+        return AVCodecServiceErrCode::AVCS_ERR_OK;
+    }
+
+    AVCodecContext *context = avcodec_alloc_context3(avCodec_.get());
+    auto tmpContext = std::shared_ptr<AVCodecContext>(context, [](AVCodecContext *ptr) {
+        avcodec_free_context(&ptr);
+        avcodec_close(ptr);
+    });
+
+    tmpContext->channels = avCodecContext_->channels;
+    tmpContext->sample_rate = avCodecContext_->sample_rate;
+    tmpContext->bit_rate = avCodecContext_->bit_rate;
+    tmpContext->channel_layout = avCodecContext_->channel_layout;
+    tmpContext->sample_fmt = avCodecContext_->sample_fmt;
+
+    auto res = avcodec_open2(tmpContext.get(), avCodec_.get(), nullptr);
+    if (res != 0) {
+        AVCODEC_LOGE("avcodec reopen error %{public}s", AVStrError(res).c_str());
+        return AVCodecServiceErrCode::AVCS_ERR_UNKNOWN;
+    }
+    avCodecContext_ = tmpContext;
+
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 

@@ -63,6 +63,7 @@ private:
 
     std::atomic<bool> isRunning_;
     std::unique_ptr<std::ifstream> inputFile_;
+    std::unique_ptr<std::ofstream> outputFile_;
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
     OH_AVCodec *audioEnc_;
