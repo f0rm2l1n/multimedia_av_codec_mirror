@@ -29,7 +29,7 @@
 
 > **说明：**
 > 
-> 如果调用封装能力写本地文件，需要[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.WRITE_MEDIA
+> 如果调用封装能力写本地文件，需要[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.READ_MEDIA, ohos.permission.WRITE_MEDIA
 
 参考以下示例代码，完成音视频封装的全流程。以封装mp4格式的音视频文件为例。
 
