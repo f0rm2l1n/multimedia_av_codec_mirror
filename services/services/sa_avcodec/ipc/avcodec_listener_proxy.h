@@ -20,7 +20,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVCodecListenerProxy : public IRemoteProxy<IStandardAVCodecListener>, public NoCopyable {
 public:
     explicit AVCodecListenerProxy(const sptr<IRemoteObject> &impl);
@@ -29,6 +29,6 @@ public:
 private:
     static inline BrokerDelegator<AVCodecListenerProxy> delegator_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_LISTENER_PROXY_H

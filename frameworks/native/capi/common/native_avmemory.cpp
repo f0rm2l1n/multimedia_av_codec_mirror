@@ -23,9 +23,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "OH_AVMemory"};
 }
 
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 
-OH_AVMemory::OH_AVMemory(const std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> &mem)
+OH_AVMemory::OH_AVMemory(const std::shared_ptr<OHOS::Media::AVSharedMemory> &mem)
     : AVObjectMagic(AVMagic::AVCODEC_MAGIC_SHARED_MEMORY), memory_(mem)
 {
 }
@@ -34,7 +34,7 @@ OH_AVMemory::~OH_AVMemory()
 {
 }
 
-bool OH_AVMemory::IsEqualMemory(const std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> &mem)
+bool OH_AVMemory::IsEqualMemory(const std::shared_ptr<OHOS::Media::AVSharedMemory> &mem)
 {
     return (mem == memory_) ? true : false;
 }

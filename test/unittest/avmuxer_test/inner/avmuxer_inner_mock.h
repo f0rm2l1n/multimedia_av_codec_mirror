@@ -22,7 +22,7 @@
 #include "avmuxer.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVMuxerInnerMock : public AVMuxerMock {
 public:
     explicit AVMuxerInnerMock(std::shared_ptr<AVMuxer> muxer) : muxer_(muxer) {}
@@ -36,6 +36,6 @@ public:
 private:
     std::shared_ptr<AVMuxer> muxer_ = nullptr;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // MUXER_NATIVE_MOCK_H

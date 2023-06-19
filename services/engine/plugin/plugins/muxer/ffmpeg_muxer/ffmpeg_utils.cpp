@@ -20,7 +20,7 @@
 #include "avcodec_info.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 namespace Ffmpeg {
 // Internal definitions
@@ -126,5 +126,5 @@ int64_t ConvertTimeToFFmpeg(int64_t timestampUs, AVRational base)
 }
 } // namespace Ffmpeg
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

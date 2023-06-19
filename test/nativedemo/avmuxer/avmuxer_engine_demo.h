@@ -20,7 +20,7 @@
 #include "avmuxer_demo_base.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVMuxerEngineDemo : public AVMuxerDemoBase {
 public:
     AVMuxerEngineDemo() = default;
@@ -34,6 +34,6 @@ private:
     void DoRunMuxer(const std::string &runMode);
     std::shared_ptr<IMuxerEngine> avmuxer_;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif  // AVMUXER_DEMO_H

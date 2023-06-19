@@ -26,8 +26,8 @@
 #include "avcodec_audio_aac_encoder_demo.h"
 
 using namespace OHOS;
-using namespace OHOS::MediaAVCodec;
-using namespace OHOS::MediaAVCodec::AudioAacDemo;
+using namespace OHOS::Media;
+using namespace OHOS::Media::AudioAacDemo;
 using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;

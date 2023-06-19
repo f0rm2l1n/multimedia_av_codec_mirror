@@ -22,7 +22,7 @@
 #include "errors.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 using AVCSErrCode = ErrCode;
 
 // bit 28~21 is subsys, bit 20~16 is Module. bit 15~0 is code
@@ -90,6 +90,6 @@ __attribute__((visibility("default"))) std::string AVCSErrorToString(AVCodecServ
 __attribute__((visibility("default"))) std::string OHAVErrCodeToString(OH_AVErrCode code);
 __attribute__((visibility("default"))) std::string AVCSErrorToOHAVErrCodeString(AVCodecServiceErrCode code);
 __attribute__((visibility("default"))) OH_AVErrCode AVCSErrorToOHAVErrCode(AVCodecServiceErrCode code);
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_ERRORS_H

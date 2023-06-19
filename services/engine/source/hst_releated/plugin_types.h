@@ -19,7 +19,7 @@
 #include <cstdint> // NOLINT: using int32_t in this file
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 /**
  * @enum Plugin running state.
@@ -110,6 +110,6 @@ enum class VideoScaleType {
     VIDEO_SCALE_TYPE_FIT_CROP,
 };
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_TYPES_H

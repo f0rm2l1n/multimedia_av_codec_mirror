@@ -25,7 +25,7 @@ constexpr uint32_t MAX_STRING_LENGTH = 256;
 constexpr uint32_t MAX_DUMP_LENGTH = 1024;
 }
 
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 
 OH_AVFormat::OH_AVFormat()
     : AVObjectMagic(AVMagic::AVCODEC_MAGIC_FORMAT)

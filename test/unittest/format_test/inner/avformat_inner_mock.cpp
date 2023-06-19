@@ -18,7 +18,7 @@
 #include "media_description.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 bool AVFormatInnerMock::PutIntValue(const std::string_view &key, int32_t value)
 {
     return format_.PutIntValue(key, value);
@@ -130,5 +130,5 @@ const char *AVFormatInnerMock::DumpInfo()
     }
     return dumpInfo_;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

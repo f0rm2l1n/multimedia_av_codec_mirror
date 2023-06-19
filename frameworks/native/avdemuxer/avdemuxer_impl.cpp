@@ -30,7 +30,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<AVDemuxer> AVDemuxerFactory::CreateWithSource(std::shared_ptr<AVSource> source)
 {
     AVCodecTrace trace("AVDemuxerFactory::CreateWithSource");
@@ -132,5 +132,5 @@ int32_t AVDemuxerImpl::SeekToTime(int64_t millisecond, AVSeekMode mode)
     
     return demuxerClient_->SeekToTime(millisecond, mode);
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

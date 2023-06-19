@@ -25,7 +25,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVMuxerMock : public NoCopyable {
 public:
     virtual ~AVMuxerMock() = default;
@@ -45,6 +45,6 @@ private:
     AVMuxerMockFactory() = delete;
     ~AVMuxerMockFactory() = delete;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif // AVMUXER_MOCK_H

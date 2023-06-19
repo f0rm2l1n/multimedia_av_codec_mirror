@@ -16,7 +16,7 @@
 #include "avmemory_inner_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 uint8_t *AVMemoryInnerMock::GetAddr() const
 {
     if (memory_ != nullptr) {
@@ -40,5 +40,5 @@ uint32_t AVMemoryInnerMock::GetFlags() const
     }
     return 0;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

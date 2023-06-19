@@ -22,7 +22,7 @@
 #include "avcodec_log.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace {
 constexpr size_t DEFAULT_QUEUE_SIZE = 10;
 }
@@ -163,6 +163,6 @@ private:
     std::atomic<bool> isActive_;
     const OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "BlockQueue"};
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // !UTILS_BLOCK_QUEUE_H

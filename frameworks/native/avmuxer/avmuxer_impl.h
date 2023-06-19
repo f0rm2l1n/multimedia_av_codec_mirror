@@ -20,7 +20,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVMuxerImpl : public AVMuxer, public NoCopyable {
 public:
     AVMuxerImpl(int32_t fd, OutputFormat format);
@@ -38,6 +38,6 @@ private:
     int32_t fd_ = -1;
     OutputFormat format_ = OUTPUT_FORMAT_DEFAULT;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVMUXER_IMPL_H

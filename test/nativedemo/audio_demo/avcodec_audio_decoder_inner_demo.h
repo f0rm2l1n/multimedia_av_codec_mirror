@@ -26,7 +26,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace InnerAudioDemo {
 class ADecSignal {
 public:
@@ -86,6 +86,6 @@ private:
     std::ifstream inputFile_;
 };
 } // namespace InnerAudioDemo
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_DECODER_INNER_DEMO_H

@@ -22,8 +22,8 @@
 #include "native_avmuxer_demo.h"
 
 using namespace std;
-using namespace OHOS::MediaAVCodec;
-using namespace OHOS::MediaAVCodec::Plugin;
+using namespace OHOS::Media;
+using namespace OHOS::Media::Plugin;
 
 constexpr int RUN_TIME = 60000;
 constexpr int DEMO_THREAD_COUNT = 10;

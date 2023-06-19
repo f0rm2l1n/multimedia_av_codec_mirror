@@ -26,7 +26,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 Status AVMuxerFFmpegDemo::FfmpegRegister::AddPlugin(const PluginDefBase& def)
 {
@@ -153,5 +153,5 @@ int AVMuxerFFmpegDemo::GetFfmpegRegister()
     return 0;
 }
 }  // Plugin
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

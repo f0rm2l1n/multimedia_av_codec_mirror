@@ -17,7 +17,7 @@
 #include "avmuxer_inner_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<AVMuxerMock> AVMuxerMockFactory::CreateMuxer(int32_t fd, const OutputFormat &format)
 {
     auto muxer = AVMuxerFactory::CreateAVMuxer(fd, format);
@@ -26,5 +26,5 @@ std::shared_ptr<AVMuxerMock> AVMuxerMockFactory::CreateMuxer(int32_t fd, const O
     }
     return nullptr;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

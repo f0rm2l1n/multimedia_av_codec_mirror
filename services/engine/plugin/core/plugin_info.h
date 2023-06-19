@@ -20,7 +20,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 /**
  * PluginInfo, which describes static information for a plugin, including basic plugin information,
@@ -73,6 +73,6 @@ struct PluginInfo {
  */
 #define PLUGIN_INFO_EXTRA_CODEC_MODE        "codec_mode" // NOLINT: macro constant
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // PLUGIN_INFO_H

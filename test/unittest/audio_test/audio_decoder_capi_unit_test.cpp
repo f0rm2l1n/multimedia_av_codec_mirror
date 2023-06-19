@@ -38,7 +38,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 
 namespace {
 const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME);
@@ -63,7 +63,7 @@ constexpr string_view OUTPUT_VORBIS_PCM_FILE_PATH = "/data/test/media/vorbis_2c_
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class ADecSignal {
 public:
     std::mutex inMutex_;
@@ -1336,5 +1336,5 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Vorbis_ReleaseOutputBuffer_0
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioDecoder_FreeOutputData(audioDec_, index));
     Release();
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

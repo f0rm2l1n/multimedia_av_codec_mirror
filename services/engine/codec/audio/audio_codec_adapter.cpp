@@ -25,7 +25,7 @@ constexpr uint8_t LOGD_FREQUENCY = 5;
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AudioCodecAdapter::AudioCodecAdapter(const std::string &name) : state_(CodecState::RELEASED), name_(name)
 {
     AVCODEC_LOGI("enter constructor of adapter,name:%{public}s", name_.data());
@@ -522,5 +522,5 @@ std::string_view AudioCodecAdapter::stateToString(CodecState state)
     };
     return stateStrMap[state];
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

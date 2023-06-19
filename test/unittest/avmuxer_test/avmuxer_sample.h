@@ -20,7 +20,7 @@
 #include "avmuxer_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVMuxerSample : public NoCopyable {
 public:
     explicit AVMuxerSample();
@@ -35,6 +35,6 @@ public:
 private:
     std::shared_ptr<AVMuxerMock> muxer_;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif // AVMUXER_SAMPLE

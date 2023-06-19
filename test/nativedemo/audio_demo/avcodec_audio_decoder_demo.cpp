@@ -26,8 +26,8 @@
 #include "securec.h"
 
 using namespace OHOS;
-using namespace OHOS::MediaAVCodec;
-using namespace OHOS::MediaAVCodec::AudioDemo;
+using namespace OHOS::Media;
+using namespace OHOS::Media::AudioDemo;
 using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;

@@ -24,19 +24,19 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "DemuxerServiceStub"};
 
     const std::map<int32_t, std::string> DEMUXER_FUNC_NAME = {
-        { OHOS::MediaAVCodec::DemuxerServiceStub::DemuxerServiceMsg::INIT, "DemuxerServiceStub Init" },
-        { OHOS::MediaAVCodec::DemuxerServiceStub::DemuxerServiceMsg::SELECT_TRACK_BY_ID,
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::INIT, "DemuxerServiceStub Init" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::SELECT_TRACK_BY_ID,
             "DemuxerServiceStub SelectTrackByID" },
-        { OHOS::MediaAVCodec::DemuxerServiceStub::DemuxerServiceMsg::UNSELECT_TRACK_BY_ID,
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::UNSELECT_TRACK_BY_ID,
             "DemuxerServiceStub UnselectTrackByID" },
-        { OHOS::MediaAVCodec::DemuxerServiceStub::DemuxerServiceMsg::READ_SAMPLE, "DemuxerServiceStub ReadSample" },
-        { OHOS::MediaAVCodec::DemuxerServiceStub::DemuxerServiceMsg::SEEK_TO_TIME, "DemuxerServiceStub SeekToTime" },
-        { OHOS::MediaAVCodec::DemuxerServiceStub::DemuxerServiceMsg::DESTROY_STUB, "DemuxerServiceStub DestroyStub" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::READ_SAMPLE, "DemuxerServiceStub ReadSample" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::SEEK_TO_TIME, "DemuxerServiceStub SeekToTime" },
+        { OHOS::Media::DemuxerServiceStub::DemuxerServiceMsg::DESTROY_STUB, "DemuxerServiceStub DestroyStub" },
     };
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 sptr<DemuxerServiceStub> DemuxerServiceStub::Create()
 {
     sptr<DemuxerServiceStub> demuxerStub = new(std::nothrow) DemuxerServiceStub();
@@ -207,5 +207,5 @@ int32_t DemuxerServiceStub::DestroyStub(MessageParcel &data, MessageParcel &repl
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(DestroyStub()), AVCS_ERR_UNKNOWN, "Reply DestroyStub failed!");
     return AVCS_ERR_OK;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

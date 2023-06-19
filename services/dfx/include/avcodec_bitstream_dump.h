@@ -22,7 +22,7 @@
 #include <condition_variable>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 enum class BitStreamDumpType {
     BIT_STREAM_DUMP_TYPE_DEFAULT,
     BIT_STREAM_DUMP_TYPE_VCODEC,
@@ -59,13 +59,13 @@ private:
 #ifdef  BITSTREAM_DUMP_ENABLE
 #define AVCODEC_BITSTREAM_DUMP(type, name, index, buffer, size)                     \
     do {                                                                            \
-        (void)OHOS::MediaAVCodec::AVCodecBitStreamDumper::GetInstance().SaveBitStream(     \
+        (void)OHOS::Media::AVCodecBitStreamDumper::GetInstance().SaveBitStream(     \
             type, name, index, buffer, size);                                       \
     } while (0)
 #else
 #define AVCODEC_BITSTREAM_DUMP(type, name, index, buffer, size)
 #endif
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 
 #endif // AVCODEC_LOG_DUMP_H

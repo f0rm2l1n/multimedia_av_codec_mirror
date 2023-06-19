@@ -21,7 +21,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class CodecListenerCallback : public AVCodecCallback, public NoCopyable {
 public:
     explicit CodecListenerCallback(const sptr<IStandardCodecListener> &listener);
@@ -49,6 +49,6 @@ public:
 private:
     static inline BrokerDelegator<CodecListenerProxy> delegator_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // CODEC_LISTENER_PROXY_H

@@ -40,7 +40,7 @@ extern "C" {
 #include "block_queue_pool.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 namespace FFmpeg {
 class FFmpegDemuxerPlugin : public DemuxerPlugin {
@@ -78,6 +78,6 @@ private:
 };
 } // namespace FFmpeg
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OH
 #endif // FFMPEG_DEMUXER_PLUGIN_H

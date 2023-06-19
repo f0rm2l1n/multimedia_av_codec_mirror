@@ -37,14 +37,14 @@ static const uint64_t FLAC_CHANNEL_LAYOUT_TABLE[] = {AV_CH_LAYOUT_MONO,    AV_CH
                                                      AV_CH_LAYOUT_QUAD,    AV_CH_LAYOUT_5POINT0, AV_CH_LAYOUT_5POINT1,
                                                      AV_CH_LAYOUT_6POINT1, AV_CH_LAYOUT_7POINT1};
 const std::map<int32_t, int32_t> BITS_PER_RAW_SAMPLE_MAP = {
-    {OHOS::MediaAVCodec::AudioSampleFormat::SAMPLE_S16LE, 16},
-    {OHOS::MediaAVCodec::AudioSampleFormat::SAMPLE_S24LE, 24},
-    {OHOS::MediaAVCodec::AudioSampleFormat::SAMPLE_S32LE, 32},
+    {OHOS::Media::AudioSampleFormat::SAMPLE_S16LE, 16},
+    {OHOS::Media::AudioSampleFormat::SAMPLE_S24LE, 24},
+    {OHOS::Media::AudioSampleFormat::SAMPLE_S32LE, 32},
 };
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 constexpr std::string_view AUDIO_CODEC_NAME = "flac";
 AudioFFMpegFlacEncoderPlugin::AudioFFMpegFlacEncoderPlugin() : basePlugin(std::make_unique<AudioFfmpegEncoderPlugin>())
 {
@@ -231,5 +231,5 @@ std::string_view AudioFFMpegFlacEncoderPlugin::GetCodecType() const noexcept
 {
     return AUDIO_CODEC_NAME;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

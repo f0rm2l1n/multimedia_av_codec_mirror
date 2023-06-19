@@ -28,7 +28,7 @@ extern "C" {
 #include "libswscale/swscale.h"
 };
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Codec {
 const int32_t VIDEO_ALIGN_SIZE = 16;
 struct ScalePara {
@@ -64,6 +64,6 @@ std::string AVStrError(int errnum);
 bool IsYuvFormat(VideoPixelFormat &format);
 bool IsRgbFormat(VideoPixelFormat &format);
 } // namespace Codec
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

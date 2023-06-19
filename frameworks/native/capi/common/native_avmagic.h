@@ -45,18 +45,18 @@ struct AVObjectMagic : public OHOS::RefBase {
 
 struct OH_AVFormat : public AVObjectMagic {
     OH_AVFormat();
-    explicit OH_AVFormat(const OHOS::MediaAVCodec::Format &fmt);
+    explicit OH_AVFormat(const OHOS::Media::Format &fmt);
     ~OH_AVFormat() override;
-    OHOS::MediaAVCodec::Format format_;
+    OHOS::Media::Format format_;
     char *outString_ = nullptr;
     char *dumpInfo_ = nullptr;
 };
 
 struct OH_AVMemory : public AVObjectMagic {
-    explicit OH_AVMemory(const std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> &mem);
+    explicit OH_AVMemory(const std::shared_ptr<OHOS::Media::AVSharedMemory> &mem);
     ~OH_AVMemory() override;
-    bool IsEqualMemory(const std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> &mem);
-    const std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> memory_;
+    bool IsEqualMemory(const std::shared_ptr<OHOS::Media::AVSharedMemory> &mem);
+    const std::shared_ptr<OHOS::Media::AVSharedMemory> memory_;
     bool isUserCreated = false;
 };
 
@@ -66,9 +66,9 @@ struct OH_AVCodec : public AVObjectMagic {
 };
 
 struct OH_AVCapability : public OHOS::RefBase {
-    explicit OH_AVCapability(OHOS::MediaAVCodec::CapabilityData *capabilityData);
+    explicit OH_AVCapability(OHOS::Media::CapabilityData *capabilityData);
     ~OH_AVCapability() override;
-    OHOS::MediaAVCodec::CapabilityData *capabilityData_;
+    OHOS::Media::CapabilityData *capabilityData_;
 };
 
 struct OH_AVMuxer : public AVObjectMagic {

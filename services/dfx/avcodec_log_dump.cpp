@@ -28,7 +28,7 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecL
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AVCodecLogDump &AVCodecLogDump::GetInstance()
 {
     static AVCodecLogDump avcodecLogDump;
@@ -176,5 +176,5 @@ void AVCodecLogDump::TaskProcessor()
         ofStream.close();
     }
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

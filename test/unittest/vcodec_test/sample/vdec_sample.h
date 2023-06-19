@@ -26,7 +26,7 @@
 #include "vcodec_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 struct VDecSignal {
 public:
     std::mutex mutex_;
@@ -121,6 +121,6 @@ private:
     sptr<Surface> consumer_ = nullptr;
     sptr<Surface> producer_ = nullptr;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // VDEC_SAMPLE_H

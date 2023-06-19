@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecAud
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<AVCodecAudioDecoder> AudioDecoderFactory::CreateByMime(const std::string &mime)
 {
     AVCODEC_SYNC_TRACE;
@@ -168,5 +168,5 @@ int32_t AVCodecAudioDecoderImpl::SetCallback(const std::shared_ptr<AVCodecCallba
     CHECK_AND_RETURN_RET_LOG(callback != nullptr, AVCS_ERR_INVALID_VAL, "callback is nullptr");
     return codecService_->SetCallback(callback);
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

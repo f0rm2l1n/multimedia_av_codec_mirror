@@ -18,7 +18,7 @@
 #include <string_view>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVCodecCodecName {
 public:
     static constexpr std::string_view AUDIO_DECODER_MP3_NAME = "OH.Media.Codec.Decoder.Audio.Mpeg";
@@ -35,7 +35,7 @@ private:
     AVCodecCodecName() = delete;
     ~AVCodecCodecName() = delete;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 
 #endif

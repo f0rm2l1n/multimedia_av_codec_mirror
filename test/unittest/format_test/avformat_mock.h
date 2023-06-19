@@ -20,7 +20,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 struct AVCodecBufferAttrMock {
     int64_t pts = 0;
     int32_t size = 0;
@@ -61,6 +61,6 @@ private:
     FormatMockFactory() = delete;
     ~FormatMockFactory() = delete;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif // AVFORMAT_MOCK_H

@@ -47,7 +47,7 @@ namespace {
 
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 namespace FFmpeg {
 namespace {
@@ -527,5 +527,5 @@ void FFmpegDemuxerPlugin::SetEosBufferInfo(AVCodecBufferInfo &bufferInfo, AVCode
 }
 } // FFmpeg
 } // Plugin
-} // MediaAVCodec
+} // Media
 } // OHOS

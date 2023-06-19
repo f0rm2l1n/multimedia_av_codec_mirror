@@ -21,7 +21,7 @@
 #include <string>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 /**
  * @brief Unified enumerates media source types.
@@ -57,6 +57,6 @@ private:
     SourceType type_ {};
 };
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

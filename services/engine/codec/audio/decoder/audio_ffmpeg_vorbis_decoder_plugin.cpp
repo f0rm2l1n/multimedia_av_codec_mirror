@@ -33,7 +33,7 @@ constexpr int NUMBER_PER_BYTES = 255;
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 static constexpr int32_t INPUT_BUFFER_SIZE_DEFAULT = 8192;
 static constexpr int32_t OUTPUT_BUFFER_SIZE_DEFAULT = 4 * 1024 * 8;
 constexpr std::string_view AUDIO_CODEC_NAME = "vorbis";
@@ -226,5 +226,5 @@ std::string_view AudioFFMpegVorbisDecoderPlugin::GetCodecType() const noexcept
 {
     return AUDIO_CODEC_NAME;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

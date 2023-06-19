@@ -19,7 +19,7 @@
 #include "surface_inner_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 VideoDecCallbackMock::VideoDecCallbackMock(std::shared_ptr<AVCodecCallbackMock> cb,
     std::weak_ptr<AVCodecVideoDecoder> vd)
     : mockCb_(cb), videoDec_(vd)
@@ -197,5 +197,5 @@ bool VideoDecInnerMock::IsValid()
     }
     return false;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

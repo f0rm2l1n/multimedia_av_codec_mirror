@@ -20,7 +20,7 @@
 #include "i_demuxer_engine.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class DemuxerServer : public std::enable_shared_from_this<DemuxerServer>, public IDemuxerService, public NoCopyable {
 public:
     static std::shared_ptr<IDemuxerService> Create();
@@ -40,6 +40,6 @@ private:
     int32_t appUid_ = 0;
     int32_t appPid_ = 0;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif  // DEMUXER_SERVER_H

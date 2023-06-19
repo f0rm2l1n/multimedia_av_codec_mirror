@@ -21,7 +21,7 @@
 #include "avsharedmemory.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class __attribute__((visibility("default"))) AVSharedMemoryBase
     : public AVSharedMemory, public NoCopyable {
 public:
@@ -131,7 +131,7 @@ private:
     int32_t size_;
     static constexpr int32_t INVALID_POSITION = -1;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 
 #endif

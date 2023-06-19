@@ -17,9 +17,9 @@
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace OHOS::MediaAVCodec::VCodecTestParam;
+using namespace OHOS::Media::VCodecTestParam;
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 VDecCallbackTest::VDecCallbackTest(std::shared_ptr<VDecSignal> signal) : signal_(signal) {}
 
 VDecCallbackTest::~VDecCallbackTest() {}
@@ -473,5 +473,5 @@ int32_t VideoDecSample::OutputLoopInner()
     }
     return AV_ERR_OK;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

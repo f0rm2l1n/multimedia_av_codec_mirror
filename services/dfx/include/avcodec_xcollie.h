@@ -21,7 +21,7 @@
 #include <mutex>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class __attribute__((visibility("default"))) AVCodecXCollie {
 public:
     static AVCodecXCollie &GetInstance();
@@ -59,6 +59,6 @@ private:
 
 #define COLLIE_LISTEN(statement, args...) { AVCodecXcollieTimer xCollie(args); statement; }
 #define CLIENT_COLLIE_LISTEN(statement, name) { AVCodecXcollieTimer xCollie(name, false, false, 30); statement; }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_XCOLLIE_H

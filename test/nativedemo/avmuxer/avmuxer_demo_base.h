@@ -22,7 +22,7 @@
 #include "media_description.h"
 #include "avmuxer_demo_common.h"
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVMuxerDemoBase {
 public:
     AVMuxerDemoBase();
@@ -74,6 +74,6 @@ protected:
     int64_t audioPts_ {0};
     int64_t videoPts_ {0};
 };
-} // MediaAVCodec
+} // Media
 } // OHOS
 #endif

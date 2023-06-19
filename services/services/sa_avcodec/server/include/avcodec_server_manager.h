@@ -26,7 +26,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 using DumperEntry = std::function<int32_t(int32_t)>;
 struct Dumper {
     pid_t pid_;
@@ -100,6 +100,6 @@ private:
 
     std::mutex mutex_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_SERVER_MANAGER_H

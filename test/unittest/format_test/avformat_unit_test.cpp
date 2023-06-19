@@ -21,7 +21,7 @@
 
 using namespace std;
 using namespace OHOS;
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 using namespace testing::ext;
 
 constexpr float EPSINON_FLOAT = 0.0001;

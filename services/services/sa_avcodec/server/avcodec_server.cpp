@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecSer
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 REGISTER_SYSTEM_ABILITY_BY_ID(AVCodecServer, AV_CODEC_SERVICE_ID, true)
 AVCodecServer::AVCodecServer(int32_t systemAbilityId, bool runOnCreate) : SystemAbility(systemAbilityId, runOnCreate)
 {
@@ -133,5 +133,5 @@ int32_t AVCodecServer::Dump(int32_t fd, const std::vector<std::u16string>& args)
 
     return OHOS::NO_ERROR;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

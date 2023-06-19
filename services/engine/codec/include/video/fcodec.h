@@ -33,7 +33,7 @@
 #include "task_thread.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Codec {
 class FCodec : public CodecBase {
 public:
@@ -151,6 +151,6 @@ private:
     std::atomic<bool> isBufferAllocated_ = false;
 };
 } // namespace Codec
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // FCODEC_H

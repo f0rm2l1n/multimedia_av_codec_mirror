@@ -24,7 +24,7 @@
 #include "plugin_definition.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 class DemuxerFactory {
 public:
@@ -78,6 +78,6 @@ private:
     std::vector<std::shared_ptr<PluginLoader>> registeredLoaders_;
 };
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // DEMUXER_FACTORY_H

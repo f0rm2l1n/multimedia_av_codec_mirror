@@ -25,7 +25,7 @@
 #include <thread>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class __attribute__((visibility("default"))) TaskThread {
 public:
     explicit TaskThread(std::string_view name);
@@ -65,6 +65,6 @@ private:
     std::mutex stateMutex_;
     std::condition_variable syncCond_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

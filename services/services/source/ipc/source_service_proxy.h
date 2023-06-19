@@ -19,7 +19,7 @@
 #include "i_standard_source_service.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class SourceServiceProxy : public IRemoteProxy<IStandardSourceService>, public NoCopyable {
 public:
     explicit SourceServiceProxy(const sptr<IRemoteObject> &impl);
@@ -36,6 +36,6 @@ public:
 private:
     static inline BrokerDelegator<SourceServiceProxy> delegator_;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif  // SOURCE_SERVICE_PROXY_H

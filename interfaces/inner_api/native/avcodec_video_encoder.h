@@ -23,7 +23,7 @@
 #include "surface.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVCodecVideoEncoder {
 public:
     virtual ~AVCodecVideoEncoder() = default;
@@ -254,6 +254,6 @@ private:
     VideoEncoderFactory() = default;
     ~VideoEncoderFactory() = default;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_VIDEO_ENCODER_H

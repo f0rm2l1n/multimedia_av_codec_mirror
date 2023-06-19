@@ -19,7 +19,7 @@
 #include "surface_capi_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::mutex VideoDecCapiMock::mutex_;
 std::map<OH_AVCodec *, std::shared_ptr<AVCodecCallbackMock>> VideoDecCapiMock::mockCbMap_;
 void VideoDecCapiMock::OnError(OH_AVCodec *codec, int32_t errorCode, void *userData)
@@ -217,5 +217,5 @@ bool VideoDecCapiMock::IsValid()
     }
     return false;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

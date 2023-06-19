@@ -20,7 +20,7 @@
 #include "i_standard_source_service.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class SourceClient : public ISourceService, public NoCopyable {
 public:
     static std::shared_ptr<SourceClient> Create(const sptr<IStandardSourceService> &ipcProxy);
@@ -39,6 +39,6 @@ private:
     std::mutex mutex_;
     sptr<IStandardSourceService> sourceProxy_ = nullptr;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif  // SOURCE_CLIENT_H

@@ -21,7 +21,7 @@
 #include <vector> // NOLINT
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 /**
  * @enum source input type.
@@ -212,6 +212,6 @@ using ValueType = Any;
  */
 using CodecConfig = std::vector<uint8_t>;
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_COMMON_TAGS_H

@@ -33,7 +33,7 @@
 
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class VideoDecMock : public NoCopyable {
 public:
     virtual ~VideoDecMock() = default;
@@ -75,6 +75,6 @@ constexpr bool NEED_DUMP = true;
 
 constexpr uint32_t EOS_COUNT = 100;
 } // namespace VCodecTestParam
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif // VCODEC_MOCK_H

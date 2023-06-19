@@ -24,7 +24,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<AVCodecVideoEncoder> VideoEncoderFactory::CreateByMime(const std::string &mime)
 {
     AVCODEC_SYNC_TRACE;
@@ -230,5 +230,5 @@ int32_t AVCodecVideoEncoderImpl::GetInputFormat(Format &format)
     AVCODEC_SYNC_TRACE;
     return codecService_->GetInputFormat(format);
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

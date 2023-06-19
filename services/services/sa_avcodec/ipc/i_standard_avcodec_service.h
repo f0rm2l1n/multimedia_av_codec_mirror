@@ -21,7 +21,7 @@
 #include "iremote_stub.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class IStandardAVCodecService : public IRemoteBroker {
 public:
     /**
@@ -45,8 +45,8 @@ public:
         GET_SUBSYSTEM = 0,
     };
 
-    DECLARE_INTERFACE_DESCRIPTOR(u"IStandardAVCodecServiceInterface");
+    DECLARE_INTERFACE_DESCRIPTOR(u"IStandardAVCodecService");
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // I_STANDARD_AVCODEC_SERVICE_H

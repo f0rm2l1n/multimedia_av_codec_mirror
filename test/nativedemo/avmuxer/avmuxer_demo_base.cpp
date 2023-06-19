@@ -28,7 +28,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 const AudioTrackParam *AVMuxerDemoBase::audioParams_ = nullptr;
 const VideoTrackParam *AVMuxerDemoBase::videoParams_ = nullptr;
 const VideoTrackParam *AVMuxerDemoBase::coverParams_ = nullptr;
@@ -467,5 +467,5 @@ int AVMuxerDemoBase::AddCoverTrack(const VideoTrackParam *param)
     std::cout << "AVMuxerDemoBase::AddCoverTrack video trackId is: " << coverTrackId_ << std::endl;
     return 0;
 }
-} // MediaAVCodec
+} // Media
 } // OHOS

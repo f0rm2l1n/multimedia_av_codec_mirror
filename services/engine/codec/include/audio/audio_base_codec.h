@@ -24,7 +24,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AudioBaseCodec : public AVCodecBaseFactory<AudioBaseCodec, std::string>, public NoCopyable {
 public:
     AudioBaseCodec() = default;
@@ -51,7 +51,7 @@ public:
 
     virtual std::string_view GetCodecType() const noexcept = 0;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 
 #endif

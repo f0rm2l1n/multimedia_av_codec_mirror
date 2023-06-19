@@ -18,7 +18,7 @@
 #include <string_view>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 /**
  * @enum Media mime type
  *
@@ -43,6 +43,6 @@ private:
     AVCodecMimeType() = delete;
     ~AVCodecMimeType() = delete;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

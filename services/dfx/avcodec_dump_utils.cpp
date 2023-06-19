@@ -29,7 +29,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 int32_t AVCodecDumpControler::AddInfo(const uint32_t dumpIdx, const std::string &name, const std::string &value)
 {
     CHECK_AND_RETURN_RET_LOG((dumpIdx >> DUMP_OFFSET_24) > 0, AVCS_ERR_INVALID_VAL,
@@ -141,4 +141,4 @@ uint32_t AVCodecDumpControler::GetLevel(const uint32_t dumpIdx)
     return level;
 }
 } // namespace OHOS
-} // namespace MediaAVCodec
+} // namespace Media

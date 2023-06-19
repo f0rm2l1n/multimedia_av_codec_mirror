@@ -27,7 +27,7 @@
 #include "muxer_buffer_pool.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class MuxerEngineImpl : public IMuxerEngine {
 public:
     MuxerEngineImpl(int32_t appUid, int32_t appPid, int32_t fd, OutputFormat format);
@@ -86,6 +86,6 @@ private:
     std::unique_ptr<std::thread> thread_ = nullptr;
     bool isThreadExit_ = true;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // MUXER_ENGINE_IMPL_H

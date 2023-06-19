@@ -21,7 +21,7 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "PluginLoader"};
 }
 
-using namespace OHOS::MediaAVCodec::Plugin;
+using namespace OHOS::Media::Plugin;
 
 // NOLINTNEXTLINE: void*
 PluginLoader::PluginLoader(void* handler, std::string name) : handler_(handler), name_(std::move(name))

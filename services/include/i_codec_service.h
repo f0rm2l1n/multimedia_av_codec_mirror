@@ -24,7 +24,7 @@
 #include "surface.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class ICodecService {
 public:
     virtual ~ICodecService() = default;
@@ -48,6 +48,6 @@ public:
     virtual int32_t SetCallback(const std::shared_ptr<AVCodecCallback> &callback) = 0;
     virtual int32_t GetInputFormat(Format &format) = 0;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // I_CODEC_SERVICE_H

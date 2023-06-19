@@ -35,7 +35,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 
 namespace {
 const string CODEC_FLAC_NAME = std::string(AVCodecCodecName::AUDIO_ENCODER_FLAC_NAME);
@@ -55,7 +55,7 @@ constexpr string_view OUTPUT_FILE_PATH = "/data/test/media/encoderTest.flac";
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AEncSignal {
 public:
     std::mutex inMutex_;
@@ -629,5 +629,5 @@ HWTEST_F(AudioCodeCapiEncoderUnitTest, audioEncoder_abnormalcase_01, TestSize.Le
 
     EXPECT_NE(OH_AVErrCode::AV_ERR_OK, OH_AudioEncoder_Configure(audioEnc_, format));
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

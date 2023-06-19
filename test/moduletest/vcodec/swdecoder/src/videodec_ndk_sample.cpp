@@ -21,7 +21,7 @@
 #include "openssl/crypto.h"
 
 using namespace OHOS;
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 using namespace std;
 namespace {
 const string MIME_TYPE = "video_decoder.avc";

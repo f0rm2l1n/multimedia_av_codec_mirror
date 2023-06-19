@@ -20,7 +20,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class IStandardSourceService : public IRemoteBroker {
 public:
     virtual ~IStandardSourceService() = default;
@@ -46,6 +46,6 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"IStandardSourceService");
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif  // I_AVSOURCE_SERVICE_H

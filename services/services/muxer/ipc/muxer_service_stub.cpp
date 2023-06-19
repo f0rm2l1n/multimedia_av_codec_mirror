@@ -27,19 +27,19 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "MuxerServiceStub"};
 
     const std::map<uint32_t, const std::string> MUXER_FUNC_NAME = {
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::INIT_PARAMETER, "MuxerServiceStub InitParameter" },
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::SET_ROTATION, "MuxerServiceStub SetRotation" },
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::ADD_TRACK, "MuxerServiceStub AddTrack" },
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::START, "MuxerServiceStub Start" },
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::WRITE_SAMPLE, "MuxerServiceStub WriteSample" },
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::STOP, "MuxerServiceStub Stop" },
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::RELEASE, "MuxerServiceStub Release" },
-        { OHOS::MediaAVCodec::MuxerServiceStub::MuxerServiceMsg::DESTROY, "MuxerServiceStub DestroyStub" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::INIT_PARAMETER, "MuxerServiceStub InitParameter" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::SET_ROTATION, "MuxerServiceStub SetRotation" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::ADD_TRACK, "MuxerServiceStub AddTrack" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::START, "MuxerServiceStub Start" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::WRITE_SAMPLE, "MuxerServiceStub WriteSample" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::STOP, "MuxerServiceStub Stop" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::RELEASE, "MuxerServiceStub Release" },
+        { OHOS::Media::MuxerServiceStub::MuxerServiceMsg::DESTROY, "MuxerServiceStub DestroyStub" },
     };
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 sptr<MuxerServiceStub> MuxerServiceStub::Create()
 {
     sptr<MuxerServiceStub> muxerStub = new(std::nothrow) MuxerServiceStub();
@@ -235,5 +235,5 @@ int32_t MuxerServiceStub::DestroyStub(MessageParcel &data, MessageParcel &reply)
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(DestroyStub()), AVCS_ERR_UNKNOWN, "Reply DestroyStub failed!");
     return AVCS_ERR_OK;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
