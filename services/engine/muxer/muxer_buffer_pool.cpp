@@ -24,7 +24,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 MuxerBufferPool::MuxerBufferPool(std::string name, size_t capacity)
     : name_(std::move(name)), capacity_(capacity)
 {

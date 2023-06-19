@@ -31,7 +31,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecListMock : public NoCopyable {
 public:
     virtual ~CodecListMock() = default;
@@ -152,6 +152,6 @@ const std::vector<std::string> audioDecoderList = {
 
 const std::vector<std::string> audioEncoderList = {std::string(CodecMimeType::AUDIO_AAC)};
 } // namespace CodecListTestParam
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODECLIST_MOCK_H

@@ -22,8 +22,8 @@
 #include "gtest/gtest.h"
 
 using namespace testing::ext;
-using namespace OHOS::Media;
-using namespace OHOS::Media::CodecListTestParam;
+using namespace OHOS::MediaAVCodec;
+using namespace OHOS::MediaAVCodec::CodecListTestParam;
 
 void CodecListUnitTest::SetUpTestCase() {}
 

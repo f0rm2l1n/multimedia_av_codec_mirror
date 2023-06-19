@@ -24,7 +24,7 @@
 #include "securec.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 /// End of Stream Buffer Flag
 #define BUFFER_FLAG_EOS 0x00000001
@@ -110,6 +110,6 @@ private:
     std::vector<std::shared_ptr<Memory>> data {};
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_COMMON_BUFFER_H

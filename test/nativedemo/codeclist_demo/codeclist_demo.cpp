@@ -18,7 +18,7 @@
 #include "codeclist_demo.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 void CodecListDemo::RunCase()
 {
     std::cout << "===== ============== ======" << std::endl;
@@ -28,5 +28,5 @@ void CodecListDemo::RunCase()
     std::cout << name << std::endl;
     std::cout << "get caps successful" << std::endl;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

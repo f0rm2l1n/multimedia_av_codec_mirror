@@ -28,7 +28,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<ISourceEngine> ISourceEngineFactory::CreateSourceEngine(int32_t appUid, int32_t appPid,
                                                                         const std::string& uri)
 {
@@ -101,5 +101,5 @@ uintptr_t SourceEngineImpl::GetSourceAddr()
     CHECK_AND_RETURN_RET_LOG(source_ != nullptr, AVCS_ERR_INVALID_OPERATION, "source_ is nullptr");
     return source_->GetSourceAddr();
 }
-} // Media
+} // MediaAVCodec
 } // OHOS

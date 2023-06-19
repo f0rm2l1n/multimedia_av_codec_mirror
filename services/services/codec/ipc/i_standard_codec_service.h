@@ -26,7 +26,7 @@
 #include "surface.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class IStandardCodecService : public IRemoteBroker {
 public:
     virtual ~IStandardCodecService() = default;
@@ -84,6 +84,6 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"IStandardCodecService");
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // I_STANDARD_CODEC_SERVICE_H

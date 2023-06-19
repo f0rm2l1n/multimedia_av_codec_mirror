@@ -24,7 +24,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 SourceServiceProxy::SourceServiceProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IStandardSourceService>(impl)
 {
@@ -144,5 +144,5 @@ int32_t SourceServiceProxy::GetSourceAddr(uintptr_t &addr)
     addr = reply.ReadPointer();
     return reply.ReadUint64();
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

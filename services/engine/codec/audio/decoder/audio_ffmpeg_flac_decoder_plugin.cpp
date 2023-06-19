@@ -32,7 +32,7 @@ static const int32_t FLAC_DECODER_SAMPLE_RATE_TABLE[] = {
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 constexpr std::string_view AUDIO_CODEC_NAME = "flac";
 AudioFFMpegFlacDecoderPlugin::AudioFFMpegFlacDecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
@@ -154,5 +154,5 @@ std::string_view AudioFFMpegFlacDecoderPlugin::GetCodecType() const noexcept
 {
     return AUDIO_CODEC_NAME;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

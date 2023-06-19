@@ -18,7 +18,7 @@
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 const std::vector<int32_t> AUDIO_SAMPLE_RATE = {8000,  11025, 12000, 16000, 22050, 24000,
                                                 32000, 44100, 48000, 64000, 88200, 96000};
 constexpr int MAX_AUDIO_CHANNEL_COUNT = 8;
@@ -146,5 +146,5 @@ std::vector<CapabilityData> AudioCodeclistInfo::GetAudioCapabilities() const noe
 {
     return audioCapabilities_;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

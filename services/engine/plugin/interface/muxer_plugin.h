@@ -23,7 +23,7 @@
 #include "plugin_definition.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 struct MuxerPlugin : public PluginBase {
     explicit MuxerPlugin(std::string &&name) : PluginBase(std::move(name)) {}
@@ -64,6 +64,6 @@ struct MuxerPluginDef : public PluginDefBase {
     }
 };
 } // Plugin
-} // Media
+} // MediaAVCodec
 } // OHOS
 #endif // PLUGIN_INTF_MUXER_PLUGIN_H

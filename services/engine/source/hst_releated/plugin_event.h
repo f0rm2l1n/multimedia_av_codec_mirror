@@ -21,7 +21,7 @@
 #include "plugin_tags.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 enum struct PluginEventType : int32_t {
     CLIENT_ERROR,
@@ -48,6 +48,6 @@ struct PluginEvent {
     std::string description;
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_TYPES_H

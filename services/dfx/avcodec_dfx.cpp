@@ -28,7 +28,7 @@ constexpr char HISYSEVENT_DOMAIN_AVCODEC[] = "AV_CODEC";
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 bool AVCodecEvent::CreateMsg(const char* format, ...)
 {
     va_list args;
@@ -112,5 +112,5 @@ AVCodecTrace::~AVCodecTrace()
         FinishTrace(HITRACE_TAG_ZMEDIA);
     }
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

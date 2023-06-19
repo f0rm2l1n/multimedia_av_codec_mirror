@@ -47,7 +47,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace OHOS::Media;
+using namespace OHOS::MediaAVCodec;
 
 namespace {
 const uint32_t ES_H264[] = { // H264_FRAME_SIZE_240
@@ -97,7 +97,7 @@ uint32_t writeFrameCount = 0;
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace VCodecUT {
 class VDecSignal {
 public:
@@ -1030,5 +1030,5 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_getOutputBuffer_01, TestSize
     EXPECT_NE(AV_ERR_OK, OH_VideoDecoder_RenderOutputData(videoDec_, 1024));
 }
 } // namespace VCodecUT
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

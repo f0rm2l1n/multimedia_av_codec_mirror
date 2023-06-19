@@ -27,7 +27,7 @@
 #include <policycoreutils.h>
 
 using namespace testing::ext;
-using namespace OHOS::Media;
+using namespace OHOS::MediaAVCodec;
 namespace {
 constexpr int32_t TEST_CHANNEL_COUNT = 2;
 constexpr int32_t TEST_SAMPLE_RATE = 2;

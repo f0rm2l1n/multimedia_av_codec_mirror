@@ -32,10 +32,10 @@
 
 using namespace std;
 using namespace OHOS;
-using namespace OHOS::Media;
+using namespace OHOS::MediaAVCodec;
 using namespace testing::ext;
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class ActsCodecApiNdkTest : public testing::Test {
 public:
     // SetUpTestCase: Called before all test cases
@@ -68,7 +68,7 @@ void ActsCodecApiNdkTest::TearDown()
         vdec_ = nullptr;
     }
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 /**

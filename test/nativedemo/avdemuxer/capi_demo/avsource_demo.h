@@ -20,7 +20,7 @@
 #include "native_avsource.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVSourceDemo {
 public:
     AVSourceDemo();
@@ -37,7 +37,7 @@ private:
     OH_AVFormat* avformat_ = nullptr;
     OH_AVFormat* trackFormat_ = nullptr;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 
 #endif

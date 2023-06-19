@@ -22,7 +22,7 @@
 #include "plugin_loader.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 class MuxerFactory {
 public:
@@ -76,6 +76,6 @@ private:
     std::vector<std::shared_ptr<PluginLoader>> registeredLoaders_;
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // MUXER_FACTORY_H

@@ -22,7 +22,7 @@
 #include "sync_fence.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace {
 constexpr uint64_t USAGE = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
 constexpr int32_t SURFACE_STRIDE_ALIGN = 8;
@@ -65,6 +65,6 @@ private:
     static ScalingMode scalingMode_;
     static constexpr int32_t INVALID_POSITION = -1;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif

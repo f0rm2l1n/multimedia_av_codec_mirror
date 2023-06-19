@@ -19,7 +19,7 @@
 #include "avcodec_info.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class ICodecListService {
 public:
     virtual ~ICodecListService() = default;
@@ -28,6 +28,6 @@ public:
     virtual int32_t GetCapability(CapabilityData &capabilityData, const std::string &mime, const bool isEncoder,
                                   const AVCodecCategory &category) = 0;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // I_CODECLIST_SERVICE_H

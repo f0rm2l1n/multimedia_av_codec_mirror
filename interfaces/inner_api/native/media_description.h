@@ -19,7 +19,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 /**
  * @brief Provides the uniform container for storing the media description.
  */
@@ -311,6 +311,6 @@ enum MatrixCoefficient : int32_t {
     MATRIX_COEFFICIENT_CHROMATICITY_CL = 13,
     MATRIX_COEFFICIENT_ICTCP = 14,
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // MEDIA_DESCRIPTION_H

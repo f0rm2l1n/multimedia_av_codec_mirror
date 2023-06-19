@@ -21,7 +21,7 @@
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AudioFFMpegAacEncoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegAacEncoderPlugin> {
 public:
     AudioFFMpegAacEncoderPlugin();
@@ -47,6 +47,6 @@ private:
     bool CheckFormat(const Format &format) const;
     std::unique_ptr<AudioFfmpegEncoderPlugin> basePlugin;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif

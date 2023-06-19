@@ -16,7 +16,7 @@
 #include "avformat_capi_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<FormatMock> FormatMockFactory::CreateFormat()
 {
     std::shared_ptr<FormatMock> format = std::make_shared<AVFormatCapiMock>();
@@ -39,5 +39,5 @@ std::shared_ptr<FormatMock> FormatMockFactory::CreateVideoFormat(
     format->InitVideoTrackFormat(mimeType, width, height);
     return format;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

@@ -21,7 +21,7 @@
 
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecServiceProxy : public IRemoteProxy<IStandardCodecService>, public NoCopyable {
 public:
     explicit CodecServiceProxy(const sptr<IRemoteObject> &impl);
@@ -56,6 +56,6 @@ private:
     std::unique_ptr<CodecBufferCache> inputBufferCache_;
     std::unique_ptr<CodecBufferCache> outputBufferCache_;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODEC_SERVICE_PROXY_H

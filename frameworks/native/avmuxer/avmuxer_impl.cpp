@@ -28,7 +28,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<AVMuxer> AVMuxerFactory::CreateAVMuxer(int32_t fd, OutputFormat format)
 {
     AVCodecTrace trace("AVMuxerFactory::CreateAVMuxer");
@@ -111,5 +111,5 @@ int32_t AVMuxerImpl::Stop()
     CHECK_AND_RETURN_RET_LOG(muxerService_ != nullptr, AVCS_ERR_INVALID_OPERATION, "AVMuxer Service does not exist");
     return muxerService_->Stop();
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

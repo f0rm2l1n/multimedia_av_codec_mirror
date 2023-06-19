@@ -18,7 +18,7 @@
 #include "hcodec_loader.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "codecLoader"};
 const char *HCODEC_CREATE_FUNC_NAME = "CreateHCodecByName";
@@ -76,5 +76,5 @@ int32_t HCodecLoader::GetCaps(std::vector<CapabilityData> &caps)
 {
     return getCapsFunc_(caps);
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

@@ -16,7 +16,7 @@
 #include "plugin_buffer.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 Memory::Memory(size_t capacity, std::shared_ptr<uint8_t> bufData, size_t align, MemoryType type)
     : memoryType(type), capacity(capacity), alignment(align),
@@ -203,5 +203,5 @@ void Buffer::Reset()
     flag = 0;
 }
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

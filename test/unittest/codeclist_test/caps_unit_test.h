@@ -19,7 +19,7 @@
 #include "codeclist_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CapsUnitTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -63,6 +63,6 @@ protected:
     std::string sampleRateKey_;
     bool isHardIncluded_ = false;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif

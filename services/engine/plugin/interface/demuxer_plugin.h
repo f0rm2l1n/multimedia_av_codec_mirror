@@ -22,7 +22,7 @@
 #include "avsharedmemory.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 struct DemuxerPlugin : public PluginBase {
     explicit DemuxerPlugin() : PluginBase("Demuxer") {}
@@ -63,6 +63,6 @@ struct DemuxerPluginDef : public PluginDefBase {
     }
 };
 } // namepsace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // DEDEMUXER_PLUGIN_H

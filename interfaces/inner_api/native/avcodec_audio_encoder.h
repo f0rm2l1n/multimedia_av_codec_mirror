@@ -22,7 +22,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVCodecAudioEncoder {
 public:
     virtual ~AVCodecAudioEncoder() = default;
@@ -221,6 +221,6 @@ private:
     AudioEncoderFactory() = default;
     ~AudioEncoderFactory() = default;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_ENCODER_H

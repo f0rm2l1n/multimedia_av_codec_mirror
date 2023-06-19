@@ -17,10 +17,10 @@
 
 using namespace std;
 using namespace OHOS;
-using namespace OHOS::Media;
+using namespace OHOS::MediaAVCodec;
 using namespace testing::ext;
 using namespace testing::mt;
-using namespace OHOS::Media::VCodecTestParam;
+using namespace OHOS::MediaAVCodec::VCodecTestParam;
 
 namespace {
 std::atomic<int32_t> vdecCount = 0;

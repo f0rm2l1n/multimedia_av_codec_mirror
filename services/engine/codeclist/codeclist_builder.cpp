@@ -22,7 +22,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecList_builder"};
 }
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 int32_t VideoCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
 {
     auto ret = Codec::FCodec::GetCodecCapability(caps);
@@ -40,5 +40,5 @@ int32_t AudioCodecList::GetCapabilityList(std::vector<CapabilityData> &caps)
     }
     return AVCS_ERR_OK;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

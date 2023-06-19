@@ -20,7 +20,7 @@
 #include "avdemuxer.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class InnerDemuxerDemo {
 public:
     InnerDemuxerDemo();
@@ -41,7 +41,7 @@ public:
 private:
     std::shared_ptr<AVSource> avsource_ = nullptr;
     std::shared_ptr<AVDemuxer> demuxer_ = nullptr;
-    std::shared_ptr<OHOS::Media::AVSharedMemory> sharedMemory_ = nullptr;
+    std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> sharedMemory_ = nullptr;
     Format source_format_;
     Format track_format_;
 };

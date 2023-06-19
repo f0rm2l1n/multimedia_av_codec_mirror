@@ -26,7 +26,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace AudioDemo {
 enum AudioFormatType : int32_t {
     TYPE_AAC = 0,
@@ -85,6 +85,6 @@ private:
     AudioFormatType audioType_;
 };
 } // namespace AudioDemo
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_DECODER_DEMO_H

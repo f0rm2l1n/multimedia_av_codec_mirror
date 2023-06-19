@@ -38,7 +38,7 @@
 #include <sys/types.h>
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class FileServerMock {
 public:
     explicit FileServerMock();
@@ -55,7 +55,7 @@ private:
     std::unique_ptr<std::thread> fileLoop_ = nullptr;
     int32_t listenFd_ = 0;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 #endif

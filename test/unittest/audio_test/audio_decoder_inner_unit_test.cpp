@@ -28,7 +28,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace OHOS::Media;
+using namespace OHOS::MediaAVCodec;
 
 namespace {
 const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME);
@@ -45,7 +45,7 @@ constexpr uint32_t DEFAULT_AAC_LATM_TYPE = 0;
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class ADecSignal {
 public:
     std::mutex inMutex_;
@@ -120,7 +120,7 @@ protected:
     FILE *inFile_;
     FILE *dumpFd_;
 
-    OHOS::Media::Format format_;
+    OHOS::MediaAVCodec::Format format_;
     std::shared_ptr<AVCodecAudioDecoder> adec_ = {nullptr};
 };
 
@@ -427,7 +427,7 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_GetInputBuffer_01, Test
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateMp3CodecFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceMp3Func());
     sleep(1);
-    std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> buffer = nullptr;
     index_ = -1;
     buffer = adec_->GetInputBuffer(index_);
     EXPECT_EQ(nullptr, buffer);
@@ -470,7 +470,7 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Mp3_GetOutputBuffer_01, Tes
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateMp3CodecFunc());
     EXPECT_EQ(AVCS_ERR_OK, ProceMp3Func());
-    std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> buffer = nullptr;
 
     // case1 传参异常
     index_ = -1;
@@ -692,7 +692,7 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_GetInputBuffer_01, Tes
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateFlacCodecFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceFlacFunc());
     sleep(1);
-    std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> buffer = nullptr;
     index_ = -1;
     buffer = adec_->GetInputBuffer(index_);
     EXPECT_EQ(nullptr, buffer);
@@ -735,7 +735,7 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Flac_GetOutputBuffer_01, Te
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateFlacCodecFunc());
     EXPECT_EQ(AVCS_ERR_OK, ProceFlacFunc());
-    std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> buffer = nullptr;
 
     // case1 传参异常
     index_ = -1;
@@ -1012,7 +1012,7 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_GetInputBuffer_01, Test
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateAacCodecFunc());
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, ProceAacFunc());
     sleep(1);
-    std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> buffer = nullptr;
     index_ = -1;
     buffer = adec_->GetInputBuffer(index_);
     EXPECT_EQ(nullptr, buffer);
@@ -1055,7 +1055,7 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_GetOutputBuffer_01, Tes
 {
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, CreateAacCodecFunc());
     EXPECT_EQ(AVCS_ERR_OK, ProceAacFunc());
-    std::shared_ptr<OHOS::Media::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<OHOS::MediaAVCodec::AVSharedMemory> buffer = nullptr;
 
     // case1 传参异常
     index_ = -1;
@@ -1080,5 +1080,5 @@ HWTEST_F(AudioCodeDecoderInnerUnitTest, audioDecoder_Aac_ReleaseOutputBuffer_01,
     index_ = 0;
     EXPECT_EQ(AVCodecServiceErrCode::AVCS_ERR_OK, adec_->ReleaseOutputBuffer(index_));
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

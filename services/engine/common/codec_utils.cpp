@@ -17,7 +17,7 @@
 #include "avcodec_log.h"
 #include "media_description.h"
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Codec {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "FCodec"};
@@ -318,5 +318,5 @@ int32_t Scale::Convert(uint8_t **srcData, const int32_t *srcLineSize, uint8_t **
     return AVCS_ERR_OK;
 }
 } // namespace Codec
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

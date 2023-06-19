@@ -20,7 +20,7 @@
 #include <memory>
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 constexpr size_t INVALID_POSITION = -1;
 /**
@@ -169,6 +169,6 @@ private:
     friend class Buffer;
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_MEMORY_H

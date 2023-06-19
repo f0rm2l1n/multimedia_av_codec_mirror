@@ -33,7 +33,7 @@ constexpr int INPUT_BUFFER_SIZE_DEFAULT = 8192;
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 constexpr std::string_view AUDIO_CODEC_NAME = "mp3";
 AudioFFMpegMp3DecoderPlugin::AudioFFMpegMp3DecoderPlugin() : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
@@ -148,5 +148,5 @@ std::string_view AudioFFMpegMp3DecoderPlugin::GetCodecType() const noexcept
 {
     return AUDIO_CODEC_NAME;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

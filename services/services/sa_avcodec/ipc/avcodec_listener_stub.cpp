@@ -21,7 +21,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecLis
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 AVCodecListenerStub::AVCodecListenerStub()
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
@@ -31,5 +31,5 @@ AVCodecListenerStub::~AVCodecListenerStub()
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

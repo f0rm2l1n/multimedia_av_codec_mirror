@@ -16,7 +16,7 @@
 #include "videodec_capi_mock.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 std::shared_ptr<VideoDecMock> VCodecMockFactory::CreateVideoDecMockByMime(const std::string &mime)
 {
     OH_AVCodec *videoDec = OH_VideoDecoder_CreateByMime(mime.c_str());
@@ -34,5 +34,5 @@ std::shared_ptr<VideoDecMock> VCodecMockFactory::CreateVideoDecMockByName(const 
     }
     return nullptr;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

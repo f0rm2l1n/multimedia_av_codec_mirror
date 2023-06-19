@@ -21,7 +21,7 @@
 #include "avsharedmemory.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class IDemuxerService {
 public:
     virtual ~IDemuxerService() = default;
@@ -33,6 +33,6 @@ public:
         AVCodecBufferInfo &info, AVCodecBufferFlag &flag) = 0;
     virtual int32_t SeekToTime(int64_t millisecond, const AVSeekMode mode) = 0;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // I_DEMUXER_SERVICE_H

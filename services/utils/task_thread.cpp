@@ -21,7 +21,7 @@ namespace {
     constexpr uint8_t LOGD_FREQUENCY = 5;
 }
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 TaskThread::TaskThread(std::string_view name) : name_(name), runningState_(RunningState::STOPPED), loop_(nullptr)
 {
     AVCODEC_LOGD("task %{public}s ctor called", name_.data());
@@ -155,5 +155,5 @@ void TaskThread::Run()
         }
     }
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

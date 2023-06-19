@@ -20,7 +20,7 @@
 #include "plugin_definition.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 class PluginLoader {
 public:
@@ -52,6 +52,6 @@ private:
     UnregisterFunc unregisterFunc_ {nullptr};
 };
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // PLUGIN_CORE_PLUGIN_LOADER_H

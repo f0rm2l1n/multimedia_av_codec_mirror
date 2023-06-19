@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AudioFfmpegEncoderPlugin : NoCopyable {
     using HeaderFunc = std::function<int32_t(std::string &header, uint32_t &headerSize, std::shared_ptr<AVCodecContext>,
                                              uint32_t dataLength)>;
@@ -80,7 +80,7 @@ private:
     bool headerFuncValid_ = false;
     uint32_t channelsBytesPerSample_ {1};
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 #endif

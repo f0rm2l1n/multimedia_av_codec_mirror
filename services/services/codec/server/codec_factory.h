@@ -20,7 +20,7 @@
 #include "codecbase.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecFactory {
 public:
     static CodecFactory &Instance();
@@ -31,6 +31,6 @@ private:
     CodecFactory() = default;
     ~CodecFactory();
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODEC_FACTORY_H

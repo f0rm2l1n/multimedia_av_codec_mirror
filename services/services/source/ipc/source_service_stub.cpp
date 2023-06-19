@@ -27,19 +27,23 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "SourceAVServiceStub"};
 
     const std::map<int32_t, std::string> SOURCE_FUNC_NAME = {
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::INIT_WITH_URI, "SourceServiceStub InitWithURI" },
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::INIT_WITH_FD, "SourceServiceStub InitWithFD" },
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_TRACK_COUNT, "SourceServiceStub GetTrackCount" },
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::DESTROY, "SourceServiceStub Destroy" },
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_TRACK_FORMAT, "SourceServiceStub GetTrackFormat" },
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_SOURCE_FORMAT, "SourceServiceStub GetSourceFormat" },
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::GET_SOURCE_ADDR, "SourceServiceStub GetSourceAddr" },
-        { OHOS::Media::SourceServiceStub::SourceServiceMsg::DESTROY_STUB, "SourceServiceStub DestroyStub" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::INIT_WITH_URI, "SourceServiceStub InitWithURI" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::INIT_WITH_FD, "SourceServiceStub InitWithFD" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_TRACK_COUNT,
+            "SourceServiceStub GetTrackCount" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::DESTROY, "SourceServiceStub Destroy" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_TRACK_FORMAT,
+            "SourceServiceStub GetTrackFormat" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_SOURCE_FORMAT,
+            "SourceServiceStub GetSourceFormat" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::GET_SOURCE_ADDR,
+            "SourceServiceStub GetSourceAddr" },
+        { OHOS::MediaAVCodec::SourceServiceStub::SourceServiceMsg::DESTROY_STUB, "SourceServiceStub DestroyStub" },
     };
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 sptr<SourceServiceStub> SourceServiceStub::Create()
 {
     sptr<SourceServiceStub> sourceStub = new(std::nothrow) SourceServiceStub();
@@ -224,5 +228,5 @@ int32_t SourceServiceStub::GetSourceAddr(MessageParcel &data, MessageParcel &rep
     CHECK_AND_RETURN_RET_LOG(reply.WriteInt32(ret), AVCS_ERR_UNKNOWN, "Reply GetSourceAddr failed!");
     return AVCS_ERR_OK;
 }
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS

@@ -36,7 +36,8 @@
           "hisysevent_native",
           "c_utils",
           "hilog_native",
-          "hitrace_native"
+          "hitrace_native",
+          "graphic_standard"
         ],
         "third_party": [
           "glib",

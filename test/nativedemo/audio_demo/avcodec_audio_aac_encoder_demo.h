@@ -26,7 +26,7 @@
 #include "native_avcodec_audioencoder.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace AudioAacDemo {
 class AEncSignal {
 public:
@@ -74,6 +74,6 @@ private:
     uint32_t frameCount_ = 0;
 };
 } // namespace AudioAacDemo
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_AAC_ENCODER_DEMO_H

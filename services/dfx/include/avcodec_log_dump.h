@@ -21,7 +21,7 @@
 #include <mutex>
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class __attribute__((visibility("default"))) AVCodecLogDump {
 public:
     static AVCodecLogDump &GetInstance();
@@ -48,13 +48,13 @@ private:
 #ifdef  OHOS_MEDIA_AVCODEC_LOG_DUMP
 #define AVCODEC_DUMP_LOG(fmt, args...)                                            \
     do {                                                                            \
-        (void)OHOS::Media::AVCodecLogDump::GetInstance().SaveLog(                   \
+        (void)OHOS::MediaAVCodec::AVCodecLogDump::GetInstance().SaveLog(                   \
             "{%s():%d} " fmt, __FUNCTION__, __LINE__, ##args);                      \
     } while (0)
 #else
 #define AVCODEC_DUMP_LOG(fmt, args...)
 #endif
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 #endif // AVCODEC_LOG_DUMP_H

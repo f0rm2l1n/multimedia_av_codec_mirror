@@ -27,7 +27,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 static std::string g_libFileHead = "libav_codec_plugin_";
 static std::string g_fileSeparator = "/";
@@ -195,5 +195,5 @@ bool DemuxerFactory::RegisterImpl::VersionMatched(const PluginDefBase& definitio
     return (major == coreMajor) && (minor <= coreMinor);
 }
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

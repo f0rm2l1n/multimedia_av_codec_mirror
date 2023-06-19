@@ -17,7 +17,7 @@
 #define AV_CODEC_AUDIO_COMMON_INFO_H
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 enum class BufferStatus {
     IDLE,
     OWEN_BY_CLIENT,
@@ -36,7 +36,7 @@ enum class CodecState {
     RESUMING,     // FLUSHED -> RUNNING
     RELEASING,    // {ANY EXCEPT RELEASED} -> RELEASED
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 
 #endif

@@ -22,7 +22,7 @@
 #include "native_avmuxer.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVMuxerCapiMock : public AVMuxerMock {
 public:
     explicit AVMuxerCapiMock(OH_AVMuxer *muxer) : muxer_(muxer) {}
@@ -36,6 +36,6 @@ public:
 private:
     OH_AVMuxer *muxer_ = nullptr;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVMUXER_CAPI_MOCK_H

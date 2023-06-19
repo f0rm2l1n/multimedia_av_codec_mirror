@@ -41,7 +41,7 @@ static std::string g_fileSeparator = "/";
 static std::string g_libFileTail = ".z.so";
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "Source"};
@@ -671,5 +671,5 @@ uintptr_t Source::GetSourceAddr()
     return (uintptr_t)(formatContext_.get());
 }
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

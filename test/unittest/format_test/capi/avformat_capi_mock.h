@@ -20,7 +20,7 @@
 #include "native_avformat.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVFormatCapiMock : public FormatMock {
 public:
     explicit AVFormatCapiMock(OH_AVFormat *format) : format_(format) {}
@@ -49,6 +49,6 @@ public:
 private:
     OH_AVFormat *format_;
 };
-}  // namespace Media
+}  // namespace MediaAVCodec
 }  // namespace OHOS
 #endif // AVFORMAT_CAPI_MOCK_H

@@ -23,7 +23,7 @@
 #include "avsource_impl.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class AVDemuxerImpl : public AVDemuxer, public NoCopyable {
 public:
     AVDemuxerImpl();
@@ -40,6 +40,6 @@ private:
     std::shared_ptr<IDemuxerService> demuxerClient_ = nullptr;
     std::string sourceUri_;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVDEMUXER_IMPL_H

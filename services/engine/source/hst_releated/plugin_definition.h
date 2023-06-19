@@ -22,7 +22,7 @@
 #include "plugin_types.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace Plugin {
 /**
  * @enum Plugin Return Status.
@@ -223,10 +223,10 @@ using UnregisterFunc = void (*)();
  */
 #define PLUGIN_DEFINITION(name, license, registerFunc, unregisterFunc)                                                 \
     PLUGIN_EXPORT Status PLUGIN_PASTE(register_, name)(                                                                \
-        const std::shared_ptr<OHOS::Media::Plugin::PackageRegister>& pkgReg)                                           \
+        const std::shared_ptr<OHOS::MediaAVCodec::Plugin::PackageRegister>& pkgReg)                                    \
     {                                                                                                                  \
         pkgReg->AddPackage({ PLUGIN_INTERFACE_VERSION, PLUGIN_STRINGIFY(name), license });                             \
-        std::shared_ptr<OHOS::Media::Plugin::Register> pluginReg = pkgReg;                                             \
+        std::shared_ptr<OHOS::MediaAVCodec::Plugin::Register> pluginReg = pkgReg;                                      \
         return registerFunc(pluginReg);                                                                                \
     }                                                                                                                  \
     PLUGIN_EXPORT void PLUGIN_PASTE(unregister_, name)()                                                               \
@@ -234,6 +234,6 @@ using UnregisterFunc = void (*)();
         unregisterFunc();                                                                                              \
     }
 } // namespace Plugin
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // PLUGIN_INTF_PLUGIN_DEFINITION_H

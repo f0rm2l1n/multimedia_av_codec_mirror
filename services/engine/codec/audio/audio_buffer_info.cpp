@@ -24,7 +24,7 @@ constexpr uint8_t LOGD_FREQUENCY = 5;
 } // namespace
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 AudioBufferInfo::AudioBufferInfo(const uint32_t &bufferSize, const std::string_view &name, const uint32_t &metaSize,
                                  size_t align)
     : isHasMeta_(false),
@@ -158,5 +158,5 @@ bool AudioBufferInfo::ResetBuffer()
     }
     return true;
 }
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS

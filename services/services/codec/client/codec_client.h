@@ -21,7 +21,7 @@
 #include "codec_listener_stub.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 class CodecClient : public ICodecService {
 public:
     static std::shared_ptr<CodecClient> Create(const sptr<IStandardCodecService> &ipcProxy);
@@ -57,6 +57,6 @@ private:
     std::shared_ptr<AVCodecCallback> callback_ = nullptr;
     std::mutex mutex_;
 };
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // CODEC_CLIENT_H

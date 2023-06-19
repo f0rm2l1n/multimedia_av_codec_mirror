@@ -26,7 +26,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace Media {
+namespace MediaAVCodec {
 namespace InnerAudioDemo {
 class AEnSignal {
 public:
@@ -79,6 +79,6 @@ private:
     std::shared_ptr<AEnDemoCallback> cb_;
 };
 } // namespace InnerAudioDemo
-} // namespace Media
+} // namespace MediaAVCodec
 } // namespace OHOS
 #endif // AVCODEC_AUDIO_DECODER_INNER_DEMO_H
