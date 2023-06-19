@@ -337,13 +337,15 @@ Status FFmpegMuxerPlugin::WriteSample(uint32_t trackIndex, const uint8_t *sample
         "av_write_frame sample is null!");
     CHECK_AND_RETURN_RET_LOG(trackIndex < formatContext_->nb_streams,
         Status::ERROR_INVALID_PARAMETER, "track index is invalid!");
-    av_init_packet(cachePacket_.get());
+    (void)memset_s(cachePacket_.get(), sizeof(AVPacket), 0, sizeof(AVPacket));
     cachePacket_->data = const_cast<uint8_t *>(sample);
     cachePacket_->size = info.size;
     cachePacket_->stream_index = static_cast<int>(trackIndex);
     cachePacket_->pts = ConvertTimeToFFmpeg(info.presentationTimeUs, formatContext_->streams[trackIndex]->time_base);
     if (formatContext_->streams[trackIndex]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
         cachePacket_->dts = cachePacket_->pts;
+    } else {
+        cachePacket_->dts = AV_NOPTS_VALUE;
     }
     cachePacket_->flags = 0;
     if (flag & AVCODEC_BUFFER_FLAG_SYNC_FRAME) {
