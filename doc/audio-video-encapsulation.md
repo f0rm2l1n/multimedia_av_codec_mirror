@@ -29,7 +29,7 @@
 
 > **说明：**
 > 
-> 如果调用封装能力写本地文件，需要[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.WRITE_MEDIA
+> 如果调用封装能力写本地文件，需要[申请相关权限](../security/accesstoken-guidelines.md)：ohos.permission.READ_MEDIA, ohos.permission.WRITE_MEDIA
 
 参考以下示例代码，完成音视频封装的全流程。以封装mp4格式的音视频文件为例。
 
@@ -40,7 +40,7 @@
    OH_AVOutputFormat format = AV_OUTPUT_FORMAT_MPEG_4;
    // 以读写方式创建fd
    int32_t fd = open("test.mp4", O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
-   OH_AVMuxer *muxer = OH_AVMuxer_Create(fd, OH_AVOutputFormat format);
+   OH_AVMuxer *muxer = OH_AVMuxer_Create(fd, format);
    ```
 
 2. （可选）调用OH_AVMuxer_SetRotation()设置旋转角度。

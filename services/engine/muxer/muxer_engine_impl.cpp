@@ -219,6 +219,7 @@ int32_t MuxerEngineImpl::WriteSample(uint32_t trackIndex, std::shared_ptr<AVShar
         sample->GetSize() >= (info.offset + info.size), AVCS_ERR_INVALID_VAL, "Invalid memory");
 
     std::shared_ptr<uint8_t> buffer = pool_.AcquireBuffer(info.size);
+    CHECK_AND_RETURN_RET_LOG(buffer != nullptr, AVCS_ERR_NO_MEMORY, "AcquireBuffer from pool failed");
     errno_t rc = memcpy_s(buffer.get(), info.size, sample->GetBase() + info.offset, info.size);
     CHECK_AND_RETURN_RET_LOG(rc == EOK, AVCS_ERR_UNKNOWN, "memcpy_s failed");
 
