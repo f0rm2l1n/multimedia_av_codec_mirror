@@ -40,7 +40,7 @@
    OH_AVOutputFormat format = AV_OUTPUT_FORMAT_MPEG_4;
    // 以读写方式创建fd
    int32_t fd = open("test.mp4", O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR);
-   OH_AVMuxer *muxer = OH_AVMuxer_Create(fd, OH_AVOutputFormat format);
+   OH_AVMuxer *muxer = OH_AVMuxer_Create(fd, format);
    ```
 
 2. （可选）调用OH_AVMuxer_SetRotation()设置旋转角度。
