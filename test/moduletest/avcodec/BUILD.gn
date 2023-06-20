@@ -17,7 +17,7 @@ import("//foundation/multimedia/av_codec/config.gni")
 MEDIA_ROOT_DIR = "//foundation/multimedia/av_codec/"
 module_output_path = "av_codec/moduletest"
 
-swdecoder_moduletest_native_include_dirs = [
+avcodec_moduletest_native_include_dirs = [
   "./include",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/frameworks/surface/include",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/interfaces/inner_api",
@@ -28,7 +28,7 @@ swdecoder_moduletest_native_include_dirs = [
   "$MEDIA_ROOT_DIR/../../../third_party/openssl/ohos_lite/include",
 ]
 
-swdecoder_moduletest_cflags = [
+avcodec_moduletest_cflags = [
   "-std=c++17",
   "-fno-rtti",
   "-fno-exceptions",
@@ -51,22 +51,16 @@ swdecoder_moduletest_cflags = [
 ]
 
 ##################################################################################################################
-ohos_unittest("swdecoder_native_module_test") {
+ohos_unittest("avcodec_native_module_test") {
   module_out_path = module_output_path
-  include_dirs = swdecoder_moduletest_native_include_dirs
+  include_dirs = avcodec_moduletest_native_include_dirs
   include_dirs += [ "./" ]
 
-  cflags = swdecoder_moduletest_cflags
+  cflags = avcodec_moduletest_cflags
 
   if (multimedia_av_codec_support_codec) {
     sources = [
-      "./src/api_test.cpp",
-      "./src/func_test.cpp",
-      #"./src/perf_test.cpp",
-      #"./src/reli_test.cpp",
-      "./src/state_test.cpp",
-      #"./src/compatibility_test.cpp",
-      "./src/videodec_ndk_sample.cpp",
+      "./func_test.cpp"
     ]
   }
 
@@ -79,13 +73,14 @@ ohos_unittest("swdecoder_native_module_test") {
     "$MEDIA_ROOT_DIR/../../window/window_manager/wm:libwm",
     "$MEDIA_ROOT_DIR//interfaces/kits/c:native_av_codec_core",
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native:av_codec_client",
-    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_codec",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_avdemuxer",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_avmuxer",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_avsource",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_codec"
   ]
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_core"
   ]
-  resource_config_file =
-      "$MEDIA_ROOT_DIR/test/moduletest/resources/ohos_test.xml"
 }

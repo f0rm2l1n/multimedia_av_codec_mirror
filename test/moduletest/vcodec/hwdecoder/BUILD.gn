@@ -17,7 +17,7 @@ import("//foundation/multimedia/av_codec/config.gni")
 MEDIA_ROOT_DIR = "//foundation/multimedia/av_codec/"
 module_output_path = "av_codec/moduletest"
 
-swdecoder_moduletest_native_include_dirs = [
+hwdecoder_moduletest_native_include_dirs = [
   "./include",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/frameworks/surface/include",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/interfaces/inner_api",
@@ -28,7 +28,7 @@ swdecoder_moduletest_native_include_dirs = [
   "$MEDIA_ROOT_DIR/../../../third_party/openssl/ohos_lite/include",
 ]
 
-swdecoder_moduletest_cflags = [
+hwdecoder_moduletest_cflags = [
   "-std=c++17",
   "-fno-rtti",
   "-fno-exceptions",
@@ -51,12 +51,12 @@ swdecoder_moduletest_cflags = [
 ]
 
 ##################################################################################################################
-ohos_unittest("swdecoder_native_module_test") {
+ohos_unittest("hwdecoder_native_module_test") {
   module_out_path = module_output_path
-  include_dirs = swdecoder_moduletest_native_include_dirs
+  include_dirs = hwdecoder_moduletest_native_include_dirs
   include_dirs += [ "./" ]
 
-  cflags = swdecoder_moduletest_cflags
+  cflags = hwdecoder_moduletest_cflags
 
   if (multimedia_av_codec_support_codec) {
     sources = [

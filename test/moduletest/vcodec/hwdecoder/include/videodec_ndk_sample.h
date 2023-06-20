@@ -16,23 +16,23 @@
 #ifndef VIDEODEC_NDK_SAMPLE_H
 #define VIDEODEC_NDK_SAMPLE_H
 
-#include "native_avcodec_videodecoder.h"
-#include "native_averrors.h"
-#include "native_avformat.h"
-#include "native_avmemory.h"
-#include "nocopyable.h"
-#include "securec.h"
-#include "surface/window.h"
-#include <atomic>
-#include <cstdio>
-#include <fstream>
 #include <iostream>
+#include <cstdio>
+#include <unistd.h>
+#include <atomic>
+#include <fstream>
+#include <thread>
 #include <mutex>
 #include <queue>
 #include <string>
-#include <thread>
-#include <unistd.h>
 #include <unordered_map>
+#include "securec.h"
+#include "native_avcodec_videodecoder.h"
+#include "nocopyable.h"
+#include "native_avmemory.h"
+#include "native_avformat.h"
+#include "native_averrors.h"
+#include "surface/window.h"
 
 namespace OHOS {
 namespace Media {
@@ -61,14 +61,13 @@ public:
     uint32_t DEFAULT_WIDTH = 1920;
     uint32_t DEFAULT_HEIGHT = 1080;
     uint32_t DEFAULT_FRAME_RATE = 30;
-    uint32_t DEFAULT_ROTATION = 0;
-    uint32_t DEFAULT_PIXEL_FORMAT = 1;
     bool BEFORE_EOS_INPUT = false;              // 0800 测试用例
     bool BEFORE_EOS_INPUT_INPUT = false;        // 0900 测试用例
     bool AFTER_EOS_DESTORY_CODEC = true;        // 1000 测试用例 结束不销毁codec
     uint32_t REPEAT_START_STOP_BEFORE_EOS = 0;  // 1200 测试用例
     uint32_t REPEAT_START_FLUSH_BEFORE_EOS = 0; // 1300 测试用例
     uint32_t frameCount_ = 0;
+    uint32_t repeat_time = 0;
     const char *fileSourcesha256[64] = {"27", "6D", "A2", "D4", "18", "21", "A5", "CD", "50", "F6", "DD", "CA", "46",
                                         "32", "C3", "FE", "58", "FC", "BC", "51", "FD", "70", "C7", "D4", "E7", "4D",
                                         "5C", "76", "E7", "71", "8A", "B3", "C0", "51", "84", "0A", "FA", "AF", "FA",
@@ -78,7 +77,6 @@ public:
     int32_t Start();
     int32_t Stop();
     int32_t Flush();
-    void Flush_buffer();
     int32_t Reset();
     int32_t EOS();
     int32_t state_EOS();
@@ -89,11 +87,13 @@ public:
     int32_t CreateVideoDecoder(std::string codeName);
     int32_t SetVideoDecoderCallback();
     int32_t SetSurface(OHNativeWindow *window);
+    void testAPI();
     int32_t Release();
     int32_t SetParameter(OH_AVFormat *format);
+    void InputFunc();
     void OutputFunc();
-    void InputFunc_AVCC();
-    OH_AVErrCode InputFunc_FUZZ(const uint8_t *data, size_t size);
+    void InputFuncTest();
+    void OutputFuncTest();
     void ReleaseSignal();
     void ReleaseInFile();
     void StopInloop();
@@ -106,21 +106,20 @@ public:
     int64_t outTimeArray[2000] = {};
     bool sleepOnFPS = false;
     bool repeatRun = false;
+    int64_t decode_count = 0;
     int64_t start_time = 0;
     int64_t end_time = 0;
-    bool setParameters = false;
-    OH_AVCodec *vdec_;
-
 private:
-    std::atomic<bool> isRunning_{false};
+    std::atomic<bool> isRunning_ {false};
     std::unique_ptr<std::ifstream> inFile_;
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
     std::unordered_map<uint32_t, OH_AVMemory *> inBufferMap_;
     std::unordered_map<uint32_t, OH_AVMemory *> outBufferMap_;
+    OH_AVCodec *vdec_;
     OH_AVCodecAsyncCallback cb_;
-    int64_t timeStamp_{0};
-    int64_t lastRenderedTimeUs_{0};
+    int64_t timeStamp_ {0};
+    int64_t lastRenderedTimeUs_ {0};
     bool isFirstFrame_ = true;
 };
 } // namespace Media

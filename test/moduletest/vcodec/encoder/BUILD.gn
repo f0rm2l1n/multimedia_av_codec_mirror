@@ -17,18 +17,17 @@ import("//foundation/multimedia/av_codec/config.gni")
 MEDIA_ROOT_DIR = "//foundation/multimedia/av_codec/"
 module_output_path = "av_codec/moduletest"
 
-swdecoder_moduletest_native_include_dirs = [
+encoder_moduletest_native_include_dirs = [
   "./include",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/frameworks/surface/include",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/interfaces/inner_api",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/interfaces/inner_api/surface",
   "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/interfaces/inner_api/common",
-  "$MEDIA_ROOT_DIR/interfaces/inner_api/native",
   "$MEDIA_ROOT_DIR/interfaces/kits/c",
   "$MEDIA_ROOT_DIR/../../../third_party/openssl/ohos_lite/include",
 ]
 
-swdecoder_moduletest_cflags = [
+encoder_moduletest_cflags = [
   "-std=c++17",
   "-fno-rtti",
   "-fno-exceptions",
@@ -51,12 +50,11 @@ swdecoder_moduletest_cflags = [
 ]
 
 ##################################################################################################################
-ohos_unittest("swdecoder_native_module_test") {
+ohos_unittest("encoder_native_module_test") {
   module_out_path = module_output_path
-  include_dirs = swdecoder_moduletest_native_include_dirs
+  include_dirs = encoder_moduletest_native_include_dirs
   include_dirs += [ "./" ]
-
-  cflags = swdecoder_moduletest_cflags
+  cflags = encoder_moduletest_cflags
 
   if (multimedia_av_codec_support_codec) {
     sources = [
@@ -65,8 +63,7 @@ ohos_unittest("swdecoder_native_module_test") {
       #"./src/perf_test.cpp",
       #"./src/reli_test.cpp",
       "./src/state_test.cpp",
-      #"./src/compatibility_test.cpp",
-      "./src/videodec_ndk_sample.cpp",
+      "./src/videoenc_ndk_sample.cpp",
     ]
   }
 
@@ -75,17 +72,15 @@ ohos_unittest("swdecoder_native_module_test") {
     "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/frameworks/surface:surface",
     "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/utils:libgraphic_utils",
-    "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/utils:sync_fence",
-    "$MEDIA_ROOT_DIR/../../window/window_manager/wm:libwm",
-    "$MEDIA_ROOT_DIR//interfaces/kits/c:native_av_codec_core",
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native:av_codec_client",
     "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_codec",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_av_codec_core",
+    "$MEDIA_ROOT_DIR/../../window/window_manager/wm:libwm",
   ]
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
-  resource_config_file =
-      "$MEDIA_ROOT_DIR/test/moduletest/resources/ohos_test.xml"
+  #resource_config_file = "$MEDIA_ROOT_DIR/test/moduletest/resources/ohos_test.xml"
 }
