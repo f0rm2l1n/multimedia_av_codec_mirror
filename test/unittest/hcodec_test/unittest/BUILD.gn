@@ -12,11 +12,10 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//foundation/multimedia/av_codec/config.gni")
 
 config("hcodec_unittest_cfg") {
-  cflags_cc = [
-    "-fexceptions",
-  ]
+  cflags_cc = [ "-fexceptions" ]
 
   include_dirs = [
     "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec/",
@@ -32,13 +31,11 @@ ohos_unittest("hdecoder_unit_test") {
   testonly = true
   configs = [ ":hcodec_unittest_cfg" ]
   module_out_path = "av_codec/hcodec"
-  sources = [
-      "hdecoder_unit_test.cpp"
-  ]
+  sources = [ "hdecoder_unit_test.cpp" ]
   deps = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//commonlibrary/c_utils/base:utils",
+    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
   ]
   external_deps = [
     "drivers_interface_codec:codec_idl_headers",
@@ -50,13 +47,11 @@ ohos_unittest("hencoder_unit_test") {
   testonly = true
   configs = [ ":hcodec_unittest_cfg" ]
   module_out_path = "av_codec/hcodec"
-  sources = [
-      "hencoder_unit_test.cpp",
-  ]
+  sources = [ "hencoder_unit_test.cpp" ]
   deps = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//commonlibrary/c_utils/base:utils",
+    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
   ]
   external_deps = [
     "drivers_interface_codec:codec_idl_headers",
@@ -68,18 +63,14 @@ ohos_unittest("hcodec_list_unit_test") {
   testonly = true
   configs = [ ":hcodec_unittest_cfg" ]
   module_out_path = "av_codec/hcodec"
-  sources = [
-      "hcodec_list_unit_test.cpp",
-  ]
+  sources = [ "hcodec_list_unit_test.cpp" ]
   deps = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//commonlibrary/c_utils/base:utils",
+    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
   ]
   external_deps = [
     "drivers_interface_codec:codec_idl_headers",
     "hdf_core:libhdi",
   ]
 }
-
-

@@ -12,27 +12,28 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/multimedia/av_codec/config.gni")
 
 ohos_executable("hdecoder_demo") {
   install_enable = false
   subsystem_name = "multimedia"
   part_name = "av_codec"
   sources = [
+    "command_parser.cpp",
     "hdecoder_test.cpp",
     "start_code_detector.cpp",
-    "command_parser.cpp",
   ]
   include_dirs = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec/",
-    "//foundation/multimedia/av_codec/interfaces/inner_api/native/",
-    "//foundation/multimedia/av_codec/interfaces/kits/c/",
+    "$av_codec_root_dir/services/engine/codec/video/hcodec/",
+    "$av_codec_root_dir/interfaces/inner_api/native/",
+    "$av_codec_root_dir/interfaces/kits/c/",
     "//foundation/window/window_manager/interfaces/innerkits/wm/",
   ]
   deps = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
+    "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/window/window_manager/wm:libwm",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
+    "//foundation/window/window_manager/wm:libwm",
   ]
 }
 
@@ -41,39 +42,35 @@ ohos_executable("hencoder_demo") {
   subsystem_name = "multimedia"
   part_name = "av_codec"
   sources = [
-    "hencoder_test.cpp",
     "command_parser.cpp",
+    "hencoder_test.cpp",
   ]
   include_dirs = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec/",
-    "//foundation/multimedia/av_codec/interfaces/inner_api/native/",
-    "//foundation/multimedia/av_codec/interfaces/kits/c/",
+    "$av_codec_root_dir/services/engine/codec/video/hcodec/",
+    "$av_codec_root_dir/interfaces/inner_api/native/",
+    "$av_codec_root_dir/interfaces/kits/c/",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/codec/interfaces/include/",
   ]
   deps = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec:hcodec",
+    "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
   ]
-  external_deps = [
-    "drivers_interface_codec:codec_idl_headers",
-  ]
+  external_deps = [ "drivers_interface_codec:codec_idl_headers" ]
 }
 
 ohos_executable("create_hcodec_by_capi") {
   install_enable = false
   subsystem_name = "multimedia"
   part_name = "av_codec"
-  sources = [
-    "create_by_capi.cpp",
-  ]
+  sources = [ "create_by_capi.cpp" ]
   include_dirs = [
-    "//foundation/multimedia/av_codec/services/engine/codec/video/hcodec/",
-    "//foundation/multimedia/av_codec/interfaces/kits/c/",
+    "$av_codec_root_dir/services/engine/codec/video/hcodec/",
+    "$av_codec_root_dir/interfaces/kits/c/",
   ]
   deps = [
+    "$av_codec_root_dir/interfaces/inner_api/native:av_codec_client",
+    "$av_codec_root_dir/interfaces/kits/c:capi_packages",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/multimedia/av_codec/interfaces/kits/c:capi_packages",
-    "//foundation/multimedia/av_codec/interfaces/inner_api/native:av_codec_client",
   ]
 }

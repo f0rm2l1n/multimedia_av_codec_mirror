@@ -14,11 +14,11 @@
 group("hcodec_unit_test") {
   testonly = true
   deps = [
+    "demo:create_hcodec_by_capi",
     "demo:hdecoder_demo",
     "demo:hencoder_demo",
-    "demo:create_hcodec_by_capi",
+    "unittest:hcodec_list_unit_test",
     "unittest:hdecoder_unit_test",
     "unittest:hencoder_unit_test",
-    "unittest:hcodec_list_unit_test",
   ]
 }
