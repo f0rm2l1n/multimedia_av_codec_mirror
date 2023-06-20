@@ -31,11 +31,11 @@ ohos_executable("hdecoder_demo") {
   ]
   deps = [ "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec" ]
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
     "graphic_standard:librender_service_client",
-    "window_manager:libwm",
     "graphic_standard:surface",
     "graphic_standard:sync_fence",
+    "hiviewdfx_hilog_native:libhilog",
+    "window_manager:libwm",
   ]
 }
 
@@ -55,7 +55,7 @@ ohos_executable("hencoder_demo") {
     "$av_codec_root_dir/../../../drivers/peripheral/codec/interfaces/include/",
   ]
   deps = [ "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec" ]
-  external_deps = [ 
+  external_deps = [
     "drivers_interface_codec:codec_idl_headers",
     "graphic_standard:surface",
     "graphic_standard:sync_fence",
@@ -75,9 +75,9 @@ ohos_executable("create_hcodec_by_capi") {
     "$av_codec_root_dir/interfaces/inner_api/native:av_codec_client",
     "$av_codec_root_dir/interfaces/kits/c:capi_packages",
   ]
-  external_deps = [ 
-    "hiviewdfx_hilog_native:libhilog",
+  external_deps = [
     "graphic_standard:surface",
     "graphic_standard:sync_fence",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 }
