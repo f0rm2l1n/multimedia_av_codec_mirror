@@ -146,7 +146,7 @@ int64_t FFmpegDemuxerPlugin::GetTotalStreamFrames(int streamIndex)
 AVCodecBufferFlag FFmpegDemuxerPlugin::ConvertFlagsFromFFmpeg(AVPacket* pkt,  AVStream* avStream)
 {
     AVCodecBufferFlag flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_NONE;
-    if (pkt->flags & AV_PKT_FLAG_KEY) {
+    if (static_cast<uint32_t>(pkt->flags) & static_cast<uint32_t>(AV_PKT_FLAG_KEY)) {
         flags = AVCodecBufferFlag::AVCODEC_BUFFER_FLAG_SYNC_FRAME;
     }
     return flags;
