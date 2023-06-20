@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecAbili
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> GetCodecLists()
 {
     std::unordered_map<CodecType, std::shared_ptr<CodecListBase>> codecLists;
@@ -100,5 +100,5 @@ std::unordered_map<std::string, std::vector<size_t>> CodecAbilitySingleton::GetM
     std::lock_guard<std::mutex> lock(mutex_);
     return mimeCapIdxMap_;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

@@ -29,18 +29,18 @@ namespace {
     constexpr int32_t FILE_BIT_STREAM_MAX = 1000;
     constexpr uint8_t HEX_WIDTH = 2;
 
-    const std::map<OHOS::MediaAVCodec::BitStreamDumpType, std::string_view> BIT_STREAM_DUMP_MAP = {
-        { OHOS::MediaAVCodec::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_DEFAULT, "Default" },
-        { OHOS::MediaAVCodec::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_VCODEC, "Video_Codec" },
-        { OHOS::MediaAVCodec::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_ACODEC, "Audio_Codec" },
-        { OHOS::MediaAVCodec::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_MUXER, "Muxer" },
-        { OHOS::MediaAVCodec::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_DEMUXER, "Demuxer" },
-        { OHOS::MediaAVCodec::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_SOURCE, "Source" },
+    const std::map<OHOS::Media::BitStreamDumpType, std::string_view> BIT_STREAM_DUMP_MAP = {
+        { OHOS::Media::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_DEFAULT, "Default" },
+        { OHOS::Media::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_VCODEC, "Video_Codec" },
+        { OHOS::Media::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_ACODEC, "Audio_Codec" },
+        { OHOS::Media::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_MUXER, "Muxer" },
+        { OHOS::Media::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_DEMUXER, "Demuxer" },
+        { OHOS::Media::BitStreamDumpType::BIT_STREAM_DUMP_TYPE_SOURCE, "Source" },
     };
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AVCodecBitStreamDumper &AVCodecBitStreamDumper::GetInstance()
 {
     static AVCodecBitStreamDumper avcodecBitStreamDumper;
@@ -183,5 +183,5 @@ void AVCodecBitStreamDumper::TaskProcessor()
         ofStream.close();
     }
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

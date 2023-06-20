@@ -23,7 +23,7 @@
 #include "avcodec_common.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class IMuxerEngine {
 public:
     virtual ~IMuxerEngine() = default;
@@ -44,6 +44,6 @@ private:
     IMuxerEngineFactory() = default;
     ~IMuxerEngineFactory() = default;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // IMUXER_ENGINE_H

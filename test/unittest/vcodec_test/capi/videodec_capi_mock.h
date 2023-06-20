@@ -24,7 +24,7 @@
 
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class VideoDecCapiMock : public VideoDecMock {
 public:
     explicit VideoDecCapiMock(OH_AVCodec *codec) : codec_(codec) {}
@@ -59,6 +59,6 @@ private:
     static std::map<OH_AVCodec *, std::shared_ptr<AVCodecCallbackMock>> mockCbMap_;
     OH_AVCodec *codec_ = nullptr;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // VIDEODEC_CAPI_MOCK_H

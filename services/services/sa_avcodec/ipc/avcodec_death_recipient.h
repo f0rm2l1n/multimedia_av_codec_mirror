@@ -20,7 +20,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVCodecDeathRecipient : public IRemoteObject::DeathRecipient, public NoCopyable {
 public:
     explicit AVCodecDeathRecipient(pid_t pid) : pid_(pid) {}
@@ -43,6 +43,6 @@ private:
     pid_t pid_ = 0;
     NotifyCbFunc diedCb_ = nullptr;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_DEATH_RECIPIENT_H

@@ -21,7 +21,7 @@
 #include "native_window.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class SurfaceCapiMock : public SurfaceMock {
 public:
     explicit SurfaceCapiMock(OHNativeWindow *nativeWindow) : nativeWindow_(nativeWindow) {}
@@ -32,6 +32,6 @@ public:
 private:
     OHNativeWindow *nativeWindow_ = nullptr;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // SURFACE_CAPI_MOCK_H

@@ -16,7 +16,7 @@
 #include "media_source.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 MediaSource::MediaSource(std::string uri)
     : uri_(std::move(uri)), type_(SourceType::SOURCE_TYPE_URI)
@@ -33,6 +33,6 @@ const std::string &MediaSource::GetSourceUri() const
     return uri_;
 }
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 

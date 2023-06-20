@@ -36,7 +36,7 @@
 #include "avdemuxer_demo_runner.h"
 
 using namespace std;
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 
 static int64_t g_seekTime = 1000;
 static int64_t g_startTime = 0;

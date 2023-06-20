@@ -21,7 +21,7 @@
 #include "i_codeclist_service.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVCodecListImpl : public AVCodecList, public NoCopyable {
 public:
     AVCodecListImpl();
@@ -40,6 +40,6 @@ private:
     std::unordered_map<std::string, void *> nameAddrMap_;
     std::mutex mutex_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_LIST_IMPL_H

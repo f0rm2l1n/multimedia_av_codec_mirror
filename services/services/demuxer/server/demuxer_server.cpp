@@ -23,7 +23,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<IDemuxerService> DemuxerServer::Create()
 {
     std::shared_ptr<DemuxerServer> server = std::make_shared<DemuxerServer>();
@@ -83,5 +83,5 @@ int32_t DemuxerServer::SeekToTime(int64_t millisecond, const AVSeekMode mode)
     CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, ret, "Failed to call SeekToTime");
     return AVCS_ERR_OK;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

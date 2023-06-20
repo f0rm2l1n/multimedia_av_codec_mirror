@@ -16,7 +16,7 @@
 #include "codeclist_capi_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 bool CodecListCapiMock::IsHardware()
 {
     if (codeclist_ != nullptr) {
@@ -361,5 +361,5 @@ bool CodecListCapiMock::AreProfileAndLevelSupported(int32_t profile, int32_t lev
     std::cout << "codeclist_ is nullptr" << std::endl;
     return false;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

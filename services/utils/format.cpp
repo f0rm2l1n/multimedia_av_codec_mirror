@@ -23,7 +23,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "Format"};
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 void CopyFormatDataMap(const Format::FormatDataMap &from, Format::FormatDataMap &to)
 {
     for (auto it = to.begin(); it != to.end(); ++it) {
@@ -322,5 +322,5 @@ std::string Format::Stringify() const
     }
     return outString;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

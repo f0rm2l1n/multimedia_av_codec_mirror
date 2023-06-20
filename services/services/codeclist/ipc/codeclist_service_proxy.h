@@ -20,7 +20,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class CodecListServiceProxy : public IRemoteProxy<IStandardCodecListService>, public NoCopyable {
 public:
     explicit CodecListServiceProxy(const sptr<IRemoteObject> &impl);
@@ -35,6 +35,6 @@ public:
 private:
     static inline BrokerDelegator<CodecListServiceProxy> delegator_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // CODECLIST_SERVICE_PROXY_H

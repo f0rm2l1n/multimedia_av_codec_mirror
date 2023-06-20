@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 struct SamplePacket {
     uint64_t offset;
     AVPacket* pkt;
@@ -67,6 +67,6 @@ private:
     bool InnerQueueIsFull(uint32_t queueIndex);
     bool HasQueue(uint32_t trackIndex);
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // !UTILS_BLOCK_QUEUE_POOL_H

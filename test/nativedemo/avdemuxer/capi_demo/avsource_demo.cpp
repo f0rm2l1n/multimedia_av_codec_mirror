@@ -21,7 +21,7 @@
 #include "avsource_demo.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AVSourceDemo::AVSourceDemo()
 {
     printf("AVSourceDemo construtor\n");
@@ -97,5 +97,5 @@ OH_AVFormat* AVSourceDemo::GetTrackFormat(uint32_t trackIndex)
     }
     return this->trackFormat_;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

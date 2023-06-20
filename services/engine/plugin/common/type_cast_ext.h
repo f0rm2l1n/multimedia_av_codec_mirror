@@ -18,7 +18,7 @@
 #include <cstring>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 /**
  * This function is used to compare two type_info. Besides the basic compare using operator == of type_info,
@@ -52,7 +52,7 @@ inline std::shared_ptr<T> ReinterpretPointerCast(const std::shared_ptr<U>& ptr) 
     return std::shared_ptr<T>(ptr, reinterpret_cast<T*>(ptr.get()));
 }
 } // Plugin
-} // MediaAVCodec
+} // Media
 } // OHOS
 
 #endif // TYPE_CAST_EXT_H

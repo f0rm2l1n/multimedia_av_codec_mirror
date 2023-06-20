@@ -23,7 +23,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AudioCodecAdapter : public CodecBase, public NoCopyable {
 public:
     explicit AudioCodecAdapter(const std::string &name);
@@ -75,6 +75,6 @@ private:
     int32_t doConfigure(const Format &format);
     std::string_view stateToString(CodecState state);
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

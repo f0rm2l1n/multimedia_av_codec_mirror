@@ -25,7 +25,7 @@ constexpr float EPSINON = 0.0001;
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 CodecListCore::CodecListCore()
 {
     AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
@@ -263,5 +263,5 @@ int32_t CodecListCore::GetCapability(CapabilityData &capData, const std::string 
     }
     return AVCS_ERR_OK;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

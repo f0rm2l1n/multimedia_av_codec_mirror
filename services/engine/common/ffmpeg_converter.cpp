@@ -18,7 +18,7 @@ namespace {
     constexpr int US_PER_SECOND = 1000000;
 }
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 // ffmpeg channel layout to histreamer channel layout
 const std::vector<std::pair<AudioChannelLayout, uint64_t>> g_toFFMPEGChannelLayout = {
     {AudioChannelLayout::MONO, AV_CH_LAYOUT_MONO},
@@ -154,5 +154,5 @@ int64_t FFMpegConverter::ConvertAudioPtsToUs(int64_t pts, AVRational base)
     AVRational us = {1, US_PER_SECOND};
     return av_rescale_q(pts, base, us);
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

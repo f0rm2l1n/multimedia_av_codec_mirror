@@ -23,7 +23,7 @@
 #include "plugin_event.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 enum class ErrorType {
     PLUGIN_ERROR,
@@ -197,6 +197,6 @@ protected:
     const std::string pluginName_;
 };
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_INTF_PLUGIN_BASE_H

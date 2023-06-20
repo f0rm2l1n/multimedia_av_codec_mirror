@@ -23,7 +23,7 @@
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class __attribute__((visibility("default"))) CodecAbilitySingleton : public NoCopyable {
 public:
     ~CodecAbilitySingleton();
@@ -40,6 +40,6 @@ private:
     std::unordered_map<std::string, CodecType> nameCodecTypeMap_;
     std::mutex mutex_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // CODEABILITY_SINGLETON_H

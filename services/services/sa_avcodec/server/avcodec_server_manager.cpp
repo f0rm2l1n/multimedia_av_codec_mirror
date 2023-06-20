@@ -53,15 +53,15 @@ const std::vector<const std::string> SA_DUMP_MENU_DUMP_TABLE = {
     "All", "Codec", "Muxer", "Source/Demuxer", " ", "Switch_bitstream_dump"
 };
 
-const std::map<OHOS::MediaAVCodec::AVCodecServerManager::StubType, const std::string> STUB_TYPE_STRING_MAP = {
-    { OHOS::MediaAVCodec::AVCodecServerManager::StubType::CODEC,  "Codec"},
-    { OHOS::MediaAVCodec::AVCodecServerManager::StubType::MUXER,  "Muxer"},
-    { OHOS::MediaAVCodec::AVCodecServerManager::StubType::SOURCE,  "Source/Demuxer"},
+const std::map<OHOS::Media::AVCodecServerManager::StubType, const std::string> STUB_TYPE_STRING_MAP = {
+    { OHOS::Media::AVCodecServerManager::StubType::CODEC,  "Codec"},
+    { OHOS::Media::AVCodecServerManager::StubType::MUXER,  "Muxer"},
+    { OHOS::Media::AVCodecServerManager::StubType::SOURCE,  "Source/Demuxer"},
 };
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 constexpr uint32_t SERVER_MAX_NUMBER = 16;
 AVCodecServerManager& AVCodecServerManager::GetInstance()
 {
@@ -522,5 +522,5 @@ void AVCodecServerManager::PrintDumpMenu(int32_t fd)
         write(fd, dumpString.c_str(), dumpString.size());
     }
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

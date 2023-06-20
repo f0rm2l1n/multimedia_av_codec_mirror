@@ -19,7 +19,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class SourceBase {
 public:
     virtual ~SourceBase() = default;
@@ -29,6 +29,6 @@ public:
     virtual int32_t GetTrackFormat(Format &format, uint32_t trackIndex) = 0;
     virtual uintptr_t GetSourceAddr() = 0;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // SOURCEBASE_H

@@ -26,7 +26,7 @@
 #include <string_view>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AudioBuffersManager : public NoCopyable {
 public:
     AudioBuffersManager(const uint32_t &bufferSize, const std::string_view &name, const uint32_t &metaSize = 0,
@@ -65,7 +65,7 @@ private:
     std::string_view name_;
     std::vector<std::shared_ptr<AudioBufferInfo>> bufferInfo_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 
 #endif

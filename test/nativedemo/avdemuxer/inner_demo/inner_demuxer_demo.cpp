@@ -19,7 +19,7 @@
 #include "inner_demuxer_demo.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 InnerDemuxerDemo::InnerDemuxerDemo()
 {
     printf("InnerDemuxerDemo is called\n");

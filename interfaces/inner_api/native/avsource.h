@@ -23,7 +23,7 @@
 #include "format.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVSource {
 public:
     virtual ~AVSource() = default;
@@ -99,7 +99,7 @@ private:
     AVSourceFactory() = default;
     ~AVSourceFactory() = default;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVSOURCE_H
 

@@ -35,7 +35,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 
 namespace {
 const string CODEC_MP3_NAME = std::string(AVCodecCodecName::AUDIO_DECODER_MP3_NAME);
@@ -110,7 +110,7 @@ constexpr string_view OUTPUT_PCM_FILE_PATH = "/data/test/media/out.pcm";
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class ADecSignal {
 public:
     std::mutex inMutex_;
@@ -603,5 +603,5 @@ HWTEST_F(AudioCodeCapiDecoderUnitTest, audioDecoder_Normalcase_04, TestSize.Leve
         Release();
     }
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

@@ -26,7 +26,7 @@ constexpr uint8_t LOGD_FREQUENCY = 5;
 } // namespace
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AudioFfmpegDecoderPlugin::AudioFfmpegDecoderPlugin()
     : hasExtra_(false),
       maxInputSize_(-1),
@@ -353,5 +353,5 @@ int32_t AudioFfmpegDecoderPlugin::CloseCtxLocked()
     }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

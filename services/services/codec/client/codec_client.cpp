@@ -22,7 +22,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<CodecClient> CodecClient::Create(const sptr<IStandardCodecService> &ipcProxy)
 {
     CHECK_AND_RETURN_RET_LOG(ipcProxy != nullptr, nullptr, "Ipc proxy is nullptr.");
@@ -299,5 +299,5 @@ int32_t CodecClient::GetInputFormat(Format &format)
     }
     return ret;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

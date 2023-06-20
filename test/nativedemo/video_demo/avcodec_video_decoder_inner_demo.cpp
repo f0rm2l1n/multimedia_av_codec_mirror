@@ -30,8 +30,8 @@
 #include "avcodec_video_decoder_inner_demo.h"
 
 using namespace OHOS;
-using namespace OHOS::MediaAVCodec;
-using namespace OHOS::MediaAVCodec::InnerVideoDemo;
+using namespace OHOS::Media;
+using namespace OHOS::Media::InnerVideoDemo;
 using namespace std;
 namespace {
 constexpr uint32_t DEFAULT_WIDTH = 320;

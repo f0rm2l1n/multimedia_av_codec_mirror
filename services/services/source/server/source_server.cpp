@@ -32,37 +32,37 @@ namespace {
     constexpr uint32_t DUMP_OFFSET_8 = 8;
 
     const std::vector<std::pair<std::string_view, const std::string>> SOURCE_DUMP_TABLE = {
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_TITLE, "Title" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_ARTIST, "Artist" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_ALBUM, "Album" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_ALBUM_ARTIST, "Album_Artist" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_DATE, "Date" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_COMMENT, "Comment" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_GENRE, "Genre" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_COPYRIGHT, "Copyright" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_LANGUAGE, "Language" },
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_DURATION, "Duration" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_DESCRIPTION, "Description" },
-        { OHOS::MediaAVCodec::AVSourceFormat::SOURCE_LYRICS, "Lyrics" },
+        { OHOS::Media::AVSourceFormat::SOURCE_TITLE, "Title" },
+        { OHOS::Media::AVSourceFormat::SOURCE_ARTIST, "Artist" },
+        { OHOS::Media::AVSourceFormat::SOURCE_ALBUM, "Album" },
+        { OHOS::Media::AVSourceFormat::SOURCE_ALBUM_ARTIST, "Album_Artist" },
+        { OHOS::Media::AVSourceFormat::SOURCE_DATE, "Date" },
+        { OHOS::Media::AVSourceFormat::SOURCE_COMMENT, "Comment" },
+        { OHOS::Media::AVSourceFormat::SOURCE_GENRE, "Genre" },
+        { OHOS::Media::AVSourceFormat::SOURCE_COPYRIGHT, "Copyright" },
+        { OHOS::Media::AVSourceFormat::SOURCE_LANGUAGE, "Language" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_DURATION, "Duration" },
+        { OHOS::Media::AVSourceFormat::SOURCE_DESCRIPTION, "Description" },
+        { OHOS::Media::AVSourceFormat::SOURCE_LYRICS, "Lyrics" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> AUDIO_TRACK_DUMP_TABLE = {
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_BITRATE, "Bitrate" },
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, "AAC_Is_ADTS" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_SAMPLE_RATE, "Sample_Rate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, "Channel_Count" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_BITRATE, "Bitrate" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_AAC_IS_ADTS, "AAC_Is_ADTS" },
     };
 
     const std::vector<std::pair<std::string_view, const std::string>> VIDEO_TRACK_DUMP_TABLE = {
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
-        { OHOS::MediaAVCodec::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_CODEC_MIME, "Codec_Mime" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_WIDTH, "Width" },
+        { OHOS::Media::MediaDescriptionKey::MD_KEY_HEIGHT, "Height" },
     };
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<ISourceService> SourceServer::Create()
 {
     std::shared_ptr<SourceServer> server = std::make_shared<SourceServer>();
@@ -195,5 +195,5 @@ int32_t SourceServer::GetDumpInfo(std::string &dumpInfo)
         AVCS_ERR_INVALID_OPERATION, "Get dump string failed!");
     return AVCS_ERR_OK;
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

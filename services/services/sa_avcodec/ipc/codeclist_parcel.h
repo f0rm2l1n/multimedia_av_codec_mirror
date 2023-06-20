@@ -21,7 +21,7 @@
 #include "avcodec_info.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class CodecListParcel {
 public:
     CodecListParcel() = delete;
@@ -35,6 +35,6 @@ public:
     static bool Unmarshalling(MessageParcel &parcel, std::map<ImgSize, Range> &mapSizeToRange);
     static bool Unmarshalling(MessageParcel &parcel, std::map<int32_t, std::vector<int32_t>> &mapIntToVec);
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // MEDIA_PARCEL_H

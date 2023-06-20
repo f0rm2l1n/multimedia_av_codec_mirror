@@ -25,7 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-Au
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AudioFfmpegEncoderPlugin::AudioFfmpegEncoderPlugin()
     : maxInputSize_(-1), avCodec_(nullptr), avCodecContext_(nullptr), cachedFrame_(nullptr), avPacket_(nullptr),
       prevPts_(0), codecContextValid_(false)
@@ -406,5 +406,5 @@ void AudioFfmpegEncoderPlugin::RegisterHeaderFunc(HeaderFunc headerFunc)
     GetHeaderFunc_ = headerFunc;
     headerFuncValid_ = true;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

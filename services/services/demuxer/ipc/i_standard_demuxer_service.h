@@ -21,7 +21,7 @@
 #include "avsharedmemory.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class IStandardDemuxerService : public IRemoteBroker {
 public:
     virtual ~IStandardDemuxerService() = default;
@@ -48,6 +48,6 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"IStandardDemuxerService");
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif  // I_STANDARD_DEMUXER_SERVICE_H

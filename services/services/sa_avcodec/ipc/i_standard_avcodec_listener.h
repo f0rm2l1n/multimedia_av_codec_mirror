@@ -22,12 +22,12 @@
 #include "iremote_stub.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class IStandardAVCodecListener : public IRemoteBroker {
 public:
     virtual ~IStandardAVCodecListener() = default;
-    DECLARE_INTERFACE_DESCRIPTOR(u"IStandardAVCodecListenerInterface");
+    DECLARE_INTERFACE_DESCRIPTOR(u"IStandardAVCodecListener");
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // I_STANDARD_AVCODEC_LISTENER_H

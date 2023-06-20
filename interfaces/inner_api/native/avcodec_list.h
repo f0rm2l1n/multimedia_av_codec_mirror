@@ -21,7 +21,7 @@
 #include "avcodec_info.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVCodecList {
 public:
     virtual ~AVCodecList() = default;
@@ -70,6 +70,6 @@ private:
     AVCodecListFactory() = default;
     ~AVCodecListFactory() = default;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_LIST_H

@@ -18,7 +18,7 @@
 #include "avcodec_info.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AudioCodeclistInfo {
 public:
     ~AudioCodeclistInfo();
@@ -35,6 +35,6 @@ private:
     std::vector<CapabilityData> audioCapabilities_;
     AudioCodeclistInfo();
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

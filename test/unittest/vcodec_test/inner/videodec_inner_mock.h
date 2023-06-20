@@ -21,7 +21,7 @@
 #include "avcodec_video_decoder.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class VideoDecInnerMock : public VideoDecMock {
 public:
     explicit VideoDecInnerMock(std::shared_ptr<AVCodecVideoDecoder> videoDec) : videoDec_(videoDec) {}
@@ -58,6 +58,6 @@ private:
     std::shared_ptr<AVCodecCallbackMock> mockCb_ = nullptr;
     std::weak_ptr<AVCodecVideoDecoder> videoDec_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // VIDEO_DEC_INNER_MOCK_H

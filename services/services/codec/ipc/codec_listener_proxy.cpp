@@ -23,7 +23,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 CodecListenerProxy::CodecListenerProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IStandardCodecListener>(impl)
 {
@@ -130,5 +130,5 @@ void CodecListenerCallback::OnOutputBufferAvailable(uint32_t index, AVCodecBuffe
         listener_->OnOutputBufferAvailable(index, info, flag);
     }
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

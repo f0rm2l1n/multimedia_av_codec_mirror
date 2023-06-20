@@ -21,7 +21,7 @@
 #include "avcodec_codec_name.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AudioFFMpegMp3DecoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegMp3DecoderPlugin> {
 public:
     AudioFFMpegMp3DecoderPlugin();
@@ -50,6 +50,6 @@ private:
     int64_t bitRate;
     std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

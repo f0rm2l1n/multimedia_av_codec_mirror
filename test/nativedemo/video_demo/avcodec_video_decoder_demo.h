@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace VideoDemo {
 class VDecSignal {
 public:
@@ -97,6 +97,6 @@ private:
     std::string mode_ = "0";
 };
 } // namespace VideoDemo
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_VIDEO_DECODER_DEMO_H

@@ -23,7 +23,7 @@
 #include "i_source_engine.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class ISourceEngine {
 public:
     virtual ~ISourceEngine() = default;
@@ -41,6 +41,6 @@ private:
     ISourceEngineFactory() = default;
     ~ISourceEngineFactory() = default;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // ISOURCE_ENGINE_H

@@ -26,8 +26,8 @@
 #include "avcodec_audio_flac_encoder_demo.h"
 
 using namespace OHOS;
-using namespace OHOS::MediaAVCodec;
-using namespace OHOS::MediaAVCodec::AudioFlacDemo;
+using namespace OHOS::Media;
+using namespace OHOS::Media::AudioFlacDemo;
 using namespace std;
 namespace {
 constexpr uint32_t CHANNEL_COUNT = 2;

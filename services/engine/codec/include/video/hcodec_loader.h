@@ -18,7 +18,7 @@
 #include "codecbase.h"
 #include "codeclistbase.h"
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class HCodecLoader {
 public:
     static std::shared_ptr<CodecBase> CreateByName(const std::string &name);
@@ -37,6 +37,6 @@ private:
     std::shared_ptr<CodecBase> Create(const std::string &name);
     int32_t GetCaps(std::vector<CapabilityData> &caps);
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

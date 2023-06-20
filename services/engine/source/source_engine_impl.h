@@ -26,7 +26,7 @@
 #include "avcodec_common.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class SourceEngineImpl : public ISourceEngine {
 public:
     SourceEngineImpl(int32_t appUid, int32_t appPid, const std::string& uri);
@@ -44,6 +44,6 @@ private:
     std::mutex mutex_;
     std::shared_ptr<Plugin::Source> source_ = nullptr;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // SOURCE_ENGINE_IMPL_H

@@ -19,12 +19,12 @@
 #include "avcodec_info.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class CodecListBase {
 public:
     virtual ~CodecListBase() = default;
     virtual int32_t GetCapabilityList(std::vector<CapabilityData> &caps) = 0;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // CODECLISTBASE_H

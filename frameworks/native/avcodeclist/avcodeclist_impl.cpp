@@ -22,7 +22,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AVCodecListImpl"};
 }
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<AVCodecList> AVCodecListFactory::CreateAVCodecList()
 {
     static std::shared_ptr<AVCodecListImpl> impl = std::make_shared<AVCodecListImpl>();
@@ -132,5 +132,5 @@ void *AVCodecListImpl::GetBuffer(const std::string &name, uint32_t sizeOfCap)
     nameAddrMap_[name] = (void *)malloc(sizeOfCap);
     return nameAddrMap_[name];
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

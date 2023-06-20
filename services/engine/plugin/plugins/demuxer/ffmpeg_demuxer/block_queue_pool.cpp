@@ -23,7 +23,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 BlockQueuePool::~BlockQueuePool()
 {
     AVCODEC_LOGD("block queue %{public}s ~BlockQueuePool enter.", name_.c_str());
@@ -222,5 +222,5 @@ bool BlockQueuePool::HasQueue(uint32_t trackIndex)
     AVCODEC_LOGD("block queue %{public}s HasQueue enter, trackIndex: %{public}u.", name_.c_str(), trackIndex);
     return queMap_.count(trackIndex) > 0;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

@@ -27,7 +27,7 @@ extern "C" {
 }
 #endif
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class FFMpegConverter {
 public:
     static AudioSampleFormat ConvertFFMpegToOHAudioFormat(AVSampleFormat ffSampleFormat);
@@ -41,6 +41,6 @@ private:
     FFMpegConverter() = delete;
     ~FFMpegConverter() = delete;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

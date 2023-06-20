@@ -20,7 +20,7 @@
 #include <unordered_map>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 template <typename I, typename Identity, typename... Args>
 class AVCodecBaseFactory {
 public:
@@ -71,7 +71,7 @@ template <typename I, typename Identify, typename... Args>
 template <typename T>
 bool AVCodecBaseFactory<I, Identify, Args...>::CodecRegister<T>::registered =
     AVCodecBaseFactory<I, Identify, Args...>::CodecRegister<T>::avRegister();
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 
 #endif

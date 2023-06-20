@@ -221,4 +221,5 @@ OH_AVErrCode OH_AudioDecoder_IsValid(OH_AVCodec *codec, bool *isValid);
 #ifdef __cplusplus
 }
 #endif
+
 #endif // NATIVE_AVCODEC_AUDIODECODER_H

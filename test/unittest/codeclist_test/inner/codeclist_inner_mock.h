@@ -22,7 +22,7 @@
 #include "codeclist_mock.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class CodecListInnerMock : public CodecListMock {
 public:
     explicit CodecListInnerMock(std::shared_ptr<AVCodecList> codeclist, CapabilityData *capabilityData)
@@ -56,6 +56,6 @@ private:
     std::shared_ptr<AVCodecList> codeclist_ = nullptr;
     CapabilityData *capabilityData_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // CODECLIST_INNER_MOCK_H

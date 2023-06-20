@@ -20,7 +20,7 @@
 #include <string>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 /**
  * @brief Provides a unified interface to implement convenient memory sharing
  * mechanism. For those platforms that do not support multi-process, it may
@@ -70,6 +70,6 @@ public:
      */
     virtual uint32_t GetFlags() const = 0;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVSHAREDMEMORY_H

@@ -18,7 +18,7 @@
 #include "avsharedmemorybase.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 int32_t AVMuxerCapiMock::Destroy()
 {
     int ret = OH_AVMuxer_Destroy(muxer_);
@@ -68,5 +68,5 @@ int32_t AVMuxerCapiMock::SetRotation(int32_t rotation)
 {
     return OH_AVMuxer_SetRotation(muxer_, rotation);
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

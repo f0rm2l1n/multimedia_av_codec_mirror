@@ -22,7 +22,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-SurfaceMemory"};
 }
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 sptr<Surface> SurfaceMemory::surface_ = nullptr;
 BufferRequestConfig SurfaceMemory::requestConfig_ = {0};
 ScalingMode SurfaceMemory::scalingMode_ = {ScalingMode::SCALING_MODE_SCALE_TO_WINDOW};
@@ -221,5 +221,5 @@ uint32_t SurfaceMemory::GetFlags() const
     CHECK_AND_RETURN_RET_LOG(surfaceBuffer_ != nullptr, 0, "surfaceBuffer is nullptr");
     return FLAGS_READ_WRITE;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

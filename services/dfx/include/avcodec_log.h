@@ -19,7 +19,7 @@
 #include <cinttypes>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002BAC
 
@@ -81,6 +81,6 @@ namespace MediaAVCodec {
 
 #define POINTER_MASK 0x00FFFFFF
 #define FAKE_POINTER(addr) (POINTER_MASK & reinterpret_cast<uintptr_t>(addr))
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_LOG_H

@@ -20,7 +20,7 @@
 #include "avmuxer_sample.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVMuxerUnitTest : public testing::Test {
 public:
     // SetUpTestCase: Called before all test cases
@@ -37,6 +37,6 @@ protected:
     int32_t fd_ {-1};
     uint8_t buffer_[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVMUXER_UNIT_TEST_H

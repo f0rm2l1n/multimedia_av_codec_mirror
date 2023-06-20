@@ -26,7 +26,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AudioBufferInfo : public NoCopyable {
 public:
     AudioBufferInfo(const uint32_t &bufferSize, const std::string_view &name, const uint32_t &metaSize = 0,
@@ -75,6 +75,6 @@ private:
     AVCodecBufferInfo info_;
     AVCodecBufferFlag flag_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif

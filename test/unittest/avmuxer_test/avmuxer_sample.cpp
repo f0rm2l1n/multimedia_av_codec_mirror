@@ -18,7 +18,7 @@
 using namespace std;
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AVMuxerSample::AVMuxerSample()
 {
 }
@@ -80,5 +80,5 @@ int32_t AVMuxerSample::SetRotation(int32_t rotation)
     }
     return muxer_->SetRotation(rotation);
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS

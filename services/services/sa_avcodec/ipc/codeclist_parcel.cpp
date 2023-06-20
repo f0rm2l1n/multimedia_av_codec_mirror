@@ -21,7 +21,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListP
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 bool CodecListParcel::Marshalling(MessageParcel &parcel, CapabilityData &capabilityData)
 {
     (void)parcel.WriteString(capabilityData.codecName);
@@ -153,5 +153,5 @@ bool CodecListParcel::Unmarshalling(MessageParcel &parcel, std::map<int32_t, std
     }
     return true;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

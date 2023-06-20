@@ -24,7 +24,7 @@
 #include "avcodec_common.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class DemuxerEngineImpl : public IDemuxerEngine {
 public:
     DemuxerEngineImpl(int32_t appUid, int32_t appPid, uintptr_t sourceAddr);
@@ -41,6 +41,6 @@ private:
     std::mutex mutex_;
     std::shared_ptr<Plugin::Demuxer> demuxer_ = nullptr;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // DEMUXER_ENGINE_IMPL_H

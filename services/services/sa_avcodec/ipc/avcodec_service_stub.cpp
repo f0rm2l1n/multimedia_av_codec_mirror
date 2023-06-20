@@ -23,7 +23,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 AVCodecServiceStub::AVCodecServiceStub()
 {
     deathRecipientMap_.clear();
@@ -150,5 +150,5 @@ int32_t AVCodecServiceStub::GetSystemAbility(MessageParcel &data, MessageParcel 
 
     return AVCS_ERR_OK;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

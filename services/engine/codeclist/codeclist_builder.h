@@ -20,7 +20,7 @@
 #include "codeclistbase.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class VideoCodecList : public CodecListBase {
 public:
     ~VideoCodecList() override = default;
@@ -31,6 +31,6 @@ public:
     ~AudioCodecList() override = default;
     int32_t GetCapabilityList(std::vector<CapabilityData> &caps) override;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // CODECLIST_BUILDER_H

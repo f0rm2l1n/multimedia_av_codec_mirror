@@ -27,7 +27,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeAudioEncoder"};
 }
 
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 class NativeAudioEncoderCallback;
 
 struct AudioEncoderObject : public OH_AVCodec {
@@ -174,7 +174,7 @@ private:
 };
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -467,5 +467,5 @@ OH_AVErrCode OH_AudioEncoder_IsValid(OH_AVCodec *codec, bool *isValid)
 #ifdef __cplusplus
 };
 #endif
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

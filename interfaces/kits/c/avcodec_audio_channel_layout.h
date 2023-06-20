@@ -16,6 +16,7 @@
 #ifndef AVCODEC_AUDIO_CHANNEL_LAYOUT_H
 #define AVCODEC_AUDIO_CHANNEL_LAYOUT_H
 #include <cstdint>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

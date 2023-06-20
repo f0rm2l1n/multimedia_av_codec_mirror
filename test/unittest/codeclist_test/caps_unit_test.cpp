@@ -21,12 +21,12 @@
 
 using namespace std;
 using namespace OHOS;
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 using namespace testing::ext;
-using namespace OHOS::MediaAVCodec::CodecListTestParam;
+using namespace OHOS::Media::CodecListTestParam;
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 void CapsUnitTest::SetUpTestCase(void) {}
 
 void CapsUnitTest::TearDownTestCase(void) {}
@@ -831,5 +831,5 @@ HWTEST_F(CapsUnitTest, AVCaps_NullvalToCapi_002, TestSize.Level1)
     EXPECT_EQ(range.maxVal, 0);
 }
 #endif
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

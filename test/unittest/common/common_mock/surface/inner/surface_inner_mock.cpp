@@ -18,7 +18,7 @@
 #include "window_option.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace {
 constexpr uint32_t DEFAULT_WIDTH = 480;
 constexpr uint32_t DEFAULT_HEIGHT = 360;
@@ -56,5 +56,5 @@ sptr<Surface> SurfaceInnerMock::GetSurface()
     }
     return surface_;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

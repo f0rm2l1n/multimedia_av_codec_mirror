@@ -35,7 +35,7 @@ extern "C" {
 #include "native_avdemuxer.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AVDemuxerDemo {
 public:
     AVDemuxerDemo();
@@ -56,6 +56,6 @@ private:
     OH_AVSource* avsource_ = nullptr;
     OH_AVDemuxer* avdemxuer_ = nullptr;
 };
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
 #endif

@@ -25,7 +25,7 @@
 
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 namespace Plugin {
 /**
  * @brief Source Plugin Interface.
@@ -51,7 +51,7 @@ struct SourcePlugin : public PluginBase {
      *  @retval ERROR_UNSUPPORTED_FORMAT: Uri is not supported.
      *  @retval ERROR_INVALID_PARAMETER: Uri is invalid.
      */
-    virtual OHOS::MediaAVCodec::Plugin::Status SetSource(std::shared_ptr<MediaSource> source) = 0;
+    virtual OHOS::Media::Plugin::Status SetSource(std::shared_ptr<MediaSource> source) = 0;
 
     /**
      * @brief Read data from data source.
@@ -130,6 +130,6 @@ struct SourcePluginDef : public PluginDefBase {
     }
 };
 } // namespace Plugin
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // HISTREAMER_PLUGIN_INTF_SOURCE_PLUGIN_H

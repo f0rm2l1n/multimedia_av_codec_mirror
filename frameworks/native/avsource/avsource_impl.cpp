@@ -27,7 +27,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<AVSource> AVSourceFactory::CreateWithURI(const std::string &uri)
 {
     AVCodecTrace trace("AVSourceFactory::CreateWithURI");
@@ -161,5 +161,5 @@ int32_t AVSourceImpl::GetTrackFormat(Format &format, uint32_t trackIndex)
 
     return sourceClient_->GetTrackFormat(format, trackIndex);
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

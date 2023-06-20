@@ -18,7 +18,7 @@
 #include <string>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 using ErrorMessageFunc = std::function<std::string(const std::string &param1, const std::string &param2)>;
 const std::map<AVCodecServiceErrCode, std::string> AVCS_ERRCODE_INFOS = {
     {AVCS_ERR_OK,                                    "success"},
@@ -241,5 +241,5 @@ OH_AVErrCode AVCSErrorToOHAVErrCode(AVCodecServiceErrCode code)
 
     return AV_ERR_UNKNOWN;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

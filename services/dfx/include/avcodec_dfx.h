@@ -22,7 +22,7 @@
 #include "hisysevent.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 enum class FaultType : int32_t {
     FAULT_TYPE_INVALID = -1,
     FAULT_TYPE_FREEZE = 0,
@@ -69,6 +69,6 @@ public:
 private:
     bool isSync_ = false;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // AVCODEC_DFX_H

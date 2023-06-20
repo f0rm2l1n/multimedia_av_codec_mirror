@@ -23,7 +23,7 @@
 #include "media_description.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class CodecListUnitTest : public testing::Test {
 public:
     // SetUpTestCase: Called before all test cases
@@ -39,6 +39,6 @@ protected:
     std::shared_ptr<CodecListMock> capability_ = nullptr;
     bool isHardIncluded_ = false;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // CODECLIST_UNIT_TEST_H

@@ -22,7 +22,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "CodecListC
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<CodecListClient> CodecListClient::Create(const sptr<IStandardCodecListService> &ipcProxy)
 {
     CHECK_AND_RETURN_RET_LOG(ipcProxy != nullptr, nullptr, "Create codeclist client failed: ipcProxy is nullptr");
@@ -72,5 +72,5 @@ int32_t CodecListClient::GetCapability(CapabilityData &capabilityData, const std
                              "Get capability failed: codeclist service does not exist.");
     return codecListProxy_->GetCapability(capabilityData, mime, isEncoder, category);
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

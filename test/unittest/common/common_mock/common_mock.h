@@ -23,7 +23,7 @@
 #include "surface.h"
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class SurfaceMock : public NoCopyable {
 public:
     virtual ~SurfaceMock() = default;
@@ -55,6 +55,6 @@ private:
     SurfaceMockFactory() = delete;
     ~SurfaceMockFactory() = delete;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 #endif // COMMON_MOCK_H

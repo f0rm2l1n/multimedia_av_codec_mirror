@@ -26,7 +26,7 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "NativeAVDemuxer"};
 }
 
-using namespace OHOS::MediaAVCodec;
+using namespace OHOS::Media;
 
 struct DemuxerObject : public OH_AVDemuxer {
     explicit DemuxerObject(const std::shared_ptr<AVDemuxer> &demuxer)

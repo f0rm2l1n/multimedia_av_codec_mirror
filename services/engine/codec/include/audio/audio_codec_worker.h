@@ -28,7 +28,7 @@
 #include <queue>
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 class AudioCodecWorker : public NoCopyable {
 public:
     AudioCodecWorker(const std::shared_ptr<AudioBaseCodec> &codec, const std::shared_ptr<AVCodecCallback> &callback);
@@ -86,7 +86,7 @@ private:
     std::shared_ptr<AudioBuffersManager> outputBuffer_;
     std::queue<uint32_t> inBufIndexQue_;
 };
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS
 
 #endif

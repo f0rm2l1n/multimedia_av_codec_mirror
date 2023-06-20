@@ -24,7 +24,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 int32_t WriteAVSharedMemoryToParcel(const std::shared_ptr<AVSharedMemory> &memory, MessageParcel &parcel)
 {
     std::shared_ptr<AVSharedMemoryBase> baseMem = std::static_pointer_cast<AVSharedMemoryBase>(memory);
@@ -60,5 +60,5 @@ std::shared_ptr<AVSharedMemory> ReadAVSharedMemoryFromParcel(MessageParcel &parc
     (void)::close(fd);
     return memory;
 }
-} // namespace MediaAVCodec
+} // namespace Media
 } // namespace OHOS

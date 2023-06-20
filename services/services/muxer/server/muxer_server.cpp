@@ -25,7 +25,7 @@ namespace {
 }
 
 namespace OHOS {
-namespace MediaAVCodec {
+namespace Media {
 std::shared_ptr<IMuxerService> MuxerServer::Create()
 {
     std::shared_ptr<MuxerServer> muxerServer = std::make_shared<MuxerServer>();
@@ -105,5 +105,5 @@ int32_t MuxerServer::DumpInfo(int32_t fd)
     CHECK_AND_RETURN_RET_LOG(muxerEngine_ != nullptr, AVCS_ERR_INVALID_OPERATION, "muxer engine does not exist");
     return muxerEngine_->DumpInfo(fd);
 }
-}  // namespace MediaAVCodec
+}  // namespace Media
 }  // namespace OHOS
