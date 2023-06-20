@@ -972,7 +972,7 @@ HWTEST_F(VideoCodeCapiDecoderUnitTest, videoDecoder_pushInputData_01, TestSize.L
     signal_->inQueue_.pop();
     signal_->inBufferQueue_.pop();
 
-    index = signal_->inQueue_.front();
+    index = 0;
     buffer = signal_->inBufferQueue_.front();
     info.size = 0;
     info.flags = AVCODEC_BUFFER_FLAGS_EOS;
