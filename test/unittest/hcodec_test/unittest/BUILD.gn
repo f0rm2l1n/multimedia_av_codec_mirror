@@ -39,6 +39,7 @@ ohos_unittest("hdecoder_unit_test") {
     "hiviewdfx_hilog_native:libhilog",
     "drivers_interface_codec:codec_idl_headers",
     "hdf_core:libhdi",
+    "graphic_standard:surface",
   ]
 }
 
@@ -55,6 +56,7 @@ ohos_unittest("hencoder_unit_test") {
     "drivers_interface_codec:codec_idl_headers",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
+    "graphic_standard:surface",
   ]
 }
 
@@ -71,5 +73,7 @@ ohos_unittest("hcodec_list_unit_test") {
     "drivers_interface_codec:codec_idl_headers",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
+    "graphic_standard:surface",
+    "ipc:ipc_core",
   ]
 }
