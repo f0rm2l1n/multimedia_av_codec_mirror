@@ -710,5 +710,4 @@ int32_t HEncoder::OnSignalEndOfInputStream()
     HLOGE("can not find any input buffer currently owned by us");
     return AVCS_ERR_UNKNOWN;
 }
-
 } // namespace OHOS::MediaAVCodec

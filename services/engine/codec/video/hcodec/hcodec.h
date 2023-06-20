@@ -30,7 +30,6 @@
 #include "v1_0/icodec_component_manager.h"
 
 namespace OHOS::MediaAVCodec {
-
 class HCodec : public CodecBase, protected StateMachine {
 public:
     static std::shared_ptr<HCodec> Create(const std::string &name);
@@ -58,7 +57,7 @@ public:
     int32_t Reset() override;
     int32_t Release() override;
 
-protected:  // struct & enum
+protected:
     enum MsgWhat : MsgType {
         INIT,
         SET_CALLBACK,
@@ -138,7 +137,7 @@ protected:  // struct & enum
         static constexpr char DUMP_PATH[] = "/data/misc/hcodecdump";
     };
 
-protected:  // member functions
+protected:
     HCodec(OMX_VIDEO_CODINGTYPE codingType, bool isEncoder);
     ~HCodec() override;
 
@@ -249,10 +248,13 @@ protected:  // member functions
 
     static inline uint32_t AlignTo(uint32_t side, uint32_t align)
     {
+        if (align == 0) {
+            return side;
+        }
         return (side + align - 1) / align * align;
     }
 
-protected:  // member variables
+protected:
     OMX_VIDEO_CODINGTYPE codingType_;
     bool isEncoder_;
     std::string componentName_;
@@ -277,7 +279,7 @@ protected:  // member variables
     uint64_t fbdCnt_ = 0;
     std::chrono::time_point<std::chrono::steady_clock> firstFbdTime_;
 
-private: // enum & struct
+private:
     struct BaseState : State {
     protected:
         BaseState(HCodec *codec, const std::string &stateName,
@@ -403,7 +405,8 @@ private: // enum & struct
         HCodec* codec_;
     };
 
-private: // member function
+private:
+    void InitCreationTime();
     int32_t DoSyncCall(MsgWhat msgType, std::function<void(ParamSP)> oper);
     int32_t DoSyncCallAndGetReply(MsgWhat msgType, std::function<void(ParamSP)> oper, ParamSP &reply);
     int32_t InitWithName(const std::string &name);
@@ -420,7 +423,7 @@ private: // member function
     void ReplyToSyncMsgLater(const MsgInfo& msg);
     bool GetFirstSyncMsgToReply(MsgInfo& msg);
 
-private: // member variable
+private:
     static constexpr size_t MAX_HCODEC_BUFFER_SIZE = 8192 * 4096 * 4; // 8K RGBA
     static constexpr uint64_t THREE_SECONDS_IN_US = 3'000'000;
     static constexpr char BUFFER_ID[] = "buffer-id";
@@ -442,6 +445,5 @@ private: // member variable
     std::list<MsgInfo> deferredQueue_;
     std::map<MsgType, std::queue<std::pair<MsgId, ParamSP>>> syncMsgToReply_;
 }; // class HCodec
-
 } // namespace OHOS::MediaAVCodec
 #endif // HCODEC_HCODEC_H

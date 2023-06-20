@@ -260,14 +260,7 @@ HCodec::HCodec(OMX_VIDEO_CODINGTYPE codingType, bool isEncoder)
     : codingType_(codingType), isEncoder_(isEncoder)
 {
     LOGI(">>");
-    {
-        chrono::system_clock::time_point now = chrono::system_clock::now();
-        time_t nowTimeT = chrono::system_clock::to_time_t(now);
-        tm *localTm = localtime(&nowTimeT);
-        char buffer[32] = "\0";
-        strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", localTm);
-        ctorTime_ = string(buffer);
-    }
+    InitCreationTime();
 
     uninitializedState_ = make_shared<UninitializedState>(this);
     initializedState_ = make_shared<InitializedState>(this);
@@ -277,6 +270,20 @@ HCodec::HCodec(OMX_VIDEO_CODINGTYPE codingType, bool isEncoder)
     stoppingState_ = make_shared<StoppingState>(this);
     flushingState_ = make_shared<FlushingState>(this);
     StateMachine::ChangeStateTo(uninitializedState_);
+}
+
+void HCodec::InitCreationTime()
+{
+    chrono::system_clock::time_point now = chrono::system_clock::now();
+    time_t nowTimeT = chrono::system_clock::to_time_t(now);
+    tm *localTm = localtime(&nowTimeT);
+    if (localTm == nullptr) {
+        return;
+    }
+    char buffer[32] = "\0";
+    if (strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", localTm) > 0) {
+        ctorTime_ = string(buffer);
+    }
 }
 
 HCodec::~HCodec()
@@ -570,6 +577,9 @@ void HCodec::BufferInfo::DecideDumpInfo(optional<uint32_t>& assumeAlignedH, stri
 {
     int h = surfaceBuffer->GetHeight();
     int alignedW = surfaceBuffer->GetStride();
+    if (alignedW <= 0) {
+        return;
+    }
     uint32_t totalSize = surfaceBuffer->GetSize();
     GraphicPixelFormat fmt = static_cast<GraphicPixelFormat>(surfaceBuffer->GetFormat());
     switch (fmt) {
@@ -1070,5 +1080,4 @@ void HCodec::ReleaseComponent()
     componentId_ = 0;
     componentName_.clear();
 }
-
 } // namespace OHOS::MediaAVCodec

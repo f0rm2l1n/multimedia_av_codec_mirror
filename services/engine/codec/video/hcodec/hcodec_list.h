@@ -22,7 +22,6 @@
 #include "v1_0/icodec_component_manager.h"
 
 namespace OHOS::MediaAVCodec {
-
 class HCodecList : public CodecListBase {
 public:
     HCodecList() = default;
@@ -41,7 +40,6 @@ private:
 
 sptr<OHOS::HDI::Codec::V1_0::ICodecComponentManager> GetManager();
 std::vector<OHOS::HDI::Codec::V1_0::CodecCompCapability> GetCapList();
-
 }
 
 #endif

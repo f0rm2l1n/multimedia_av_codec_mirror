@@ -16,7 +16,6 @@
  */
 
 #include "msg_handle_loop.h"
-#include <utility>
 #include <chrono>
 #include <cinttypes>
 #include "hcodec_log.h"
@@ -55,7 +54,7 @@ void MsgHandleLoop::SendAsyncMsg(MsgType type, const ParamSP &msg, uint32_t dela
         LOGE("DUPLICATIVE MSG TIMESTAMP!!!");
         msgProcessTime++;
     }
-    m_msgQueue[msgProcessTime] = MsgInfo{type, 0, msg};
+    m_msgQueue[msgProcessTime] = MsgInfo {type, 0, msg};
     m_threadCond.notify_all();
 }
 
@@ -69,7 +68,7 @@ bool MsgHandleLoop::SendSyncMsg(MsgType type, const ParamSP &msg, ParamSP &reply
             LOGE("DUPLICATIVE MSG TIMESTAMP!!!");
             time++;
         }
-        m_msgQueue[time] = MsgInfo{type, id, msg};
+        m_msgQueue[time] = MsgInfo {type, id, msg};
         m_threadCond.notify_all();
     }
 

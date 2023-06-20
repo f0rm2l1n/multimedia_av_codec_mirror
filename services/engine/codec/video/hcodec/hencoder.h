@@ -20,7 +20,6 @@
 #include "codec_omx_ext.h"
 
 namespace OHOS::MediaAVCodec {
-
 class HEncoder : public HCodec {
 public:
     explicit HEncoder(OMX_VIDEO_CODINGTYPE codingType) : HCodec(codingType, true) {}
@@ -68,7 +67,7 @@ private:
 private:
     class EncoderBuffersConsumerListener : public IBufferConsumerListener {
     public:
-        explicit EncoderBuffersConsumerListener(HEncoder *codec) : codec_(codec){ }
+        explicit EncoderBuffersConsumerListener(HEncoder *codec) : codec_(codec) {}
         void OnBufferAvailable();
     private:
         HEncoder* codec_;
@@ -78,6 +77,5 @@ private:
     sptr<Surface> inputSurface_;
     BufferType inputBufferType_ = BufferType::DYNAMIC_SURFACE_BUFFER;
 };
-
 } // namespace OHOS::MediaAVCodec
 #endif // HCODEC_HENCODER_H

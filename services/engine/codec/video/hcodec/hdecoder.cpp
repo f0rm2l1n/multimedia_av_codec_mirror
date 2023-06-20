@@ -550,5 +550,4 @@ std::shared_ptr<AVSharedMemoryBase> HDecoder::OnUserGetOutputBuffer(uint32_t buf
     }
     return HCodec::OnUserGetOutputBuffer(bufferId);
 }
-
 } // namespace OHOS::MediaAVCodec

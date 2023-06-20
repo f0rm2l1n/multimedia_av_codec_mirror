@@ -30,7 +30,6 @@
 #include "v1_0/codec_types.h"
 
 namespace OHOS::MediaAVCodec {
-
 struct OmxCodingType {
     OMX_VIDEO_CODINGTYPE type;
     OHOS::HDI::Codec::V1_0::AvCodecRole role;
@@ -59,6 +58,5 @@ public:
     static std::optional<CodecHevcProfile> HevcProfileToOmxHevcProfile(int32_t hevcProfile);
     static std::optional<int32_t> HdiHevcProfileToHevcProfile(OHOS::HDI::Codec::V1_0::Profile hdiHevcProfile);
 };
-
 }
 #endif // TYPE_CONVERTER_H

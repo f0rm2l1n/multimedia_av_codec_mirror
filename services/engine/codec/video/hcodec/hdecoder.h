@@ -19,7 +19,6 @@
 #include "hcodec.h"
 
 namespace OHOS::MediaAVCodec {
-
 class HDecoder : public HCodec {
 public:
     explicit HDecoder(OMX_VIDEO_CODINGTYPE codingType) : HCodec(codingType, false) {}
@@ -67,6 +66,5 @@ private:
     BufferFlushConfig flushCfg_;
     static constexpr uint32_t STRIDE_ALIGNMENT = 32;
 };
-
 } // namespace OHOS::MediaAVCodec
 #endif // HCODEC_HDECODER_H

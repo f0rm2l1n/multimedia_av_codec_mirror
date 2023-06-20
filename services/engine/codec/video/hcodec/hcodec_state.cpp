@@ -505,7 +505,7 @@ void HCodec::StartingState::OnShutDown(const MsgInfo &info)
 
 void HCodec::StartingState::ReplyStartMsg(int32_t errCode)
 {
-    MsgInfo msg{MsgWhat::START, 0, nullptr};
+    MsgInfo msg {MsgWhat::START, 0, nullptr};
     if (codec_->GetFirstSyncMsgToReply(msg)) {
         ReplyErrorCode(msg.id, errCode);
     } else {
@@ -889,7 +889,7 @@ void HCodec::FlushingState::OnCodecEvent(CodecEventType event, uint32_t data1, u
             portSettingChangedMsg->SetValue("event", event);
             portSettingChangedMsg->SetValue("data1", data1);
             portSettingChangedMsg->SetValue("data2", data2);
-            codec_->DeferMessage(MsgInfo{MsgWhat::CODEC_EVENT, 0, portSettingChangedMsg});
+            codec_->DeferMessage(MsgInfo {MsgWhat::CODEC_EVENT, 0, portSettingChangedMsg});
             SLOGI("deferring CODEC_EVENT_PORT_SETTINGS_CHANGED");
             return;
         }
@@ -929,7 +929,7 @@ void HCodec::FlushingState::ChangeStateIfWeOwnAllBuffers()
     if (!IsFlushCompleteOnAllPorts() || !codec_->IsAllBufferOwnedByUsOrSurface()) {
         return;
     }
-    MsgInfo msg{MsgWhat::FLUSH, 0, nullptr};
+    MsgInfo msg {MsgWhat::FLUSH, 0, nullptr};
     if (codec_->GetFirstSyncMsgToReply(msg)) {
         ReplyErrorCode(msg.id, AVCS_ERR_OK);
     }

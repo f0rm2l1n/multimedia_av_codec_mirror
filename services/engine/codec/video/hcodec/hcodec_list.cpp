@@ -245,5 +245,4 @@ map<int32_t, vector<int32_t>> HCodecList::GetCodecProfileLevels(const CodecCompC
     }
     return userProfileLevelMap;
 }
-
 } // namespace OHOS::MediaAVCodec

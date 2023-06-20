@@ -265,5 +265,4 @@ std::optional<int32_t> TypeConverter::HdiHevcProfileToHevcProfile(Profile hdiHev
 
     return it->second;
 }
-
 }
