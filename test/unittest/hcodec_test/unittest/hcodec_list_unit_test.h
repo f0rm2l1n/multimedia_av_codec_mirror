@@ -16,14 +16,13 @@
 #ifndef HCODEC_LIST_UNIT_TEST_H
 #define HCODEC_LIST_UNIT_TEST_H
 
-#include "gtest/gtest.h"
-#include "avcodec_info.h"
 #include <vector>
 #include <string>
+#include "gtest/gtest.h"
+#include "avcodec_info.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
-
 class HCodecListUnitTest : public testing::Test {
 public:
     // SetUpTestCase: Called before all test cases
@@ -41,7 +40,6 @@ public:
     std::string GetPrintInfo(const std::map<int32_t, std::vector<int32_t>>&);
     std::string GetPrintInfo(const std::map<ImgSize, Range>&);
 };
-
 } // namespace MediaAVCodec
 } // namespace OHOS
 

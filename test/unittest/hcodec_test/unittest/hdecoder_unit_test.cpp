@@ -16,7 +16,6 @@
 #include <string>
 #include "hdecoder_unit_test.h"
 #include "hcodec_log.h"
-#include "OMX_IVCommon.h"
 #include "av_common.h" // foundation/multimedia/player_framework/interfaces/inner_api/native
 #include "media_description.h" // foundation/multimedia/player_framework/interfaces/inner_api/native
 #include "avcodec_info.h" // foundation/multimedia/player_framework/interfaces/inner_api/native
@@ -764,7 +763,7 @@ HWTEST_F(HDecoderUserCallingUnitTest, get_input_buffer_null, TestSize.Level1)
 
     {
         unique_lock<mutex> lk(signal_->inputMtx_);
-        signal_->inputCond_.wait(lk, [this]{return !signal_->inputList_.empty();});
+        signal_->inputCond_.wait(lk, [this] {return !signal_->inputList_.empty();});
     }
     std::shared_ptr<AVSharedMemoryBase> buffer = testObj->GetInputBuffer(0);
     EXPECT_FALSE(buffer);
@@ -788,7 +787,7 @@ HWTEST_F(HDecoderUserCallingUnitTest, get_input_buffer_ok, TestSize.Level1)
     uint32_t bufferIndex = 0;
     {
         unique_lock<mutex> lk(signal_->inputMtx_);
-        signal_->inputCond_.wait(lk, [this]{return !signal_->inputList_.empty();});
+        signal_->inputCond_.wait(lk, [this] {return !signal_->inputList_.empty();});
         bufferIndex = signal_->inputList_.front();
         signal_->inputList_.pop_front();
     }
@@ -814,7 +813,7 @@ HWTEST_F(HDecoderUserCallingUnitTest, queue_input_buffer_invalid_index, TestSize
 
     {
         unique_lock<mutex> lk(signal_->inputMtx_);
-        signal_->inputCond_.wait(lk, [this]{return !signal_->inputList_.empty();});
+        signal_->inputCond_.wait(lk, [this] {return !signal_->inputList_.empty();});
     }
     AVCodecBufferInfo bufferInfo;
     ret = testObj->QueueInputBuffer(0, bufferInfo, AVCODEC_BUFFER_FLAG_NONE);
@@ -839,7 +838,7 @@ HWTEST_F(HDecoderUserCallingUnitTest, queue_input_buffer_ok, TestSize.Level1)
     uint32_t bufferIndex = 0;
     {
         unique_lock<mutex> lk(signal_->inputMtx_);
-        signal_->inputCond_.wait(lk, [this]{return !signal_->inputList_.empty();});
+        signal_->inputCond_.wait(lk, [this] {return !signal_->inputList_.empty();});
         bufferIndex = signal_->inputList_.front();
         signal_->inputList_.pop_front();
     }
@@ -852,5 +851,4 @@ HWTEST_F(HDecoderUserCallingUnitTest, queue_input_buffer_ok, TestSize.Level1)
     ret = testObj->Release();
     EXPECT_EQ(AVCS_ERR_OK, ret);
 }
-
 }

@@ -196,5 +196,4 @@ void CommandOpt::Print()
     printf("flush cnt %d\n", flushCnt);
     printf("Set NO.%u frame as the IDR Frame\n", numIdrFrame);
 }
-
 }

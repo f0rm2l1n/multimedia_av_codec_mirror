@@ -29,8 +29,6 @@
 #include "command_parser.h"
 
 namespace OHOS::MediaAVCodec {
-
-
 class HDecoderTest {
 public:
     explicit HDecoderTest(const CommandOpt& opt) : opt_(opt) { }

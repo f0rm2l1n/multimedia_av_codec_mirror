@@ -19,10 +19,9 @@ config("hcodec_unittest_cfg") {
 
   include_dirs = [
     "$av_codec_root_dir/services/engine/codec/video/hcodec/",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include/",
-    "//commonlibrary/c_utils/base/include/",
-    "//drivers/peripheral/codec/interfaces/include/",
-    "//third_party/openmax/api/1.1.2",
+    "$av_codec_root_dir/../../../commonlibrary/c_utils/base/include/",
+    "$av_codec_root_dir/../../../drivers/peripheral/codec/interfaces/include/",
+    "$av_codec_root_dir/../../../third_party/openmax/api/1.1.2",
     "$av_codec_root_dir/interfaces/kits/c/",
   ]
 }
@@ -33,7 +32,7 @@ ohos_unittest("hdecoder_unit_test") {
   module_out_path = "av_codec/hcodec"
   sources = [ "hdecoder_unit_test.cpp" ]
   deps = [
-    "//commonlibrary/c_utils/base:utils",
+    "$av_codec_root_dir/../../../commonlibrary/c_utils/base:utils",
     "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec",
   ]
   external_deps = [
@@ -49,7 +48,7 @@ ohos_unittest("hencoder_unit_test") {
   module_out_path = "av_codec/hcodec"
   sources = [ "hencoder_unit_test.cpp" ]
   deps = [
-    "//commonlibrary/c_utils/base:utils",
+    "$av_codec_root_dir/../../../commonlibrary/c_utils/base:utils",
     "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec",
   ]
   external_deps = [
@@ -65,7 +64,7 @@ ohos_unittest("hcodec_list_unit_test") {
   module_out_path = "av_codec/hcodec"
   sources = [ "hcodec_list_unit_test.cpp" ]
   deps = [
-    "//commonlibrary/c_utils/base:utils",
+    "$av_codec_root_dir/../../../commonlibrary/c_utils/base:utils",
     "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec",
   ]
   external_deps = [

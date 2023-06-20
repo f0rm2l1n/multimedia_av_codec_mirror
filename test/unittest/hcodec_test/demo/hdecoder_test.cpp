@@ -250,7 +250,7 @@ optional<std::pair<AVCodecBufferInfo, AVCodecBufferFlag>> HDecoderTest::GetNextS
         nalu = mDemuxer.GetNext(mType, offset);
         if (nalu.isEos) {
             flag = AVCODEC_BUFFER_FLAG_EOS;
-            return std::pair<AVCodecBufferInfo, AVCodecBufferFlag>{info, flag};
+            return std::pair<AVCodecBufferInfo, AVCodecBufferFlag> {info, flag};
         }
         if (nalu.isCsd) {
             flag = AVCODEC_BUFFER_FLAG_CODEC_DATA;
@@ -269,7 +269,7 @@ optional<std::pair<AVCodecBufferInfo, AVCodecBufferFlag>> HDecoderTest::GetNextS
     static int64_t pts = 0;
     info.presentationTimeUs = pts;
     pts += 1.0 / opt_.frameRate * 1000000; // 1000000: one second in micro second
-    return std::pair<AVCodecBufferInfo, AVCodecBufferFlag>{info, flag};
+    return std::pair<AVCodecBufferInfo, AVCodecBufferFlag> {info, flag};
 }
 
 void HDecoderTest::DealWithInputLoop()
@@ -405,5 +405,4 @@ int main(int argc, char *argv[])
     return 0;
 }
 }
-
 } // namespace OHOS::MediaAVCodec

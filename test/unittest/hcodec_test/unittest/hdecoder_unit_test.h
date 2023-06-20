@@ -16,15 +16,14 @@
 #ifndef HDECODER_UNIT_TEST_H
 #define HDECODER_UNIT_TEST_H
 
-#include "gtest/gtest.h"
 #include <mutex>
 #include <condition_variable>
 #include <list>
+#include "gtest/gtest.h"
 #include "hcodec.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
-
 class HDecoderSignal {
 public:
     std::mutex inputMtx_;
@@ -33,15 +32,15 @@ public:
 };
 
 class HDecoderCallback : public AVCodecCallback {
-    public:
-        explicit HDecoderCallback(std::shared_ptr<HDecoderSignal>& obj):signal_(obj) {}
-        ~HDecoderCallback() override = default;
-        void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
-        void OnOutputFormatChanged(const Format &format) override;
-        void OnInputBufferAvailable(uint32_t index) override;
-        void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+public:
+    explicit HDecoderCallback(std::shared_ptr<HDecoderSignal>& obj):signal_(obj) {}
+    ~HDecoderCallback() override = default;
+    void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    void OnOutputFormatChanged(const Format &format) override;
+    void OnInputBufferAvailable(uint32_t index) override;
+    void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 
-        std::shared_ptr<HDecoderSignal> signal_;
+    std::shared_ptr<HDecoderSignal> signal_;
 };
 
 class HDecoderPreparingUnitTest : public testing::Test {
@@ -86,8 +85,6 @@ public:
 
     std::shared_ptr<HDecoderSignal> signal_;
 };
-
-
 } // namespace MediaAVCodec
 } // namespace OHOS
 

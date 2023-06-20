@@ -16,8 +16,6 @@
 #include <string>
 #include "hencoder_unit_test.h"
 #include "hcodec_log.h"
-#include "OMX_IVCommon.h"
-#include "OMX_Video.h"
 #include "av_common.h"
 #include "media_description.h" // foundation/multimedia/player_framework/interfaces/inner_api/native
 #include "avcodec_info.h" // foundation/multimedia/player_framework/interfaces/inner_api/native
@@ -843,5 +841,4 @@ HWTEST_F(HEncoderUserCallingUnitTest, combo_op_3, TestSize.Level1)
     ret = testObj->Release();
     EXPECT_EQ(AVCS_ERR_OK, ret);
 }
-
 }

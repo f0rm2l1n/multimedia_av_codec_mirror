@@ -40,7 +40,8 @@
           "graphic_standard",
           "drivers_interface_codec",
           "hdf_core",
-          "init"
+          "init",
+          "window_manager"
         ],
         "third_party": [
           "glib",

@@ -27,7 +27,6 @@
 #include "command_parser.h"
 
 namespace OHOS::MediaAVCodec {
-
 class HEncoderTest {
 public:
     explicit HEncoderTest(const CommandOpt& opt) : opt_(opt) {}
@@ -75,6 +74,5 @@ private:
     static constexpr uint32_t SAMPLE_RATIO = 2;
     static constexpr uint32_t BYTES_PER_PIXEL_RBGA = 4;
 };
-
 }
 #endif // HENCODER_TEST_H

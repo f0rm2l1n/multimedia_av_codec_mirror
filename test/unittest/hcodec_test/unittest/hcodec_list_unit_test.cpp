@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#include <vector>
 #include "securec.h"
 #include "hcodec_list_unit_test.h"
 #include "hcodec_list.h"
 #include "hcodec_log.h"
 #include "hcodec.h"
-#include <vector>
 
 namespace OHOS::MediaAVCodec {
 using namespace std;
@@ -46,14 +46,14 @@ void HCodecListUnitTest::TearDown(void)
 string HCodecListUnitTest::GetPrintInfo(const Range& obj)
 {
     char info[64] = {0};
-    sprintf_s(info, sizeof(info), "[%d,%d]", obj.minVal, obj.maxVal);
+    (void)sprintf_s(info, sizeof(info), "[%d,%d]", obj.minVal, obj.maxVal);
     return string(info);
 }
 
 string HCodecListUnitTest::GetPrintInfo(const ImgSize& obj)
 {
     char info[64] = {0};
-    sprintf_s(info, sizeof(info), "[w:%d,h:%d]", obj.width, obj.height);
+    (void)sprintf_s(info, sizeof(info), "[w:%d,h:%d]", obj.width, obj.height);
     return string(info);
 }
 
@@ -62,7 +62,7 @@ string HCodecListUnitTest::GetPrintInfo(const vector<int32_t>& obj)
     string info = "";
     for (const int32_t& one : obj) {
         char tmp[16] = {0};
-        sprintf_s(tmp, sizeof(tmp), "%d,", one);
+        (void)sprintf_s(tmp, sizeof(tmp), "%d,", one);
         info += string(tmp);
     }
     return info;
@@ -73,7 +73,7 @@ string HCodecListUnitTest::GetPrintInfo(const map<int32_t, vector<int32_t>>& obj
     string info = "";
     for (auto iter = obj.begin(); iter != obj.end(); ++iter) {
         char tmp[16] = {0};
-        sprintf_s(tmp, sizeof(tmp), "%d", iter->first);
+        (void)sprintf_s(tmp, sizeof(tmp), "%d", iter->first);
         info += "(K=" + string(tmp) + " V=" + GetPrintInfo(iter->second) + "),";
     }
     return info;
@@ -180,5 +180,4 @@ HWTEST_F(HCodecListUnitTest, max_instance_hevc_encoder, TestSize.Level1)
     EXPECT_FALSE(failObj);
     objPool.clear();
 }
-
 }

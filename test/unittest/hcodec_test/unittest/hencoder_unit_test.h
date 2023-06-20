@@ -22,15 +22,14 @@
 
 namespace OHOS {
 namespace MediaAVCodec {
-
 class HEncoderCallback : public AVCodecCallback {
-    public:
-        HEncoderCallback() {}
-        ~HEncoderCallback() {}
-        void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
-        void OnOutputFormatChanged(const Format &format) override;
-        void OnInputBufferAvailable(uint32_t index) override;
-        void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
+public:
+    HEncoderCallback() {}
+    ~HEncoderCallback() {}
+    void OnError(AVCodecErrorType errorType, int32_t errorCode) override;
+    void OnOutputFormatChanged(const Format &format) override;
+    void OnInputBufferAvailable(uint32_t index) override;
+    void OnOutputBufferAvailable(uint32_t index, AVCodecBufferInfo info, AVCodecBufferFlag flag) override;
 };
 
 class HEncoderPreparingUnitTest : public testing::Test {
@@ -63,7 +62,6 @@ public:
     bool ConfigureHevcEncoder(std::shared_ptr<HCodec>& encoder);
     bool SetCallbackToEncoder(std::shared_ptr<HCodec>& encoder);
 };
-
 } // namespace MediaAVCodec
 } // namespace OHOS
 

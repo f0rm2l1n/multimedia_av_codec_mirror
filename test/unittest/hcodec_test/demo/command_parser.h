@@ -25,7 +25,6 @@
 #include "start_code_detector.h"
 
 namespace OHOS::MediaAVCodec {
-
 enum class BufferType {
     SURFACE,
     ASHMEM,
@@ -60,6 +59,5 @@ struct CommandOpt {
 
 CommandOpt Parse(int argc, char *argv[]);
 void ShowUsage();
-
 }
 #endif

@@ -114,4 +114,4 @@ private:
     static bool IsIdr(const NALUInfo &nalu, CodeType type);
 };
 
-#endif //UTIL_STARTCODEDETECTOR_H
+#endif // UTIL_STARTCODEDETECTOR_H

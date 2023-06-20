@@ -53,7 +53,7 @@ bool HCodecDemuxer::LoadNaluListFromPath(const std::string &path, CodeType type)
 
     for (auto it = posOfFile.begin(); it != posOfFile.end(); ++it) {
         auto nex = next(it);
-        NALUInfo info{
+        NALUInfo info {
             .offset = it->first,
             .size = (nex == posOfFile.end()) ? (fileSize - it->first) : (nex->first - it->first),
             .nalType = GetNalType(it->second, type),

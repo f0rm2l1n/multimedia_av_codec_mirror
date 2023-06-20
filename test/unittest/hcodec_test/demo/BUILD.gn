@@ -27,14 +27,14 @@ ohos_executable("hdecoder_demo") {
     "$av_codec_root_dir/services/engine/codec/video/hcodec/",
     "$av_codec_root_dir/interfaces/inner_api/native/",
     "$av_codec_root_dir/interfaces/kits/c/",
-    "//foundation/window/window_manager/interfaces/innerkits/wm/",
+    "$av_codec_root_dir/../../../foundation/window/window_manager/interfaces/innerkits/wm/",
   ]
-  deps = [
-    "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec",
-    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
-    "//foundation/window/window_manager/wm:libwm",
+  deps = [ "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "graphic_standard:librender_service_client",
+    "window_manager:libwm",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog", ]
 }
 
 ohos_executable("hencoder_demo") {
@@ -49,13 +49,10 @@ ohos_executable("hencoder_demo") {
     "$av_codec_root_dir/services/engine/codec/video/hcodec/",
     "$av_codec_root_dir/interfaces/inner_api/native/",
     "$av_codec_root_dir/interfaces/kits/c/",
-    "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/codec/interfaces/include/",
+    "$av_codec_root_dir/../../../third_party/openmax/api/1.1.2",
+    "$av_codec_root_dir/../../../drivers/peripheral/codec/interfaces/include/",
   ]
-  deps = [
-    "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-  ]
+  deps = [ "$av_codec_root_dir/services/engine/codec/video/hcodec:hcodec" ]
   external_deps = [ "drivers_interface_codec:codec_idl_headers" ]
 }
 
@@ -72,5 +69,5 @@ ohos_executable("create_hcodec_by_capi") {
     "$av_codec_root_dir/interfaces/inner_api/native:av_codec_client",
     "$av_codec_root_dir/interfaces/kits/c:capi_packages",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog", ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
