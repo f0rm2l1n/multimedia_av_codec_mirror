@@ -63,9 +63,6 @@ ohos_shared_library("hcodec") {
     "$av_codec_root_dir/multimedia/av_codec/interfaces/kits/c/",
   ]
 
-  public_deps =
-      [ "//foundation/graphic/graphic_2d/utils:sync_fence" ]
-
   deps = [
     "$av_codec_root_dir/services/engine/base:av_codec_codec_base",
     "$av_codec_root_dir/services/utils:av_codec_format",
@@ -77,6 +74,7 @@ ohos_shared_library("hcodec") {
     "drivers_interface_codec:codec_idl_headers",
     "drivers_interface_codec:libcodec_proxy_1.0",
     "graphic_standard:surface",
+    "graphic_standard:sync_fence",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
