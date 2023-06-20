@@ -24,9 +24,7 @@ config("hcodec_public_cfg") {
 }
 
 config("hcodec_cfg") {
-  cflags_cc = [
-    "-fexceptions",
-  ]
+  cflags_cc = [ "-fexceptions" ]
 }
 
 ohos_shared_library("hcodec") {
@@ -41,10 +39,10 @@ ohos_shared_library("hcodec") {
   }
 
   sources = [
+    "hcodec.cpp",
     "hcodec_api.cpp",
     "hcodec_list.cpp",
     "hcodec_state.cpp",
-    "hcodec.cpp",
     "hdecoder.cpp",
     "hencoder.cpp",
     "msg_handle_loop.cpp",
@@ -65,23 +63,22 @@ ohos_shared_library("hcodec") {
     "$av_codec_root_dir/multimedia/av_codec/interfaces/kits/c/",
   ]
 
-  public_deps = [
-    "//foundation/graphic/graphic_2d/utils/sync_fence:sync_fence",
-  ]
+  public_deps =
+      [ "//foundation/graphic/graphic_2d/utils:sync_fence" ]
 
   deps = [
+    "$av_codec_root_dir/services/engine/base:av_codec_codec_base",
     "$av_codec_root_dir/services/utils:av_codec_format",
     "$av_codec_root_dir/services/utils:av_codec_service_utils",
-    "$av_codec_root_dir/services/engine/base:av_codec_codec_base",
   ]
 
   external_deps = [
-    "hdf_core:libhdi",
     "c_utils:utils",
-    "init:libbegetutil",
-    "graphic_standard:surface",
-    "hiviewdfx_hilog_native:libhilog",
     "drivers_interface_codec:codec_idl_headers",
     "drivers_interface_codec:libcodec_proxy_1.0",
+    "graphic_standard:surface",
+    "hdf_core:libhdi",
+    "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
   ]
 }
