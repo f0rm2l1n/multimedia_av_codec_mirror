@@ -175,7 +175,7 @@ static bool UpdateWriteBufferInfo(int fd, OH_AVMemory **buffer, OH_AVCodecBuffer
     if (ret <= 0) {
         return false;
     }
-    
+
     ret = read(fd, (void*)&info->flags, sizeof(info->flags));
     if (ret <= 0) {
         return false;
