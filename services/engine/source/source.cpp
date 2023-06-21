@@ -166,14 +166,6 @@ namespace {
         return true;
     }
 
-    void ReplaceDelimiter(const std::string& delmiters, char newDelimiter, std::string& str)
-    {
-        for (auto it = str.begin(); it != str.end(); ++it) {
-            if (delmiters.find(newDelimiter) != std::string::npos) {
-                *it = newDelimiter;
-            }
-        }
-    };
 }
 
 Status SourceRegister::AddPlugin(const PluginDefBase& def)
@@ -390,13 +382,14 @@ int32_t Source::Init(std::string& uri)
     return AVCS_ERR_OK;
 }
 
-
 int32_t Source::LoadInputFormatList()
 {
     const AVInputFormat* plugin = nullptr;
     constexpr size_t strMax = 4;
+    std::map<std::string, std::string> ext2name = { {"aac", "aac"}, {"flac", "flac"}, {"mp3", "mp3"},
+                                                    {"mp4", "mov"}, {"ogg", "ogg"}, {"ts", "mpegts"}, {"wav", "wav"} };
     void* i = nullptr;
-    while ((plugin = av_demuxer_iterate(&i))) {
+    while ((plugin = av_demuxer_iterate(&i)) && !(ext2name.empty())) {
         if (plugin->long_name != nullptr) {
             if (!strncmp(plugin->long_name, "pcm ", strMax)) {
                 continue;
@@ -405,13 +398,21 @@ int32_t Source::LoadInputFormatList()
         if (!IsInputFormatSupported(plugin->name)) {
             continue;
         }
-        std::string pluginName = "avdemux_" + std::string(plugin->name);
-        ReplaceDelimiter(".,|-<> ", '_', pluginName);
-        g_pluginInputFormat[pluginName] =
-            std::shared_ptr<AVInputFormat>(const_cast<AVInputFormat*>(plugin), [](void*) {});
+        for (auto iter = ext2name.begin(); iter != ext2name.end();) {
+            if (av_match_name(iter->second.c_str(), plugin->name)) {
+                std::string pluginName = "avdemux_" + std::string(iter->first);
+                g_pluginInputFormat[pluginName] =
+                std::shared_ptr<AVInputFormat>(const_cast<AVInputFormat*>(plugin), [](void*) {});
+                ext2name.erase(iter);
+                break;
+            } else {
+                ++iter;
+            }
+        }
+        
     }
     if (g_pluginInputFormat.empty()) {
-        AVCODEC_LOGW("cannot load any format demuxer");
+        printf("cannot load any format demuxer\n");
         return AVCS_ERR_INVALID_OPERATION;
     }
     return AVCS_ERR_OK;
@@ -449,17 +450,19 @@ int32_t Source::LoadDynamicPlugin(const std::string& path)
 
 int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInputFormat> &bestInputFormat)
 {
-    std::string uriSuffix = GetUriSuffix(uri);
+    std::string uriSuffix = "avdemux_" + GetUriSuffix(uri);
     if (uriSuffix.empty()) {
         AVCODEC_LOGW("can't found suffix ,please check the file %{private}s's suffix", uri.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
+    if (av_match_name(uriSuffix.c_str(),"ts")) {
+        uriSuffix = "mpegts";
+    }
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
     for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
         std::shared_ptr<AVInputFormat> inputFormat = iter->second;
-        int32_t ret = av_match_name(uriSuffix.c_str(), inputFormat->extensions);
-        int32_t ret2 = av_match_name(uriSuffix.c_str(), inputFormat->name);
-        if (ret == 1 || ret2 == 1) {
+        int32_t ret = av_match_name(uriSuffix.c_str(), iter->first.c_str());
+        if (ret == 1) {
             bestInputFormat = inputFormat;
             AVCODEC_LOGD("find input fromat successful: %{public}s", inputFormat->name);
             break;
