@@ -165,7 +165,6 @@ namespace {
         }
         return true;
     }
-
 }
 
 Status SourceRegister::AddPlugin(const PluginDefBase& def)
