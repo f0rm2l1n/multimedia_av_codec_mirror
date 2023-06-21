@@ -263,37 +263,37 @@ int32_t HEncoder::ConfigureOutputBitrate(const Format &format)
 
 int32_t HEncoder::SetupAVCEncoderParameters(const Format &format)
 {
-    OMX_VIDEO_PARAM_AVCTYPE h264type;
-    InitOMXParam(h264type);
-    h264type.nPortIndex = OMX_DirOutput;
-    if (!GetParameter(OMX_IndexParamVideoAvc, h264type)) {
+    OMX_VIDEO_PARAM_AVCTYPE avcType;
+    InitOMXParam(avcType);
+    avcType.nPortIndex = OMX_DirOutput;
+    if (!GetParameter(OMX_IndexParamVideoAvc, avcType)) {
         HLOGE("get OMX_IndexParamVideoAvc parameter fail");
         return AVCS_ERR_UNKNOWN;
     }
-    h264type.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
-    h264type.eProfile = OMX_VIDEO_AVCProfileBaseline;
-    h264type.nBFrames = 0;
+    avcType.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
+    avcType.eProfile = OMX_VIDEO_AVCProfileBaseline;
+    avcType.nBFrames = 0;
 
-    SetAvcFields(h264type, format);
-    if (h264type.nBFrames != 0) {
-        h264type.nAllowedPictureTypes |= OMX_VIDEO_PictureTypeB;
+    SetAvcFields(avcType, format);
+    if (avcType.nBFrames != 0) {
+        avcType.nAllowedPictureTypes |= OMX_VIDEO_PictureTypeB;
     }
-    h264type.bEnableUEP = OMX_FALSE;
-    h264type.bEnableFMO = OMX_FALSE;
-    h264type.bEnableASO = OMX_FALSE;
-    h264type.bEnableRS = OMX_FALSE;
-    h264type.bFrameMBsOnly = OMX_TRUE;
-    h264type.bMBAFF = OMX_FALSE;
-    h264type.eLoopFilterMode = OMX_VIDEO_AVCLoopFilterEnable;
+    avcType.bEnableUEP = OMX_FALSE;
+    avcType.bEnableFMO = OMX_FALSE;
+    avcType.bEnableASO = OMX_FALSE;
+    avcType.bEnableRS = OMX_FALSE;
+    avcType.bFrameMBsOnly = OMX_TRUE;
+    avcType.bMBAFF = OMX_FALSE;
+    avcType.eLoopFilterMode = OMX_VIDEO_AVCLoopFilterEnable;
 
-    if (!SetParameter(OMX_IndexParamVideoAvc, h264type)) {
+    if (!SetParameter(OMX_IndexParamVideoAvc, avcType)) {
         HLOGE("failed to set OMX_IndexParamVideoAvc");
         return AVCS_ERR_UNKNOWN;
     }
     return AVCS_ERR_OK;
 }
 
-void HEncoder::SetAvcFields(OMX_VIDEO_PARAM_AVCTYPE& h264type, const Format &format)
+void HEncoder::SetAvcFields(OMX_VIDEO_PARAM_AVCTYPE& avcType, const Format &format)
 {
     int32_t iFrameInterval = -1;
     format.GetIntValue(MediaDescriptionKey::MD_KEY_I_FRAME_INTERVAL, iFrameInterval);
@@ -304,46 +304,46 @@ void HEncoder::SetAvcFields(OMX_VIDEO_PARAM_AVCTYPE& h264type, const Format &for
     if (format.GetIntValue(MediaDescriptionKey::MD_KEY_PROFILE, profile)) {
         optional<OMX_VIDEO_AVCPROFILETYPE> omxAvcProfile = TypeConverter::AvcProfileToOmxAvcProfile(profile);
         if (omxAvcProfile.has_value()) {
-            h264type.eProfile = omxAvcProfile.value();
+            avcType.eProfile = omxAvcProfile.value();
         }
     }
     HLOGI("iFrameInterval:%{public}d, frameRate:%{public}.2f, eProfile:0x%{public}x, eLevel:0x%{public}x",
-        iFrameInterval, frameRate, h264type.eProfile, h264type.eLevel);
+        iFrameInterval, frameRate, avcType.eProfile, avcType.eLevel);
 
-    if (h264type.eProfile == OMX_VIDEO_AVCProfileBaseline) {
-        h264type.nSliceHeaderSpacing = 0;
-        h264type.bUseHadamard = OMX_TRUE;
-        h264type.nRefFrames = 1;
-        h264type.nPFrames = SetPFramesSpacing(iFrameInterval, frameRate, h264type.nBFrames);
-        if (h264type.nPFrames == 0) {
-            h264type.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI;
+    if (avcType.eProfile == OMX_VIDEO_AVCProfileBaseline) {
+        avcType.nSliceHeaderSpacing = 0;
+        avcType.bUseHadamard = OMX_TRUE;
+        avcType.nRefFrames = 1;
+        avcType.nPFrames = SetPFramesSpacing(iFrameInterval, frameRate, avcType.nBFrames);
+        if (avcType.nPFrames == 0) {
+            avcType.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI;
         }
-        h264type.nRefIdx10ActiveMinus1 = 0;
-        h264type.nRefIdx11ActiveMinus1 = 0;
-        h264type.bEntropyCodingCABAC = OMX_FALSE;
-        h264type.bWeightedPPrediction = OMX_FALSE;
-        h264type.bconstIpred = OMX_FALSE;
-        h264type.bDirect8x8Inference = OMX_FALSE;
-        h264type.bDirectSpatialTemporal = OMX_FALSE;
-        h264type.nCabacInitIdc = 0;
-    } else if (h264type.eProfile == OMX_VIDEO_AVCProfileMain || h264type.eProfile == OMX_VIDEO_AVCProfileHigh) {
-        h264type.nSliceHeaderSpacing = 0;
-        h264type.bUseHadamard = OMX_TRUE;
+        avcType.nRefIdx10ActiveMinus1  = 0;
+        avcType.nRefIdx11ActiveMinus1  = 0;
+        avcType.bEntropyCodingCABAC    = OMX_FALSE;
+        avcType.bWeightedPPrediction   = OMX_FALSE;
+        avcType.bconstIpred            = OMX_FALSE;
+        avcType.bDirect8x8Inference    = OMX_FALSE;
+        avcType.bDirectSpatialTemporal = OMX_FALSE;
+        avcType.nCabacInitIdc          = 0;
+    } else if (avcType.eProfile == OMX_VIDEO_AVCProfileMain || avcType.eProfile == OMX_VIDEO_AVCProfileHigh) {
+        avcType.nSliceHeaderSpacing = 0;
+        avcType.bUseHadamard = OMX_TRUE;
         int32_t maxBframes;
         if (format.GetIntValue("max-bframes", maxBframes)) {
-            h264type.nBFrames = maxBframes;
+            avcType.nBFrames = maxBframes;
         }
-        h264type.nRefFrames = h264type.nBFrames == 0 ? 1 : 2; // 2 is number of reference frames
-        h264type.nPFrames = SetPFramesSpacing(iFrameInterval, frameRate, h264type.nBFrames);
-        h264type.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
-        h264type.nRefIdx10ActiveMinus1 = 0;
-        h264type.nRefIdx11ActiveMinus1 = 0;
-        h264type.bEntropyCodingCABAC = OMX_TRUE;
-        h264type.bWeightedPPrediction = OMX_TRUE;
-        h264type.bconstIpred = OMX_TRUE;
-        h264type.bDirect8x8Inference = OMX_TRUE;
-        h264type.bDirectSpatialTemporal = OMX_TRUE;
-        h264type.nCabacInitIdc = 1;
+        avcType.nRefFrames = avcType.nBFrames == 0 ? 1 : 2; // 2 is number of reference frames
+        avcType.nPFrames = SetPFramesSpacing(iFrameInterval, frameRate, avcType.nBFrames);
+        avcType.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
+        avcType.nRefIdx10ActiveMinus1 = 0;
+        avcType.nRefIdx11ActiveMinus1 = 0;
+        avcType.bEntropyCodingCABAC = OMX_TRUE;
+        avcType.bWeightedPPrediction = OMX_TRUE;
+        avcType.bconstIpred = OMX_TRUE;
+        avcType.bDirect8x8Inference = OMX_TRUE;
+        avcType.bDirectSpatialTemporal = OMX_TRUE;
+        avcType.nCabacInitIdc = 1;
     }
 }
 
