@@ -14,6 +14,7 @@
  */
 
 #include "audio_codec_adapter.h"
+#include <malloc.h>
 #include "avcodec_dfx.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
@@ -45,6 +46,7 @@ AudioCodecAdapter::~AudioCodecAdapter()
         audioCodec = nullptr;
     }
     state_ = CodecState::RELEASED;
+    (void)mallopt(M_FLUSH_THREAD_CACHE, 0);
 }
 
 int32_t AudioCodecAdapter::SetCallback(const std::shared_ptr<AVCodecCallback> &callback)
@@ -419,6 +421,8 @@ int32_t AudioCodecAdapter::doConfigure(const Format &format)
         AVCODEC_LOGE("state_=%{public}s", stateToString(state_).data());
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_STATE;
     }
+    (void)mallopt(M_SET_THREAD_CACHE, M_THREAD_CACHE_DISABLE);
+    (void)mallopt(M_DELAYED_FREE, M_DELAYED_FREE_DISABLE);
     int32_t ret = audioCodec->Init(format);
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         AVCODEC_LOGE("configure failed, because codec init failed,error:%{public}d.", static_cast<int>(ret));
