@@ -177,7 +177,7 @@ bool HCodecDemuxer::IsXpsStart(const NALUInfo &nalu, CodeType type)
         case H264:
             return nalType == static_cast<uint8_t>(H264NalType::SPS);
         case H265:
-            return nalType == static_cast<uint8_t>(H265NalType::VPS_NUT);
+            return nalType == static_cast<uint8_t>(H265NalType::HEVC_VPS_NUT);
         default:
             return false;
     }
@@ -191,9 +191,9 @@ bool HCodecDemuxer::IsCsd(const NALUInfo &nalu, CodeType type)
             return nalType == static_cast<uint8_t>(H264NalType::SPS) ||
                    nalType == static_cast<uint8_t>(H264NalType::PPS);
         case H265:
-            return nalType == static_cast<uint8_t>(H265NalType::VPS_NUT) ||
-                   nalType == static_cast<uint8_t>(H265NalType::SPS_NUT) ||
-                   nalType == static_cast<uint8_t>(H265NalType::PPS_NUT);
+            return nalType == static_cast<uint8_t>(H265NalType::HEVC_VPS_NUT) ||
+                   nalType == static_cast<uint8_t>(H265NalType::HEVC_SPS_NUT) ||
+                   nalType == static_cast<uint8_t>(H265NalType::HEVC_PPS_NUT);
         default:
             return false;
     }
@@ -206,9 +206,9 @@ bool HCodecDemuxer::IsIdr(const NALUInfo &nalu, CodeType type)
         case H264:
             return nalType == static_cast<uint8_t>(H264NalType::IDR);
         case H265:
-            return nalType == static_cast<uint8_t>(H265NalType::IDR_W_RADL) ||
-                   nalType == static_cast<uint8_t>(H265NalType::IDR_N_LP) ||
-                   nalType == static_cast<uint8_t>(H265NalType::CRA_NUT);
+            return nalType == static_cast<uint8_t>(H265NalType::HEVC_IDR_W_RADL) ||
+                   nalType == static_cast<uint8_t>(H265NalType::HEVC_IDR_N_LP) ||
+                   nalType == static_cast<uint8_t>(H265NalType::HEVC_CRA_NUT);
         default:
             return false;
     }
