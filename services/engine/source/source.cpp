@@ -448,11 +448,12 @@ int32_t Source::LoadDynamicPlugin(const std::string& path)
 
 int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInputFormat> &bestInputFormat)
 {
-    std::string uriSuffix = "avdemux_" + GetUriSuffix(uri);
+    std::string uriSuffix = GetUriSuffix(uri);
     if (uriSuffix.empty()) {
         AVCODEC_LOGW("can't found suffix ,please check the file %{private}s's suffix", uri.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
+    uriSuffix = "avdemux_" + uriSuffix;
     std::shared_ptr<AVInputFormat> inputFormat = nullptr;
     if (g_pluginInputFormat.count(uriSuffix)) {
         inputFormat = g_pluginInputFormat[uriSuffix];
