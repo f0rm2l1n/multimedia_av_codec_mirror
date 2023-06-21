@@ -385,7 +385,7 @@ int32_t Source::LoadInputFormatList()
 {
     const AVInputFormat* plugin = nullptr;
     constexpr size_t strMax = 4;
-    std::map<std::string, std::string> ext2demuxer = { {"aac", "aac"}, {"flac", "flac"}, {"mp3", "mp3"},
+    std::map<std::string, std::string> ext2demuxer = { {"aac", "aac"}, {"flac", "flac"}, {"mp3", "mp3"}, {"m4a","mov"},
                                                     {"mp4", "mov"}, {"ogg", "ogg"}, {"ts", "mpegts"}, {"wav", "wav"} };
     void* i = nullptr;
     while ((plugin = av_demuxer_iterate(&i)) && !(ext2demuxer.empty())) {
@@ -454,15 +454,11 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
         AVCODEC_LOGW("can't found suffix ,please check the file %{private}s's suffix", uri.c_str());
         return AVCS_ERR_INVALID_OPERATION;
     }
-    std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
-    for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
-        std::shared_ptr<AVInputFormat> inputFormat = iter->second;
-        int32_t ret = av_match_name(uriSuffix.c_str(), iter->first.c_str());
-        if (ret == 1) {
-            bestInputFormat = inputFormat;
-            AVCODEC_LOGD("find input fromat successful: %{public}s", inputFormat->name);
-            break;
-        }
+    std::shared_ptr<AVInputFormat> inputFormat = nullptr;
+    if (g_pluginInputFormat.count(uriSuffix)) {
+        inputFormat = g_pluginInputFormat[uriSuffix];
+        bestInputFormat = inputFormat;
+        AVCODEC_LOGD("find input fromat successful: %{public}s", inputFormat->name);
     }
     return AVCS_ERR_OK;
 }
