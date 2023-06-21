@@ -386,10 +386,10 @@ int32_t Source::LoadInputFormatList()
 {
     const AVInputFormat* plugin = nullptr;
     constexpr size_t strMax = 4;
-    std::map<std::string, std::string> ext2name = { {"aac", "aac"}, {"flac", "flac"}, {"mp3", "mp3"},
+    std::map<std::string, std::string> ext2demuxer = { {"aac", "aac"}, {"flac", "flac"}, {"mp3", "mp3"},
                                                     {"mp4", "mov"}, {"ogg", "ogg"}, {"ts", "mpegts"}, {"wav", "wav"} };
     void* i = nullptr;
-    while ((plugin = av_demuxer_iterate(&i)) && !(ext2name.empty())) {
+    while ((plugin = av_demuxer_iterate(&i)) && !(ext2demuxer.empty())) {
         if (plugin->long_name != nullptr) {
             if (!strncmp(plugin->long_name, "pcm ", strMax)) {
                 continue;
@@ -398,12 +398,12 @@ int32_t Source::LoadInputFormatList()
         if (!IsInputFormatSupported(plugin->name)) {
             continue;
         }
-        for (auto iter = ext2name.begin(); iter != ext2name.end();) {
+        for (auto iter = ext2demuxer.begin(); iter != ext2demuxer.end();) {
             if (av_match_name(iter->second.c_str(), plugin->name)) {
                 std::string pluginName = "avdemux_" + std::string(iter->first);
                 g_pluginInputFormat[pluginName] =
                 std::shared_ptr<AVInputFormat>(const_cast<AVInputFormat*>(plugin), [](void*) {});
-                ext2name.erase(iter);
+                ext2demuxer.erase(iter);
                 break;
             } else {
                 ++iter;
@@ -412,7 +412,7 @@ int32_t Source::LoadInputFormatList()
         
     }
     if (g_pluginInputFormat.empty()) {
-        printf("cannot load any format demuxer\n");
+        AVCODEC_LOGW("cannot load any format demuxer");
         return AVCS_ERR_INVALID_OPERATION;
     }
     return AVCS_ERR_OK;
@@ -454,9 +454,6 @@ int32_t Source::GuessInputFormat(const std::string& uri, std::shared_ptr<AVInput
     if (uriSuffix.empty()) {
         AVCODEC_LOGW("can't found suffix ,please check the file %{private}s's suffix", uri.c_str());
         return AVCS_ERR_INVALID_OPERATION;
-    }
-    if (av_match_name(uriSuffix.c_str(),"ts")) {
-        uriSuffix = "mpegts";
     }
     std::map<std::string, std::shared_ptr<AVInputFormat>>::iterator iter;
     for (iter = g_pluginInputFormat.begin(); iter != g_pluginInputFormat.end(); ++iter) {
