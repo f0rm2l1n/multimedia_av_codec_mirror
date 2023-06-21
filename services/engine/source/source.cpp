@@ -408,7 +408,6 @@ int32_t Source::LoadInputFormatList()
                 ++iter;
             }
         }
-        
     }
     if (g_pluginInputFormat.empty()) {
         AVCODEC_LOGW("cannot load any format demuxer");
