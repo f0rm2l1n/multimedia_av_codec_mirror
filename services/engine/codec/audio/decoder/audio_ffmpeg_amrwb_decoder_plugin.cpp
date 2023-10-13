@@ -13,24 +13,24 @@
  * limitations under the License.
  */
 
-#include "audio_ffmpeg_amrnb_decoder_plugin.h"
+#include "audio_ffmpeg_amrwb_decoder_plugin.h"
 #include "avcodec_errors.h"
 #include "avcodec_log.h"
 #include "media_description.h"
 #include "avcodec_mime_type.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegAmrnbDecoderPlugin"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioFFMpegAmrwbDecoderPlugin"};
 constexpr int SUPPORT_CHANNELS = 1;
-constexpr int SUPPORT_SAMPLE_RATE = 8000;
+constexpr int SUPPORT_SAMPLE_RATE = 16000;
 constexpr int INPUT_BUFFER_SIZE_DEFAULT = 150;
 constexpr int OUTPUT_BUFFER_SIZE_DEFAULT = 1280;
 } // namespace
 
 namespace OHOS {
 namespace MediaAVCodec {
-constexpr std::string_view AUDIO_CODEC_NAME = "amrnb";
-AudioFFMpegAmrnbDecoderPlugin::AudioFFMpegAmrnbDecoderPlugin()
+constexpr std::string_view AUDIO_CODEC_NAME = "amrwb";
+AudioFFMpegAmrwbDecoderPlugin::AudioFFMpegAmrwbDecoderPlugin()
     : basePlugin(std::make_unique<AudioFfmpegDecoderPlugin>())
 {
     channels = 0;
@@ -38,17 +38,17 @@ AudioFFMpegAmrnbDecoderPlugin::AudioFFMpegAmrnbDecoderPlugin()
     bitRate = 0;
 }
 
-AudioFFMpegAmrnbDecoderPlugin::~AudioFFMpegAmrnbDecoderPlugin()
+AudioFFMpegAmrwbDecoderPlugin::~AudioFFMpegAmrwbDecoderPlugin()
 {
     basePlugin->Release();
     basePlugin.reset();
     basePlugin = nullptr;
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::Init(const Format &format)
+int32_t AudioFFMpegAmrwbDecoderPlugin::Init(const Format &format)
 {
-    int32_t ret = basePlugin->AllocateContext("amrnb");
-    int32_t checkresult = AudioFFMpegAmrnbDecoderPlugin::Checkinit(format);
+    int32_t ret = basePlugin->AllocateContext("amrwb");
+    int32_t checkresult = AudioFFMpegAmrwbDecoderPlugin::Checkinit(format);
     if (checkresult != AVCodecServiceErrCode::AVCS_ERR_OK) {
         return checkresult;
     }
@@ -64,32 +64,32 @@ int32_t AudioFFMpegAmrnbDecoderPlugin::Init(const Format &format)
     return basePlugin->OpenContext();
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioFFMpegAmrwbDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     return basePlugin->ProcessSendData(inputBuffer);
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioFFMpegAmrwbDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     return basePlugin->ProcessRecieveData(outBuffer);
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::Reset()
+int32_t AudioFFMpegAmrwbDecoderPlugin::Reset()
 {
     return basePlugin->Reset();
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::Release()
+int32_t AudioFFMpegAmrwbDecoderPlugin::Release()
 {
     return basePlugin->Release();
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::Flush()
+int32_t AudioFFMpegAmrwbDecoderPlugin::Flush()
 {
     return basePlugin->Flush();
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::GetInputBufferSize() const
+int32_t AudioFFMpegAmrwbDecoderPlugin::GetInputBufferSize() const
 {
     int32_t maxSize = basePlugin->GetMaxInputSize();
     if (maxSize < 0 || maxSize > INPUT_BUFFER_SIZE_DEFAULT) {
@@ -98,19 +98,19 @@ int32_t AudioFFMpegAmrnbDecoderPlugin::GetInputBufferSize() const
     return maxSize;
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::GetOutputBufferSize() const
+int32_t AudioFFMpegAmrwbDecoderPlugin::GetOutputBufferSize() const
 {
     return OUTPUT_BUFFER_SIZE_DEFAULT;
 }
 
-Format AudioFFMpegAmrnbDecoderPlugin::GetFormat() const noexcept
+Format AudioFFMpegAmrwbDecoderPlugin::GetFormat() const noexcept
 {
     auto format = basePlugin->GetFormat();
     format.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_MPEG);
     return format;
 }
 
-int32_t AudioFFMpegAmrnbDecoderPlugin::Checkinit(const Format &format)
+int32_t AudioFFMpegAmrwbDecoderPlugin::Checkinit(const Format &format)
 {
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
@@ -125,7 +125,7 @@ int32_t AudioFFMpegAmrnbDecoderPlugin::Checkinit(const Format &format)
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-std::string_view AudioFFMpegAmrnbDecoderPlugin::GetCodecType() const noexcept
+std::string_view AudioFFMpegAmrwbDecoderPlugin::GetCodecType() const noexcept
 {
     return AUDIO_CODEC_NAME;
 }
