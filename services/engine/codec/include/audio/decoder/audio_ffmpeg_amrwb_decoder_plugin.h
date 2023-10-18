@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_FFMPEG_AAC_DECODER_PLUGIN_H
-#define AUDIO_FFMPEG_AAC_DECODER_PLUGIN_H
+#ifndef AUDIO_FFMPEG_AMRWB_DECODER_PLUGIN_H
+#define AUDIO_FFMPEG_AMRWB_DECODER_PLUGIN_H
 
 #include "audio_base_codec.h"
 #include "audio_ffmpeg_decoder_plugin.h"
@@ -22,10 +22,10 @@
 
 namespace OHOS {
 namespace MediaAVCodec {
-class AudioFFMpegAacDecoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegAacDecoderPlugin> {
+class AudioFFMpegAmrwbDecoderPlugin : public AudioBaseCodec::CodecRegister<AudioFFMpegAmrwbDecoderPlugin> {
 public:
-    AudioFFMpegAacDecoderPlugin();
-    ~AudioFFMpegAacDecoderPlugin() override;
+    AudioFFMpegAmrwbDecoderPlugin();
+    ~AudioFFMpegAmrwbDecoderPlugin() override;
 
     int32_t Init(const Format &format) override;
     int32_t ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer) override;
@@ -37,22 +37,19 @@ public:
     int32_t GetOutputBufferSize() const override;
     Format GetFormat() const noexcept override;
     std::string_view GetCodecType() const noexcept override;
+
     const static std::string Identify()
     {
-        return std::string(AVCodecCodecName::AUDIO_DECODER_AAC_NAME);
+        return std::string(AVCodecCodecName::AUDIO_DECODER_AMRWB_NAME);
     }
 
 private:
-    std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
-    std::string aacName_;
-    int32_t channels_;
-
-private:
-    bool CheckAdts(const Format &format);
+    int32_t Checkinit(const Format &format);
     bool CheckSampleFormat(const Format &format);
-    bool CheckFormat(const Format &format);
-    bool CheckChannelCount(const Format &format);
-    bool CheckSampleRate(const Format &format) const;
+    int channels;
+    int sampleRate;
+    int64_t bitRate;
+    std::unique_ptr<AudioFfmpegDecoderPlugin> basePlugin;
 };
 } // namespace MediaAVCodec
 } // namespace OHOS
