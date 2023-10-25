@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,20 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//foundation/multimedia/av_codec/config.gni")
-
-group("av_codec_services_package") {
+group("hcodec_test_adapter") {
   deps = [
-    "etc:av_codec_service.cfg",
-    "services:av_codec_service",
-    "utils:av_codec_service_utils",
+    "demo:hcodec_demo_adapter",
+    "helper:hcodec_test_helper_adapter",
   ]
-  if (av_codec_support_hcodec) {
-    deps += [
-      "engine/codec/video/hcodec:hcodec",
-      "media_engine/modules/codec/video_adapter/hcodec_adapter:hcodec_adapter",
-      "media_engine/modules/codec/video_adapter/hcodec_test_adapter:hcodec_test_adapter",
-    ]
-  }
 }
