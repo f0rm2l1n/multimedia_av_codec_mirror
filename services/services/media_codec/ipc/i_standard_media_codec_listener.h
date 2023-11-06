@@ -12,36 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_STANDARD_AVCODEC_SERVICE_H
-#define I_STANDARD_AVCODEC_SERVICE_H
 
+#ifndef I_STANDARD_MEDIA_CODEC_LISTENER_H
+#define I_STANDARD_MEDIA_CODEC_LISTENER_H
+
+#include <atomic>
+#include <limits>
 #include "av_codec_service_ipc_interface_code.h"
+#include "avcodec_common.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
 #include "iremote_stub.h"
+#include "avbuffer.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
-class IStandardAVCodecService : public IRemoteBroker {
+class IStandardMediaCodecListener : public IRemoteBroker {
 public:
-    /**
-     * sub system ability ID
-     */
-    enum AVCodecSystemAbility : int32_t {
-        AVCODEC_DEMUXER = 0,
-        AVCODEC_MUXER,
-        AVCODEC_CODECLIST,
-        AVCODEC_CODEC,
-        AVCODEC_SOURCE,
-        AVCODEC_MEDIA_CODEC
-    };
+    virtual ~IStandardMediaCodecListener() = default;
+    virtual void OnError(AVCodecErrorType errorType, int32_t errorCode) = 0;
+    virtual void OnStreamChanged(const Format &format) = 0;
+    virtual void SurfaceModeOnBufferFilled(std::shared_ptr<Media::AVBuffer> buffer) = 0;
+    virtual bool FindBufferFromIndex(uint64_t index, std::shared_ptr<Media::AVBuffer> buffer) = 0;
+};
 
-    virtual sptr<IRemoteObject> GetSubSystemAbility(IStandardAVCodecService::AVCodecSystemAbility subSystemId,
-        const sptr<IRemoteObject> &listener) = 0;
-
-    DECLARE_INTERFACE_DESCRIPTOR(u"IStandardAVCodecServiceInterface");
+    DECLARE_INTERFACE_DESCRIPTOR(u"IStandardCodecListener");
+private:
+    std::atomic<uint64_t> generation_ { 0 };
 };
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // I_STANDARD_AVCODEC_SERVICE_H
+#endif // I_STANDARD_MEDIA_CODEC_LISTENER_H
