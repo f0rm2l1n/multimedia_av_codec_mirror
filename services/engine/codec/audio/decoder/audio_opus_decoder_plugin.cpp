@@ -23,55 +23,51 @@
 #include "ffmpeg_converter.h"
 #include "avcodec_audio_common.h"
 #include "securec.h"
-#include "audio_opus_encoder_plugin.h"
+#include "audio_opus_decoder_plugin.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioOpusEncoderPlugin"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN, "AvCodec-AudioOpusDecoderPlugin"};
 constexpr std::string_view AUDIO_CODEC_NAME = "opus";
 constexpr int32_t INITVAL = -1;
-constexpr float TIME_S = 0.02;
 constexpr int64_t TIME_US = 20000;
 constexpr int32_t MIN_CHANNELS = 1;
 constexpr int32_t MAX_CHANNELS = 2;
-constexpr int32_t MIN_COMPLEX = 1;
-constexpr int32_t MAX_COMPLEX = 10;
-constexpr int32_t MIN_BITRATE = 6000;
-constexpr int32_t MAX_BITRATE = 510000;
-static const int32_t OPUS_ENCODER_SAMPLE_RATE_TABLE[] = {
+
+static const int32_t OPUS_DECODER_SAMPLE_RATE_TABLE[] = {
     8000, 12000, 16000, 24000, 48000
 };
 }
 
 namespace OHOS {
 namespace MediaAVCodec {
-AudioOpusEncoderPlugin::AudioOpusEncoderPlugin()
+AudioOpusDecoderPlugin::AudioOpusDecoderPlugin()
 {
     ret = 0;
     void* handle = dlopen("/system/lib64/libav_codec_ext_base.z.so", 1);
     if (!handle) {
         ret = -1;
-        AVCODEC_LOGE("AudioOpusEncoderPlugin dlopen error, check .so file exist");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin dlopen error, check .so file exist");
     }
     OpusPluginClassCreateFun* PluginCodecCreate = (OpusPluginClassCreateFun *)dlsym(handle,
-        "OpusPluginClassEncoderCreate");
+        "OpusPluginClassDecoderCreate");
     if (!PluginCodecCreate) {
         ret = -1;
-        AVCODEC_LOGE("AudioOpusEncoderPlugin dlsym error, check .so file has this function");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin dlsym error, check .so file has this function");
     }
     if (ret == 0) {
-        AVCODEC_LOGD("AudioOpusEncoderPlugin dlopen and dlsym success");
+        AVCODEC_LOGD("AudioOpusDecoderPlugin dlopen and dlsym success");
         ret = PluginCodecCreate(&PluginCodecPtr);
     }
 }
 
-AudioOpusEncoderPlugin::~AudioOpusEncoderPlugin()
+AudioOpusDecoderPlugin::~AudioOpusDecoderPlugin()
 {
     Release();
 }
 
 static bool CheckSampleRate(int32_t sampleR)
 {
-    for (auto i : OPUS_ENCODER_SAMPLE_RATE_TABLE) {
+    for (auto i : OPUS_DECODER_SAMPLE_RATE_TABLE) {
         if (i == sampleR) {
             return true;
         }
@@ -79,65 +75,44 @@ static bool CheckSampleRate(int32_t sampleR)
     return false;
 }
 
-int32_t AudioOpusEncoderPlugin::CheckSampleFormat()
+int32_t AudioOpusDecoderPlugin::CheckSampleFormat()
 {
     if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin channels not supported");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin channels not supported");
         return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_MISMATCH_CHANNEL_COUNT;
     }
     if (!CheckSampleRate(sampleRate)) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin sampleRate not supported");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin sampleRate not supported");
         return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_SAMPLE_RATE;
-    }
-    if (bitRate < MIN_BITRATE || bitRate > MAX_BITRATE) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin bitRate not supported");
-        return AVCodecServiceErrCode::AVCS_ERR_MISMATCH_BIT_RATE;
-    }
-    if (complexity < MIN_COMPLEX || complexity > MAX_COMPLEX) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin complexity not supported");
-        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
-    }
-    if (sampleFmt != OHOS::MediaAVCodec::AudioSampleFormat::SAMPLE_S16LE) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin sampleFmt not supported");
-        return AVCodecServiceErrCode::AVCS_ERR_CONFIGURE_ERROR;
     }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioOpusEncoderPlugin::Init(const Format &format)
+int32_t AudioOpusDecoderPlugin::Init(const Format &format)
 {
     if (!PluginCodecPtr) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin Init dlopen or dlsym error");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin Init dlopen or dlsym error");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     channels = INITVAL;
     sampleRate = INITVAL;
-    sampleFmt = INITVAL;
-    bitRate = (int64_t) INITVAL;
-    complexity = INITVAL;
+
     format.GetIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format.GetIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, sampleFmt);
-    format.GetLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bitRate);
-    format.GetIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, complexity);
 
     format_ = format;
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_CHANNEL_COUNT, channels);
     format_.PutIntValue(MediaDescriptionKey::MD_KEY_SAMPLE_RATE, sampleRate);
-    format_.PutIntValue(MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT, sampleFmt);
-    format_.PutLongValue(MediaDescriptionKey::MD_KEY_BITRATE, bitRate);
-    format_.PutIntValue(MediaDescriptionKey::MD_KEY_COMPLIANCE_LEVEL, complexity);
     format_.PutStringValue(MediaDescriptionKey::MD_KEY_CODEC_MIME, AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_OPUS);
 
+    AVCODEC_LOGD("AudioOpusDecoderPlugin parameter channels:%{public}d samplerate:%{public}d", channels, sampleRate);
     ret = CheckSampleFormat();
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin parameter not supported");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin parameter not supported");
         return ret;
     }
     ret = PluginCodecPtr->SetPluginParameter(CHANNEL, channels);
     ret = PluginCodecPtr->SetPluginParameter(SAMPLE_RATE, sampleRate);
-    ret = PluginCodecPtr->SetPluginParameter(BIT_RATE, (int32_t) bitRate);
-    ret = PluginCodecPtr->SetPluginParameter(COMPLEXITY, complexity);
     ret = PluginCodecPtr->Init();
     if (ret != AVCodecServiceErrCode::AVCS_ERR_OK) {
         return ret;
@@ -145,24 +120,23 @@ int32_t AudioOpusEncoderPlugin::Init(const Format &format)
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioOpusEncoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
+int32_t AudioOpusDecoderPlugin::ProcessSendData(const std::shared_ptr<AudioBufferInfo> &inputBuffer)
 {
     if (!inputBuffer) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin inputBuffer is nullptr");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin inputBuffer is nullptr");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     if (!PluginCodecPtr) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin ProcessSendData dlopen or dlsym error");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin ProcessSendData dlopen or dlsym error");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     {
         std::lock_guard<std::mutex> lock(avMutext_);
         auto attr = inputBuffer->GetBufferAttr();
         bool isEos = inputBuffer->CheckIsEos();
-        AVCODEC_LOGD("SendBuffer buffer size:%{public}d", attr.size);
-        if (attr.size != ((int32_t) (sampleRate*TIME_S))*channels*sizeof(short) && !isEos) {
-            AVCODEC_LOGE("SendBuffer buffer size:%{public}d, expect:%{public}f", attr.size,
-                ((int32_t) sampleRate*TIME_S*sizeof(short)*channels));
+        len = attr.size;
+        if (attr.size == 0 && !isEos) {
+            AVCODEC_LOGE("SendBuffer buffer size:%{public}d", attr.size);
             return AVCodecServiceErrCode::AVCS_ERR_INVALID_DATA;
         }
         if (!isEos) {
@@ -174,18 +148,19 @@ int32_t AudioOpusEncoderPlugin::ProcessSendData(const std::shared_ptr<AudioBuffe
             len = -1;
             return AVCodecServiceErrCode::AVCS_ERR_END_OF_STREAM;
         }
+        AVCODEC_LOGD("PCM buffer size:%{public}d", len);
     }
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioOpusEncoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
+int32_t AudioOpusDecoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferInfo> &outBuffer)
 {
     if (!PluginCodecPtr) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin ProcessRecieveData dlopen or dlsym error");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin ProcessRecieveData dlopen or dlsym error");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     if (!outBuffer) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin outBuffer is nullptr");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin outBuffer is nullptr");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     {
@@ -193,9 +168,9 @@ int32_t AudioOpusEncoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferIn
         if (len > 0) {
             PluginCodecPtr->ProcessRecieveData(&codeData, len);
             auto memory = outBuffer->GetBuffer();
-            memory->Write(codeData, len);
+            memory->Write(codeData, len * channels * sizeof(short));
             auto attr = outBuffer->GetBufferAttr();
-            attr.size = len;
+            attr.size = len * channels * sizeof(short);
             attr.presentationTimeUs = TIME_US;
             outBuffer->SetBufferAttr(attr);
             ret = AVCodecServiceErrCode::AVCS_ERR_OK;
@@ -207,11 +182,11 @@ int32_t AudioOpusEncoderPlugin::ProcessRecieveData(std::shared_ptr<AudioBufferIn
     return ret;
 }
 
-int32_t AudioOpusEncoderPlugin::Reset()
+int32_t AudioOpusDecoderPlugin::Reset()
 {
     std::lock_guard<std::mutex> lock(avMutext_);
     if (!PluginCodecPtr) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin Reset dlopen or dlsym error");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin Reset dlopen or dlsym error");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     ret = PluginCodecPtr->Reset();
@@ -221,11 +196,11 @@ int32_t AudioOpusEncoderPlugin::Reset()
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioOpusEncoderPlugin::Release()
+int32_t AudioOpusDecoderPlugin::Release()
 {
     std::lock_guard<std::mutex> lock(avMutext_);
     if (!PluginCodecPtr) {
-        AVCODEC_LOGD("AudioOpusEncoderPlugin Release dlopen or dlsym error. release");
+        AVCODEC_LOGD("AudioOpusDecoderPlugin Release dlopen or dlsym error. release");
         return AVCodecServiceErrCode::AVCS_ERR_OK;
     }
     ret = PluginCodecPtr->Release();
@@ -237,11 +212,11 @@ int32_t AudioOpusEncoderPlugin::Release()
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioOpusEncoderPlugin::Flush()
+int32_t AudioOpusDecoderPlugin::Flush()
 {
     std::lock_guard<std::mutex> lock(avMutext_);
     if (!PluginCodecPtr) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin Flush dlopen or dlsym error");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin Flush dlopen or dlsym error");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     ret = PluginCodecPtr->Flush();
@@ -251,30 +226,30 @@ int32_t AudioOpusEncoderPlugin::Flush()
     return AVCodecServiceErrCode::AVCS_ERR_OK;
 }
 
-int32_t AudioOpusEncoderPlugin::GetInputBufferSize() const
+int32_t AudioOpusDecoderPlugin::GetInputBufferSize() const
 {
     if (!PluginCodecPtr) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin GetInputBufferSize dlopen or dlsym error");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin GetInputBufferSize dlopen or dlsym error");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     return PluginCodecPtr->GetInputBufferSize();
 }
 
-int32_t AudioOpusEncoderPlugin::GetOutputBufferSize() const
+int32_t AudioOpusDecoderPlugin::GetOutputBufferSize() const
 {
     if (!PluginCodecPtr) {
-        AVCODEC_LOGE("AudioOpusEncoderPlugin GetOutputBufferSize dlopen or dlsym error");
+        AVCODEC_LOGE("AudioOpusDecoderPlugin GetOutputBufferSize dlopen or dlsym error");
         return AVCodecServiceErrCode::AVCS_ERR_INVALID_VAL;
     }
     return PluginCodecPtr->GetOutputBufferSize();
 }
 
-Format AudioOpusEncoderPlugin::GetFormat() const noexcept
+Format AudioOpusDecoderPlugin::GetFormat() const noexcept
 {
     return format_;
 }
 
-std::string_view AudioOpusEncoderPlugin::GetCodecType() const noexcept
+std::string_view AudioOpusDecoderPlugin::GetCodecType() const noexcept
 {
     return AUDIO_CODEC_NAME;
 }
