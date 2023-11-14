@@ -13,43 +13,63 @@
  * limitations under the License.
  */
 
-#ifndef HISTREAMER_FILE_FD_SOURCE_PLUGIN_H
-#define HISTREAMER_FILE_FD_SOURCE_PLUGIN_H
+#ifndef MEDIA_PIPELINE_FILE_SOURCE_PLUGIN_H
+#define MEDIA_PIPELINE_FILE_SOURCE_PLUGIN_H
 
 #include <cstdio>
 #include <string>
 #include "interface/plugin/source_plugin.h"
 #include "plugin/plugin_buffer.h"
+#include "plugin/plugin_memory.h"
 
 namespace OHOS {
 namespace Media {
 namespace Plugin {
-namespace FileFdSource {
-class FileFdSourcePlugin : public SourcePlugin {
+namespace FileSource {
+class FileSourceAllocator : public Allocator {
 public:
-    explicit FileFdSourcePlugin(std::string name);
-    ~FileFdSourcePlugin() = default;
+    FileSourceAllocator() = default;
+    ~FileSourceAllocator() override = default;
+
+    void* Alloc(size_t size) override;
+    void Free(void* ptr) override; // NOLINT: void*
+};
+
+class FileSourcePlugin : public SourcePlugin {
+public:
+    explicit FileSourcePlugin(std::string name);
+    ~FileSourcePlugin() override;
+
+    Status Init() override;
+    Status Deinit() override;
+    Status Prepare() override;
+    Status Reset() override;
+    Status GetParameter(std::shared_ptr<Meta> meta) override;
+    Status SetParameter(std::shared_ptr<Meta> meta) override;
     Status SetCallback(Callback* cb) override;
     Status SetSource(std::shared_ptr<MediaSource> source) override;
     Status Read(std::shared_ptr<Buffer>& buffer, uint64_t offset, size_t expectedLen) override;
     Status GetSize(uint64_t& size) override;
     Seekable GetSeekable() override;
     Status SeekTo(uint64_t offset) override;
-    Status Reset() override;
+
+    std::shared_ptr<Allocator> GetAllocator();
 private:
-    Status ParseUriInfo(const std::string& uri);
+    std::string fileName_ {};
+    std::FILE* fp_;
+    uint64_t fileSize_;
+    Seekable seekable_;
+    uint64_t position_;
+    std::shared_ptr<FileSourceAllocator> mAllocator_ {nullptr};
 
-    int32_t fd_ {-1};
-    int64_t offset_ {0};
-    uint64_t size_ {0};
-
-    uint64_t fileSize_ {0};
-    Seekable seekable_ {Seekable::SEEKABLE};
-    uint64_t position_ {0};
+    Status ParseFileName(const std::string& uri);
+    Status CheckFileStat();
+    Status OpenFile();
+    void CloseFile();
 };
 } // namespace FileSource
 } // namespace Plugin
 } // namespace Media
 } // namespace OHOS
 
-#endif // HISTREAMER_FILE_FD_SOURCE_PLUGIN_H
+#endif // MEDIA_PIPELINE_FILE_SOURCE_PLUGIN_H
