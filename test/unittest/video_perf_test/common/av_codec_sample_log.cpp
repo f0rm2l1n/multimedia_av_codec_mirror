@@ -13,19 +13,7 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_TEST_LOG_H
-#define AVCODEC_TEST_LOG_H
+#include "av_codec_sample_log.h"
+#include "syspara/parameters.h"
 
-#include "avcodec_log.h"
-
-#undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002B66
-
-extern const bool VERBOSE_LOG;
-
-#define AVCODEC_LOGV(fmt, ...)              \
-    if (VERBOSE_LOG) {                      \
-        AVCODEC_LOGI(fmt, ##__VA_ARGS__);   \
-    }
-
-#endif // AVCODEC_SAMPLE_LOG_H
+const bool VERBOSE_LOG = OHOS::system::GetBoolParameter("OHOS.Media.AVCodecSample.VerboseLog", false);
