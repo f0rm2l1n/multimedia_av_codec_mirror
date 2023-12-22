@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//foundation/multimedia/av_codec/config.gni")
 
-config("av_codec_media_engine_modules_config") {
+config("ffmpeg_adapter_config") {
   defines = [
     "HST_ANY_WITH_NO_RTTI",
     "MEDIA_OHOS",
@@ -40,14 +40,16 @@ config("av_codec_media_engine_modules_config") {
   ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include/",
     "$av_codec_root_dir/interfaces",
-    "$av_codec_root_dir/services/media_engine/modules",
+    "$av_codec_root_dir/services/media_engine/plugins/ffmpeg_adapter",
+    "$av_codec_root_dir/services/media_engine/plugins/ffmpeg_adapter/muxer",
+    "$av_codec_root_dir/services/media_engine/plugins/ffmpeg_adapter/common",
     "$media_foundation_root_dir/interface/inner_api",
+    "//third_party/ffmpeg",
   ]
 }
 
-ohos_shared_library("av_codec_media_engine_modules") {
+ohos_shared_library("media_plugin_FFmpegMuxer") {
   install_enable = true
 
   sanitize = {
@@ -57,16 +59,17 @@ ohos_shared_library("av_codec_media_engine_modules") {
   }
 
   configs = [
-    ":av_codec_media_engine_modules_config",
+    ":ffmpeg_adapter_config",
     "$av_codec_root_dir/services/dfx:av_codec_service_log_dfx_public_config",
   ]
 
   sources = [
-    "muxer/data_sink_fd.cpp",
-    "muxer/data_sink_file.cpp",
-    "muxer/media_muxer.cpp",
-    "media_codec/media_codec.cpp",
+    "common/ffmpeg_utils.cpp",
+    "common/hevc_parser_manager.cpp",
+    "muxer/ffmpeg_muxer_plugin.cpp",
   ]
+
+  public_deps = [ "//third_party/ffmpeg:libohosffmpeg" ]
 
   external_deps = [
     "c_utils:utils",
@@ -74,10 +77,9 @@ ohos_shared_library("av_codec_media_engine_modules") {
     "graphic_2d:sync_fence",
     "hilog:libhilog",
     "histreamer:media_foundation",
-    "ipc:ipc_single",
-    "safwk:system_ability_fwk",
   ]
 
+  relative_install_dir = "media/media_plugins"
   subsystem_name = "multimedia"
   part_name = "av_codec"
 }
