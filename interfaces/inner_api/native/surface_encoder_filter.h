@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FILTERS_VIDEO_CAPTURE_FILTER_H
-#define FILTERS_VIDEO_CAPTURE_FILTER_H
+#ifndef FILTERS_SURFACE_ENCODER_FILTER_H
+#define FILTERS_SURFACE_ENCODER_FILTER_H
 
 #include <cstring>
 #include "filter/filter.h"
@@ -28,15 +28,14 @@
 #include "common/status.h"
 #include "common/log.h"
 
-#define TIME_NONE ((int64_t) -1)
-
 namespace OHOS {
 namespace Media {
+class SurfaceEncoderAdapter;
 namespace Pipeline {
-class VideoCaptureFilter : public Filter, public std::enable_shared_from_this<VideoCaptureFilter> {
+class SurfaceEncoderFilter : public Filter, public std::enable_shared_from_this<SurfaceEncoderFilter> {
 public:
-    explicit VideoCaptureFilter(std::string name, FilterType type);
-    ~VideoCaptureFilter() override;
+    explicit SurfaceEncoderFilter(std::string name, FilterType type);
+    ~SurfaceEncoderFilter() override;
     Status SetCodecFormat(const std::shared_ptr<Meta> &format);
     void Init(const std::shared_ptr<EventReceiver> &receiver,
         const std::shared_ptr<FilterCallback> &callback) override;
@@ -46,6 +45,7 @@ public:
     Status Start() override;
     Status Pause() override;
     Status Resume() override;
+    Status Reset();
     Status Stop() override;
     Status Flush() override;
     Status Release() override;
@@ -59,7 +59,6 @@ public:
     void OnLinkedResult(const sptr<AVBufferQueueProducer> &outputBufferQueue, std::shared_ptr<Meta> &meta);
     void OnUpdatedResult(std::shared_ptr<Meta> &meta);
     void OnUnlinkedResult(std::shared_ptr<Meta> &meta);
-    void OnBufferAvailable();
 
 protected:
     Status OnLinked(StreamType inType, const std::shared_ptr<Meta> &meta,
@@ -69,9 +68,6 @@ protected:
     Status OnUnLinked(StreamType inType, const std::shared_ptr<FilterLinkCallback>& callback) override;
 
 private:
-    int64_t GetBufferPts(int64_t timestamp);
-    static constexpr uint32_t ENCODE_USAGE = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE |
-                                             BUFFER_USAGE_MEM_DMA | BUFFER_USAGE_VIDEO_ENCODER;
     std::string name_;
     FilterType filterType_;
 
@@ -79,21 +75,15 @@ private:
     std::shared_ptr<FilterCallback> filterCallback_;
 
     std::shared_ptr<FilterLinkCallback> onLinkedResultCallback_;
+
+    std::shared_ptr<SurfaceEncoderAdapter> mediaCodec_;
+
+    std::string codecMimeType_;
     std::shared_ptr<Meta> configureParameter_;
+
     std::shared_ptr<Filter> nextFilter_;
-
-    sptr<AVBufferQueueProducer> outputBufferQueueProducer_;
-
-    sptr<Surface> inputSurface_;
-
-    bool isStop_{false};
-    bool refreshTotalPauseTime_{false};
-    int64_t startBufferTime_{TIME_NONE};
-    int64_t latestBufferTime_{TIME_NONE};
-    int64_t latestPausedTime_{TIME_NONE};
-    int64_t totalPausedTime_{0};
 };
 } // namespace Pipeline
 } // namespace MEDIA
 } // namespace OHOS
-#endif // FILTERS_VIDEO_CAPTURE_FILTER_H
+#endif // FILTERS_SURFACE_ENCODER_FILTER_H
