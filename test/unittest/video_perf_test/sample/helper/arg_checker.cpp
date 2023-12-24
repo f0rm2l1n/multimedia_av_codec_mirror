@@ -13,26 +13,29 @@
  * limitations under the License.
  */
 
-#include <iostream>
-#include "arg_parser.h"
 #include "arg_checker.h"
-#include "sample_helper.h"
-#include "av_codec_sample_error.h"
+#include "av_codec_sample_log.h"
 
-using namespace OHOS::MediaAVCodec::Sample;
-
-int main(int argc, char *argv[])
+namespace {
+template<typename T>
+bool ArgumentChecker(T value, T lowerLimit, T upperLimit)
 {
-    auto info = ParseDemoArg(argc, argv);
-    if (!SampleInfoChecker(info)) {
-        std::cout << "Demo arg check failed, exit" << std::endl;
-        return 1;
-    }
+    (void)value;
+    (void)lowerLimit;
+    (void)upperLimit;
 
-    int ret = RunSample(info);
-    if (ret != AVCODEC_SAMPLE_ERR_OK) {
-        std::cout << "Demo run failed!" << std::endl;
-        return 1;
-    }
-    return 0;
+    return true;
 }
+}
+
+namespace OHOS {
+namespace MediaAVCodec {
+namespace Sample {
+bool SampleInfoChecker(const SampleInfo &sampleInfo)
+{
+    (void)sampleInfo;
+    return true;
+}
+} // Sample
+} // MediaAVCodec
+} // OHOS
