@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_SAMPLE_SAMPLE_HELPER_H
-#define AVCODEC_SAMPLE_SAMPLE_HELPER_H
+#ifndef AVCODEC_SAMPLE_DATA_PRODUCER_RAWDATA_READER_H
+#define AVCODEC_SAMPLE_DATA_PRODUCER_RAWDATA_READER_H
 
-#include "sample_info.h"
+#include "data_producer_base.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
 namespace Sample {
-std::string ToString(OH_AVPixelFormat pixelFormat);
-int32_t RunSample(const SampleInfo &sampleInfo);
-void PrintSampleInfo(const SampleInfo &info);
+class RawdataReader : public DataProducerBase {
+public:
+    int32_t ReadSample(CodecBufferInfo &bufferInfo) override;
+    int32_t ReadSample(uint8_t *bufferAddr, int32_t &bufferSize, uint32_t &flags);
+private:
+    int32_t GetBufferSize();
+};
 } // Sample
 } // MediaAVCodec
 } // OHOS
-#endif // AVCODEC_SAMPLE_SAMPLE_HELPER_H
+#endif // AVCODEC_SAMPLE_DATA_PRODUCER_RAWDATA_READER_H
