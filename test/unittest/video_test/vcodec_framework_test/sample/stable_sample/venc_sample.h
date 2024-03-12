@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef VDEC_SAMPLE_H
-#define VDEC_SAMPLE_H
+#ifndef VEN_SAMPLE_H
+#define VEN_SAMPLE_H
 #include <atomic>
 #include <fstream>
 #include <iostream>
@@ -26,8 +26,9 @@
 #include <thread>
 #include "iconsumer_surface.h"
 #include "native_avcodec_base.h"
-#include "native_avcodec_videodecoder.h"
+#include "native_avcodec_videoencoder.h"
 #include "native_averrors.h"
+#include "native_buffer_inner.h"
 #include "securec.h"
 #include "surface.h"
 #include "surface_buffer.h"
@@ -35,18 +36,18 @@
 
 namespace OHOS {
 namespace MediaAVCodec {
-class VideoDecSample;
-using VideoDecSignal = VCodecSignal<VideoDecSample>;
+class VideoEncSample;
+using VideoEncSignal = VCodecSignal<VideoEncSample>;
 
-class VideoDecSample : public NoCopyable {
+class VideoEncSample : public NoCopyable {
 public:
-    VideoDecSample();
-    ~VideoDecSample();
+    VideoEncSample();
+    ~VideoEncSample();
     bool Create();
 
-    int32_t SetCallback(OH_AVCodecAsyncCallback callback, std::shared_ptr<VideoDecSignal> &signal);
-    int32_t RegisterCallback(OH_AVCodecCallback callback, std::shared_ptr<VideoDecSignal> &signal);
-    int32_t SetOutputSurface();
+    int32_t SetCallback(OH_AVCodecAsyncCallback callback, std::shared_ptr<VideoEncSignal> &signal);
+    int32_t RegisterCallback(OH_AVCodecCallback callback, std::shared_ptr<VideoEncSignal> &signal);
+    int32_t GetInputSurface();
     int32_t Configure();
     int32_t Start();
     int32_t Prepare();
@@ -59,6 +60,7 @@ public:
     int32_t PushInputData(uint32_t index, OH_AVCodecBufferAttr &attr);
     int32_t PushInputData(uint32_t index);
     int32_t ReleaseOutputData(uint32_t index);
+    int32_t NotifyEos();
     int32_t IsValid(bool &isValid);
 
     int32_t HandleInputFrame(uint32_t &index, OH_AVCodecBufferAttr &attr);
@@ -73,13 +75,12 @@ public:
     uint32_t frameCount_ = 10;
     std::string operation_ = "NULL";
     std::string mime_ = "";
-    std::string inPath_ = "720_1280_25_avcc.h264";
+    std::string inPath_ = "1280_720_nv.yuv";
     std::string outPath_ = "";
     OH_AVFormat *dyFormat_ = nullptr;
     std::unique_ptr<std::thread> inputLoop_ = nullptr;
     std::unique_ptr<std::thread> outputLoop_ = nullptr;
 
-    static bool isHardware_;
     static bool needDump_;
     static uint64_t sampleTimout_;
     static uint64_t threadNum_;
@@ -89,41 +90,25 @@ private:
     int32_t SetAVBufferAttr(OH_AVBuffer *avBuffer, OH_AVCodecBufferAttr &attr);
     int32_t HandleInputFrameInner(uint8_t *addr, OH_AVCodecBufferAttr &attr);
     int32_t HandleOutputFrameInner(uint8_t *addr, OH_AVCodecBufferAttr &attr);
-    bool IsCodecData(const uint8_t *const addr);
+
+    int32_t InputProcess(OH_NativeBuffer *nativeBuffer, OHNativeWindowBuffer *ohNativeWindowBuffer);
+    void InputFuncSurface();
 
     OH_AVCodec *codec_ = nullptr;
     std::unique_ptr<std::ifstream> inFile_;
     std::unique_ptr<std::ofstream> outFile_;
-    std::shared_ptr<VideoDecSignal> signal_ = nullptr;
-
-    bool needXps_ = true;
+    std::shared_ptr<VideoEncSignal> signal_ = nullptr;
     std::atomic<uint32_t> frameInputCount_ = 0;
     std::atomic<uint32_t> frameOutputCount_ = 0;
-
     int64_t time_ = 0;
     bool isAVBufferMode_ = false;
     bool isSurfaceMode_ = false;
-    bool isH264Stream_ = true; // true: H264; false: H265
+    bool isFirstFrame_ = true;
 
     OHNativeWindow *nativeWindow_ = nullptr;
     sptr<Surface> consumer_ = nullptr;
     sptr<Surface> producer_ = nullptr;
 };
-
-class TestConsumerListener : public IBufferConsumerListener {
-public:
-    TestConsumerListener(Surface *cs, std::unique_ptr<std::ofstream> &&outFile, int32_t id);
-    ~TestConsumerListener();
-    void OnBufferAvailable() override;
-
-private:
-    int64_t timestamp_ = 0;
-    Rect damage_ = {};
-    Surface *cs_ = nullptr;
-    std::unique_ptr<std::ofstream> outFile_ = nullptr;
-    int32_t sampleId_ = 0;
-    uint32_t frameOutputCount_ = 0;
-};
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // VDEC_SAMPLE_H
+#endif // VEN_SAMPLE_H
