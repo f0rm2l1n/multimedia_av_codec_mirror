@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,25 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef CODEC_FACTORY_H
-#define CODEC_FACTORY_H
+#ifndef CODEC_PARAM_CHECKER_H
+#define CODEC_PARAM_CHECKER_H
 
-#include <memory>
-#include "codecbase.h"
+#include "meta/format.h"
+#include "avcodec_info.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
-class CodecFactory {
+class CodecParamChecker {
 public:
-    static CodecFactory &Instance();
-    std::shared_ptr<CodecBase> CreateCodecByMime(bool isEncoder, const std::string &mime,
-        API_VERSION apiVersion, std::string &codecName);
-    std::shared_ptr<CodecBase> CreateCodecByName(const std::string &name, API_VERSION apiVersion);
-
-private:
-    CodecFactory() = default;
-    ~CodecFactory();
+    static int32_t CheckParamValid(Media::Format &format, AVCodecType codecType, std::string codecName);
 };
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // CODEC_FACTORY_H
+#endif // CODEC_PARAM_CHECKER_H
