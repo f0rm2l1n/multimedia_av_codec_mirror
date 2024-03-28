@@ -12,24 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "avcodec_listener_stub.h"
-#include "avcodec_log.h"
-#include "avcodec_errors.h"
 
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, LOG_DOMAIN_FRAMEWORK, "AVCodecListenerStub"};
-}
+#ifndef CODEABILITY_SINGLETON_MOCK_H
+#define CODEABILITY_SINGLETON_MOCK_H
+
+#include <mutex>
+#include <optional>
+#include <unordered_map>
+#include "avcodec_info.h"
+#include "codeclist_core.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
-AVCodecListenerStub::AVCodecListenerStub()
-{
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances create", FAKE_POINTER(this));
-}
+class CodecAbilitySingleton {
+public:
+    ~CodecAbilitySingleton();
+    static CodecAbilitySingleton &GetInstance();
+    std::optional<CapabilityData> GetCapabilityByName(std::string name);
 
-AVCodecListenerStub::~AVCodecListenerStub()
-{
-    AVCODEC_LOGD("0x%{public}06" PRIXPTR " Instances destroy", FAKE_POINTER(this));
-}
+private:
+    CodecAbilitySingleton();
+};
 } // namespace MediaAVCodec
 } // namespace OHOS
+#endif // CODEABILITY_SINGLETON_MOCK_H
