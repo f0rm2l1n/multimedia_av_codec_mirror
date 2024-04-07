@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,25 +11,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Description: header of Type converter from framework to OMX
  */
 
-#ifndef HCODEC_LOADER_H
-#define HCODEC_LOADER_H
-#include "video_codec_loader.h"
-#include "codecbase.h"
-#include "codeclistbase.h"
-namespace OHOS {
-namespace MediaAVCodec {
-class HCodecLoader : public VideoCodecLoader {
-public:
-    static std::shared_ptr<CodecBase> CreateByName(const std::string &name);
-    static int32_t GetCapabilityList(std::vector<CapabilityData> &caps);
+#ifndef FCODEC_API_H
+#define FCODEC_API_H
 
-private:
-    HCodecLoader();
-    ~HCodecLoader() = default;
-    static HCodecLoader &GetInstance();
-};
-} // namespace MediaAVCodec
-} // namespace OHOS
+#include "codeclistbase.h"
+#include "codecbase.h"
+
+namespace OHOS::MediaAVCodec {
+extern "C" {  // these functions will be dlsym by avcodec
+int32_t GetCodecCapabilityList(std::vector<CapabilityData> &caps);
+void CreateCodecByName(const std::string& name, std::shared_ptr<CodecBase>& codec);
+}
+}
+
 #endif
