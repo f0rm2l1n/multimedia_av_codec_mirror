@@ -13,22 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef HCODEC_LOADER_H
-#define HCODEC_LOADER_H
+#ifndef FCODEC_LOADER_H
+#define FCODEC_LOADER_H
 #include "video_codec_loader.h"
 #include "codecbase.h"
 #include "codeclistbase.h"
 namespace OHOS {
 namespace MediaAVCodec {
-class HCodecLoader : public VideoCodecLoader {
+class FCodecLoader : public VideoCodecLoader {
 public:
     static std::shared_ptr<CodecBase> CreateByName(const std::string &name);
     static int32_t GetCapabilityList(std::vector<CapabilityData> &caps);
 
 private:
-    HCodecLoader();
-    ~HCodecLoader() = default;
-    static HCodecLoader &GetInstance();
+    FCodecLoader();
+    ~FCodecLoader() = default;
+    void CloseLibrary();
+    static FCodecLoader &GetInstance();
+
+    std::mutex mutex_;
+    int32_t fcodecCount_ = 0;
 };
 } // namespace MediaAVCodec
 } // namespace OHOS
