@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef VIDEOENC_NDK_SAMPLE_H
-#define VIDEOENC_NDK_SAMPLE_H
+#ifndef VIDEOENC_API11_SAMPLE_H
+#define VIDEOENC_API11_SAMPLE_H
 
 #include <iostream>
 #include <cstdio>
@@ -29,7 +29,7 @@
 #include "securec.h"
 #include "native_avcodec_videoencoder.h"
 #include "nocopyable.h"
-#include "native_avmemory.h"
+#include "native_avbuffer.h"
 #include "native_avformat.h"
 #include "native_averrors.h"
 #include "surface/window.h"
@@ -47,15 +47,14 @@ public:
     std::condition_variable outCond_;
     std::queue<uint32_t> inIdxQueue_;
     std::queue<uint32_t> outIdxQueue_;
-    std::queue<OH_AVCodecBufferAttr> attrQueue_;
-    std::queue<OH_AVMemory *> inBufferQueue_;
-    std::queue<OH_AVMemory *> outBufferQueue_;
+    std::queue<OH_AVBuffer *> inBufferQueue_;
+    std::queue<OH_AVBuffer *> outBufferQueue_;
 };
 
-class VEncNdkSample : public NoCopyable {
+class VEncAPI11Sample : public NoCopyable {
 public:
-    VEncNdkSample() = default;
-    ~VEncNdkSample();
+    VEncAPI11Sample() = default;
+    ~VEncAPI11Sample();
     const char *INP_DIR = "/data/test/media/1280_720_nv.yuv";
     const char *OUT_DIR = "/data/test/media/VEncTest.h264";
     uint32_t DEFAULT_WIDTH = 1280;
@@ -63,6 +62,7 @@ public:
     uint32_t DEFAULT_BITRATE = 5000000;
     uint32_t DEFAULT_QUALITY = 30;
     double DEFAULT_FRAME_RATE = 30.0;
+    int32_t DEFAULT_QP = 20;
     uint32_t DEFAULT_BITRATE_MODE = CBR;
     OH_AVPixelFormat DEFAULT_PIX_FMT = AV_PIXEL_FORMAT_NV12;
     uint32_t DEFAULT_KEY_FRAME_INTERVAL = 1000;
@@ -75,6 +75,7 @@ public:
     int32_t CreateSurface();
     int32_t StartVideoEncoder();
     int32_t SetParameter(OH_AVFormat *format);
+    void SetBufferParameter(OH_AVBuffer *buffer);
     void SetForceIDR();
     void GetStride();
     void testApi();
@@ -91,8 +92,8 @@ public:
     void AutoSwitchParam();
     void RepeatStartBeforeEOS();
     bool RandomEOS(uint32_t index);
-    void SetEOS(uint32_t index);
-    int32_t PushData(OH_AVMemory *buffer, uint32_t index, int32_t &result);
+    void SetEOS(uint32_t index, OH_AVBuffer *buffer);
+    int32_t PushData(OH_AVBuffer *buffer, uint32_t index, int32_t &result);
     int32_t CheckResult(bool isRandomEosSuccess, int32_t pushResult);
     void InputFunc();
     int32_t state_EOS();
@@ -115,8 +116,9 @@ public:
     uint32_t frameCount = 0;
     uint32_t switchParamsTimeSec = 3;
     bool sleepOnFPS = false;
-    bool SURFACE_INPUT = false;
+    bool SURF_INPUT = false;
     bool enableAutoSwitchParam = false;
+    bool enableAutoSwitchBufferParam = false;
     bool needResetBitrate = false;
     bool needResetFrameRate = false;
     bool needResetQP = false;
@@ -138,10 +140,10 @@ private:
     std::unique_ptr<std::ifstream> inFile_;
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
-    std::unordered_map<uint32_t, OH_AVMemory *> inBufferMap_;
-    std::unordered_map<uint32_t, OH_AVMemory *> outBufferMap_;
+    std::unordered_map<uint32_t, OH_AVBuffer *> inBufferMap_;
+    std::unordered_map<uint32_t, OH_AVBuffer *> outBufferMap_;
     OH_AVCodec *venc_;
-    OH_AVCodecAsyncCallback cb_;
+    OH_AVCodecCallback cb_;
     int64_t timeStamp_ { 0 };
     int64_t lastRenderedTimeUs_ { 0 };
     bool isFirstFrame_ = true;
@@ -152,4 +154,4 @@ private:
 } // namespace Media
 } // namespace OHOS
 
-#endif // VIDEODEC_NDK_SAMPLE_H
+#endif // VIDEOENC_API11_SAMPLE_H
