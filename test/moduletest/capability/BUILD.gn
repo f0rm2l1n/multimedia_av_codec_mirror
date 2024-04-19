@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,29 +15,17 @@ import("//build/test.gni")
 import("//foundation/multimedia/av_codec/config.gni")
 
 MEDIA_ROOT_DIR = "//foundation/multimedia/av_codec/"
+THIRD_ROOT_DIR = "//third_party/"
 module_output_path = "av_codec/moduletest"
 
-ohos_unittest("audio_encoder_module_test") {
-  sanitize = av_codec_test_sanitize
+ohos_unittest("capability_module_test") {
   module_out_path = module_output_path
-  sources = [
-    "Avbuffer/src/avcodec_audio_avbuffer_encoder_demo.cpp",
-    "Avbuffer/src/common_tool.cpp",
-    "Avbuffer/src/fuzz_test.cpp",
-    "Avbuffer/src/null_check_test.cpp",
-    "Avbuffer/src/param_check_test.cpp",
-    "Avbuffer/src/status_check_test.cpp",
-    "Common/src/AudioEncoderDemoCommon.cpp",
-    "InnerAPI/InnerInterfaceDependCheckTest.cpp",
-    "InnerAPI/InnerParamCheckTest.cpp",
-    "NativeAPI/NativeInterfaceDependCheckTest.cpp",
-    "NativeAPI/NativeNullCheckTest.cpp",
-    "NativeAPI/NativeParamCheckTest.cpp",
-  ]
+  sources = [ "./src/cap_test.cpp" ]
 
   include_dirs = [
     "Avbuffer/include",
     "Common/include",
+    "$MEDIA_ROOT_DIR/test/moduletest/vcodec/encoder/include",
     "$MEDIA_ROOT_DIR/test/nativedemo/avmuxer",
     "$MEDIA_ROOT_DIR/interfaces/kits/c",
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native",
@@ -45,6 +33,7 @@ ohos_unittest("audio_encoder_module_test") {
     "$MEDIA_ROOT_DIR/services/engine/plugin/common",
     "$MEDIA_ROOT_DIR/services/engine/plugin/core",
     "$MEDIA_ROOT_DIR/services/engine/plugin/interface",
+    "$THIRD_ROOT_DIR/ffmpeg",
     "$MEDIA_ROOT_DIR/frameworks/native/capi/common",
     "$MEDIA_ROOT_DIR/services/dfx/include",
     "$MEDIA_ROOT_DIR/services/engine/base/include",
@@ -54,12 +43,15 @@ ohos_unittest("audio_encoder_module_test") {
     "$MEDIA_ROOT_DIR/services/services/factory",
     "$MEDIA_ROOT_DIR/services/utils/include",
     "$MEDIA_ROOT_DIR/test/nativedemo/include",
+    "$MEDIA_ROOT_DIR/../../../third_party/openssl/ohos_lite/include",
+    "$MEDIA_ROOT_DIR/../../graphic/graphic_2d/interfaces/inner_api",
   ]
 
   cflags = [
-    "-Wall",
+    "-std=c++17",
     "-fno-rtti",
     "-fno-exceptions",
+    "-Wall",
     "-fno-common",
     "-fstack-protector-strong",
     "-Wshadow",
@@ -75,24 +67,24 @@ ohos_unittest("audio_encoder_module_test") {
     "-Wimplicit-fallthrough",
     "-Wsign-compare",
     "-Wunused-parameter",
-    "-Wno-deprecated-declarations",
   ]
 
   deps = [
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native:av_codec_client",
-    "$MEDIA_ROOT_DIR/interfaces/kits/c:capi_packages",
-    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_avmuxer",
-    "$MEDIA_ROOT_DIR/services/services:av_codec_service",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_codecbase",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_venc",
   ]
 
   external_deps = [
-    "bounds_checking_function:libsec_static",
     "c_utils:utils",
-    "ffmpeg:libohosffmpeg",
+    "graphic_2d:libgraphic_utils",
+    "graphic_2d:librender_service_client",
+    "graphic_surface:surface",
     "hilog:libhilog",
     "ipc:ipc_core",
     "media_foundation:media_foundation",
     "media_foundation:native_media_core",
+    "window_manager:libwm",
   ]
 
   resource_config_file =
