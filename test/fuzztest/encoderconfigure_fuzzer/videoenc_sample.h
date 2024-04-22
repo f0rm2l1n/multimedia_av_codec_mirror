@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef VIDEOENC_NDK_SAMPLE_H
-#define VIDEOENC_NDK_SAMPLE_H
+#ifndef VIDEOENC_SAMPLE_H
+#define VIDEOENC_SAMPLE_H
 
 #include <iostream>
 #include <cstdio>
@@ -32,11 +32,9 @@
 #include "native_avmemory.h"
 #include "native_avformat.h"
 #include "native_averrors.h"
-#include "surface/window.h"
 #include "media_description.h"
 #include "av_common.h"
-#include "external_window.h"
-#include "native_buffer_inner.h"
+
 namespace OHOS {
 namespace Media {
 class VEncSignal {
@@ -52,33 +50,29 @@ public:
     std::queue<OH_AVMemory *> outBufferQueue_;
 };
 
-class VEncNdkSample : public NoCopyable {
+class VEncFuzzSample : public NoCopyable {
 public:
-    VEncNdkSample() = default;
-    ~VEncNdkSample();
-    const char *INP_DIR = "/data/test/media/1280_720_nv.yuv";
-    const char *OUT_DIR = "/data/test/media/VEncTest.h264";
-    uint32_t DEFAULT_WIDTH = 1280;
-    uint32_t DEFAULT_HEIGHT = 720;
-    uint32_t DEFAULT_BITRATE = 5000000;
-    uint32_t DEFAULT_QUALITY = 30;
-    double DEFAULT_FRAME_RATE = 30.0;
-    uint32_t DEFAULT_FUZZ_TIME = 30;
-    uint32_t DEFAULT_BITRATE_MODE = CBR;
-    OH_AVPixelFormat DEFAULT_PIX_FMT = AV_PIXEL_FORMAT_NV12;
-    uint32_t DEFAULT_KEY_FRAME_INTERVAL = 1000;
-    uint32_t repeat_time = 0;
+    VEncFuzzSample() = default;
+    ~VEncFuzzSample();
+    const char *inpDir = "/data/test/media/1280_720_nv.yuv";
+    const char *outDir = "/data/test/media/VEncTest.h264";
+    uint32_t defaultWidth = 1280;
+    uint32_t defaultHeight = 720;
+    uint32_t defaultBitrate = 5000000;
+    uint32_t defaultQuality = 30;
+    double defaultFrameRate = 30.0;
+    uint32_t defaultFuzzTime = 30;
+    uint32_t defaultBitrateMode = CBR;
+    OH_AVPixelFormat defaultPixFmt = AV_PIXEL_FORMAT_NV12;
+    uint32_t defaultKeyFrameInterval = 1000;
     int32_t CreateVideoEncoder(const char *codecName);
     int32_t ConfigureVideoEncoder();
-    int32_t ConfigureVideoEncoder_Temporal(int32_t temporal_gop_size);
-    int32_t ConfigureVideoEncoder_fuzz(int32_t data);
+    int32_t ConfigureVideoEncoderFuzz(int32_t data);
     int32_t SetVideoEncoderCallback();
-    int32_t CreateSurface();
     int32_t StartVideoEncoder();
     int32_t SetParameter(OH_AVFormat *format);
     void SetForceIDR();
     void GetStride();
-    void testApi();
     void WaitForEOS();
     int32_t OpenFile();
     uint32_t ReturnZeroIfEOS(uint32_t expectedSize);
@@ -88,24 +82,17 @@ public:
     int32_t Reset();
     int32_t Stop();
     int32_t Release();
-    void Flush_buffer();
-    void AutoSwitchParam();
-    void RepeatStartBeforeEOS();
     bool RandomEOS(uint32_t index);
     void SetEOS(uint32_t index);
     int32_t PushData(OH_AVMemory *buffer, uint32_t index, int32_t &result);
-    void InputDataNormal(bool &runningFlag, uint32_t index, OH_AVMemory *buffer);
     void InputDataFuzz(bool &runningFlag, uint32_t index);
     int32_t CheckResult(bool isRandomEosSuccess, int32_t pushResult);
     void InputFunc();
-    int32_t state_EOS();
-    void InputFuncSurface();
     uint32_t ReadOneFrameYUV420SP(uint8_t *dst);
     void ReadOneFrameRGBA8888(uint8_t *dst);
     int32_t CheckAttrFlag(OH_AVCodecBufferAttr attr);
     void OutputFuncFail();
     void OutputFunc();
-    uint32_t FlushSurf(OHNativeWindowBuffer *ohNativeWindowBuffer, OH_NativeBuffer *nativeBuffer);
     void ReleaseSignal();
     void ReleaseInFile();
     void StopInloop();
@@ -118,7 +105,6 @@ public:
     uint32_t frameCount = 0;
     uint32_t switchParamsTimeSec = 3;
     bool sleepOnFPS = false;
-    bool SURFACE_INPUT = false;
     bool enableAutoSwitchParam = false;
     bool needResetBitrate = false;
     bool needResetFrameRate = false;
@@ -126,17 +112,7 @@ public:
     bool repeatRun = false;
     bool showLog = false;
     bool fuzzMode = false;
-    int64_t encode_count = 0;
-    bool enable_random_eos = false;
-    uint32_t REPEAT_START_STOP_BEFORE_EOS = 0;  // 1200 测试用例
-    uint32_t REPEAT_START_FLUSH_BEFORE_EOS = 0; // 1300 测试用例
-    int64_t start_time = 0;
-    int64_t end_time = 0;
 
-    bool TEMPORAL_CONFIG = false;
-    bool TEMPORAL_ENABLE = false;
-    bool TEMPORAL_JUMP_MODE = false;
-    bool TEMPORAL_DEFAULT = false;
 private:
     std::atomic<bool> isRunning_ { false };
     std::unique_ptr<std::ifstream> inFile_;
@@ -151,9 +127,9 @@ private:
     bool isFirstFrame_ = true;
     OHNativeWindow *nativeWindow;
     int stride_;
-    static constexpr uint32_t SAMPLE_RATIO = 2;
+    static constexpr uint32_t sampleRatio = 2;
 };
 } // namespace Media
 } // namespace OHOS
 
-#endif // VIDEODEC_NDK_SAMPLE_H
+#endif // VIDEODEC_SAMPLE_H
