@@ -16,6 +16,7 @@ import("//foundation/multimedia/av_codec/config.gni")
 
 module_output_path = "av_codec/unittest"
 hls_test_sources = [
+  "$av_codec_root_dir/services/media_engine/modules/source/source.cpp",
   "$av_codec_root_dir/services/media_engine/plugins/source/http_source/download/downloader.cpp",
   "$av_codec_root_dir/services/media_engine/plugins/source/http_source/download/http_curl_client.cpp",
   "$av_codec_root_dir/services/media_engine/plugins/source/http_source/hls/hls_media_downloader.cpp",
@@ -59,11 +60,16 @@ config("hls_unittest_cfg") {
     "$media_foundation_root_dir/src",
     "//third_party/curl/include",
     "//third_party/openssl/include",
+    "$av_codec_root_dir/services/drm_decryptor",
+    "$av_codec_root_dir/services/media_engine/modules",
+    "$media_foundation_root_dir/interface/inner_api",
+    "//commonlibrary/c_utils/base/include/",
+    "//third_party/ffmpeg",
   ]
 }
 
 #################################################################################################################
-ohos_unittest("hls_media_downloader_unit_test") {
+ohos_unittest("http_media_downloader_unit_test") {
   sanitize = av_codec_test_sanitize
   module_out_path = module_output_path
   testonly = true
@@ -71,94 +77,7 @@ ohos_unittest("hls_media_downloader_unit_test") {
     ":hls_unittest_cfg",
     "$av_codec_root_dir/services/dfx:av_codec_service_log_dfx_public_config",
   ]
-  sources = hls_test_sources + [ "hls_media_downloader_unit_test.cpp" ]
-  deps = [
-    "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
-    "//third_party/curl:curl_shared",
-    "//third_party/openssl:libcrypto_shared",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "graphic_surface:surface",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "media_foundation:media_foundation",
-    "netmanager_base:net_conn_manager_if",
-    "safwk:system_ability_fwk",
-  ]
-  resource_config_file =
-      "$av_codec_root_dir/test/unittest/resources/ohos_test.xml"
-}
-
-#################################################################################################################
-ohos_unittest("hls_playlist_downloader_unit_test") {
-  sanitize = av_codec_test_sanitize
-  module_out_path = module_output_path
-  testonly = true
-  configs = [
-    ":hls_unittest_cfg",
-    "$av_codec_root_dir/services/dfx:av_codec_service_log_dfx_public_config",
-  ]
-  sources = hls_test_sources + [ "hls_playlist_downloader_unit_test.cpp" ]
-  deps = [
-    "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
-    "//third_party/curl:curl_shared",
-    "//third_party/openssl:libcrypto_shared",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "graphic_surface:surface",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "media_foundation:media_foundation",
-    "netmanager_base:net_conn_manager_if",
-    "safwk:system_ability_fwk",
-  ]
-  resource_config_file =
-      "$av_codec_root_dir/test/unittest/resources/ohos_test.xml"
-}
-
-#################################################################################################################
-ohos_unittest("hls_tags_unit_test") {
-  sanitize = av_codec_test_sanitize
-  module_out_path = module_output_path
-  testonly = true
-  configs = [
-    ":hls_unittest_cfg",
-    "$av_codec_root_dir/services/dfx:av_codec_service_log_dfx_public_config",
-  ]
-  sources = hls_test_sources + [ "hls_tags_unit_test.cpp" ]
-  deps = [
-    "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
-    "//third_party/curl:curl_shared",
-    "//third_party/openssl:libcrypto_shared",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "graphic_surface:surface",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "media_foundation:media_foundation",
-    "netmanager_base:net_conn_manager_if",
-    "safwk:system_ability_fwk",
-  ]
-  resource_config_file =
-      "$av_codec_root_dir/test/unittest/resources/ohos_test.xml"
-}
-
-#################################################################################################################
-ohos_unittest("m3u8_unit_test") {
-  sanitize = av_codec_test_sanitize
-  module_out_path = module_output_path
-  testonly = true
-  configs = [
-    ":hls_unittest_cfg",
-    "$av_codec_root_dir/services/dfx:av_codec_service_log_dfx_public_config",
-  ]
-  sources = hls_test_sources + [ "m3u8_unit_test.cpp" ]
+  sources = hls_test_sources + [ "http_media_downloader_unit_test.cpp" ]
   deps = [
     "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
     "//third_party/curl:curl_shared",

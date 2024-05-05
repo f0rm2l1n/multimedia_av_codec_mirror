@@ -13,31 +13,32 @@
  * limitations under the License.
  */
 
+#ifndef HTTP_MEDIA_DOWNLOADER_UNIT_TEST_H
+#define HTTP_MEDIA_DOWNLOADER_UNIT_TEST_H
 
-#ifndef HLS_PLAYLIST_DOWNLOADER_UINT_TEST_H
-#define HLS_PLAYLIST_DOWNLOADER_UINT_TEST_H
-
-#include "hls/hls_playlist_downloader.h"
+#include "http/http_media_downloader.h"
 #include "gtest/gtest.h"
+#include "hls/m3u8.h"
+#include "source/source.h"
 
 namespace OHOS {
 namespace Media {
 namespace Plugins {
 namespace HttpPlugin {
-class HlsPlayListDownloaderUnitTest : public testing::Test {
+class HttpMediaDownloaderUnitTest : public testing::Test {
 public:
-    // SetUpTestCase: Called before all test cases
+
     static void SetUpTestCase(void);
-    // TearDownTestCase: Called after all test case
+
     static void TearDownTestCase(void);
-    // SetUp: Called before each test cases
+
     void SetUp(void);
-    // TearDown: Called after each test cases
+
     void TearDown(void);
 };
-std::shared_ptr<HlsPlayListDownloader> playListDownloader = std::make_shared<HlsPlayListDownloader>();
 }
 }
 }
 }
+
 #endif
