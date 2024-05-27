@@ -12,11 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef MEM_MGR_CLIENT_H
+#define MEM_MGR_CLIENT_H
 
-#ifndef SYSTEM_ABILITY_DEFINITION_MOCK_H
-#define SYSTEM_ABILITY_DEFINITION_MOCK_H
+#include <mutex>
+#include "mem_mgr_proxy.h"
+#include "nocopyable.h"
 
 namespace OHOS {
-enum { MEMORY_MANAGER_SA_ID = 1909, AV_CODEC_SERVICE_ID = 3011 };
+namespace MediaAVCodec {
+class MemMgrClient : public NoCopyable {
+public:
+    MemMgrClient() noexcept;
+    ~MemMgrClient();
+    static MemMgrClient &GetInstance();
+    bool IsAlived();
+    int32_t NotifyProcessStatus(int32_t status);
+    int32_t SetCritical(bool isKeyService);
+
+private:
+    pid_t pid_ = 0;
+    bool isKeyService_ = false;
+    sptr<Memory::MemMgrProxy> memMgrProxy_ = nullptr;
+    std::mutex mutex_;
+};
+} // namespace MediaAVCodec
 } // namespace OHOS
-#endif // SYSTEM_ABILITY_DEFINITION_MOCK_H
+#endif // MEM_MGR_CLIENT_H
