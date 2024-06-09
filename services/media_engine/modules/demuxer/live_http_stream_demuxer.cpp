@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#define HST_LOG_TAG "VodStreamDemuxer"
+#define HST_LOG_TAG "LiveHttpStreamDemuxer"
 
-#include "vod_stream_demuxer.h"
+#include "live_http_stream_demuxer.h"
 
 #include <algorithm>
 #include <map>
@@ -42,18 +42,18 @@ namespace Media {
 
 const int32_t TRY_READ_SLEEP_TIME = 10;  //ms
 const int32_t TRY_READ_TIMES = 10;
-VodStreamDemuxer::VodStreamDemuxer() : position_(0)
+LiveHttpStreamDemuxer::LiveHttpStreamDemuxer()
 {
-    MEDIA_LOG_I("VodStreamDemuxer called");
+    MEDIA_LOG_I("LiveHttpStreamDemuxer called");
 }
 
-VodStreamDemuxer::~VodStreamDemuxer()
+LiveHttpStreamDemuxer::~LiveHttpStreamDemuxer()
 {
-    MEDIA_LOG_I("~VodStreamDemuxer called");
+    MEDIA_LOG_I("~LiveHttpStreamDemuxer called");
     Reset();
 }
 
-bool VodStreamDemuxer::GetPeekRangeSub(int32_t streamID, uint64_t offset, size_t size,
+bool LiveHttpStreamDemuxer::GetPeekRangeSub(int32_t streamID, uint64_t offset, size_t size,
     std::shared_ptr<Buffer>& bufferPtr)
 {
     auto ret = PullData(streamID, offset, size, bufferPtr);
@@ -66,7 +66,8 @@ bool VodStreamDemuxer::GetPeekRangeSub(int32_t streamID, uint64_t offset, size_t
     return Status::OK == ret;
 }
 
-bool VodStreamDemuxer::TryReadCache(int32_t streamID, uint64_t offset, size_t size, std::shared_ptr<Buffer>& bufferPtr)
+bool LiveHttpStreamDemuxer::TryReadCache(int32_t streamID, uint64_t offset, size_t size,
+    std::shared_ptr<Buffer>& bufferPtr)
 {
     if (cacheDataMap_.find(streamID) != cacheDataMap_.end()) {
         MEDIA_LOG_I("GetPeekRange read cache, offset: " PUBLIC_LOG_U64, offset);
@@ -81,7 +82,8 @@ bool VodStreamDemuxer::TryReadCache(int32_t streamID, uint64_t offset, size_t si
     return false;
 }
 
-bool VodStreamDemuxer::GetPeekRange(int32_t streamID, uint64_t offset, size_t size, std::shared_ptr<Buffer>& bufferPtr)
+bool LiveHttpStreamDemuxer::GetPeekRange(int32_t streamID, uint64_t offset, size_t size,
+    std::shared_ptr<Buffer>& bufferPtr)
 {
     if (bufferPtr == nullptr) {
         MEDIA_LOG_E("GetPeekRange bufferPtr invalid.");
@@ -105,7 +107,7 @@ bool VodStreamDemuxer::GetPeekRange(int32_t streamID, uint64_t offset, size_t si
     return PullDataWithoutCache(streamID, offset, size, bufferPtr);
 }
 
-Status VodStreamDemuxer::Init(std::string uri)
+Status LiveHttpStreamDemuxer::Init(std::string uri)
 {
     MediaAVCodec::AVCodecTrace trace("VodStreamDemuxer::Init");
     MEDIA_LOG_I("VodStreamDemuxer::Init called");
@@ -120,7 +122,7 @@ Status VodStreamDemuxer::Init(std::string uri)
     return Status::OK;
 }
 
-bool VodStreamDemuxer::PullDataWithCache(int32_t streamID, uint64_t offset, size_t size,
+bool LiveHttpStreamDemuxer::PullDataWithCache(int32_t streamID, uint64_t offset, size_t size,
     std::shared_ptr<Buffer>& bufferPtr)
 {
     auto memory = cacheDataMap_[streamID].GetData()->GetMemory();
@@ -164,7 +166,7 @@ bool VodStreamDemuxer::PullDataWithCache(int32_t streamID, uint64_t offset, size
     return ret == Status::OK;
 }
 
-bool VodStreamDemuxer::PullDataWithoutCache(int32_t streamID, uint64_t offset, size_t size,
+bool LiveHttpStreamDemuxer::PullDataWithoutCache(int32_t streamID, uint64_t offset, size_t size,
     std::shared_ptr<Buffer>& bufferPtr)
 {
     Status ret = PullData(streamID, offset, size, bufferPtr);
@@ -217,7 +219,7 @@ bool VodStreamDemuxer::PullDataWithoutCache(int32_t streamID, uint64_t offset, s
     return ret == Status::OK;
 }
 
-Status VodStreamDemuxer::ReadRetry(int32_t streamID, uint64_t offset, size_t size,
+Status LiveHttpStreamDemuxer::ReadRetry(int32_t streamID, uint64_t offset, size_t size,
     std::shared_ptr<Plugins::Buffer>& data)
 {
     Status err = Status::OK;
@@ -237,51 +239,21 @@ Status VodStreamDemuxer::ReadRetry(int32_t streamID, uint64_t offset, size_t siz
     return err;
 }
 
-Status VodStreamDemuxer::PullData(int32_t streamID, uint64_t offset, size_t size,
+Status LiveHttpStreamDemuxer::PullData(int32_t streamID, uint64_t offset, size_t size,
     std::shared_ptr<Plugins::Buffer>& data)
 {
-    MEDIA_LOG_DD("IN, offset: " PUBLIC_LOG_U64 ", size: " PUBLIC_LOG_ZU
-        ", position: " PUBLIC_LOG_U64, offset, size, position_);
+    MEDIA_LOG_DD("IN, offset: " PUBLIC_LOG_U64 ", size: " PUBLIC_LOG_ZU, offset, size);
     if (!source_) {
         return Status::ERROR_INVALID_OPERATION;
     }
-    Status err;
+    
     auto readSize = size;
-    if (source_->IsSeekToTimeSupported()) {
-        err = ReadRetry(streamID, offset, readSize, data);
-        FALSE_LOG_MSG(err == Status::OK, "hls, plugin read failed.");
-        return err;
-    }
-
-    uint64_t totalSize = 0;
-    if ((source_->GetSize(totalSize) == Status::OK) && (totalSize != 0)) {
-        if (offset >= totalSize) {
-            MEDIA_LOG_W("Offset: " PUBLIC_LOG_U64 " is larger than totalSize: " PUBLIC_LOG_U64, offset, totalSize);
-            return Status::END_OF_STREAM;
-        }
-        if ((offset + readSize) > totalSize) {
-            readSize = totalSize - offset;
-        }
-        if (data->GetMemory() != nullptr) {
-            auto realSize = data->GetMemory()->GetCapacity();
-            readSize = (readSize > realSize) ? realSize : readSize;
-        }
-        MEDIA_LOG_DD("TotalSize_: " PUBLIC_LOG_U64, totalSize);
-    }
-    if (position_ != offset) {
-        err = source_->SeekTo(offset);
-        FALSE_RETURN_V_MSG_E(err == Status::OK, err, "Seek to " PUBLIC_LOG_U64 " fail", offset);
-        position_ = offset;
-    }
-
-    err = ReadRetry(streamID, offset, readSize, data);
-    if (err == Status::OK) {
-        position_ += data->GetMemory()->GetSize();
-    }
+    Status err = ReadRetry(streamID, offset, readSize, data);
+    FALSE_LOG_MSG(err == Status::OK, "hls, plugin read failed.");
     return err;
 }
 
-Status VodStreamDemuxer::ResetCache(int32_t streamID)
+Status LiveHttpStreamDemuxer::ResetCache(int32_t streamID)
 {
     if (cacheDataMap_.find(streamID) != cacheDataMap_.end()) {
         cacheDataMap_[streamID].Reset();
@@ -289,7 +261,7 @@ Status VodStreamDemuxer::ResetCache(int32_t streamID)
     return Status::OK;
 }
 
-Status VodStreamDemuxer::ResetAllCache()
+Status LiveHttpStreamDemuxer::ResetAllCache()
 {
     for (auto& iter : cacheDataMap_) {
         iter.second.Reset();
@@ -298,41 +270,41 @@ Status VodStreamDemuxer::ResetAllCache()
     return Status::OK;
 }
 
-Status VodStreamDemuxer::Reset()
+Status LiveHttpStreamDemuxer::Reset()
 {
     ResetAllCache();
     return Status::OK;
 }
 
-Status VodStreamDemuxer::Start()
+Status LiveHttpStreamDemuxer::Start()
 {
     return Status::OK;
 }
 
 
-Status VodStreamDemuxer::Stop()
+Status LiveHttpStreamDemuxer::Stop()
 {
     return Status::OK;
 }
 
 
-Status VodStreamDemuxer::Resume()
+Status LiveHttpStreamDemuxer::Resume()
 {
     return Status::OK;
 }
 
 
-Status VodStreamDemuxer::Pause()
+Status LiveHttpStreamDemuxer::Pause()
 {
     return Status::OK;
 }
 
-Status VodStreamDemuxer::Flush()
+Status LiveHttpStreamDemuxer::Flush()
 {
     return Status::OK;
 }
 
-Status VodStreamDemuxer::HandleReadHeader(int32_t streamID, int64_t offset, std::shared_ptr<Buffer>& buffer,
+Status LiveHttpStreamDemuxer::HandleReadHeader(int32_t streamID, int64_t offset, std::shared_ptr<Buffer>& buffer,
     size_t expectedLen)
 {
     MEDIA_LOG_D("Demuxer parse DEMUXER_STATE_PARSE_HEADER, offset: " PUBLIC_LOG_D64
@@ -355,7 +327,7 @@ Status VodStreamDemuxer::HandleReadHeader(int32_t streamID, int64_t offset, std:
     return Status::ERROR_NOT_ENOUGH_DATA;
 }
 
-Status VodStreamDemuxer::HandleReadPacket(int32_t streamID, int64_t offset, std::shared_ptr<Buffer>& buffer,
+Status LiveHttpStreamDemuxer::HandleReadPacket(int32_t streamID, int64_t offset, std::shared_ptr<Buffer>& buffer,
     size_t expectedLen)
 {
     MEDIA_LOG_D("Demuxer parse DEMUXER_STATE_PARSE_FRAME");
@@ -386,7 +358,7 @@ Status VodStreamDemuxer::HandleReadPacket(int32_t streamID, int64_t offset, std:
     return Status::END_OF_STREAM;
 }
 
-Status VodStreamDemuxer::CallbackReadAt(int32_t streamID, int64_t offset, std::shared_ptr<Buffer>& buffer,
+Status LiveHttpStreamDemuxer::CallbackReadAt(int32_t streamID, int64_t offset, std::shared_ptr<Buffer>& buffer,
     size_t expectedLen)
 {
     FALSE_RETURN_V(!isInterruptNeeded_.load(), Status::ERROR_WRONG_STATE);
