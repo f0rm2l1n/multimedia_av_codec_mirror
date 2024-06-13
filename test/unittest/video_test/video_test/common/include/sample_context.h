@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_SAMPLE_SAMPLE_HELPER_H
-#define AVCODEC_SAMPLE_SAMPLE_HELPER_H
+#ifndef AVCODEC_SAMPLE_SAMPLE_CONTEXT_H
+#define AVCODEC_SAMPLE_SAMPLE_CONTEXT_H
 
-#include "sample_info.h"
+#include "sample_buffer_queue.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
 namespace Sample {
-std::string ToString(OH_AVPixelFormat pixelFormat);
-int32_t RunSample(const SampleInfo &sampleInfo);
-void PrintSampleInfo(const SampleInfo &info);
-void ShowCmdCursor();
-void HideCmdCursor();
-void PrintProgress(int32_t times, int32_t frames);
+struct SampleContext {
+    SampleInfo *sampleInfo = nullptr;
+    SampleBufferQueue inputBufferQueue;
+    SampleBufferQueue outputBufferQueue;
+};
 } // Sample
 } // MediaAVCodec
 } // OHOS
-#endif // AVCODEC_SAMPLE_SAMPLE_HELPER_H
+
+#endif // AVCODEC_SAMPLE_SAMPLE_CONTEXT_H
