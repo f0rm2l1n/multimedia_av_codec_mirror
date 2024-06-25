@@ -13,29 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef FILTERS_MUXER_FILTER_H
-#define FILTERS_MUXER_FILTER_H
+#ifndef FILTERS_VIDEO_RESIZE_FILTER_H
+#define FILTERS_VIDEO_RESIZE_FILTER_H
 
 #include <cstring>
-#include <map>
-
 #include "filter/filter.h"
 #include "common/status.h"
-#include "meta/media_types.h"
+#include "common/log.h"
 
 namespace OHOS {
 namespace Media {
-class MediaMuxer;
+namespace VideoProcessingEngine {
+    class DetailEnhancerVideo;
+}
 namespace Pipeline {
-using Plugins::OutputFormat;
-class MuxerFilter : public Filter, public std::enable_shared_from_this<MuxerFilter> {
+class VideoResizeFilter : public Filter, public std::enable_shared_from_this<VideoResizeFilter> {
 public:
-    explicit MuxerFilter(std::string name, FilterType type);
-    ~MuxerFilter() override;
-    Status SetOutputParameter(int32_t appUid, int32_t appPid, int32_t fd, int32_t format);
-    Status SetTransCoderMode();
-    int64_t GetCurrentPtsMs();
-    void Init(const std::shared_ptr<EventReceiver> &receiver, const std::shared_ptr<FilterCallback> &callback) override;
+    explicit VideoResizeFilter(std::string name, FilterType type);
+    ~VideoResizeFilter() override;
+    Status SetCodecFormat(const std::shared_ptr<Meta> &format);
+    void Init(const std::shared_ptr<EventReceiver> &receiver,
+        const std::shared_ptr<FilterCallback> &callback) override;
+    Status Configure(const std::shared_ptr<Meta> &parameter);
+    sptr<Surface> GetInputSurface();
+    Status SetOutputSurface(sptr<Surface> surface);
     Status DoPrepare() override;
     Status DoStart() override;
     Status DoPause() override;
@@ -43,57 +44,49 @@ public:
     Status DoStop() override;
     Status DoFlush() override;
     Status DoRelease() override;
+    Status NotifyEos();
     void SetParameter(const std::shared_ptr<Meta> &parameter) override;
-    void SetUserMeta(const std::shared_ptr<Meta> &userMeta);
     void GetParameter(std::shared_ptr<Meta> &parameter) override;
     Status LinkNext(const std::shared_ptr<Filter> &nextFilter, StreamType outType) override;
     Status UpdateNext(const std::shared_ptr<Filter> &nextFilter, StreamType outType) override;
     Status UnLinkNext(const std::shared_ptr<Filter> &nextFilter, StreamType outType) override;
     FilterType GetFilterType();
+    void OnLinkedResult(const sptr<AVBufferQueueProducer> &outputBufferQueue, std::shared_ptr<Meta> &meta);
+    void OnUpdatedResult(std::shared_ptr<Meta> &meta);
+    void OnUnlinkedResult(std::shared_ptr<Meta> &meta);
+    void OnOutputBufferAvailable(uint32_t index);
+    void SetFaultEvent(const std::string &errMsg);
+    void SetFaultEvent(const std::string &errMsg, int32_t ret);
+    void SetCallingInfo(int32_t appUid, int32_t appPid, const std::string &bundleName, uint64_t instanceId);
+
+protected:
     Status OnLinked(StreamType inType, const std::shared_ptr<Meta> &meta,
         const std::shared_ptr<FilterLinkCallback> &callback) override;
     Status OnUpdated(StreamType inType, const std::shared_ptr<Meta> &meta,
         const std::shared_ptr<FilterLinkCallback> &callback) override;
     Status OnUnLinked(StreamType inType, const std::shared_ptr<FilterLinkCallback>& callback) override;
-    void OnBufferFilled(std::shared_ptr<AVBuffer> &inputBuffer, int32_t trackIndex,
-        StreamType streamType, sptr<AVBufferQueueProducer> inputBufferQueue);
-    void OnTransCoderBufferFilled(std::shared_ptr<AVBuffer> &inputBuffer, int32_t trackIndex,
-        StreamType streamType, sptr<AVBufferQueueProducer> inputBufferQueue);
-    void SetFaultEvent(const std::string &errMsg);
-    void SetFaultEvent(const std::string &errMsg, int32_t ret);
-    const std::string &GetContainerFormat(Plugins::OutputFormat format);
-    void SetCallingInfo(int32_t appUid, int32_t appPid, const std::string &bundleName, uint64_t instanceId);
 
 private:
     std::string name_;
+    FilterType filterType_;
 
     std::shared_ptr<EventReceiver> eventReceiver_;
     std::shared_ptr<FilterCallback> filterCallback_;
 
-    std::shared_ptr<MediaMuxer> mediaMuxer_;
+    std::shared_ptr<FilterLinkCallback> onLinkedResultCallback_;
 
-    int32_t preFilterCount_{0};
-    int32_t startCount_{0};
-    int32_t stopCount_{0};
-    int32_t eosCount_{0};
-    std::map<int32_t, int64_t> bufferPtsMap_;
-    std::string videoCodecMimeType_;
-    std::string audioCodecMimeType_;
+    std::shared_ptr<VideoProcessingEngine::DetailEnhancerVideo> videoEnhancer_;
+
+    std::string codecMimeType_;
+    std::shared_ptr<Meta> configureParameter_;
+
+    std::shared_ptr<Filter> nextFilter_;
     std::string bundleName_;
     uint64_t instanceId_{0};
     int32_t appUid_ {0};
     int32_t appPid_ {0};
-    Plugins::OutputFormat outputFormat_{Plugins::OutputFormat::DEFAULT};
-
-    int64_t lastVideoPts_{0};
-    int64_t lastAudioPts_{0};
-    bool videoIsEos{false};
-    bool isTransCoderMode{false};
- 
-    std::mutex stopMutex_;
-    std::condition_variable stopCondition_;
 };
 } // namespace Pipeline
 } // namespace MEDIA
 } // namespace OHOS
-#endif // FILTERS_MUXER_FILTER_H
+#endif // FILTERS_VIDEO_RESIZE_FILTER_H
