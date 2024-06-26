@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_SAMPLE_VIDEO_ENCODER_SAMPLE_H
-#define AVCODEC_SAMPLE_VIDEO_ENCODER_SAMPLE_H
+#ifndef AVCODEC_SAMPLE_SAMPLE_UTILS_H
+#define AVCODEC_SAMPLE_SAMPLE_UTILS_H
 
-#include "video_sample_base.h"
+#include <cstdint>
 
 namespace OHOS {
 namespace MediaAVCodec {
 namespace Sample {
-class VideoEncoderSample : public VideoSampleBase {
-public:
-    VideoEncoderSample() {};
-    ~VideoEncoderSample() override;
-
-private:
-    int32_t Init() override;
-    int32_t StartThread() override;
-    void BufferInputThread();
-    void SurfaceInputThread();
-    void OutputThread();
-};
+void ThreadSleep(bool isValid, int32_t interval);
 } // Sample
 } // MediaAVCodec
 } // OHOS
-#endif // AVCODEC_SAMPLE_VIDEO_ENCODER_SAMPLE_H
+
+#endif // AVCODEC_SAMPLE_SAMPLE_UTILS_H
