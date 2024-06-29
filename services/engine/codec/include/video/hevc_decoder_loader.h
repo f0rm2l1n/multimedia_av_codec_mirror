@@ -13,23 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef CODECLIST_UTILS_H
-#define CODECLIST_UTILS_H
+#ifndef HEVC_DECODER_LOADER_H
+#define HEVC_DECODER_LOADER_H
+#include "video_codec_loader.h"
+#include "codecbase.h"
+#include "codeclistbase.h"
 namespace OHOS {
 namespace MediaAVCodec {
-/**
- * @brief Codec Type
- *
- * @since 3.1
- * @version 3.1
- */
-enum class CodecType : int32_t {
-    AVCODEC_INVALID = -1,
-    AVCODEC_HCODEC = 0,
-    AVCODEC_VIDEO_CODEC,
-    AVCODEC_VIDEO_HEVC_DECODER,
-    AVCODEC_AUDIO_CODEC,
+class HevcDecoderLoader : public VideoCodecLoader {
+public:
+    static std::shared_ptr<CodecBase> CreateByName(const std::string &name);
+    static int32_t GetCapabilityList(std::vector<CapabilityData> &caps);
+
+private:
+    HevcDecoderLoader();
+    ~HevcDecoderLoader() = default;
+    void CloseLibrary();
+    static HevcDecoderLoader &GetInstance();
+
+    std::mutex mutex_;
+    int32_t hevcDecoderCount_ = 0;
 };
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // CODECLIST_UTILS_H
+#endif
