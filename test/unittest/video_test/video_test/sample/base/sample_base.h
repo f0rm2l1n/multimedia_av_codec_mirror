@@ -13,18 +13,34 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_SAMPLE_SAMPLE_UTILS_H
-#define AVCODEC_SAMPLE_SAMPLE_UTILS_H
+#ifndef AVCODEC_SAMPLE_SAMPLE_BASE_H
+#define AVCODEC_SAMPLE_SAMPLE_BASE_H
 
-#include <cstdint>
+#include <fstream>
+#include <thread>
+#include "sample_info.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
 namespace Sample {
-void ThreadSleep(bool isValid, int32_t interval);
-int32_t ToGraphicPixelFormat(int32_t avPixelFormat, int32_t profile);
+class SampleBase {
+public:
+    virtual ~SampleBase() {};
+
+    virtual int32_t Create(SampleInfo sampleInfo) = 0;
+    virtual int32_t Start() = 0;
+    virtual int32_t WaitForDone();
+
+protected:
+    std::mutex mutex_;
+    std::condition_variable doneCond_;
+};
+
+class SampleFactory {
+public:
+    static std::shared_ptr<SampleBase> CreateSample(const SampleInfo &info);
+};
 } // Sample
 } // MediaAVCodec
 } // OHOS
-
-#endif // AVCODEC_SAMPLE_SAMPLE_UTILS_H
+#endif // AVCODEC_SAMPLE_SAMPLE_BASE_H
