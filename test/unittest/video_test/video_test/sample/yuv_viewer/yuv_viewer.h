@@ -13,32 +13,34 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_SAMPLE_SAMPLE_BUFFER_QUEUE_H
-#define AVCODEC_SAMPLE_SAMPLE_BUFFER_QUEUE_H
+#ifndef AVCODEC_SAMPLE_YUV_VIEWER_H
+#define AVCODEC_SAMPLE_YUV_VIEWER_H
+#include "sample_base.h"
+#include "data_producer_base.h"
 
-#include <optional>
-#include <condition_variable>
-#include <atomic>
-#include "sample_info.h"
+#include "../../window/window_manager/interfaces/innerkits/wm/window.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
 namespace Sample {
-class SampleBufferQueue {
+class YuvViewer : public SampleBase {
 public:
-    virtual int32_t QueueBuffer(const CodecBufferInfo& bufferInfo);
-    virtual std::optional<CodecBufferInfo> DequeueBuffer();
-    virtual int32_t Clear();
-    virtual uint32_t GetFrameCount();
-    virtual uint32_t IncFrameCount();
+    ~YuvViewer() override;
 
-protected:
-    std::atomic<uint32_t> frameCount_ = 0;
-    std::mutex mutex_;
-    std::condition_variable cond_;
-    std::queue<CodecBufferInfo> bufferQueue_;
+    int32_t Create(SampleInfo sampleInfo) override;
+    int32_t Start() override;
+
+private:
+    int32_t CreateWindow();
+    void InputThread();
+
+    sptr<Rosen::Window> rosenWindow_;
+    std::shared_ptr<NativeWindow> window_ = nullptr;
+    std::shared_ptr<DataProducerBase> dataProducer_ = nullptr;
+    std::shared_ptr<SampleInfo> sampleInfo_ = nullptr;
+    std::unique_ptr<std::thread> inputThread_ = nullptr;
 };
 } // Sample
 } // MediaAVCodec
 } // OHOS
-#endif // AVCODEC_SAMPLE_SAMPLE_BUFFER_QUEUE_H
+#endif // AVCODEC_SAMPLE_YUV_VIEWER_H
