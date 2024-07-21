@@ -13,32 +13,34 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_SAMPLE_SAMPLE_BUFFER_QUEUE_H
-#define AVCODEC_SAMPLE_SAMPLE_BUFFER_QUEUE_H
+#ifndef AVCODEC_SAMPLE_SAMPLE_BASE_H
+#define AVCODEC_SAMPLE_SAMPLE_BASE_H
 
-#include <optional>
-#include <condition_variable>
-#include <atomic>
+#include <fstream>
+#include <thread>
 #include "sample_info.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
 namespace Sample {
-class SampleBufferQueue {
+class SampleBase {
 public:
-    virtual int32_t QueueBuffer(const CodecBufferInfo& bufferInfo);
-    virtual std::optional<CodecBufferInfo> DequeueBuffer();
-    virtual int32_t Clear();
-    virtual uint32_t GetFrameCount();
-    virtual uint32_t IncFrameCount();
+    virtual ~SampleBase() {};
+
+    virtual int32_t Create(SampleInfo sampleInfo) = 0;
+    virtual int32_t Start() = 0;
+    virtual int32_t WaitForDone();
 
 protected:
-    std::atomic<uint32_t> frameCount_ = 0;
     std::mutex mutex_;
-    std::condition_variable cond_;
-    std::queue<CodecBufferInfo> bufferQueue_;
+    std::condition_variable doneCond_;
+};
+
+class SampleFactory {
+public:
+    static std::shared_ptr<SampleBase> CreateSample(const SampleInfo &info);
 };
 } // Sample
 } // MediaAVCodec
 } // OHOS
-#endif // AVCODEC_SAMPLE_SAMPLE_BUFFER_QUEUE_H
+#endif // AVCODEC_SAMPLE_SAMPLE_BASE_H
