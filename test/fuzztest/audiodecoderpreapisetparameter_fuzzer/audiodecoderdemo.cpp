@@ -568,29 +568,21 @@ void ADecDemoAuto::OutputFunc()
     signal_->startCond_.notify_all();
 }
 
-bool ADecDemoAuto::RunCase(const uint8_t *data, size_t size)
+bool ADecDemoAuto::RunCaseSetParameter(const uint8_t *data, size_t size)
 {
-    std::string codecdata(reinterpret_cast<const char*>(data), size);
-    inputdata = codecdata;
-    inputdatasize = size;
-    DEMO_CHECK_AND_RETURN_RET_LOG(CreateDec() == AVCS_ERR_OK, false, "Fatal: CreateDec fail");
-
-    OH_AVFormat* format = OH_AVFormat_Create();
-    auto res = InitFormat(format);
-    if (res == false) {
-        return false;
+    DEMO_CHECK_AND_RETURN_RET_LOG(CreateDecByMime() == AVCS_ERR_OK, false, "Fatal: CreateDec fail");
+    int32_t intData = *reinterpret_cast<const int32_t *>(data);
+    OH_AVFormat *format = OH_AVFormat_Create();
+    if (audioType_ == TYPE_AAC) {
+        OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_AAC_IS_ADTS.data(), intData);
     }
-    DEMO_CHECK_AND_RETURN_RET_LOG(Start() == AVCS_ERR_OK, false, "Fatal: Start fail");
-    auto start = chrono::steady_clock::now();
-
-    unique_lock<mutex> lock(signal_->startMutex_);
-    signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
-
-    auto end = chrono::steady_clock::now();
-    std::cout << "Encode finished, time = " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count()
-        << " ms" << std::endl;
-    DEMO_CHECK_AND_RETURN_RET_LOG(Stop() == AVCS_ERR_OK, false, "Fatal: Stop fail");
-    DEMO_CHECK_AND_RETURN_RET_LOG(Release() == AVCS_ERR_OK, false, "Fatal: Release fail");
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_AUDIO_SAMPLE_FORMAT.data(), intData);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_CHANNEL_COUNT.data(), intData);
+    OH_AVFormat_SetIntValue(format, MediaDescriptionKey::MD_KEY_SAMPLE_RATE.data(), intData);
+    OH_AudioDecoder_SetParameter(audioDec_, format);
+    if (audioDec_) {
+        OH_AudioDecoder_Destroy(audioDec_);
+    }
     if (format != nullptr) {
         OH_AVFormat_Destroy(format);
         format = nullptr;
