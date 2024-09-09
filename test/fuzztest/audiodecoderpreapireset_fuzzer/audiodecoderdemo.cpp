@@ -353,6 +353,9 @@ int32_t ADecDemoAuto::CreateDecByMime()
         return AVCS_ERR_INVALID_VAL;
     }
     DEMO_CHECK_AND_RETURN_RET_LOG(audioDec_ != nullptr, AVCS_ERR_UNKNOWN, "Fatal: CreateByName fail");
+    cb_ = { &OnError, &OnOutputFormatChanged, &OnInputBufferAvailable, &OnOutputBufferAvailable };
+    int32_t ret = OH_AudioDecoder_SetCallback(audioDec_, cb_, signal_);
+    DEMO_CHECK_AND_RETURN_RET_LOG(ret == AVCS_ERR_OK, AVCS_ERR_UNKNOWN, "Fatal: SetCallback fail");
     return AVCS_ERR_OK;
 }
 
@@ -568,7 +571,7 @@ void ADecDemoAuto::OutputFunc()
     signal_->startCond_.notify_all();
 }
 
-bool ADecDemoAuto::RunCase(const uint8_t *data, size_t size)
+bool ADecDemoAuto::RunCaseReset(const uint8_t *data, size_t size)
 {
     std::string codecdata(reinterpret_cast<const char*>(data), size);
     inputdata = codecdata;
@@ -589,7 +592,12 @@ bool ADecDemoAuto::RunCase(const uint8_t *data, size_t size)
     auto end = chrono::steady_clock::now();
     std::cout << "Encode finished, time = " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count()
         << " ms" << std::endl;
+
     DEMO_CHECK_AND_RETURN_RET_LOG(Stop() == AVCS_ERR_OK, false, "Fatal: Stop fail");
+    //Reset
+    if (AV_ERR_OK != Reset(audioDec_)) {
+        return false;
+    }
     DEMO_CHECK_AND_RETURN_RET_LOG(Release() == AVCS_ERR_OK, false, "Fatal: Release fail");
     if (format != nullptr) {
         OH_AVFormat_Destroy(format);

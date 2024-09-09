@@ -13,41 +13,37 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_DECODER_DEMO_BASE_H
-#define AUDIO_DECODER_DEMO_BASE_H
+#ifndef AVCODEC_AUDIO_AVBUFFER_ENCODER_DESCRIPTION_DEMO_H
+#define AVCODEC_AUDIO_AVBUFFER_ENCODER_DESCRIPTION_DEMO_H
 
 #include <atomic>
+#include <condition_variable>
 #include <fstream>
 #include <queue>
 #include <string>
 #include <thread>
-
-#include "native_avcodec_audiodecoder.h"
 #include "nocopyable.h"
-#include "avcodec_audio_common.h"
+#include "common/native_mfmagic.h"
+#include "native_avcodec_audiocodec.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
-namespace AudioDemoAuto {
-extern void OnError(OH_AVCodec* codec, int32_t errorCode, void* userData);
-extern void OnOutputFormatChanged(OH_AVCodec* codec, OH_AVFormat* format, void* userData);
-extern void OnInputBufferAvailable(OH_AVCodec* codec, uint32_t index, OH_AVMemory* data, void* userData);
-extern void OnOutputBufferAvailable(OH_AVCodec* codec, uint32_t index, OH_AVMemory* data,
-    OH_AVCodecBufferAttr* attr, void* userData);
+namespace AudioAacEncDemo {
 
-enum AudioFormatType : int32_t {
+enum class AudioBufferFormatType : int32_t {
     TYPE_AAC = 0,
     TYPE_FLAC = 1,
     TYPE_MP3 = 2,
     TYPE_VORBIS = 3,
     TYPE_AMRNB = 4,
     TYPE_AMRWB = 5,
-    TYPE_OPUS = 6,
-    TYPE_G711MU = 7,
-    TYPE_MAX = 10,
+    TYPE_VIVID = 6,
+    TYPE_OPUS = 7,
+    TYPE_G711MU = 8,
+    TYPE_LBVC = 10,
 };
 
-class ADecSignal {
+class AEncSignal {
 public:
     std::mutex inMutex_;
     std::mutex outMutex_;
@@ -57,27 +53,24 @@ public:
     std::condition_variable startCond_;
     std::queue<uint32_t> inQueue_;
     std::queue<uint32_t> outQueue_;
-    std::queue<OH_AVMemory*> inBufferQueue_;
-    std::queue<OH_AVMemory*> outBufferQueue_;
-    std::queue<OH_AVCodecBufferAttr> attrQueue_;
+    std::queue<OH_AVBuffer *> inBufferQueue_;
+    std::queue<OH_AVBuffer *> outBufferQueue_;
 };
 
-class ADecDemoAuto : public NoCopyable {
+class AudioBufferAacEncDemo : public NoCopyable {
 public:
-    ADecDemoAuto();
-    virtual ~ADecDemoAuto();
-    bool InitFile(std::string inputFile);
-    bool RunCase(const uint8_t *data, size_t size);
+    AudioBufferAacEncDemo();
+    virtual ~AudioBufferAacEncDemo();
+
+    bool CheckGetOutputDescription(const uint8_t *data, size_t size);
 
     OH_AVCodec* CreateByMime(const char* mime);
 
-    OH_AVCodec* CreateByName(const char* mime);
+    OH_AVCodec* CreateByName(const char* name);
 
     OH_AVErrCode Destroy(OH_AVCodec* codec);
 
     OH_AVErrCode SetCallback(OH_AVCodec* codec);
-
-    OH_AVErrCode Configure(OH_AVCodec* codec, OH_AVFormat* format, int32_t channel, int32_t sampleRate);
 
     OH_AVErrCode Prepare(OH_AVCodec* codec);
 
@@ -91,7 +84,7 @@ public:
 
     OH_AVFormat* GetOutputDescription(OH_AVCodec* codec);
 
-    OH_AVErrCode PushInputData(OH_AVCodec* codec, uint32_t index, int32_t size, int32_t offset);
+    OH_AVErrCode PushInputData(OH_AVCodec* codec, uint32_t index);
 
     OH_AVErrCode PushInputDataEOS(OH_AVCodec* codec, uint32_t index);
 
@@ -102,11 +95,12 @@ public:
     uint32_t GetInputIndex();
 
     uint32_t GetOutputIndex();
+
+    bool InitFile(const std::string& inputFile);
 private:
     void ClearQueue();
-    int32_t CreateDec();
-    int32_t CreateDecByMime();
-    int32_t Configure(OH_AVFormat* format);
+    int32_t CreateEnc();
+    int32_t Configure(OH_AVFormat *format);
     int32_t Start();
     int32_t Stop();
     int32_t Flush();
@@ -114,24 +108,26 @@ private:
     int32_t Release();
     void InputFunc();
     void OutputFunc();
-    void HandleInputEOS(const uint32_t index);
-    bool InitFormat(OH_AVFormat *format);
-    int32_t HandleNormalInput(const uint32_t& index, const int64_t pts, const size_t size);
-
-    std::atomic<bool> isRunning_ = false;
+    void Setformat(OH_AVFormat *format);
+    void HandleEOS(const uint32_t &index);
+    int32_t GetFileSize(const std::string &filePath);
+    
+    std::atomic<bool> isRunning_;
+    std::ifstream inputFile_;
+    std::ofstream outputFile_;
     std::unique_ptr<std::thread> inputLoop_;
     std::unique_ptr<std::thread> outputLoop_;
-    OH_AVCodec* audioDec_;
-    ADecSignal* signal_;
-    struct OH_AVCodecAsyncCallback cb_;
+    OH_AVCodec *audioEnc_;
+    AEncSignal *signal_;
+    struct OH_AVCodecCallback cb_;
     bool isFirstFrame_ = true;
+    int64_t timeStamp_ = 0;
     uint32_t frameCount_ = 0;
-    AudioFormatType audioType_;
-    OH_AVFormat* format_;
-    size_t inputdatasize;
+    size_t inputdatasize = 0;
     std::string inputdata;
+    AudioBufferFormatType audioType_ = AudioBufferFormatType::TYPE_AAC;
 };
-} // namespace AudioDemoAuto
+} // namespace AudioAacEncDemo
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // AUDIO_DECODER_DEMO_BASE_H
+#endif // AVCODEC_AUDIO_AVBUFFER_ENCODER_DESCRIPTION_DEMO_H

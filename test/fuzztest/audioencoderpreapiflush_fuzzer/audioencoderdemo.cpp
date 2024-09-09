@@ -311,7 +311,7 @@ AEncDemoAuto::~AEncDemoAuto()
     }
 }
 
-int32_t AEncDemoAuto::CreateEnc()
+int32_t AEncDemoAuto::CreateEnd()
 {
     if (audioType_ == TYPE_AAC) {
         audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_AAC_NAME).data());
@@ -340,7 +340,7 @@ int32_t AEncDemoAuto::CreateEnc()
     return AVCS_ERR_OK;
 }
 
-int32_t AEncDemoAuto::CreateEncByMime()
+int32_t AEncDemoAuto::CreateEndByMime()
 {
     if (audioType_ == TYPE_AAC) {
         audioEnc_ = OH_AudioEncoder_CreateByMime((AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC).data());
@@ -508,6 +508,11 @@ int32_t AEncDemoAuto::Reset()
     return OH_AudioEncoder_Reset(audioEnc_);
 }
 
+OH_AVFormat* AEncDemoAuto::GetOutputDescription(OH_AVCodec* codec)
+{
+    return OH_AudioEncoder_GetOutputDescription(codec);
+}
+
 void AEncDemoAuto::HandleInputEOS(const uint32_t index)
 {
     OH_AVCodecBufferAttr info;
@@ -613,12 +618,12 @@ void AEncDemoAuto::OutputFunc()
     signal_->startCond_.notify_all();
 }
 
-bool AEncDemoAuto::RunCase(const uint8_t *data, size_t size)
+bool AEncDemoAuto::RunCaseFlush(const uint8_t *data, size_t size)
 {
     std::string codecdata(reinterpret_cast<const char*>(data), size);
     inputdata = codecdata;
     inputdatasize = size;
-    DEMO_CHECK_AND_RETURN_RET_LOG(CreateEnc() == AVCS_ERR_OK, false, "Fatal: CreateEnc fail");
+    DEMO_CHECK_AND_RETURN_RET_LOG(CreateEnd() == AVCS_ERR_OK, false, "Fatal: CreateEnd fail");
     OH_AVFormat* format = OH_AVFormat_Create();
     SetFormat(format);
     DEMO_CHECK_AND_RETURN_RET_LOG(Configure(format) == AVCS_ERR_OK, false, "Fatal: Configure fail");
@@ -632,9 +637,14 @@ bool AEncDemoAuto::RunCase(const uint8_t *data, size_t size)
     auto end = chrono::steady_clock::now();
     std::cout << "Encode finished, time = " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count()
         << " ms" << std::endl;
+    //Flush
+    DEMO_CHECK_AND_RETURN_RET_LOG(Flush() == AVCS_ERR_OK, false, "Fatal: Flush fail");
     DEMO_CHECK_AND_RETURN_RET_LOG(Stop() == AVCS_ERR_OK, false, "Fatal: Stop fail");
     DEMO_CHECK_AND_RETURN_RET_LOG(Release() == AVCS_ERR_OK, false, "Fatal: Release fail");
-    DEMO_CHECK_AND_RETURN_RET_LOG(Destroy(audioEnc_) == AV_ERR_OK, false, "Fatal: Destroy fail");
+    if (format != nullptr) {
+        OH_AVFormat_Destroy(format);
+        format = nullptr;
+    }
     sleep(1);
     return true;
 }

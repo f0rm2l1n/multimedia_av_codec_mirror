@@ -311,7 +311,7 @@ AEncDemoAuto::~AEncDemoAuto()
     }
 }
 
-int32_t AEncDemoAuto::CreateEnc()
+int32_t AEncDemoAuto::CreateEnd()
 {
     if (audioType_ == TYPE_AAC) {
         audioEnc_ = OH_AudioEncoder_CreateByName((AVCodecCodecName::AUDIO_ENCODER_AAC_NAME).data());
@@ -340,7 +340,7 @@ int32_t AEncDemoAuto::CreateEnc()
     return AVCS_ERR_OK;
 }
 
-int32_t AEncDemoAuto::CreateEncByMime()
+int32_t AEncDemoAuto::CreateEndByMime()
 {
     if (audioType_ == TYPE_AAC) {
         audioEnc_ = OH_AudioEncoder_CreateByMime((AVCodecMimeType::MEDIA_MIMETYPE_AUDIO_AAC).data());
@@ -508,6 +508,11 @@ int32_t AEncDemoAuto::Reset()
     return OH_AudioEncoder_Reset(audioEnc_);
 }
 
+OH_AVFormat* AEncDemoAuto::GetOutputDescription(OH_AVCodec* codec)
+{
+    return OH_AudioEncoder_GetOutputDescription(codec);
+}
+
 void AEncDemoAuto::HandleInputEOS(const uint32_t index)
 {
     OH_AVCodecBufferAttr info;
@@ -613,28 +618,26 @@ void AEncDemoAuto::OutputFunc()
     signal_->startCond_.notify_all();
 }
 
-bool AEncDemoAuto::RunCase(const uint8_t *data, size_t size)
+bool AEncDemoAuto::RunCaseSetParameter(const uint8_t *data, size_t size)
 {
-    std::string codecdata(reinterpret_cast<const char*>(data), size);
-    inputdata = codecdata;
-    inputdatasize = size;
-    DEMO_CHECK_AND_RETURN_RET_LOG(CreateEnc() == AVCS_ERR_OK, false, "Fatal: CreateEnc fail");
-    OH_AVFormat* format = OH_AVFormat_Create();
-    SetFormat(format);
-    DEMO_CHECK_AND_RETURN_RET_LOG(Configure(format) == AVCS_ERR_OK, false, "Fatal: Configure fail");
-    DEMO_CHECK_AND_RETURN_RET_LOG(Start() == AVCS_ERR_OK, false, "Fatal: Start fail");
-    sleep(1);
-    auto start = chrono::steady_clock::now();
-
-    unique_lock<mutex> lock(signal_->startMutex_);
-    signal_->startCond_.wait(lock, [this]() { return (!(isRunning_.load())); });
-
-    auto end = chrono::steady_clock::now();
-    std::cout << "Encode finished, time = " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count()
-        << " ms" << std::endl;
-    DEMO_CHECK_AND_RETURN_RET_LOG(Stop() == AVCS_ERR_OK, false, "Fatal: Stop fail");
-    DEMO_CHECK_AND_RETURN_RET_LOG(Release() == AVCS_ERR_OK, false, "Fatal: Release fail");
-    DEMO_CHECK_AND_RETURN_RET_LOG(Destroy(audioEnc_) == AV_ERR_OK, false, "Fatal: Destroy fail");
+    DEMO_CHECK_AND_RETURN_RET_LOG(CreateEndByMime() == AVCS_ERR_OK, false, "Fatal: CreateEndByMime fail");
+    int32_t intData = *reinterpret_cast<const int32_t *>(data);
+    int64_t longData = *reinterpret_cast<const int64_t *>(data);
+    OH_AVFormat *format = OH_AVFormat_Create();
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_AUD_CHANNEL_COUNT, intData);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_AUD_SAMPLE_RATE, intData);
+    OH_AVFormat_SetLongValue(format, OH_MD_KEY_BITRATE, longData);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_AUDIO_SAMPLE_FORMAT, intData);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_BITS_PER_CODED_SAMPLE, intData);
+    OH_AVFormat_SetIntValue(format, OH_MD_KEY_COMPLIANCE_LEVEL, intData);
+    OH_AudioEncoder_SetParameter(audioEnc_, format);
+    if (audioEnc_) {
+        OH_AudioEncoder_Destroy(audioEnc_);
+    }
+    if (format != nullptr) {
+        OH_AVFormat_Destroy(format);
+        format = nullptr;
+    }
     sleep(1);
     return true;
 }

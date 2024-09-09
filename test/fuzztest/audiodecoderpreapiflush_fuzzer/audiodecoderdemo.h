@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_DECODER_DEMO_BASE_H
-#define AUDIO_DECODER_DEMO_BASE_H
+#ifndef AUDIO_DECODER_FLUSH_DEMO_BASE_H
+#define AUDIO_DECODER_FLUSH_DEMO_BASE_H
 
 #include <atomic>
 #include <fstream>
@@ -67,7 +67,7 @@ public:
     ADecDemoAuto();
     virtual ~ADecDemoAuto();
     bool InitFile(std::string inputFile);
-    bool RunCase(const uint8_t *data, size_t size);
+    bool RunCaseFlush(const uint8_t *data, size_t size);
 
     OH_AVCodec* CreateByMime(const char* mime);
 
@@ -134,4 +134,4 @@ private:
 } // namespace AudioDemoAuto
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // AUDIO_DECODER_DEMO_BASE_H
+#endif // AUDIO_DECODER_FLUSH_DEMO_BASE_H
