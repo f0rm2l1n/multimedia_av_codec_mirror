@@ -316,12 +316,6 @@ Status DecoderSurfaceFilter::DoPause()
     return Status::OK;
 }
 
-Status DecoderSurfaceFilter::DoPauseDragging()
-{
-    MEDIA_LOG_I("DoPauseDragging enter.");
-    return DoPause();
-}
-
 Status DecoderSurfaceFilter::DoResume()
 {
     MEDIA_LOG_I("Resume");
