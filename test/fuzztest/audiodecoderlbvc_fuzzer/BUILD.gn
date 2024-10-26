@@ -19,11 +19,11 @@ module_output_path = "av_codec/av_codec"
 MEDIA_ROOT_DIR = "//foundation/multimedia/av_codec/"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("AudioDecoderAmrwbFuzzTest") {
+ohos_fuzztest("AudioDecoderLbvcFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "$MEDIA_ROOT_DIR/test/fuzztest/audiodecoderamrwb_fuzzer"
+  fuzz_config_file = "$MEDIA_ROOT_DIR/test/fuzztest/audiodecoderlbvc_fuzzer"
   include_dirs = [
-    "$MEDIA_ROOT_DIR/test/fuzztest/audiodecoderamrwb_fuzzer",
+    "$MEDIA_ROOT_DIR/test/fuzztest/audiodecoderlbvc_fuzzer",
     "$MEDIA_ROOT_DIR/test/nativedemo/avmuxer",
     "$MEDIA_ROOT_DIR/interfaces/kits/c",
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native",
@@ -48,8 +48,8 @@ ohos_fuzztest("AudioDecoderAmrwbFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "audio_decoder_amrwb_demo.cpp",
-    "audiodecoderamrwb_fuzzer.cpp",
+    "audio_decoder_lbvc_demo.cpp",
+    "audiodecoderlbvc_fuzzer.cpp",
   ]
 
   defines = []
@@ -85,7 +85,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":AudioDecoderAmrwbFuzzTest",
+    ":AudioDecoderLbvcFuzzTest",
   ]
 }
 ###############################################################################
