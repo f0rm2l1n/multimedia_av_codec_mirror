@@ -18,8 +18,8 @@
 #include <queue>
 #include <string>
 #include <thread>
-#include "audio_decoder_demo.h"
-#define FUZZ_PROJECT_NAME "audiodecoder_fuzzer"
+#include "audio_decoder_vorbis_demo.h"
+#define FUZZ_PROJECT_NAME "audiodecodervorbis_fuzzer"
 
 using namespace std;
 using namespace OHOS::MediaAVCodec;
@@ -28,22 +28,17 @@ using namespace OHOS::MediaAVCodec::AudioBufferDemo;
 
 namespace OHOS {
 
-bool AudioDecoderFuzzTest(const uint8_t *data, size_t size)
+bool AudioDecoderVORBISFuzzTest(const uint8_t *data, size_t size)
 {
     if (size < sizeof(int64_t)) {
         return false;
     }
-    // FUZZ OH_AudioCodec_CreateByMime
-    std::string codecdata(reinterpret_cast<const char*>(data), size);
-    OH_AVCodec *source =  OH_AudioCodec_CreateByMime(codecdata.c_str(), true);
-    if (source) {
-        OH_AudioCodec_Destroy(source);
-    }
-    OH_AVCodec *sourcename =  OH_AudioCodec_CreateByName(codecdata.c_str());
-    if (sourcename) {
-        OH_AudioCodec_Destroy(sourcename);
-    }
-    return true;
+    // FUZZ vorbis
+    ADecBufferDemo* aDecBufferDemo = new ADecBufferDemo();
+    aDecBufferDemo->InitFile("vorbis");
+    auto res = aDecBufferDemo->RunCase(data, size);
+    delete aDecBufferDemo;
+    return res;
 }
 }
 
@@ -51,6 +46,6 @@ bool AudioDecoderFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::AudioDecoderFuzzTest(data, size);
+    OHOS::AudioDecoderVORBISFuzzTest(data, size);
     return 0;
 }
