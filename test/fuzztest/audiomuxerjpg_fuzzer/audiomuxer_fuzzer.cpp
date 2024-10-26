@@ -18,8 +18,8 @@
 #include <queue>
 #include <string>
 #include <thread>
-#include "audio_decoder_demo.h"
-#define FUZZ_PROJECT_NAME "audiodecoder_fuzzer"
+#include "audio_muxer_demo.h"
+#define FUZZ_PROJECT_NAME "audiomuxerjpg_fuzzer"
 
 using namespace std;
 using namespace OHOS::MediaAVCodec;
@@ -28,29 +28,25 @@ using namespace OHOS::MediaAVCodec::AudioBufferDemo;
 
 namespace OHOS {
 
-bool AudioDecoderFuzzTest(const uint8_t *data, size_t size)
+bool AudioMuxerJPGFuzzTest(const uint8_t *data, size_t size)
 {
     if (size < sizeof(int64_t)) {
         return false;
     }
-    // FUZZ OH_AudioCodec_CreateByMime
-    std::string codecdata(reinterpret_cast<const char*>(data), size);
-    OH_AVCodec *source =  OH_AudioCodec_CreateByMime(codecdata.c_str(), true);
-    if (source) {
-        OH_AudioCodec_Destroy(source);
-    }
-    OH_AVCodec *sourcename =  OH_AudioCodec_CreateByName(codecdata.c_str());
-    if (sourcename) {
-        OH_AudioCodec_Destroy(sourcename);
-    }
-    return true;
+    // FUZZ jpg
+    AVMuxerDemo* aMuxerBufferDemo = new AVMuxerDemo();
+    aMuxerBufferDemo->InitFile("jpg");
+    auto res = aMuxerBufferDemo->RunCase(data, size);
+    delete aMuxerBufferDemo;
+    return res;
 }
+
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::AudioDecoderFuzzTest(data, size);
+    OHOS::AudioMuxerJPGFuzzTest(data, size);
     return 0;
 }
