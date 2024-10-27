@@ -13,21 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef AVCODEC_SAMPLE_SAMPLE_UTILS_H
-#define AVCODEC_SAMPLE_SAMPLE_UTILS_H
+#ifndef AVCODEC_SAMPLE_NATIVE_IMAGE_WINDOW_WRAPPER_H
+#define AVCODEC_SAMPLE_NATIVE_IMAGE_WINDOW_WRAPPER_H
 
-#include <cstdint>
-#include <string>
-#include <unordered_map>
+#include <memory>
+#include "window_wrapper.h"
+#include "native_image.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
 namespace Sample {
-void ThreadSleep(bool isValid, int32_t interval);
-int32_t ToGraphicPixelFormat(int32_t avPixelFormat, int32_t profile);
-std::string ToString(int32_t index, std::unordered_map<int32_t, std::string> map);
+class NativeImageWindowWrapper : public WindowWrapper {
+public:
+    NativeImageWindowWrapper();
+
+private:
+    std::shared_ptr<OH_NativeImage> image_ = nullptr;
+};
 } // Sample
 } // MediaAVCodec
 } // OHOS
-
-#endif // AVCODEC_SAMPLE_SAMPLE_UTILS_H
+#endif // AVCODEC_SAMPLE_NATIVE_IMAGE_WINDOW_WRAPPER_H
