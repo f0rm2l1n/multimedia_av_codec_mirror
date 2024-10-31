@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,41 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <cstddef>
 #include <cstdint>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
-#include <iostream>
-#include "demuxer_sample.h"
-
-
-#define FUZZ_PROJECT_NAME "demuxer_fuzzer"
+#include "serverdec_sample.h"
 using namespace std;
+using namespace OHOS;
 using namespace OHOS::Media;
-namespace OHOS {
-const char *OGG_PATH = "/data/test/fuzz_create.ogg";
+using namespace OHOS::MediaAVCodec;
+#define FUZZ_PROJECT_NAME "swdecoderserver_fuzzer"
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+namespace OHOS {
+bool SwdecoderServerFuzzTest(const uint8_t *data, size_t size)
 {
-    if (size < sizeof(int64_t)) {
+    if (size < sizeof(int32_t)) {
         return false;
     }
-    int32_t fd = open(OGG_PATH, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-    if (fd < 0) {
-        return false;
-    }
-    int len = write(fd, data, size);
-    if (len <= 0) {
-        return false;
-    }
-    close(fd);
-    shared_ptr<DemuxerSample> demuxerSample = make_shared<DemuxerSample>();
-    demuxerSample->filePath = OGG_PATH;
-    demuxerSample->RunNormalDemuxerApi11(data, size);
-    return true;
+    VDecServerSample *vDecSample = new VDecServerSample();
+    vDecSample->fuzzData = data;
+    vDecSample->fuzzSize = size;
+    vDecSample->RunVideoServerDecoder();
+    vDecSample->WaitForEos();
+    delete vDecSample;
+    return false;
 }
 } // namespace OHOS
 
@@ -54,6 +41,6 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::SwdecoderServerFuzzTest(data, size);
     return 0;
 }
