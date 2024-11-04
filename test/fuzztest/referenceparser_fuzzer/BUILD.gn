@@ -14,18 +14,16 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import("//foundation/multimedia/av_codec/config.gni")
 module_output_path = "av_codec/av_codec"
 MEDIA_ROOT_DIR = "//foundation/multimedia/av_codec/"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("SwdecoderServerFuzzTest") {
+ohos_fuzztest("ReferenceparserFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "$MEDIA_ROOT_DIR/test/fuzztest/swdecoderserver_fuzzer"
+  fuzz_config_file = "$MEDIA_ROOT_DIR/test/fuzztest/referenceparser_fuzzer"
   include_dirs = [
-    "$MEDIA_ROOT_DIR/interfaces/kits/c",
-    "$MEDIA_ROOT_DIR/services/engine/codec/video/fcodec/include",
-    "$MEDIA_ROOT_DIR/test/fuzztest/swdecoderserver_fuzzer/include",
+    "$MEDIA_ROOT_DIR/interfaces/inner_api/native",
+    "$MEDIA_ROOT_DIR/test/fuzztest/referenceparser_fuzzer",
   ]
   cflags = [
     "-g",
@@ -34,8 +32,8 @@ ohos_fuzztest("SwdecoderServerFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "serverdec_sample.cpp",
-    "swdecoderserver_fuzzer.cpp",
+    "parser_sample.cpp",
+    "referenceparser_fuzzer.cpp",
   ]
   external_deps = [
     "c_utils:utils",
@@ -46,26 +44,21 @@ ohos_fuzztest("SwdecoderServerFuzzTest") {
   ]
   deps = [
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native:av_codec_client",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_avdemuxer",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_avsource",
     "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_codecbase",
-    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_vdec",
-    "$MEDIA_ROOT_DIR/services/engine/codec/video/fcodec:fcodec",
   ]
-  defines = []
-  defines += av_codec_defines
-  if (build_variant != "user") {
-    defines += [ "BUILD_ENG_VERSION" ]
-  }
   resource_config_file =
       "$MEDIA_ROOT_DIR/test/moduletest/resources/ohos_test.xml"
 }
 
-###############################################################################
+#################################################################################
 group("fuzztest") {
   testonly = true
   deps = []
   deps += [
     # deps file
-    ":SwdecoderServerFuzzTest",  #引用测试套
+    ":ReferenceparserFuzzTest",
   ]
 }
-###############################################################################
+#################################################################################
