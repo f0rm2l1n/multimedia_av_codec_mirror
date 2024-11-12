@@ -15,23 +15,23 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <utility>
-#include "serverdec_sample.h"
+#include "hevcserverdec_sample.h"
 #include <iostream>
-#include <chrono>
+#include "hevc_decoder_api.h"
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::MediaAVCodec;
 using namespace OHOS::MediaAVCodec::Codec;
 using namespace std;
 namespace {
-
+constexpr int32_t TIME = 12345;
+constexpr int32_t MAX_SEND_FRAMES = 10;
 } // namespace
 
 void VDecServerSample::CallBack::OnError(AVCodecErrorType errorType, int32_t errorCode)
 {
-    cout << "--OnError--" << endl;
-    tester->isRunning_.store(false);
-    tester->signal_->inCond_.notify_all();
+    tester->Flush();
+    tester->Reset();
 }
 
 void VDecServerSample::CallBack::OnOutputFormatChanged(const Format &format)
@@ -57,6 +57,8 @@ VDecServerSample::~VDecServerSample()
     if (codec_ != nullptr) {
         codec_->Stop();
         codec_->Release();
+        HevcDecoder *codec = reinterpret_cast<HevcDecoder*>(codec_.get());
+        codec->DecStrongRef(codec);
     }
     if (signal_ != nullptr) {
         delete signal_;
@@ -67,11 +69,12 @@ VDecServerSample::~VDecServerSample()
 int32_t VDecServerSample::ConfigServerDecoder()
 {
     Format fmt;
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, width);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, height);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, 1);
-    fmt.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, frameRate);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, 0);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, kWidth);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, kHeight);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, kFormat);
+    fmt.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, kFormatRate);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, kAngle);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_DURATION, kRotation);
     return codec_->Configure(fmt);
 }
 
@@ -83,7 +86,7 @@ int32_t VDecServerSample::SetCallback()
 
 void VDecServerSample::RunVideoServerDecoder()
 {
-    codec_ = make_shared<FCodec>("OH.Media.Codec.Decoder.Video.AVC");
+    CreateHevcDecoderByName("OH.Media.Codec.Decoder.Video.HEVC", codec_);
     if (codec_ == nullptr) {
         cout << "Create failed" << endl;
         return;
@@ -118,20 +121,19 @@ void VDecServerSample::RunVideoServerDecoder()
 
 void VDecServerSample::InputFunc()
 {
-    int32_t time = 1000;
-    while (sendFrameIndex < frameIndex) {
+    while (sendFrameIndex < MAX_SEND_FRAMES) {
         if (!isRunning_.load()) {
             break;
         }
         unique_lock<mutex> lock(signal_->inMutex_);
-        signal_->inCond_.wait_for(lock, std::chrono::milliseconds(time), [this]() {
+        signal_->inCond_.wait(lock, [this]() {
             if (!isRunning_.load()) {
                 cout << "quit signal" << endl;
                 return true;
             }
             return signal_->inIdxQueue_.size() > 0;
         });
-        if (!isRunning_.load() || signal_->inIdxQueue_.size() == 0) {
+        if (!isRunning_.load()) {
             break;
         }
         uint32_t index = signal_->inIdxQueue_.front();
@@ -147,6 +149,10 @@ void VDecServerSample::InputFunc()
         if (memcpy_s(bufferAddr, buffer->memory_->GetCapacity(), fuzzData, fuzzSize) != EOK) {
             break;
         }
+        buffer->pts_ = TIME;
+        buffer->flag_ = 0;
+        buffer->memory_->SetOffset(0);
+        buffer->memory_->SetSize(fuzzSize);
         int32_t err = codec_->QueueInputBuffer(index);
         if (err != AVCS_ERR_OK) {
             cout << "QueueInputBuffer fail" << endl;
