@@ -14,33 +14,39 @@
 import("//build/ohos.gni")
 import("//foundation/multimedia/av_codec/config.gni")
 
-config("event_manager_public_config") {
-  include_dirs = [ "./" ]
+config("sa_manager_public_config") {
+  include_dirs = [ "./server/include/" ]
 }
 
-ohos_source_set("event_manager") {
+ohos_source_set("sa_manager") {
   branch_protector_ret = "pac_ret"
   sanitize = av_codec_sanitize
-  public_configs = [ ":event_manager_public_config" ]
+  public_configs = [ ":sa_manager_public_config" ]
 
-  public_external_deps = [ "media_foundation:media_foundation" ]
-
-  configs = [ "../../../dfx:av_codec_service_log_dfx_public_config" ]
+  configs = [ "../../dfx:av_codec_service_log_dfx_public_config" ]
 
   include_dirs = [
-    "./",
-    "../",
-    "../../../../interfaces/inner_api/native/",
-    "../../sa_avcodec/server/include/",
-    "./event_handler/",
+    "./ipc/",
+    "./server/include/",
+    "../common/",
+    "../../../interfaces/inner_api/native/",
   ]
 
   sources = [
-    "./event_handler/instance_memory_update_event_handler/instance_memory_update_event_handler.cpp",
-    "./event_manager.cpp",
+    "ipc/avcodec_listener_proxy.cpp",
+    "ipc/avcodec_parcel.cpp",
+    "ipc/avcodec_service_stub.cpp",
+    "server/avcodec_server.cpp",
+    "server/avcodec_server_manager.cpp",
   ]
 
-  deps = [ "../../sa_avcodec:sa_manager" ]
+  external_deps = [
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "media_foundation:media_foundation",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
 
   subsystem_name = "multimedia"
   part_name = "av_codec"

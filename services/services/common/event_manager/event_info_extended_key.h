@@ -16,39 +16,17 @@
 #ifndef AVCODEC_EVENT_MANAGER_H
 #define AVCODEC_EVENT_MANAGER_H
 
-#include <mutex>
-#include <memory>
 #include <string>
-#include "meta.h"
-#include "event_info_extended_key.h"
 
 namespace OHOS {
 namespace MediaAVCodec {
-enum class EventType {
-    UNKNOWN,
-    INSTANCE_INIT,
-    INSTANCE_RELEASE,
-    INSTANCE_MEMORY_UPDATE,
-    INSTANCE_FREEZE,
-    INSTANCE_UNFREEZE,
-    END,
-};
-
-class EventManager{
+class EventInfoExtentedKey {
 public:
-    static EventManager &GetInstance();
-    void OnInstanceEvent(EventType type, Media::Meta &meta);
-
-private:
-    std::mutex eventMutex_;
-
-/* For extented event callback */
-private:
-    void OnInstanceInitEvent(Media::Meta &meta);
-    void OnInstanceReleaseEvent(Media::Meta &meta);
-    void OnInstanceMemoryUpdateEvent(Media::Meta &meta);
-    void OnAppFreezeEvent(Media::Meta &meta);
-    void OnAppUnfreezeEvent(Media::Meta &meta);
+    static constexpr std::string_view INSTANCE_ID = "av_codec_event_info_instance_id";
+    static constexpr std::string_view CODEC_TYPE = "av_codec_event_info_codec_type";
+    static constexpr std::string_view IS_HARDWARE = "av_codec_event_info_codec_type";
+    static constexpr std::string_view BIT_DEPTH = "av_codec_event_info_bit_depth";
+    static constexpr std::string_view ENABLE_POST_PROCESSING = "av_codec_event_info_enable_post_processing";
 };
 } // namespace MediaAVCodec
 } // namespace OHOS
