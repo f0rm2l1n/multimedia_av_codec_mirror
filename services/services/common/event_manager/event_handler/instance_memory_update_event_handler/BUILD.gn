@@ -14,30 +14,39 @@
 import("//build/ohos.gni")
 import("//foundation/multimedia/av_codec/config.gni")
 
-config("event_manager_public_config") {
+config("instance_memory_update_event_handler_public_config") {
   include_dirs = [ "./" ]
 }
 
-ohos_source_set("event_manager") {
+ohos_source_set("instance_memory_update_event_handler") {
   branch_protector_ret = "pac_ret"
   sanitize = av_codec_sanitize
-  public_configs = [ ":event_manager_public_config" ]
+  public_configs = [ ":instance_memory_update_event_handler_public_config" ]
 
   public_external_deps = [ "media_foundation:media_foundation" ]
 
-  configs = [ "../../../dfx:av_codec_service_log_dfx_public_config" ]
+  configs = [ "../../../../../dfx:av_codec_service_log_dfx_public_config" ]
 
   include_dirs = [
     "./",
-    "../",
-    "../../../../interfaces/inner_api/native/",
+    "../../",
+    "../../../",
+    "../../../../../../interfaces/inner_api/native/",
   ]
 
-  sources = [ "./event_manager.cpp" ]
+  sources = [
+    "./config_json_parser.cpp",
+    "./instance_memory_update_event_handler.cpp",
+    "./waterline_manager.cpp",
+  ]
 
-  deps = [
-    "../../sa_avcodec:sa_manager",
-    "./event_handler/instance_memory_update_event_handler:instance_memory_update_event_handler",
+  deps = [ "../../../../sa_avcodec:sa_manager" ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "hiview:libucollection_client",
+    "init:libbegetutil",
   ]
 
   subsystem_name = "multimedia"
