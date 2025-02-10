@@ -18,13 +18,12 @@ module_output_path = "av_codec/av_codec"
 MEDIA_ROOT_DIR = "//foundation/multimedia/av_codec/"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("PtsAndIndexConversionFuzzTest") {
+ohos_fuzztest("AvSourceFuncFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "$MEDIA_ROOT_DIR/test/fuzztest/ptsandindexconversion_fuzzer"
+  fuzz_config_file = "$MEDIA_ROOT_DIR/test/fuzztest/avsourcefunc_fuzzer"
   include_dirs = [
     "$MEDIA_ROOT_DIR/interfaces/kits/c",
-    "$MEDIA_ROOT_DIR/test/fuzztest/ptsandindexconversion_fuzzer",
+    "$MEDIA_ROOT_DIR/test/fuzztest/avsourcefunc_fuzzer",
   ]
   cflags = [
     "-g",
@@ -32,10 +31,7 @@ ohos_fuzztest("PtsAndIndexConversionFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [
-    "ptsandindexconversion_fuzzer.cpp",
-    "ptsandindexconversion_sample.cpp",
-  ]
+  sources = [ "avsource_fuzzer.cpp" ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
@@ -45,7 +41,8 @@ ohos_fuzztest("PtsAndIndexConversionFuzzTest") {
   ]
   deps = [
     "$MEDIA_ROOT_DIR/interfaces/inner_api/native:av_codec_client",
-    "$MEDIA_ROOT_DIR/services/media_engine/modules:av_codec_media_engine_modules",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_codecbase",
+    "$MEDIA_ROOT_DIR/interfaces/kits/c:native_media_vdec",
   ]
   resource_config_file =
       "$MEDIA_ROOT_DIR/test/moduletest/resources/ohos_test.xml"
@@ -57,7 +54,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":PtsAndIndexConversionFuzzTest",
+    ":AvSourceFuncFuzzTest",
   ]
 }
 ###############################################################################
