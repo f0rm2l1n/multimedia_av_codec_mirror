@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,11 +21,14 @@
 #ifdef VIDEODEC_CAPI_UNIT_TEST
 #include "native_avmagic.h"
 #include "videodec_capi_mock.h"
-#define TEST_SUIT VideoDecCapiTest
+#define TEST_SUIT VideoDecCapiTestH263
 #else
-#define TEST_SUIT VideoDecInnerTest
+#define TEST_SUIT VideoDecInnerTestH263
 #endif
 #include "videodec_func_test_suit.h"
+
+const int DEFAULT_WIDTH_H263 = 1920;
+const int DEFAULT_HEIGHT_H263 = 1080;
 
 using namespace std;
 using namespace OHOS;
@@ -40,39 +43,17 @@ std::string g_vdecName = "";
 
 void TEST_SUIT::SetUpTestCase(void)
 {
-    auto capability = CodecListMockFactory::GetCapabilityByCategory((CodecMimeType::VIDEO_AVC).data(), false,
-                                                                    AVCodecCategory::AVCODEC_HARDWARE);
-    ASSERT_NE(nullptr, capability) << (CodecMimeType::VIDEO_AVC).data() << " can not found!" << std::endl;
+    auto capability = CodecListMockFactory::GetCapabilityByCategory((CodecMimeType::VIDEO_H263).data(), false,
+                                                                    AVCodecCategory::AVCODEC_SOFTWARE);
+    ASSERT_NE(nullptr, capability) << (CodecMimeType::VIDEO_H263).data() << " can not found!" << std::endl;
     g_vdecName = capability->GetName();
 }
 
 void TEST_SUIT::CreateByNameWithParam(int32_t param)
 {
     std::string codecName = "";
-    switch (param) {
-        case VCodecTestCode::SW_AVC:
-            capability_ = CodecListMockFactory::GetCapabilityByCategory(CodecMimeType::VIDEO_AVC.data(), false,
-                                                                        AVCodecCategory::AVCODEC_SOFTWARE);
-            break;
-        case VCodecTestCode::HW_AVC:
-            capability_ = CodecListMockFactory::GetCapabilityByCategory(CodecMimeType::VIDEO_AVC.data(), false,
-                                                                        AVCodecCategory::AVCODEC_HARDWARE);
-            break;
-        case VCodecTestCode::HW_HEVC:
-            capability_ = CodecListMockFactory::GetCapabilityByCategory(CodecMimeType::VIDEO_HEVC.data(), false,
-                                                                        AVCodecCategory::AVCODEC_HARDWARE);
-            break;
-#ifdef SUPPORT_CODEC_RV
-        case VCodecTestCode::SW_RV40:
-            capability_ = CodecListMockFactory::GetCapabilityByCategory(CodecMimeType::VIDEO_RV40.data(), false,
-                                                                        AVCodecCategory::AVCODEC_SOFTWARE);
-            break;
-#endif
-        default:
-            capability_ = CodecListMockFactory::GetCapabilityByCategory(CodecMimeType::VIDEO_AVC.data(), false,
-                                                                        AVCodecCategory::AVCODEC_SOFTWARE);
-            break;
-    }
+    capability_ = CodecListMockFactory::GetCapabilityByCategory(CodecMimeType::VIDEO_H263.data(), false,
+                                                                AVCodecCategory::AVCODEC_SOFTWARE);
     codecName = capability_->GetName();
     std::cout << "CodecName: " << codecName << "\n";
     ASSERT_TRUE(CreateVideoCodecByName(codecName));
@@ -81,9 +62,6 @@ void TEST_SUIT::CreateByNameWithParam(int32_t param)
 void TEST_SUIT::PrepareSource(int32_t param)
 {
     std::string sourcePath = decSourcePathMap_.at(param);
-    if (param == VCodecTestCode::HW_HEVC) {
-        videoDec_->SetSourceType(false);
-    }
     videoDec_->testParam_ = param;
     std::cout << "SourcePath: " << sourcePath << std::endl;
     videoDec_->SetSource(sourcePath);
@@ -98,16 +76,12 @@ void TEST_SUIT::PrepareSource(int32_t param)
 void TEST_SUIT::SetFormatWithParam(int32_t param)
 {
     (void)param;
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH_H263);
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT_H263);
     format_->PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::NV12));
 }
 
-INSTANTIATE_TEST_SUITE_P(, TEST_SUIT, testing::Values(HW_AVC, HW_HEVC, SW_AVC
-#ifdef SUPPORT_CODEC_RV
-, SW_RV40
-#endif
-));
+INSTANTIATE_TEST_SUITE_P(, TEST_SUIT, testing::Values(SW_H263));
 
 /**
  * @tc.name: VideoDecoder_Multithread_Create_001
@@ -153,7 +127,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Multithread_Create_002, TestSize.Level1)
         std::shared_ptr<VDecSignal> vdecSignal = std::make_shared<VDecSignal>();
         std::shared_ptr<VideoDecSample> videoDec = std::make_shared<VideoDecSample>(vdecSignal);
         ASSERT_NE(nullptr, videoDec);
-        if (videoDec->CreateVideoDecMockByMime(CodecMimeType::VIDEO_AVC.data())) {
+        if (videoDec->CreateVideoDecMockByMime(CodecMimeType::VIDEO_H263.data())) {
             g_vdecCount++;
             cout << "create successed, num:" << g_vdecCount.load() << endl;
         } else {
@@ -246,7 +220,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_004, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_001, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecCallback cb = GetVoidCallback();
     EXPECT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_RegisterCallback(nullptr, cb, nullptr));
@@ -259,7 +233,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_001, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_002, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecCallback cb = GetVoidCallback();
     cb.onNeedInputBuffer = nullptr;
@@ -273,7 +247,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_002, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_003, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecCallback cb = GetVoidCallback();
     cb.onNewOutputBuffer = nullptr;
@@ -287,7 +261,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_003, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_004, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecCallback cb = GetVoidCallback();
     codec_->magic_ = AVMagic::AVCODEC_MAGIC_VIDEO_ENCODER;
@@ -302,7 +276,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_SetCallback_Invalid_004, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_001, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecCallback cb = GetVoidCallback();
     OH_AVCodecBufferAttr attr = {0, 0, 0, 0};
@@ -317,7 +291,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_001, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_002, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecAsyncCallback cb = GetVoidAsyncCallback();
     EXPECT_EQ(AV_ERR_OK, OH_VideoDecoder_SetCallback(codec_, cb, nullptr));
@@ -331,7 +305,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_002, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_003, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     EXPECT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_PushInputBuffer(nullptr, 0));
 }
@@ -343,7 +317,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_003, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_004, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     codec_->magic_ = AVMagic::AVCODEC_MAGIC_VIDEO_ENCODER;
     EXPECT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_PushInputBuffer(codec_, 0));
@@ -357,7 +331,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_PushInputBuffer_Invalid_004, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_001, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecCallback cb = GetVoidCallback();
     EXPECT_EQ(AV_ERR_OK, OH_VideoDecoder_RegisterCallback(codec_, cb, nullptr));
@@ -371,7 +345,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_001, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_002, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecAsyncCallback cb = GetVoidAsyncCallback();
     EXPECT_EQ(AV_ERR_OK, OH_VideoDecoder_SetCallback(codec_, cb, nullptr));
@@ -385,7 +359,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_002, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_003, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     EXPECT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_FreeOutputBuffer(nullptr, 0));
 }
@@ -397,7 +371,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_003, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_004, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     codec_->magic_ = AVMagic::AVCODEC_MAGIC_VIDEO_ENCODER;
     EXPECT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_FreeOutputBuffer(codec_, 0));
@@ -411,7 +385,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Free_Buffer_Invalid_004, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Render_Buffer_Invalid_001, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecCallback cb = GetVoidCallback();
     EXPECT_EQ(AV_ERR_OK, OH_VideoDecoder_RegisterCallback(codec_, cb, nullptr));
@@ -425,7 +399,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Render_Buffer_Invalid_001, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Render_Buffer_Invalid_002, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     struct OH_AVCodecAsyncCallback cb = GetVoidAsyncCallback();
     EXPECT_EQ(AV_ERR_OK, OH_VideoDecoder_SetCallback(codec_, cb, nullptr));
@@ -439,7 +413,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Render_Buffer_Invalid_002, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Render_Buffer_Invalid_003, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     EXPECT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_RenderOutputBuffer(nullptr, 0));
 }
@@ -451,7 +425,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_Render_Buffer_Invalid_003, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_Render_Buffer_Invalid_004, TestSize.Level1)
 {
-    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_AVC).data());
+    codec_ = OH_VideoDecoder_CreateByMime((CodecMimeType::VIDEO_H263).data());
     ASSERT_NE(nullptr, codec_);
     codec_->magic_ = AVMagic::AVCODEC_MAGIC_VIDEO_ENCODER;
     EXPECT_EQ(AV_ERR_INVALID_VAL, OH_VideoDecoder_RenderOutputBuffer(codec_, 0));
@@ -507,7 +481,7 @@ HWTEST_P(TEST_SUIT, VideoDecoder_Configure_003, TestSize.Level1)
 {
     CreateByNameWithParam(GetParam());
     format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, -2); // invalid width size -2
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT_H263);
     EXPECT_NE(AV_ERR_OK, videoDec_->Configure(format_));
 }
 
@@ -519,7 +493,7 @@ HWTEST_P(TEST_SUIT, VideoDecoder_Configure_003, TestSize.Level1)
 HWTEST_P(TEST_SUIT, VideoDecoder_Configure_004, TestSize.Level1)
 {
     CreateByNameWithParam(GetParam());
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH_H263);
     format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, -2); // invalid height size -2
     EXPECT_NE(AV_ERR_OK, videoDec_->Configure(format_));
 }
@@ -854,6 +828,74 @@ HWTEST_P(TEST_SUIT, VideoDecoder_Release_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name: VideoDecoder_RGBA_001
+ * @tc.desc: correct flow 1
+ * @tc.type: FUNC
+ */
+HWTEST_P(TEST_SUIT, VideoDecoder_RGBA_001, TestSize.Level1)
+{
+    CreateByNameWithParam(GetParam());
+    SetFormatWithParam(GetParam());
+    PrepareSource(GetParam());
+    ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::RGBA));
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Release());
+}
+
+/**
+ * @tc.name: VideoDecoder_YUVI420_001
+ * @tc.desc: correct flow 1
+ * @tc.type: FUNC
+ */
+HWTEST_P(TEST_SUIT, VideoDecoder_YUVI420_001, TestSize.Level1)
+{
+    CreateByNameWithParam(GetParam());
+    SetFormatWithParam(GetParam());
+    PrepareSource(GetParam());
+    ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::YUVI420));
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Release());
+}
+
+/**
+ * @tc.name: VideoDecoder_NV21_001
+ * @tc.desc: correct flow 1
+ * @tc.type: FUNC
+ */
+HWTEST_P(TEST_SUIT, VideoDecoder_NV21_001, TestSize.Level1)
+{
+    CreateByNameWithParam(GetParam());
+    SetFormatWithParam(GetParam());
+    PrepareSource(GetParam());
+    ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::NV21));
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Release());
+}
+
+/**
+ * @tc.name: VideoDecoder_NV12_001
+ * @tc.desc: correct flow 1
+ * @tc.type: FUNC
+ */
+HWTEST_P(TEST_SUIT, VideoDecoder_NV12_001, TestSize.Level1)
+{
+    CreateByNameWithParam(GetParam());
+    SetFormatWithParam(GetParam());
+    PrepareSource(GetParam());
+    ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::NV12));
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
+    EXPECT_EQ(AV_ERR_OK, videoDec_->Release());
+}
+
+/**
  * @tc.name: VideoDecoder_SetSurface_001
  * @tc.desc: video decodec setsurface
  * @tc.type: FUNC
@@ -1001,8 +1043,8 @@ HWTEST_P(TEST_SUIT, VideoDecoder_SetParameter_001, TestSize.Level1)
     format_ = FormatMockFactory::CreateFormat();
     ASSERT_NE(nullptr, format_);
 
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH_H263);
+    format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT_H263);
     format_->PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::YUV420P));
     format_->PutIntValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, DEFAULT_FRAME_RATE);
 
@@ -1043,77 +1085,14 @@ HWTEST_P(TEST_SUIT, VideoDecoder_SetParameter_002, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_GetOutputDescription_001, TestSize.Level1)
 {
-    CreateByNameWithParam(HW_AVC);
-    SetFormatWithParam(HW_AVC);
-    PrepareSource(HW_AVC);
+    CreateByNameWithParam(SW_H263);
+    SetFormatWithParam(SW_H263);
+    PrepareSource(SW_H263);
     ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
 
     EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
     format_ = videoDec_->GetOutputDescription();
     std::cout << format_->DumpInfo() << std::endl;
-    EXPECT_NE(nullptr, format_);
-    EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
-}
-
-/**
- * @tc.name: VideoDecoder_GetOutputDescription_002
- * @tc.desc: video codec GetOutputDescription
- * @tc.type: FUNC
- */
-HWTEST_F(TEST_SUIT, VideoDecoder_GetOutputDescription_002, TestSize.Level1)
-{
-    CreateByNameWithParam(HW_AVC);
-    SetFormatWithParam(HW_AVC);
-    PrepareSource(HW_AVC);
-    ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
-
-    EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
-    format_ = videoDec_->GetOutputDescription();
-
-    std::string dumpInfo = format_->DumpInfo();
-    std::cout << "dumpInfo: [" << dumpInfo << "]\n";
-    auto checkFunc = [&dumpInfo](const std::string key) {
-        std::string keyStr = key + " = ";
-        EXPECT_NE(dumpInfo.find(keyStr), string::npos) << "keyStr: [" << keyStr << "]\n"
-                                                       << "dumpInfo: [" << dumpInfo << "]\n";
-    };
-    checkFunc(Media::Tag::VIDEO_CROP_TOP);
-    checkFunc(Media::Tag::VIDEO_CROP_BOTTOM);
-    checkFunc(Media::Tag::VIDEO_CROP_LEFT);
-    checkFunc(Media::Tag::VIDEO_CROP_RIGHT);
-    checkFunc(Media::Tag::VIDEO_STRIDE);
-
-    EXPECT_NE(nullptr, format_);
-    EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
-}
-
-/**
- * @tc.name: VideoDecoder_GetOutputDescription_003
- * @tc.desc: video codec GetOutputDescription
- * @tc.type: FUNC
- */
-HWTEST_F(TEST_SUIT, VideoDecoder_GetOutputDescription_003, TestSize.Level1)
-{
-    CreateByNameWithParam(HW_AVC);
-    SetFormatWithParam(HW_AVC);
-    PrepareSource(HW_AVC);
-    ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
-
-    EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
-    format_ = videoDec_->GetOutputDescription();
-
-    int32_t cropRight = 0;
-    int32_t stride = 0;
-    int32_t cropBottom = 0;
-
-    EXPECT_TRUE(format_->GetIntValue(Media::Tag::VIDEO_CROP_RIGHT, cropRight));
-    EXPECT_TRUE(format_->GetIntValue(Media::Tag::VIDEO_STRIDE, stride));
-    EXPECT_TRUE(format_->GetIntValue(Media::Tag::VIDEO_CROP_BOTTOM, cropBottom));
-
-    EXPECT_GE(cropRight, DEFAULT_WIDTH - 1);
-    EXPECT_GE(stride, DEFAULT_WIDTH);
-    EXPECT_GE(cropBottom, DEFAULT_HEIGHT - 1);
-
     EXPECT_NE(nullptr, format_);
     EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
 }
@@ -1139,49 +1118,10 @@ HWTEST_P(TEST_SUIT, VideoDecoder_GetOutputDescription_004, TestSize.Level1)
     EXPECT_TRUE(format_->GetIntValue(Media::Tag::VIDEO_PIC_WIDTH, pictureWidth));
     EXPECT_TRUE(format_->GetIntValue(Media::Tag::VIDEO_PIC_HEIGHT, pictureHeight));
 
-    EXPECT_GE(pictureWidth, DEFAULT_WIDTH - 1);
-    EXPECT_GE(pictureHeight, DEFAULT_HEIGHT - 1);
+    EXPECT_GE(pictureWidth, DEFAULT_WIDTH_H263 - 1);
+    EXPECT_GE(pictureHeight, DEFAULT_HEIGHT_H263 - 1);
 
     EXPECT_NE(nullptr, format_);
-    EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
-}
-
-/**
- * @tc.name: VideoDecoder_HDR_Function_001
- * @tc.desc: video decodec hdr function test
- * @tc.type: FUNC
- */
-HWTEST_F(TEST_SUIT, VideoDecoder_HDR_Function_001, TestSize.Level1)
-{
-    capability_ = CodecListMockFactory::GetCapabilityByCategory(CodecMimeType::VIDEO_HEVC.data(), false,
-                                                                AVCodecCategory::AVCODEC_HARDWARE);
-    std::string codecName = capability_->GetName();
-    if (codecName == "OMX.rk.video_decoder.hevc") {
-        return;
-    }
-    std::cout << "CodecName: " << codecName << "\n";
-    ASSERT_TRUE(CreateVideoCodecByName(codecName));
-
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, DEFAULT_WIDTH);
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, DEFAULT_HEIGHT);
-    format_->PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, static_cast<int32_t>(VideoPixelFormat::NV12));
-
-    VCodecTestCode param = VCodecTestCode::HW_HDR;
-    std::string sourcePath = decSourcePathMap_.at(param);
-    videoDec_->SetSourceType(false);
-    videoDec_->testParam_ = param;
-    std::cout << "SourcePath: " << sourcePath << std::endl;
-    videoDec_->SetSource(sourcePath);
-    const ::testing::TestInfo *testInfo_ = ::testing::UnitTest::GetInstance()->current_test_info();
-    string prefix = "/data/test/media/";
-    string fileName = testInfo_->name();
-    auto check = [](char it) { return it == '/'; };
-    (void)fileName.erase(std::remove_if(fileName.begin(), fileName.end(), check), fileName.end());
-    videoDec_->SetOutPath(prefix + fileName);
-
-    ASSERT_EQ(AV_ERR_OK, videoDec_->Configure(format_));
-    ASSERT_EQ(AV_ERR_OK, videoDec_->SetOutputSurface());
-    EXPECT_EQ(AV_ERR_OK, videoDec_->Start());
     EXPECT_EQ(AV_ERR_OK, videoDec_->Stop());
 }
 
@@ -1192,7 +1132,7 @@ HWTEST_F(TEST_SUIT, VideoDecoder_HDR_Function_001, TestSize.Level1)
  */
 HWTEST_F(TEST_SUIT, VideoDecoder_SetDecryptionConfig_001, TestSize.Level1)
 {
-    VCodecTestCode param = VCodecTestCode::HW_AVC;
+    VCodecTestCode param = VCodecTestCode::SW_H263;
     CreateByNameWithParam(param);
     SetFormatWithParam(param);
     PrepareSource(param);
