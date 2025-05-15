@@ -46,6 +46,16 @@ public:
     ~VDecServerSample();
 
     void RunVideoServerDecoder();
+    const char *inpDir = "/data/test/media/720_1280_25_avcc.h265";
+    const char *outDir = "/data/test/media/VDecTest.yuv";
+    uint32_t defaultWidth = 1920;
+    uint32_t defaultHeight = 1080;
+    uint32_t defaultFrameRate = 30;
+    uint32_t defaultRotation = 0;
+
+    uint32_t defaultPixelFormat = 1;
+    uint32_t frameCount_ = 0;
+    uint32_t errCount = 0;
     int32_t ConfigServerDecoder();
     int32_t SetCallback();
     void GetOutputFormat();
@@ -54,14 +64,17 @@ public:
     void Reset();
     void InputFunc();
     void WaitForEos();
+    int32_t SetOutputSurface();
     std::shared_ptr<VDecSignal> signal_;
-    const uint8_t *fuzzData;
-    size_t fuzzSize;
-    int32_t sendFrameIndex;
-    const char *outDIR = "/data/test/media/VDecTest.yuv";
+    bool repeateRun = false;
+    bool isSurfMode = false;
+    std::atomic<bool> isEOS_ { false };
+    std::vector<sptr<Surface>> cs_vector;
+    std::vector<sptr<Surface>> ps_vector;
 protected:
     std::shared_ptr<CodecBase> codec_;
     std::atomic<bool> isRunning_ { false };
+    std::unique_ptr<std::ifstream> inFile_;
     std::unique_ptr<std::thread> inputLoop_;
     struct CallBack : public MediaCodecCallback {
         explicit CallBack(VDecServerSample* tester) : tester(tester) {}
@@ -73,6 +86,33 @@ protected:
     private:
         VDecServerSample* tester;
     };
+};
+private:
+    int64_t GetSystemTimeUs();
+    void ReleaseInFile();
+    void Stopinloop();
+    void SetEOS(uint32_t index, std::shared_ptr<AVBuffer> buffer);
+    void CopyStartCode(uint8_t *frameBuffer, uint32_t bufferSize, std::shared_ptr<AVBuffer> buffer);
+    int32_t ReadData(uint32_t index, std::shared_ptr<AVBuffer> buffer);
+    int32_t SendData(uint32_t bufferSize, uint32 index, std::shared_ptr<AVBuffer> buffer);
+};
+
+class ConsumerListener : public IBufferConsumerListener {
+public:
+    ConsumerListener(sptr<Surface> cs) : cs_(cs){};
+    ~ConsumerListener() {}
+    void OnBufferAvailable() override
+    {
+        sptr<SurfaceBuffer> buffer;
+        int32_t flushFence;
+        cs_->AcquireBuffer(buffer, flushFence, timestamp_, damage_);
+        cs_->ReleaseBuffer(buffer, -1);
+    }
+
+private:
+    int64_t timestamp_ = 0;
+    Rect damage_ = {};
+    sptr<Surface> cs_{nullptr};
 };
 } // namespace Media
 } // namespace OHOS
