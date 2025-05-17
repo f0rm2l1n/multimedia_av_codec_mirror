@@ -82,22 +82,58 @@ int32_t VDecServerSample::ConfigServerDecoder()
     return codec_->Configure(fmt);
 }
 
+int32_t VDecServerSample::SetParameter()
+{
+    Format fmt;
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, WIDTH);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, HIGHT);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, FORMAT);
+    fmt.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, FRAME_RATE);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, ANGLE);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE, ScalingMode::SCALING_MODE_SCALE_TO_WINDOW);
+    return codec_->SetParameter(fmt);
+}
+
 int32_t VDecServerSample::SetCallback()
 {
     shared_ptr<CallBack> cb = make_shared<CallBack>(this);
     return codec_->SetCallback(cb);
 }
 
-void VDecServerSample::RunVideoServerDecoder()
+int32_t VDecServerSample::SetOutputSurface()
 {
+    auto cs = Surface::CreateSurfaceAsConsumer();
+    cs_vector.push_back(cs);
+    sptr<IBufferConsumerListener> listener = new ConsumerListener(cs);
+    cs->RegisterConsumerListener(listener);
+    auto p = cs->GetProducer();
+    auto ps = Surface::CreateSurfaceAsProducer(p);
+    ps_vector.push_back(ps);
+    return codec_->SetOutputSurface(ps);
+}
+
+void VDecServerSample::RunVideoServerSurfaceDecoder()
+{
+    int32_t err;
     CreateHevcDecoderByName("OH.Media.Codec.Decoder.Video.HEVC", codec_);
     if (codec_ == nullptr) {
         cout << "Create failed" << endl;
         return;
     }
-    int32_t err = ConfigServerDecoder();
+    std::vector<CapabilityData> caps;
+    err = GetHevcDecoderCapabilityList(caps);
+    if (err != AVCS_ERR_OK) {
+        cout << "GetHevcDecoderCapabilityList failed" << endl;
+        return;
+    }
+    err = ConfigServerDecoder();
     if (err != AVCS_ERR_OK) {
         cout << "ConfigServerDecoder failed" << endl;
+        return;
+    }
+    err = SetOutputSurface();
+    if (err != AVCS_ERR_OK) {
+        cout << "SetOutputSurface failed" << endl;
         return;
     }
     signal_ = std::make_shared<VDecSignal>();
@@ -121,6 +157,17 @@ void VDecServerSample::RunVideoServerDecoder()
         cout << "Failed to create input loop" << endl;
         isRunning_.store(false);
     }
+    err = SetOutputSurface();
+    if (err != AVCS_ERR_OK) {
+        cout << "SetOutputSurface 2 failed" << endl;
+        return;
+    }
+    err = SetParameter();
+    if (err != AVCS_ERR_OK) {
+        cout << "SetParameter failed" << endl;
+        return;
+    }
+    GetOutputFormat();
 }
 
 void VDecServerSample::InputFunc()

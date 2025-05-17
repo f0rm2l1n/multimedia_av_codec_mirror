@@ -19,10 +19,10 @@ using namespace std;
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::MediaAVCodec;
-#define FUZZ_PROJECT_NAME "swdecoderserver_fuzzer"
+#define FUZZ_PROJECT_NAME "swdecoderserversurface_fuzzer"
 
 namespace OHOS {
-bool SwdecoderServerFuzzTest(const uint8_t *data, size_t size)
+bool SwdecoderServerSurfaceFuzzTest(const uint8_t *data, size_t size)
 {
     if (size < sizeof(int32_t)) {
         return false;
@@ -30,7 +30,7 @@ bool SwdecoderServerFuzzTest(const uint8_t *data, size_t size)
     VDecServerSample *vDecSample = new VDecServerSample();
     vDecSample->fuzzData = data;
     vDecSample->fuzzSize = size;
-    vDecSample->RunVideoServerDecoder();
+    vDecSample->RunVideoServerSurfaceDecoder();
     vDecSample->Flush();
     vDecSample->Stop();
     vDecSample->Reset();
@@ -38,12 +38,13 @@ bool SwdecoderServerFuzzTest(const uint8_t *data, size_t size)
     delete vDecSample;
     return false;
 }
+
 } // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::SwdecoderServerFuzzTest(data, size);
+    OHOS::SwdecoderServerSurfaceFuzzTest(data, size);
     return 0;
 }

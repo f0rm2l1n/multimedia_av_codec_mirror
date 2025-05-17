@@ -45,8 +45,9 @@ public:
     VDecServerSample() = default;
     ~VDecServerSample();
 
-    void RunVideoServerDecoder();
+    void RunVideoServerSurfaceDecoder();
     int32_t ConfigServerDecoder();
+    int32_t SetParameter();
     int32_t SetCallback();
     void GetOutputFormat();
     void Flush();
@@ -54,10 +55,13 @@ public:
     void Reset();
     void InputFunc();
     void WaitForEos();
+    int32_t SetOutputSurface();
     std::shared_ptr<VDecSignal> signal_;
     const uint8_t *fuzzData;
     size_t fuzzSize;
     int32_t sendFrameIndex;
+    std::vector<sptr<Surface>> cs_vector;
+    std::vector<sptr<Surface>> ps_vector;
     const char *outDIR = "/data/test/media/VDecTest.yuv";
 protected:
     std::shared_ptr<CodecBase> codec_;
@@ -73,6 +77,24 @@ protected:
     private:
         VDecServerSample* tester;
     };
+};
+
+class ConsumerListener : public IBufferConsumerListener {
+public:
+    ConsumerListener(sptr<Surface> cs) : cs_(cs){};
+    ~ConsumerListener() {}
+    void OnBufferAvailable() override
+    {
+        sptr<SurfaceBuffer> buffer;
+        int32_t flushFence;
+        cs_->AcquireBuffer(buffer, flushFence, timestamp_, damage_);
+        cs_->ReleaseBuffer(buffer, -1);
+    }
+
+private:
+    int64_t timestamp_ = 0;
+    Rect damage_ = {};
+    sptr<Surface> cs_{nullptr};
 };
 } // namespace Media
 } // namespace OHOS
