@@ -13,16 +13,17 @@
  * limitations under the License.
  */
 
+#include <unistd.h> 
 #include <fcntl.h>
-#include <fuzzer/FuzzedDataProvider.h>
-#include "demuxersetdatasourcewithprobsize_sample.h"
+#include "native_avsource.h"
+#include "native_avformat.h"
+#include "native_avcodec_base.h"
 
 #define FUZZ_PROJECT_NAME "demuxer_fuzzer"
 using namespace std;
-using namespace OHOS::Media;
 namespace OHOS {
 const int64_t EXPECT_SIZE = 64;
-const char* TEST_FILE_PATH = "/data/test/demuxersetdatasourcewithprobsizefuzztest.mp4";
+char TEST_FILE_PATH[] = "/data/test/demuxergetcommentdatafuzztest.mp4";
 
 bool CheckDataValidity(const uint8_t *data, size_t size)
 {
@@ -42,17 +43,24 @@ bool CheckDataValidity(const uint8_t *data, size_t size)
     return true;
 }
 
-void DemuxerSetDataSourceWithProbSizeFuzzTest(const uint8_t *data, size_t size)
+void DemuxerGetCommentDataFuzzTest(const uint8_t *data, size_t size)
 {
     if (!CheckDataValidity(data, size)) {
         return;
     }
-
-    FuzzedDataProvider provider(data, size);
-    std::string typeName = provider.ConsumeRandomLengthString();
-    int probSize = provider.ConsumeIntegral<int32_t>();
-    DemuxerPluginTest test;
-    test.Run(typeName, TEST_FILE_PATH, probSize);
+    const char* metaStringValue = nullptr;
+    auto source = OH_AVSource_CreateWithURI(TEST_FILE_PATH);
+    if (source == nullptr) {
+        return;
+    }
+    auto metaFormat = OH_AVSource_GetSourceFormat(source);
+    if (metaFormat == nullptr) {
+        OH_AVSource_Destroy(source);
+        return;
+    }
+    OH_AVFormat_GetStringValue(metaFormat, OH_MD_KEY_COMMENT, &metaStringValue);
+    OH_AVSource_Destroy(source);
+    OH_AVFormat_Destroy(metaFormat);
     (void)remove(TEST_FILE_PATH);
     return;
 }
@@ -62,6 +70,6 @@ void DemuxerSetDataSourceWithProbSizeFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DemuxerSetDataSourceWithProbSizeFuzzTest(data, size);
+    OHOS::DemuxerGetCommentDataFuzzTest(data, size);
     return 0;
 }
