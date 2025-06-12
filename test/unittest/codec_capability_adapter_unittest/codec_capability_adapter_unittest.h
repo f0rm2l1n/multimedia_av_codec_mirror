@@ -12,36 +12,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef AUDIO_DATA_SOURCE_FILTER_UNITTEST_H
-#define AUDIO_DATA_SOURCE_FILTER_UNITTEST_H
+#ifndef CODEC_CAPABILITY_ADAPTER_UNITTEST_H
+#define CODEC_CAPABILITY_ADAPTER_UNITTEST_H
 
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
-#include "mock/task.h"
-#include "audio_data_source_filter.h"
-#include "audio_data_source_filter.cpp"
+#include "codec_capability_adapter.h"
+#include "mock/mock_avcodec_list.h"
 
 namespace OHOS {
 namespace Media {
 namespace Pipeline {
-class AudioDataSourceFilterUnitTest : public testing::Test {
+class CodecCapabilityAdapterUnitTest : public testing::Test {
 public:
+    // SetUpTestCase: Called before all test cases
     static void SetUpTestCase(void);
+    // TearDownTestCase: Called after all test case
     static void TearDownTestCase(void);
+    // SetUp: Called before each test cases
     void SetUp(void);
+    // TearDown: Called after each test cases
     void TearDown(void);
-    std::shared_ptr<AudioDataSourceFilter> filter_;
-};
 
-class MockAudioDataSource : public IAudioDataSource {
-public:
-    MOCK_METHOD(AudioDataSourceReadAtActionState, ReadAt,
-                (std::shared_ptr<AVBuffer> buffer, uint32_t length), (override));
-    MOCK_METHOD(int32_t, GetSize, (int64_t& size), (override));
-    MOCK_METHOD(void, SetVideoFirstFramePts, (int64_t firstFramePts), (override));
+protected:
+    MediaAVCodec::CapabilityData capabilityData_;
+    std::shared_ptr<MockAVCodecList> mockAvcodecList_ { nullptr };
+    std::shared_ptr<CodecCapabilityAdapter> codecCapabilityAdapter_ { nullptr };
 };
-
 } // namespace Pipeline
 } // namespace Media
 } // namespace OHOS
-#endif // AUDIO_DATA_SOURCE_FILTER_UNITTEST_H
+#endif // CODEC_CAPABILITY_ADAPTER_UNITTEST_H
