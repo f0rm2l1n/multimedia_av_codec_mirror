@@ -13,35 +13,34 @@
  * limitations under the License.
  */
 
-#ifndef SOURCE_TEST_H
-#define SOURCE_TEST_H
+#ifndef DEMUXER_FILTER_UNITTEST_H
+#define DEMUXER_FILTER_UNITTEST_H
 
 #include "gtest/gtest.h"
-#include "source_plugin_mock.h"
-#include "media_source_mock.h"
-#include "callback_mock.h"
-#include "source.h"
+#include "gmock/gmock.h"
+#include "demuxer_filter.h"
 
 namespace OHOS {
 namespace Media {
+namespace Pipeline {
 
-class MockMediaSource;
-class SourceTest : public testing::Test {
+class DemuxerFilterUnitTest : public testing::Test {
 public:
-    // SetUpTestCase: Called before all test cases
-    static void SetUpTestCase(void) { }
-    // TearDownTestCase: Called after all test case
-    static void TearDownTestCase(void) { }
-    // SetUp: Called before each test cases
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
     void SetUp(void);
-    // TearDown: Called after each test cases
     void TearDown(void);
-protected:
-    std::shared_ptr<Source> source_ = nullptr;
-    std::shared_ptr<MockCallback> mockCallback_ = nullptr;
-    std::shared_ptr<MockMediaSource> mockMediaSource_ = nullptr;
-    std::shared_ptr<MockSourcePlugin> mockSourcePlugin_ = nullptr;
+    std::shared_ptr<DemuxerFilter> demuxerFilter_ { nullptr };
 };
+
+class MockFilterCallback : public FilterCallback {
+public:
+    MOCK_METHOD(Status, OnCallback,
+        (const std::shared_ptr<Filter>& filter, FilterCallBackCommand cmd, StreamType outType), (override));
+    MOCK_METHOD(void, NotifyRelease, (), (override));
+};
+
+} // namespace Pipeline
 } // namespace Media
 } // namespace OHOS
-#endif // SOURCE_TEST_H
+#endif // DEMUXER_FILTER_UNITTEST_H

@@ -13,35 +13,40 @@
  * limitations under the License.
  */
 
-#ifndef SOURCE_TEST_H
-#define SOURCE_TEST_H
+#ifndef AUDIO_CAPTURE_MODULE_UNITTEST_H
+#define AUDIO_CAPTURE_MODULE_UNITTEST_H
 
 #include "gtest/gtest.h"
-#include "source_plugin_mock.h"
-#include "media_source_mock.h"
-#include "callback_mock.h"
-#include "source.h"
+#include "gmock/gmock.h"
+#include "mock/mock_audio_capture.h"
+#include "audio_capture_module.h"
 
 namespace OHOS {
 namespace Media {
-
-class MockMediaSource;
-class SourceTest : public testing::Test {
+class AudioCaptureModuleUnitTest : public testing::Test {
 public:
     // SetUpTestCase: Called before all test cases
-    static void SetUpTestCase(void) { }
+    static void SetUpTestCase(void);
     // TearDownTestCase: Called after all test case
-    static void TearDownTestCase(void) { }
+    static void TearDownTestCase(void);
     // SetUp: Called before each test cases
     void SetUp(void);
     // TearDown: Called after each test cases
     void TearDown(void);
+
+    void InitMeta(std::shared_ptr<Meta> meta);
+
 protected:
-    std::shared_ptr<Source> source_ = nullptr;
-    std::shared_ptr<MockCallback> mockCallback_ = nullptr;
-    std::shared_ptr<MockMediaSource> mockMediaSource_ = nullptr;
-    std::shared_ptr<MockSourcePlugin> mockSourcePlugin_ = nullptr;
+    std::unique_ptr<MockAudioCapturer> mockAudioCapturer_ {nullptr};
+    std::shared_ptr<AudioCaptureModule::AudioCaptureModule> audioCaptureModule_ {nullptr};
+};
+
+class MockAudioCaptureModuleCallback : public AudioCaptureModule::AudioCaptureModuleCallback {
+public:
+    virtual ~MockAudioCaptureModuleCallback() = default;
+
+    MOCK_METHOD(void, OnInterrupt, (const std::string &interruptInfo), (override));
 };
 } // namespace Media
 } // namespace OHOS
-#endif // SOURCE_TEST_H
+#endif // AUDIO_CAPTURE_MODULE_UNITTEST_H
