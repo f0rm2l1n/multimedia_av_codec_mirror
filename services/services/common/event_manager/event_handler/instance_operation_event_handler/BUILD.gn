@@ -14,30 +14,26 @@
 import("//build/ohos.gni")
 import("//foundation/multimedia/av_codec/config.gni")
 
-config("event_manager_public_config") {
-  include_dirs = [ "./" ]
-}
-
-ohos_source_set("event_manager") {
-  branch_protector_ret = "pac_ret"
-  sanitize = av_codec_sanitize
-  public_configs = [ ":event_manager_public_config" ]
-
-  public_external_deps = [ "media_foundation:media_foundation" ]
-
+config("instance_operation_event_handler_public_config") {
   include_dirs = [
     "./",
-    "../",
-    "../../../../interfaces/inner_api/native/",
+    "../../../",
+    "../../../../../../interfaces/inner_api/native/",
   ]
+}
 
-  sources = [ "./event_manager.cpp" ]
+ohos_source_set("instance_operation_event_handler") {
+  branch_protector_ret = "pac_ret"
+  sanitize = av_codec_sanitize
+  public_configs = [ ":instance_operation_event_handler_public_config" ]
+  sources = [ "./instance_operation_event_handler.cpp" ]
 
-  deps = [
-    "$av_codec_root_dir/services/dfx:av_codec_service_dfx",
-    "$av_codec_root_dir/services/services/sa_avcodec:sa_manager",
-    "./event_handler/instance_memory_update_event_handler:instance_memory_update_event_handler",
-    "./event_handler/instance_operation_event_handler:instance_operation_event_handler",
+  deps = [ "$av_codec_root_dir/services/dfx:av_codec_service_dfx" ]
+  external_deps = [
+    "c_utils:utils",
+    "media_foundation:media_foundation",
+    "resource_schedule_service:ressched_client",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "multimedia"
