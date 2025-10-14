@@ -27,7 +27,7 @@
 #include "native_avcodec_base.h"
 #include "native_avformat.h"
 #include "native_avbuffer.h"
-#include "audio_decoder_aac_new_demo.h"
+#include "audio_decoder_amrwb_new_demo.h"
 #include "audio_decoder_base_new_demo.h"
 
 using namespace std;
@@ -38,14 +38,13 @@ using namespace OHOS::MediaAVCodec::AudioBufferNewDemo;
 
 namespace OHOS {
 
-static uint32_t g_supportedSampleRateSet[] = {
-    7350, 8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000};
-static int32_t g_supportedChannels[] = {1, 2, 3, 4, 5, 6, 7, 8}; // 2 for max channel
+static uint32_t g_supportedSampleRateSet[] = {16000};
+static int32_t g_supportedChannels[] = {1}; // 1 for max channel
 
 uint16_t g_supportedSampleRateSetSize = sizeof(g_supportedSampleRateSet) / sizeof(g_supportedSampleRateSet[0]);
 uint16_t g_supportedChannelsSize = sizeof(g_supportedChannels) / sizeof(g_supportedChannels[0]);
 
-void AacFuzzDemo::RandomSetMeta(const uint8_t *data)
+void AmrwbFuzzDemo::RandomSetMeta(const uint8_t *data)
 {
     int32_t channel = g_supportedChannels[static_cast<uint8_t>((*data) % g_supportedChannelsSize)];
     data++;
@@ -57,14 +56,14 @@ void AacFuzzDemo::RandomSetMeta(const uint8_t *data)
     return;
 }
 
-bool AacFuzzDemo::DoAacParserWithParserAPI(const uint8_t *data, size_t size)
+bool AmrwbFuzzDemo::DoAmrwbParserWithParserAPI(const uint8_t *data, size_t size)
 {
     if (size < 2) { // 2 for ramdom set format data
         return false;
     }
     BaseFuzzDemo base;
     base.signal_ = new ADecBufferSignal();
-    base.audioDec_ = OH_AudioCodec_CreateByName((AVCodecCodecName::AUDIO_DECODER_AAC_NAME).data());
+    base.audioDec_ = OH_AudioCodec_CreateByName((AVCodecCodecName::AUDIO_DECODER_AMRNB_NAME).data());
     base.cb_ = base.GetCbFunc();
     DEMO_CHECK_AND_RETURN_RET_LOG(OH_AudioCodec_RegisterCallback(base.audioDec_, base.cb_, base.signal_) == AV_ERR_OK,
                                   false, "Fatal: OH_AudioCodec_RegisterCallback fail");

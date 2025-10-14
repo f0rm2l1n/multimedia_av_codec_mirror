@@ -38,10 +38,10 @@ namespace AudioBufferNewDemo {
 using namespace std;
 using namespace OHOS::Media;
 
-class ApeFuzzDemo : public BaseFuzzDemo {
+class Mp3FuzzDemo : public BaseFuzzDemo {
 public:
     void RandomSetMeta(const uint8_t *data);
-    bool DoApeParserWithParserAPI(const uint8_t *data, size_t size);
+    bool DoMp3ParserWithParserAPI(const uint8_t *data, size_t size);
 };
 } // namespace AudioBufferNewDemo
 } // namespace MediaAVCodec
