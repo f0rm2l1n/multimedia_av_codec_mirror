@@ -109,15 +109,15 @@ config("fuzz_cfg") {
 }
 
 ##############################fuzztest##########################################
-ohos_fuzztest("HlsCfgFuzzTest") {
+ohos_fuzztest("HlsM3u8MutateFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "$av_codec_root_dir/test/fuzztest/http_plugin_fuzztest/hlscfg_fuzzer"
+  fuzz_config_file = "$av_codec_root_dir/test/fuzztest/http_plugin_fuzztest/hlsm3u8mutate_fuzzer"
   configs = [
     ":fuzz_cfg"
   ]
 
   sources = test_sources + [
-    "hlscfg_fuzzer.cpp",
+    "hlsm3u8mutate_fuzzer.cpp",
     "../common/http_server_fuzz_demo.cpp",
     "../common/http_server_mock.cpp",
   ]
@@ -151,7 +151,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":HlsCfgFuzzTest",  #引用测试套
+    ":HlsM3u8MutateFuzzTest",  #引用测试套
   ]
 }
 ###############################################################################
