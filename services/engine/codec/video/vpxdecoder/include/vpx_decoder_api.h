@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,28 +11,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Description: header of Type converter from framework to OMX
  */
 
-#ifndef CODECLIST_UTILS_H
-#define CODECLIST_UTILS_H
-namespace OHOS {
-namespace MediaAVCodec {
-/**
- * @brief Codec Type
- *
- * @since 3.1
- * @version 3.1
- */
-enum class CodecType : int32_t {
-    AVCODEC_INVALID = -1,
-    AVCODEC_HCODEC = 0,
-    AVCODEC_VIDEO_CODEC,
-    AVCODEC_VIDEO_HEVC_DECODER,
-    AVCODEC_VIDEO_AVC_ENCODER,
-    AVCODEC_VIDEO_VP8_DECODER,
-    AVCODEC_VIDEO_VP9_DECODER,
-    AVCODEC_AUDIO_CODEC,
-};
-} // namespace MediaAVCodec
-} // namespace OHOS
-#endif // CODECLIST_UTILS_H
+#ifndef VPX_DECODER_API_H
+#define VPX_DECODER_API_H
+
+#include "codeclistbase.h"
+#include "codecbase.h"
+
+namespace OHOS::MediaAVCodec {
+extern "C" {  // these functions will be dlsym by avcodec
+int32_t GetVpxDecoderCapabilityList(std::vector<CapabilityData> &caps);
+void CreateVpxDecoderByName(const std::string& name, std::shared_ptr<CodecBase>& codec);
+}
+}
+#endif

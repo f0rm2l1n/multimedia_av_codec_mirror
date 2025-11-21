@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef CODECLIST_UTILS_H
-#define CODECLIST_UTILS_H
+#ifndef CODER_STATE_H
+#define CODER_STATE_H
+#include <cstdint>
 namespace OHOS {
 namespace MediaAVCodec {
-/**
- * @brief Codec Type
- *
- * @since 3.1
- * @version 3.1
- */
-enum class CodecType : int32_t {
-    AVCODEC_INVALID = -1,
-    AVCODEC_HCODEC = 0,
-    AVCODEC_VIDEO_CODEC,
-    AVCODEC_VIDEO_HEVC_DECODER,
-    AVCODEC_VIDEO_AVC_ENCODER,
-    AVCODEC_VIDEO_VP8_DECODER,
-    AVCODEC_VIDEO_VP9_DECODER,
-    AVCODEC_AUDIO_CODEC,
+namespace Codec {
+
+enum class State : int32_t {
+    UNINITIALIZED,
+    INITIALIZED,
+    CONFIGURED,
+    STOPPING,
+    RUNNING,
+    FLUSHED,
+    FLUSHING,
+    EOS,
+    ERROR,
+    FREEZING,
+    FROZEN,
 };
+} // namespace Codec
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // CODECLIST_UTILS_H
+#endif // CODER_STATE_H
