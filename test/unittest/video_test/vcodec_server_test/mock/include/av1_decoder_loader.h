@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef CODECLIST_UTILS_H
-#define CODECLIST_UTILS_H
+#ifndef AV1_DECODER_LOADER_MOCK_H
+#define AV1_DECODER_LOADER_MOCK_H
+
+#include <gmock/gmock.h>
+#include <map>
+#include <string>
+#include "codecbase.h"
+
 namespace OHOS {
 namespace MediaAVCodec {
-/**
- * @brief Codec Type
- *
- * @since 3.1
- * @version 3.1
- */
-enum class CodecType : int32_t {
-    AVCODEC_INVALID = -1,
-    AVCODEC_HCODEC = 0,
-    AVCODEC_VIDEO_CODEC,
-    AVCODEC_VIDEO_HEVC_DECODER,
-    AVCODEC_VIDEO_AVC_ENCODER,
-    AVCODEC_VIDEO_VP8_DECODER,
-    AVCODEC_VIDEO_VP9_DECODER,
-    AVCODEC_VIDEO_AV1_DECODER,
-    AVCODEC_AUDIO_CODEC,
+class Av1DecoderLoader {
+public:
+    static std::shared_ptr<CodecBase> CreateByName(const std::string &name);
+    static int32_t GetCapabilityList(std::vector<CapabilityData> &caps);
 };
 } // namespace MediaAVCodec
 } // namespace OHOS
-#endif // CODECLIST_UTILS_H
+#endif // AV1_DECODER_LOADER_MOCK_H
