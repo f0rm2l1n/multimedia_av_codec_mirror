@@ -27,7 +27,7 @@
 using namespace std;
 using namespace OHOS::Media;
 namespace OHOS {
-const char *RM_PATH = "/data/test/fuzz_create.rm";
+const char *RMVB_PATH = "/data/test/fuzz_create.rmvb";
 const int64_t EXPECT_SIZE = 36;
 const size_t URI_BUFFER_SIZE = 21;
 const int64_t URI_COUNT = 20;
@@ -39,7 +39,7 @@ bool CheckDataValidity(FuzzedDataProvider *fdp, size_t size)
     if (size <= EXPECT_SIZE) {
         return false;
     }
-    int32_t fd = open(RM_PATH, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    int32_t fd = open(RMVB_PATH, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
     if (fd < 0) {
         return false;
     }
@@ -98,11 +98,11 @@ bool DemuxerFuzzTest(const uint8_t *data, size_t size)
     params.setVideoWidth = fdp.ConsumeIntegral<int32_t>();
     uint32_t createSize = fdp.ConsumeIntegral<uint32_t>();
     shared_ptr<DemuxerSample> demuxerSample = make_shared<DemuxerSample>();
-    demuxerSample->filePath = RM_PATH;
+    demuxerSample->filePath = RMVB_PATH;
     demuxerSample->RunNormalDemuxerApi11(createSize, uri, setLanguage, params);
     delete[] uri;
     delete[] setLanguage;
-    int ret = remove(RM_PATH);
+    int ret = remove(RMVB_PATH);
     if (ret != 0) {
         return false;
     }
