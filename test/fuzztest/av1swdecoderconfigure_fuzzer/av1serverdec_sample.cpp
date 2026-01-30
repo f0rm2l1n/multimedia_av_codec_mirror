@@ -15,43 +15,33 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <utility>
-#include "vp8serverdec_sample.h"
+#include "av1serverdec_sample.h"
 #include <iostream>
-#include "vpx_decoder_api.h"
-#include "window.h"
-#include "window_manager.h"
-#include "window_option.h"
+#include "av1_decoder_api.h"
 #include "video_decoder.h"
-
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::MediaAVCodec;
 using namespace OHOS::MediaAVCodec::Codec;
 using namespace std;
 namespace {
-constexpr int32_t WIDTH = 1920;
-constexpr int32_t HEIGHT = 1080;
-constexpr int32_t FORMAT = 2;
-constexpr int32_t ANGLE = 0;
-constexpr int32_t FRAME_RATE = 30;
 constexpr int32_t TIME = 12345;
 constexpr int32_t MAX_SEND_FRAMES = 10;
 } // namespace
 
-void Vp8VDecServerSample::CallBack::OnError(AVCodecErrorType errorType, int32_t errorCode)
+void VDecServerSample::CallBack::OnError(AVCodecErrorType errorType, int32_t errorCode)
 {
     cout << "errorType: " << errorType << endl;
     cout << "errorCode:" << errorCode << endl;
     tester->Flush();
-    tester->Reset();
 }
 
-void Vp8VDecServerSample::CallBack::OnOutputFormatChanged(const Format &format)
+void VDecServerSample::CallBack::OnOutputFormatChanged(const Format &format)
 {
     tester->GetOutputFormat();
 }
 
-void Vp8VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+void VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     unique_lock<mutex> lock(tester->signal_->inMutex_);
     tester->signal_->inIdxQueue_.push(index);
@@ -59,12 +49,12 @@ void Vp8VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::
     tester->signal_->inCond_.notify_all();
 }
 
-void Vp8VDecServerSample::CallBack::OnOutputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+void VDecServerSample::CallBack::OnOutputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     tester->codec_->ReleaseOutputBuffer(index);
 }
 
-Vp8VDecServerSample::~Vp8VDecServerSample()
+VDecServerSample::~VDecServerSample()
 {
     if (codec_ != nullptr) {
         codec_->Stop();
@@ -72,57 +62,37 @@ Vp8VDecServerSample::~Vp8VDecServerSample()
         VideoDecoder *codec = static_cast<VideoDecoder*>(codec_.get());
         codec->DecStrongRef(codec);
     }
-    for (auto cs : cs_vector) {
-        if (cs != nullptr) {
-            cs->DecStrongRef(cs);
-        }
+    if (signal_ != nullptr) {
+        delete signal_;
+        signal_ = nullptr;
     }
 }
 
-int32_t Vp8VDecServerSample::ConfigServerDecoder()
+int32_t VDecServerSample::ConfigServerDecoder()
 {
     Format fmt;
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, WIDTH);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, HEIGHT);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, FORMAT);
-    fmt.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, FRAME_RATE);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, ANGLE);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE, ScalingMode::SCALING_MODE_SCALE_TO_WINDOW);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, kWidth);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, kHeight);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, kFormat);
+    fmt.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, kFormatRate);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, kAngle);
+    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_DURATION, kRotation);
     return codec_->Configure(fmt);
 }
 
-int32_t Vp8VDecServerSample::SetParameter()
-{
-    Format fmt;
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, WIDTH);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_HEIGHT, HEIGHT);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_PIXEL_FORMAT, FORMAT);
-    fmt.PutDoubleValue(MediaDescriptionKey::MD_KEY_FRAME_RATE, FRAME_RATE);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_ROTATION_ANGLE, ANGLE);
-    fmt.PutIntValue(MediaDescriptionKey::MD_KEY_SCALE_TYPE, ScalingMode::SCALING_MODE_SCALE_TO_WINDOW);
-    return codec_->SetParameter(fmt);
-}
-
-int32_t Vp8VDecServerSample::SetCallback()
+int32_t VDecServerSample::SetCallback()
 {
     shared_ptr<CallBack> cb = make_shared<CallBack>(this);
     return codec_->SetCallback(cb);
 }
 
-int32_t Vp8VDecServerSample::SetOutputSurface()
+void VDecServerSample::RunVideoServerDecoder()
 {
-    auto cs = Surface::CreateSurfaceAsConsumer();
-    cs_vector.push_back(cs);
-    sptr<IBufferConsumerListener> listener = new ConsumerListener(cs);
-    cs->RegisterConsumerListener(listener);
-    auto p = cs->GetProducer();
-    auto ps = Surface::CreateSurfaceAsProducer(p);
-    ps_vector.push_back(ps);
-    return codec_->SetOutputSurface(ps);
-}
-
-int32_t Vp8VDecServerSample::InitDecoder()
-{
+    CreateAv1DecoderByName("OH.Media.Codec.Decoder.Video.AV1", codec_);
+    if (codec_ == nullptr) {
+        cout << "Create failed" << endl;
+        return;
+    }
     int32_t err;
     Media::Meta codecInfo;
     int32_t instanceid = 0;
@@ -130,48 +100,21 @@ int32_t Vp8VDecServerSample::InitDecoder()
     err = codec_->Init(codecInfo);
     if (err != AVCS_ERR_OK) {
         cout << "decoder Init failed!" << endl;
-        return err;
-    }
-    std::vector<CapabilityData> caps;
-    err = GetVpxDecoderCapabilityList(caps);
-    if (err != AVCS_ERR_OK) {
-        cout << "GetVpxDecoderCapabilityList failed" << endl;
-        return err;
+        return;
     }
     err = ConfigServerDecoder();
     if (err != AVCS_ERR_OK) {
         cout << "ConfigServerDecoder failed" << endl;
-        return err;
+        return;
+    }
+    signal_ = new VDecSignal();
+    if (signal_ == nullptr) {
+        cout << "Failed to new VDecSignal" << endl;
+        return;
     }
     err = SetCallback();
     if (err != AVCS_ERR_OK) {
         cout << "SetCallback failed" << endl;
-        return err;
-    }
-    signal_ = std::make_shared<VDecSignal>();
-    if (signal_ == nullptr) {
-        cout << "Failed to new VDecSignal" << endl;
-        err = AVCS_ERR_NO_MEMORY;
-        return err;
-    }
-    err = SetOutputSurface();
-    if (err != AVCS_ERR_OK) {
-        cout << "SetOutputSurface failed" << endl;
-        return err;
-    }
-    return err;
-}
-
-void Vp8VDecServerSample::RunVideoServerSurfaceDecoder()
-{
-    CreateVpxDecoderByName("OH.Media.Codec.Decoder.Video.VP8", codec_);
-    if (codec_ == nullptr) {
-        cout << "Create failed" << endl;
-        return;
-    }
-    int32_t err = InitDecoder();
-    if (err != AVCS_ERR_OK) {
-        cout << "Init decoder failed" << endl;
         return;
     }
     err = codec_->Start();
@@ -180,25 +123,14 @@ void Vp8VDecServerSample::RunVideoServerSurfaceDecoder()
         return;
     }
     isRunning_.store(true);
-    inputLoop_ = make_unique<thread>(&Vp8VDecServerSample::InputFunc, this);
+    inputLoop_ = make_unique<thread>(&VDecServerSample::InputFunc, this);
     if (inputLoop_ == nullptr) {
         cout << "Failed to create input loop" << endl;
         isRunning_.store(false);
     }
-    err = SetOutputSurface();
-    if (err != AVCS_ERR_OK) {
-        cout << "SetOutputSurface 2 failed" << endl;
-        return;
-    }
-    err = SetParameter();
-    if (err != AVCS_ERR_OK) {
-        cout << "SetParameter failed" << endl;
-        return;
-    }
-    GetOutputFormat();
 }
 
-void Vp8VDecServerSample::InputFunc()
+void VDecServerSample::InputFunc()
 {
     while (sendFrameIndex < MAX_SEND_FRAMES) {
         if (!isRunning_.load()) {
@@ -241,14 +173,14 @@ void Vp8VDecServerSample::InputFunc()
     }
 }
 
-void Vp8VDecServerSample::WaitForEos()
+void VDecServerSample::WaitForEos()
 {
     if (inputLoop_ && inputLoop_->joinable()) {
         inputLoop_->join();
     }
 }
 
-void Vp8VDecServerSample::GetOutputFormat()
+void VDecServerSample::GetOutputFormat()
 {
     Format fmt;
     int32_t err = codec_->GetOutputFormat(fmt);
@@ -259,31 +191,20 @@ void Vp8VDecServerSample::GetOutputFormat()
     }
 }
 
-void Vp8VDecServerSample::Flush()
+void VDecServerSample::Flush()
 {
     int32_t err = codec_->Flush();
     if (err != AVCS_ERR_OK) {
-        cout << "Flush fail" << endl;
         isRunning_.store(false);
         signal_->inCond_.notify_all();
     }
 }
 
-void Vp8VDecServerSample::Reset()
+void VDecServerSample::Reset()
 {
     int32_t err = codec_->Reset();
     if (err != AVCS_ERR_OK) {
         cout << "Reset fail" << endl;
-        isRunning_.store(false);
-        signal_->inCond_.notify_all();
-    }
-}
-
-void Vp8VDecServerSample::Stop()
-{
-    int32_t err = codec_->Stop();
-    if (err != AVCS_ERR_OK) {
-        cout << "Stop fail" << endl;
         isRunning_.store(false);
         signal_->inCond_.notify_all();
     }

@@ -15,14 +15,13 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <utility>
-#include "vp9serverdec_sample.h"
+#include "av1serverdec_sample.h"
 #include <iostream>
-#include "vpx_decoder_api.h"
+#include "av1_decoder_api.h"
 #include "window.h"
 #include "window_manager.h"
 #include "window_option.h"
 #include "video_decoder.h"
-
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::MediaAVCodec;
@@ -38,18 +37,18 @@ constexpr int32_t TIME = 12345;
 constexpr int32_t MAX_SEND_FRAMES = 10;
 } // namespace
 
-void Vp9VDecServerSample::CallBack::OnError(AVCodecErrorType errorType, int32_t errorCode)
+void Av1VDecServerSample::CallBack::OnError(AVCodecErrorType errorType, int32_t errorCode)
 {
     tester->Flush();
     tester->Reset();
 }
 
-void Vp9VDecServerSample::CallBack::OnOutputFormatChanged(const Format &format)
+void Av1VDecServerSample::CallBack::OnOutputFormatChanged(const Format &format)
 {
     tester->GetOutputFormat();
 }
 
-void Vp9VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+void Av1VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     unique_lock<mutex> lock(tester->signal_->inMutex_);
     tester->signal_->inIdxQueue_.push(index);
@@ -57,12 +56,12 @@ void Vp9VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::
     tester->signal_->inCond_.notify_all();
 }
 
-void Vp9VDecServerSample::CallBack::OnOutputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+void Av1VDecServerSample::CallBack::OnOutputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     tester->codec_->ReleaseOutputBuffer(index);
 }
 
-Vp9VDecServerSample::~Vp9VDecServerSample()
+Av1VDecServerSample::~Av1VDecServerSample()
 {
     if (codec_ != nullptr) {
         codec_->Stop();
@@ -77,7 +76,7 @@ Vp9VDecServerSample::~Vp9VDecServerSample()
     }
 }
 
-int32_t Vp9VDecServerSample::ConfigServerDecoder()
+int32_t Av1VDecServerSample::ConfigServerDecoder()
 {
     Format fmt;
     fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, WIDTH);
@@ -89,7 +88,7 @@ int32_t Vp9VDecServerSample::ConfigServerDecoder()
     return codec_->Configure(fmt);
 }
 
-int32_t Vp9VDecServerSample::SetParameter()
+int32_t Av1VDecServerSample::SetParameter()
 {
     Format fmt;
     fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, WIDTH);
@@ -101,13 +100,13 @@ int32_t Vp9VDecServerSample::SetParameter()
     return codec_->SetParameter(fmt);
 }
 
-int32_t Vp9VDecServerSample::SetCallback()
+int32_t Av1VDecServerSample::SetCallback()
 {
     shared_ptr<CallBack> cb = make_shared<CallBack>(this);
     return codec_->SetCallback(cb);
 }
 
-int32_t Vp9VDecServerSample::SetOutputSurface()
+int32_t Av1VDecServerSample::SetOutputSurface()
 {
     auto cs = Surface::CreateSurfaceAsConsumer();
     cs_vector.push_back(cs);
@@ -119,7 +118,7 @@ int32_t Vp9VDecServerSample::SetOutputSurface()
     return codec_->SetOutputSurface(ps);
 }
 
-int32_t Vp9VDecServerSample::InitDecoder()
+int32_t Av1VDecServerSample::InitDecoder()
 {
     int32_t err;
     Media::Meta codecInfo;
@@ -127,76 +126,76 @@ int32_t Vp9VDecServerSample::InitDecoder()
     codecInfo.SetData("av_codec_event_info_instance_id", instanceid);
     err = codec_->Init(codecInfo);
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 decoder Init failed!" << endl;
+        cout << "decoder Init failed!" << endl;
         return err;
     }
     std::vector<CapabilityData> caps;
-    err = GetVpxDecoderCapabilityList(caps);
+    err = GetAv1DecoderCapabilityList(caps);
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 GetVp9DecoderCapabilityList failed" << endl;
+        cout << "GetAv1DecoderCapabilityList failed" << endl;
         return err;
     }
     err = ConfigServerDecoder();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 ConfigServerDecoder failed" << endl;
+        cout << "ConfigServerDecoder failed" << endl;
         return err;
     }
     err = SetCallback();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 SetCallback failed" << endl;
+        cout << "SetCallback failed" << endl;
         return err;
     }
     signal_ = std::make_shared<VDecSignal>();
     if (signal_ == nullptr) {
-        cout << "VP9 Failed to new VDecSignal" << endl;
+        cout << "Failed to new VDecSignal" << endl;
         err = AVCS_ERR_NO_MEMORY;
         return err;
     }
     err = SetOutputSurface();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 SetOutputSurface failed" << endl;
+        cout << "SetOutputSurface failed" << endl;
         return err;
     }
     return err;
 }
 
-void Vp9VDecServerSample::RunVideoServerSurfaceDecoder()
+void Av1VDecServerSample::RunVideoServerSurfaceDecoder()
 {
-    CreateVpxDecoderByName("OH.Media.Codec.Decoder.Video.VP9", codec_);
+    CreateAv1DecoderByName("OH.Media.Codec.Decoder.Video.AV1", codec_);
     if (codec_ == nullptr) {
-        cout << "VP9 Create failed" << endl;
+        cout << "Create failed" << endl;
         return;
     }
     int32_t err = InitDecoder();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 Init decoder failed" << endl;
+        cout << "Init decoder failed" << endl;
         return;
     }
     err = codec_->Start();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 Start failed" << endl;
+        cout << "Start failed" << endl;
         return;
     }
     isRunning_.store(true);
-    inputLoop_ = make_unique<thread>(&Vp9VDecServerSample::InputFunc, this);
+    inputLoop_ = make_unique<thread>(&Av1VDecServerSample::InputFunc, this);
     if (inputLoop_ == nullptr) {
-        cout << "VP9 Failed to create input loop" << endl;
+        cout << "Failed to create input loop" << endl;
         isRunning_.store(false);
     }
     err = SetOutputSurface();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 SetOutputSurface 2 failed" << endl;
+        cout << "SetOutputSurface 2 failed" << endl;
         return;
     }
     err = SetParameter();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 SetParameter failed" << endl;
+        cout << "SetParameter failed" << endl;
         return;
     }
     GetOutputFormat();
 }
 
-void Vp9VDecServerSample::InputFunc()
+void Av1VDecServerSample::InputFunc()
 {
     while (sendFrameIndex < MAX_SEND_FRAMES) {
         if (!isRunning_.load()) {
@@ -205,7 +204,7 @@ void Vp9VDecServerSample::InputFunc()
         unique_lock<mutex> lock(signal_->inMutex_);
         signal_->inCond_.wait(lock, [this]() {
             if (!isRunning_.load()) {
-                cout << "VP9 quit signal" << endl;
+                cout << "quit signal" << endl;
                 return true;
             }
             return signal_->inIdxQueue_.size() > 0;
@@ -232,56 +231,55 @@ void Vp9VDecServerSample::InputFunc()
         buffer->memory_->SetSize(fuzzSize);
         int32_t err = codec_->QueueInputBuffer(index);
         if (err != AVCS_ERR_OK) {
-            cout << "VP9 QueueInputBuffer fail" << endl;
+            cout << "QueueInputBuffer fail" << endl;
             break;
         }
         sendFrameIndex++;
     }
 }
 
-void Vp9VDecServerSample::WaitForEos()
+void Av1VDecServerSample::WaitForEos()
 {
     if (inputLoop_ && inputLoop_->joinable()) {
         inputLoop_->join();
     }
 }
 
-void Vp9VDecServerSample::GetOutputFormat()
+void Av1VDecServerSample::GetOutputFormat()
 {
     Format fmt;
     int32_t err = codec_->GetOutputFormat(fmt);
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 GetOutputFormat fail" << endl;
+        cout << "GetOutputFormat fail" << endl;
         isRunning_.store(false);
         signal_->inCond_.notify_all();
     }
 }
 
-void Vp9VDecServerSample::Flush()
+void Av1VDecServerSample::Flush()
 {
     int32_t err = codec_->Flush();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 Flush fail" << endl;
         isRunning_.store(false);
         signal_->inCond_.notify_all();
     }
 }
 
-void Vp9VDecServerSample::Reset()
+void Av1VDecServerSample::Reset()
 {
     int32_t err = codec_->Reset();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 Reset fail" << endl;
+        cout << "Reset fail" << endl;
         isRunning_.store(false);
         signal_->inCond_.notify_all();
     }
 }
 
-void Vp9VDecServerSample::Stop()
+void Av1VDecServerSample::Stop()
 {
     int32_t err = codec_->Stop();
     if (err != AVCS_ERR_OK) {
-        cout << "VP9 Stop fail" << endl;
+        cout << "Stop fail" << endl;
         isRunning_.store(false);
         signal_->inCond_.notify_all();
     }

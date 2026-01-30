@@ -15,14 +15,13 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <utility>
-#include "vp9serverdec_sample.h"
+#include "av1serverdec_sample.h"
 #include <iostream>
-#include "vpx_decoder_api.h"
+#include "av1_decoder_api.h"
 #include "window.h"
 #include "window_manager.h"
 #include "window_option.h"
 #include "video_decoder.h"
-
 using namespace OHOS;
 using namespace OHOS::Media;
 using namespace OHOS::MediaAVCodec;
@@ -32,9 +31,11 @@ namespace {
     constexpr int32_t EIGHT = 8;
     constexpr int32_t SIXTEEN = 16;
     constexpr int32_t TWENTY_FOUR = 24;
+    constexpr uint32_t MAX_BUFFER_SIZE = 4 * 1024 * 1024;
     constexpr int64_t NANOS_IN_SECOND = 1000000000L;
     constexpr int64_t NANOS_IN_MICRO = 1000L;
-    constexpr int32_t MAX_SEND_FRAMES = 10;
+    constexpr int32_t SEND_MAX_FRAMES = 10;
+    constexpr int32_t NUM_4 = 4;
     typedef enum OH_AVCodecBufferFlags {
         AVCODEC_BUFFER_FLAGS_NONE = 0,
         AVCODEC_BUFFER_FLAGS_EOS = 1 << 0,
@@ -52,7 +53,7 @@ namespace {
     }
 } // namespace
 
-int64_t Vp9VDecServerSample::GetSystemTimeUs()
+int64_t Av1VDecServerSample::GetSystemTimeUs()
 {
     struct timespec now;
     (void)clock_gettime(CLOCK_BOOTTIME, &now);
@@ -60,20 +61,18 @@ int64_t Vp9VDecServerSample::GetSystemTimeUs()
     return nanoTime / NANOS_IN_MICRO;
 }
 
-void Vp9VDecServerSample::CallBack::OnError(AVCodecErrorType errorType, int32_t errorCode)
+void Av1VDecServerSample::CallBack::OnError(AVCodecErrorType errorType, int32_t errorCode)
 {
-    cout << "errorType: " << errorType << endl;
-    cout << "errorCode:" << errorCode << endl;
     tester->Flush();
     tester->Reset();
 }
 
-void Vp9VDecServerSample::CallBack::OnOutputFormatChanged(const Format &format)
+void Av1VDecServerSample::CallBack::OnOutputFormatChanged(const Format &format)
 {
     tester->GetOutputFormat();
 }
 
-void Vp9VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+void Av1VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     unique_lock<mutex> lock(tester->signal_->inMutex_);
     tester->signal_->inIdxQueue_.push(index);
@@ -81,7 +80,7 @@ void Vp9VDecServerSample::CallBack::OnInputBufferAvailable(uint32_t index, std::
     tester->signal_->inCond_.notify_all();
 }
 
-void Vp9VDecServerSample::CallBack::OnOutputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+void Av1VDecServerSample::CallBack::OnOutputBufferAvailable(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     if (buffer->flag_ == AVCODEC_BUFFER_FLAGS_EOS) {
         tester->isEOS_.store(true);
@@ -91,7 +90,7 @@ void Vp9VDecServerSample::CallBack::OnOutputBufferAvailable(uint32_t index, std:
     tester->codec_->ReleaseOutputBuffer(index);
 }
 
-Vp9VDecServerSample::~Vp9VDecServerSample()
+Av1VDecServerSample::~Av1VDecServerSample()
 {
     if (codec_ != nullptr) {
         codec_->Stop();
@@ -99,14 +98,9 @@ Vp9VDecServerSample::~Vp9VDecServerSample()
         VideoDecoder *codec = static_cast<VideoDecoder*>(codec_.get());
         codec->DecStrongRef(codec);
     }
-    for (auto cs : cs_vector) {
-        if (cs != nullptr) {
-            cs->DecStrongRef(cs);
-        }
-    }
 }
 
-int32_t Vp9VDecServerSample::ConfigServerDecoder()
+int32_t Av1VDecServerSample::ConfigServerDecoder()
 {
     Format fmt;
     fmt.PutIntValue(MediaDescriptionKey::MD_KEY_WIDTH, defaultWidth);
@@ -118,13 +112,13 @@ int32_t Vp9VDecServerSample::ConfigServerDecoder()
     return codec_->Configure(fmt);
 }
 
-int32_t Vp9VDecServerSample::SetCallback()
+int32_t Av1VDecServerSample::SetCallback()
 {
     shared_ptr<CallBack> cb = make_shared<CallBack>(this);
     return codec_->SetCallback(cb);
 }
 
-int32_t Vp9VDecServerSample::SetOutputSurface()
+int32_t Av1VDecServerSample::SetOutputSurface()
 {
     auto cs = Surface::CreateSurfaceAsConsumer();
     cs_vector.push_back(cs);
@@ -136,7 +130,7 @@ int32_t Vp9VDecServerSample::SetOutputSurface()
     return codec_->SetOutputSurface(ps);
 }
 
-int32_t Vp9VDecServerSample::InitDecoder()
+int32_t Av1VDecServerSample::InitDecoder()
 {
     int32_t err;
     Media::Meta codecInfo;
@@ -157,6 +151,12 @@ int32_t Vp9VDecServerSample::InitDecoder()
         cout << "SetCallback failed" << endl;
         return err;
     }
+    signal_ = std::make_shared<VDecSignal>();
+    if (signal_ == nullptr) {
+        cout << "Failed to new VDecSignal" << endl;
+        err = AVCS_ERR_NO_MEMORY;
+        return err;
+    }
     if (isSurfMode) {
         err = SetOutputSurface();
         if (err != AVCS_ERR_OK) {
@@ -167,13 +167,9 @@ int32_t Vp9VDecServerSample::InitDecoder()
     return err;
 }
 
-void Vp9VDecServerSample::RunVideoServerDecoder()
+void Av1VDecServerSample::RunVideoServerDecoder()
 {
-    signal_ = std::make_shared<VDecSignal>();
-    if (signal_ == nullptr) {
-        return;
-    }
-    CreateVpxDecoderByName("OH.Media.Codec.Decoder.Video.VP9", codec_);
+    CreateAv1DecoderByName("OH.Media.Codec.Decoder.Video.AV1", codec_);
     if (codec_ == nullptr) {
         cout << "Create failed" << endl;
         return;
@@ -203,7 +199,7 @@ void Vp9VDecServerSample::RunVideoServerDecoder()
         inFile_ = nullptr;
         return;
     }
-    inputLoop_ = make_unique<thread>(&Vp9VDecServerSample::InputFunc, this);
+    inputLoop_ = make_unique<thread>(&Av1VDecServerSample::InputFunc, this);
     if (inputLoop_ == nullptr) {
         cout << "Failed to create input loop" << endl;
         isRunning_.store(false);
@@ -219,14 +215,14 @@ void Vp9VDecServerSample::RunVideoServerDecoder()
     }
 }
 
-void Vp9VDecServerSample::WaitForEos()
+void Av1VDecServerSample::WaitForEos()
 {
     if (inputLoop_ && inputLoop_->joinable()) {
         inputLoop_->join();
     }
 }
 
-void Vp9VDecServerSample::GetOutputFormat()
+void Av1VDecServerSample::GetOutputFormat()
 {
     Format fmt;
     int32_t err = codec_->GetOutputFormat(fmt);
@@ -238,18 +234,17 @@ void Vp9VDecServerSample::GetOutputFormat()
     }
 }
 
-void Vp9VDecServerSample::Flush()
+void Av1VDecServerSample::Flush()
 {
     int32_t err = codec_->Flush();
     if (err != AVCS_ERR_OK) {
-        cout << "Flush fail" << endl;
         isRunning_.store(false);
         signal_->inCond_.notify_all();
         signal_->endCond_.notify_all();
     }
 }
 
-void Vp9VDecServerSample::Reset()
+void Av1VDecServerSample::Reset()
 {
     int32_t err = codec_->Reset();
     if (err != AVCS_ERR_OK) {
@@ -260,7 +255,7 @@ void Vp9VDecServerSample::Reset()
     }
 }
 
-void Vp9VDecServerSample::Stop()
+void Av1VDecServerSample::Stop()
 {
     StopInloop();
     ReleaseInFile();
@@ -273,7 +268,7 @@ void Vp9VDecServerSample::Stop()
     }
 }
 
-void Vp9VDecServerSample::SetEOS(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+void Av1VDecServerSample::SetEOS(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     buffer->pts_ = GetSystemTimeUs();
     buffer->flag_ = AVCODEC_BUFFER_FLAGS_EOS;
@@ -289,10 +284,9 @@ void Vp9VDecServerSample::SetEOS(uint32_t index, std::shared_ptr<AVBuffer> buffe
     });
 }
 
-int32_t Vp9VDecServerSample::ReadData(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+int32_t Av1VDecServerSample::ReadData(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
-    int NUM_4 = 4;
-    uint8_t ch[4] = {};
+    uint8_t ch[NUM_4] = {};
     (void)inFile_->read(reinterpret_cast<char *>(ch), NUM_4);
     if (repeatRun && inFile_->eof()) {
         inFile_->clear();
@@ -308,11 +302,11 @@ int32_t Vp9VDecServerSample::ReadData(uint32_t index, std::shared_ptr<AVBuffer> 
     return SendData(bufferSize, index, buffer);
 }
 
-int32_t Vp9VDecServerSample::SendData(uint32_t bufferSize, uint32_t index, std::shared_ptr<AVBuffer> buffer)
+int32_t Av1VDecServerSample::SendData(uint32_t bufferSize, uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     if (bufferSize == 0 || bufferSize > MAX_BUFFER_SIZE) {
         cout << "ERROR: Invalid buffer size " << bufferSize << endl;
-        return -1;
+        return 1;
     }
     uint8_t *frameBuffer = new uint8_t[bufferSize];
     (void)inFile_->read(reinterpret_cast<char *>(frameBuffer), bufferSize);
@@ -348,7 +342,7 @@ int32_t Vp9VDecServerSample::SendData(uint32_t bufferSize, uint32_t index, std::
     return 0;
 }
 
-int32_t Vp9VDecServerSample::SendFuzzData(uint32_t index, std::shared_ptr<AVBuffer> buffer)
+int32_t Av1VDecServerSample::SendFuzzData(uint32_t index, std::shared_ptr<AVBuffer> buffer)
 {
     uint8_t *bufferAddr = buffer->memory_->GetAddr();
     if (memcpy_s(bufferAddr, buffer->memory_->GetCapacity(), fuzzData, fuzzSize) != EOK) {
@@ -363,7 +357,7 @@ int32_t Vp9VDecServerSample::SendFuzzData(uint32_t index, std::shared_ptr<AVBuff
     return codec_->QueueInputBuffer(index);
 }
 
-void Vp9VDecServerSample::InputFunc()
+void Av1VDecServerSample::InputFunc()
 {
     frameCount_ = 1;
     errCount = 0;
@@ -384,7 +378,7 @@ void Vp9VDecServerSample::InputFunc()
         signal_->inIdxQueue_.pop();
         signal_->inBufferQueue_.pop();
         lock.unlock();
-        if (sendFrameIndex == MAX_SEND_FRAMES) {
+        if (sendFrameIndex == SEND_MAX_FRAMES) {
             int ret = SendFuzzData(index, buffer);
             if (ret == 1) {
                 break;
@@ -392,7 +386,7 @@ void Vp9VDecServerSample::InputFunc()
             sendFrameIndex++;
             continue;
         }
-        if (sendFrameIndex > MAX_SEND_FRAMES) {
+        if (sendFrameIndex > SEND_MAX_FRAMES) {
             SetEOS(index, buffer);
             break;
         }
@@ -406,29 +400,7 @@ void Vp9VDecServerSample::InputFunc()
     }
 }
 
-void Vp9VDecServerSample::NotifyMemoryRecycle()
-{
-    int32_t err = codec_->NotifyMemoryRecycle();
-    if (err != AVCS_ERR_OK) {
-        cout << "NotifyMemoryRecycle fail" << endl;
-        isRunning_.store(false);
-        signal_->inCond_.notify_all();
-        signal_->endCond_.notify_all();
-    }
-}
-
-void Vp9VDecServerSample::NotifyMemoryWriteBack()
-{
-    int32_t err = codec_->NotifyMemoryWriteBack();
-    if (err != AVCS_ERR_OK) {
-        cout << "NotifyMemoryWriteBack fail" << endl;
-        isRunning_.store(false);
-        signal_->inCond_.notify_all();
-        signal_->endCond_.notify_all();
-    }
-}
-
-void Vp9VDecServerSample::StopInloop()
+void Av1VDecServerSample::StopInloop()
 {
     if (inputLoop_ != nullptr && inputLoop_->joinable()) {
         unique_lock<mutex> lock(signal_->inMutex_);
@@ -443,7 +415,7 @@ void Vp9VDecServerSample::StopInloop()
     }
 }
 
-void Vp9VDecServerSample::ReleaseInFile()
+void Av1VDecServerSample::ReleaseInFile()
 {
     if (inFile_ != nullptr) {
         if (inFile_->is_open()) {
